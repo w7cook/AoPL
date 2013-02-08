@@ -1086,18 +1086,20 @@ return statements, because every expression automatically returns
 a value. A similar program can be written in Haskell, also
 without return statements:
 
-    power(n, m) = 
-      if (m == 0) then
-        1
-      else 
-        n * power(n, m - 1)
-    
-    main() = 
-      power(3, 4)    
+````haskell
+power(n, m) = 
+  if (m == 0) then
+    1
+  else 
+    n * power(n, m - 1)
+
+main =         -- not really a valid Haskell main function
+  power(3, 4)
+````
 
 These examples provides an outline for the basic concrete syntax of a function:
 
-*function-name* `(` *parameter-name*, ..., *parameter-name* `)` *body-expression*
+`function` *function-name* `(` *parameter-name*, ..., *parameter-name* `)` *body-expression*
 
 The exact syntax varies from language to language. Some languages 
 begin with a keyword `function` or `def`. Other languages require brackets
@@ -1109,7 +1111,7 @@ in many languages.
 
 A call to a function is an expression that has the following concrete syntax:
 
-`function` *function-name* `(` *expression*, ..., *expression* `)`
+*function-name* `(` *expression*, ..., *expression* `)`
 
 Again, there are some variations on this theme. For example, 
 in Haskell the parentheses are optional. The program has a 
@@ -1197,9 +1199,11 @@ The certainty about where to look up a name comes from the
 the fact that the names appear in completely different places
 in the abstract syntax:
 
-    data Exp = ...
-         | Variable'6  String         -- variable name
-         | Call'6      String [Exp'6] -- function name
+````haskell
+data Exp = ...
+     | Variable'6  String         -- variable name
+     | Call'6      String [Exp'6]   -- function name
+````
 
 A variable name is tagged as a `Variable` and a function name
 appears in a `Call` expression.         
