@@ -13,11 +13,12 @@ update: notes.pdf
 	cat $< | sed "s/^ #/#/" | sed "s/'[0-9][0-9]*//g" | sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' > $@
 
 .mkd.htm:
-	cat $< | $(PANDOC) -f markdown+lhs -t html -c hscolour.css | sed "s/.eps/.png/" > $@
+	cat $< | $(PANDOC) --toc -f markdown+lhs -t html -c hscolour.css | sed "s/.eps/.png/" > $@
 
 .mkd.tex:
-	cat $< | $(PANDOC) -f markdown+lhs -t latex> $@
-	# http://www.haskell.org/pipermail/haskell/2009-March/021070.html
+	cat $< | $(PANDOC) --toc -f markdown+lhs -t latex> $@
+  # cat $< | $(PANDOC) --to=latex+lhs --template=template.tex  > temp.lhs
+  # lhs2TeX temp.lhs > $@
 
 .tex.pdf:
 	pdflatex $< && pdflatex $< && pdflatex $<
