@@ -15,14 +15,16 @@
 > check msg a b = putStr (if a == b then "OK\n" else "*** CHECK " ++ msg ++ " Failed ***\n")
 > --------------------END-HIDE-------------------------
 
- # Preface #
+ # Preliminaries
 
- ## What? ##
+ ## Preface
+
+ ### What?
 
 This document is a series of notes about programming languages, intended for
 students of the undergraduate programming languages course at UT.
 
- ## Why? ##
+ ### Why?
 
 I'm writing these notes because I want to teach the theory of programming 
 languages with a practical focus, but I don't want to use Scheme (or ML) as the 
@@ -38,7 +40,7 @@ he said no (although I recently learned that his book is published under
 Creative Commons, so I could create a derived work, I decided in the end to 
 branch out on my own). Hence I seem to be left to write some notes myself.
 
- ## Who? ##
+ ### Who?
 
 These notes assume knowledge of programming, and in particular assume some
 knowledge of programming in Haskell. When I teach the course I give a few hours
@@ -48,7 +50,7 @@ tutorials on Haskell.
 I recommend
 [Learn You a Haskell for Great Good!](http://learnyouahaskell.com/).
 
- # Introduction #
+ ## Introduction #
 
 In order to understand programming languages, it is useful to spend some time thinking
 about *languages* in general. Usually we treat language like the air we breath:
@@ -92,7 +94,9 @@ any program whose input or output is a program. Familiar examples of metaprogram
 include compilers, interpreters, virtual machines. In this course we will read, write and 
 discuss many metaprograms.
 
- # Simple Language of Arithmetic
+ # Expressions and Variables
+ 
+ ## Simple Language of Arithmetic
 
 A good place to start is analyzing the language of arithmetic, which is 
 familiar to every grade-school child:
@@ -137,7 +141,7 @@ syntax for arithmetic expressions is very simple, while the concrete syntax
 is quite complex. As a result, for now we will focus on the abstract syntax,
 and deal with concrete syntax later.
 
- ## Abstract Syntax in Haskell ##
+ ### Abstract Syntax in Haskell
 
 Arithmetic expressions can be represented in Haskell with the following data type:
 
@@ -186,7 +190,7 @@ a short-hand for the real value `Add (Number 3) (Number 7)`.
 As new features are added to the language, both the familar
 concrete syntax and the abstract syntax will be extended.
 
- ## Evaluation ##
+ ### Evaluation
 
 The normal meaning assigned to arithmetic expressions is the evaluation of the
 arithmetic operators to compute a final answer. This evaluation process is
@@ -216,7 +220,7 @@ The output is
 This looks pretty good, except that the default `Show` format for
 expressions is quite ugly.
 
- ## Formatting ##
+ ### Formatting
  
 Another way to interpret abstract `Exp` values is as
 a string that corresponds to our normal way of writing arithmetic
@@ -318,7 +322,7 @@ converts abstract syntax into readable text. In a later chapter
 we will develop a *parser* for expressions, which converts text into
 abstract syntax.
 
- # Variables
+ ## Variables
 
 Arithmetic expressions often contain variables in addition
 to constants. In grade school the first introduction to variables
@@ -412,7 +416,7 @@ stage is to *evaluate* the resulting arithmetic expression.
 
 TODO: talk about *renaming* variables, or substituting one variable for another
 
- ## Variable Discussion
+ ### Variable Discussion
  
 We are used to calling $x$ and $y$ "variables" without really thinking
 much about what it means to be a "variable". A variable is something
@@ -455,7 +459,7 @@ we will not discuss them directly in these notes. For our purposes, we will
 assume that we already know the value of the variable, and that the problem 
 is to compute a result using that value. 
 
- ## Environments
+ ### Environments
 
 There can be multiple variables in a single expression. For example,
 evaluating $2*x+y$ where $x=3$ and $y=-2$. A collection of bindings
@@ -521,7 +525,7 @@ in a list, starting with a given initial value.
 > check1 = check "subst-fold" (substitute e1 exp1) (substitute'2 e1 exp1)
 > --------------------END-HIDE-------------------------
 
- ## Local Variables
+ ### Local Variables
 
 So far we have only considered variables that are defined *outside*
 the expression itself. It is also useful to allow variables to be 
@@ -588,7 +592,7 @@ data Exp'3 = ...
 where the string is the variable name, the first Exp is the bound expression
 and the second expression is the body.
 
- ## Scope
+ ### Scope
  
 The *scope* of a variable is the portion of the text of a program
 in which a variable is defined. Normally the scope of a local
@@ -605,7 +609,7 @@ TODO: talk about *free* versus *bound* variables
 
 TODO: talk about renaming
 
- ## Substituting into `Let` Expressions
+ ### Substituting into `Let` Expressions
 
 When substutiting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
@@ -630,7 +634,7 @@ same as the variable `x` defined in the let expression.
 
 TODO: need some test cases here
 
- ## Evaluating `Let` Expressions
+ ### Evaluating `Let` Expressions
 
 The evaluation of a let expression is based on substitution.
 To evaluate `let` *x* `=` *e* `in` *b*,
@@ -649,7 +653,7 @@ evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) bo
  
 TODO: need some test cases here
  
- ## Summary
+ ### Summary
 
 Here is the full code evaluation using substitution of a language
 with local variables.
@@ -682,7 +686,7 @@ with local variables.
 > evaluate'3 (Multiply'3 a b)   = evaluate'3 a * evaluate'3 b
 > evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) body)
 
- # Evaluation with Environments
+ ## Evaluation with Environments
 
 For the basic evaluator substitution and evaluation were 
 completely separate, but the evaluation rule for `let` 
@@ -821,7 +825,7 @@ single binding. The next two let expressions create environments
 Internally Haskell allows these two environments to share the definition
 of the original environment `x` $\mapsto$ 3.
 
- # Conditionals and Booleans
+ ## Conditionals and Booleans
 
 In addition to arithmetic computations, it is useful to allow expressions
 to evaluation conditions and also return different kinds of values.
@@ -1004,7 +1008,7 @@ Running these test cases with the `test` function defined above yields these res
     if 3 > 1*(8 + 5) then 1 else 0 ==> 0
     2 + (if 3 <= 0 then 9 else (-5)) ==> (-3)
 
- ## Type Errors
+ ### Type Errors
 
 Now that our language supports two kinds of values, it is possible for
 an expression to get *type errors*. A type error occurs when evaluation of
@@ -1249,7 +1253,7 @@ all functions have *global scope*.
 
 TODO: what about one argument versus multiple?
  
- ## Summary
+ ### Summary
  
 Here is the full code for the evaluator supporting
 global functions definitions.
@@ -1347,18 +1351,7 @@ later section, but the basic concepts are introduced here.
 There are really only two basic ideas in lambda calculus: 
 function creation and function application. 
 
-
-
-
-
-
-
-The new notation we need is a function notation that does
-not require the function to have a name.
- 
-
-
-TODO: give a nice introduction here!
+TODO: more here
 
 Closure definition: 
 
@@ -1384,9 +1377,16 @@ evaluate'7 env exp = eval exp
             env'' = (x, eval arg) : env'
 ````
  
- ## Recursive Functions and Fixed-Points
+ ### Relationship between Let and Functions
  
- ## Self Application
+ TODO: prove that `let x =` $e$ `in` $b$ is equivalent to
+   ($\lambda$`x.`$b$)$e$ 
+
+ ## Recursive Functions
+ 
+ ### Recursive Functions and Fixed-Points
+ 
+ ### Self Application
 
  ## Summary of First-Class Functions
   
@@ -1405,8 +1405,8 @@ Here is the full code:
 >          | If'7        Exp'7 Exp'7 Exp'7
 >          | Variable'7  String
 >          | Let'7       String Exp'7 Exp'7
->          | Function'7  String Exp'7     -- new
->          | Call'7      Exp'7 Exp'7       -- changed
+>          | Function'7  String Exp'7      -- new
+>          | Call'7      Exp'7 Exp'7         -- changed
 >   deriving Eq
 >
 > evaluate'7 :: Env'7 -> Exp'7 -> Value'7
@@ -1421,11 +1421,11 @@ Here is the full code:
 >     eval (Variable'7 x)     = fromJust (lookup x env)
 >     eval (Let'7 x exp body) = evaluate'7 env' body
 >       where env' = (x, eval exp) : env
->     eval (Function'7 x body) = Closure'7 x body env
->     eval (Call'7 fun arg)   = evaluate'7 env'' body
+>     eval (Function'7 x body) = Closure'7 x body env   -- new
+>     eval (Call'7 fun arg)   = evaluate'7 env'' body   -- changed
 >       where Closure'7 x body env' = eval fun
 >             env'' = (x, eval arg) : env'
->
+> --------------------BEGIN-HIDE-------------------------
 > fromBool'7 (Bool'7 b) = b
 >
 > unary'7 Not (Bool'7 b) = Bool'7 (not b)
@@ -1442,36 +1442,42 @@ Here is the full code:
 > binary'7 GE  (Int'7 a)  (Int'7 b)  = Bool'7 (a >= b)
 > binary'7 GT  (Int'7 a)  (Int'7 b)  = Bool'7 (a > b)
 > binary'7 EQ  a        b        = Bool'7 (a == b)
+> --------------------END-HIDE-------------------------
  
 > --------------------BEGIN-HIDE-------------------------
 
- # Lambda-Calculus (planned)
+ ## Lambda-Calculus (planned)
+
+ ### Representing Data as Functions
  
- ## Representing Data with Functions
+ # Mutation, Effects, and Monads 
  
- # Mutable State
+ ## Mutable State
  
- ## Transformation Functions
+ ### Transformation Functions
  
- ## Monads
+ ### Monads
  
- ## Order of Evaluation
+ ### Order of Evaluation
    Strict versus non-strict
    Lazy
  
- # Parsing (planned)
+ ## Parsing (planned)
  
- # Abstract Interpretation (planned)
+ # Abstract Interpretation and Types
  
- ## Type Checking
+ ## Abstract Interpretation (planned)
+ 
+ ### Type Checking
  
  # Data Abstraction (planned)
+ 
  
  ## Abstract Data Types
  
  ## Objects
  
- # Partial Evaluation
+ ## Partial Evaluation
  
  > --------------------END-HIDE-------------------------
  

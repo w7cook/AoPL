@@ -16,7 +16,7 @@ update: notes.pdf
 	cat $< | $(PANDOC) --toc -f markdown+lhs -t html -c hscolour.css | sed "s/.eps/.png/" > $@
 
 .mkd.tex:
-	cat $< | $(PANDOC) --toc -f markdown+lhs -t latex> $@
+	cat $< | $(PANDOC) --toc -f markdown+lhs -t latex --chapters > $@
   # cat $< | $(PANDOC) --to=latex+lhs --template=template.tex  > temp.lhs
   # lhs2TeX temp.lhs > $@
 
