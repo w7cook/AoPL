@@ -33,7 +33,8 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/\\\\\textbar{}/|/g" \
 		| sed "s/\\\\\textless{}/</g" \
 		| sed "s/\\\\\textgreater{}/>/g" \
-		| sed "s/\\\\\ldots{}/.../g" \
+    | sed "s/\\\\\ldots{}/.../g" \
+    | sed "s/\\\\\\textbackslash{}/\\\\/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \

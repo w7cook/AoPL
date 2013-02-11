@@ -52,27 +52,6 @@
 %\setlength{\columnsep}{.5in}
 
 
-% I use the special 'komascript' article class "scrartcl" 
-% reasons I can't entirely remember; I'm not sure it's that great.
-% One reason is the unimportant one that, like many classes,
-% it allows very big fonts which are convenient for booklet printing 
-% in the idiotic American way by shrinking letterpaper pages.
-
-% the standard minimal LaTeX 'article' class declaration would be something like:
-
-% \documentclass[12pt]{article} 
-
-% or for big type:
-
-% \documentclass[24pt]{extarticle}
-
-% but these restrict you to old-fashioned LaTeX materials.
-% Note that Kieran Healy uses the swank 'Memoir' class, 
-% \documentclass[11pt,article,oneside]{memoir}
-% which might be worth a look. 
-
-% Enough about the document class.
-
 
 
 % Symbols: 
@@ -133,6 +112,8 @@
 \usepackage[flushmargin]{footmisc} 
 % \usepackage[hang,flushmargin]{footmisc}
 
+% \usepackage[T1]{fontenc}
+% \usepackage[scaled]{beramono}
 
 % So much for my personal template.
 

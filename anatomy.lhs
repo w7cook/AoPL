@@ -355,7 +355,7 @@ a |Variable| case.
 >          | Add'2      Exp'2 Exp'2
 >          | Subtract'2 Exp'2 Exp'2
 >          | Multiply'2 Exp'2 Exp'2
->          | Variable'2 String
+>          | Variable'2 String        -- added
 > --------------------BEGIN-HIDE-------------------------
 >    deriving Eq
 > instance Show Exp'2 where
@@ -580,9 +580,11 @@ TODO: note that |where| in Haskell is similar to |let|.
 
 It is also possible to define multiple local variables in Java or C:
 
-    int x = 3;
-    int y = x*2;
-    return x + y;
+````Java
+int x = 3;
+int y = x*2;
+return x + y;
+````
 
 and Haskell or ML
 
@@ -783,19 +785,19 @@ Environment                                         Evaluation
 -------------------------------------------         -----------------------------------
 $\emptyset$                                         |let x = 2 in|
                                                     \ \ \ \ |let y = x+1 in|
-                                                    \ \ \ \ \ \ \ \ |let z = y+2 in x*y*z|
+                                                    \ \ \ \ \ \ \ \ |let z = y+2 in x\*y\*z|
                                                     { evaluate bound expression |2|}
 $\emptyset$                                         |2| $\Rightarrow$ |2|
                                                     { evaluate body of let }
-|x| $\mapsto$ 2                                     |let y = x+1 in (let z = y+2 in x*y*z)|
+|x| $\mapsto$ 2                                     |let y = x+1 in (let z = y+2 in x\*y\*z)|
                                                     { evaluate bound expression |x+1| }
 |x| $\mapsto$ 2                                     |x+1| $\Rightarrow$ |3|
                                                     { evaluate body of let }
-|y| $\mapsto$ 3, |x| $\mapsto$ 2                    |let z = y+2 in x*y*z|
+|y| $\mapsto$ 3, |x| $\mapsto$ 2                    |let z = y+2 in x\*y\*z|
                                                     { evaluate bound expression |y+2| }
 |y| $\mapsto$ 3, |x| $\mapsto$ 2                    |y+2| $\Rightarrow$ |5|
                                                     { evaluate body of let }
-|z| $\mapsto$ 5, |y| $\mapsto$ 3, |x| $\mapsto$ 2   |x*y*z| $\Rightarrow$ |70|
+|z| $\mapsto$ 5, |y| $\mapsto$ 3, |x| $\mapsto$ 2   |x\*y\*z| $\Rightarrow$ |70|
 
 In the |Let| case of |eval|, a new environment |env'| is created and used
 as the environment for evaluation of the body |b|. 
@@ -1096,17 +1098,19 @@ function named |main|. Even if a programming language does support more flexible
 definition of functions, top-level functions are quite common.
 Here is an example of some top-level functions, written in JavaScript:
     
-    // compute n raised to the m-th power
-    function power(n, m) {
-      if (m == 0)
-        return 1;
-      else 
-        return n * power(n, m - 1);
-    }
-    
-    function main() {
-      return power(3, 4);
-    }
+````Java
+// compute n raised to the m-th power
+function power(n, m) {
+  if (m == 0)
+    return 1;
+  else 
+    return n * power(n, m - 1);
+}
+
+function main() {
+  return power(3, 4);
+}
+````
 
 This code resembles C or Java, but without types.
 The expression language we are developing does not need
@@ -1413,7 +1417,7 @@ definitions are all equivalent in Haskell:
 The last example uses Haskell's notation for writing a lambda.
 Because $\lambda$ is not a standard character on most
 keyboards (and it is not part of ASCII), Haskell uses
-an *ASCII art* rendition of $\lambda$ as a backslash |\|.
+an *ASCII art* rendition of $\lambda$ as a backslash |\\|.
 The dot used in a traditional lambda expression is replaced
 by ASCII art |->| for an arrow. The idea is that the function
 maps from |x| to its result, so an arrow makes some sense.
@@ -1426,7 +1430,7 @@ which we will call the *rule of lambda definition*:
 A parameter can always be moved from the left of an 
 equality sign to the right. Haskell convention is to always
 write them on the left of the equals if possible, thus
-avoiding explicit (and somewhat ugly ASCII encoding) of
+avoiding explicit use (and somewhat ugly ASCII encoding) of
 lambdas. Since every function definition in Haskell is
 implicitly a lambda expression, you have already been
 using lambdas without realizing it. As the old 
