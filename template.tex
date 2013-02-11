@@ -80,7 +80,6 @@
 % the syntax is very unforgiving, but permits 3cm and 2.5in and some other things.
 
 %include lhs2TeX.fmt
-%include lhs2TeX.sty
 
 % Font:
 % Here I set my main font, which is an Apple Corporation Exclusive, golly. 
@@ -111,9 +110,6 @@
 % into it now. 
 \usepackage[flushmargin]{footmisc} 
 % \usepackage[hang,flushmargin]{footmisc}
-
-% \usepackage[T1]{fontenc}
-% \usepackage[scaled]{beramono}
 
 % So much for my personal template.
 
@@ -176,19 +172,19 @@ $endif$
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
 % Add ',fontsize=\small' for more characters per line
 \newenvironment{Shaded}{}{}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+\newcommand{\KeywordTok}[1]{\textbf{{#1}}}
+\newcommand{\DataTypeTok}[1]{{#1}}
+\newcommand{\DecValTok}[1]{{#1}}
+\newcommand{\BaseNTok}[1]{{#1}}
+\newcommand{\FloatTok}[1]{{#1}}
+\newcommand{\CharTok}[1]{{#1}}
+\newcommand{\StringTok}[1]{{#1}}
 \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+\newcommand{\OtherTok}[1]{{#1}}
+\newcommand{\AlertTok}[1]{\textbf{{#1}}}
+\newcommand{\FunctionTok}[1]{{#1}}
 \newcommand{\RegionMarkerTok}[1]{{#1}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+\newcommand{\ErrorTok}[1]{\textbf{{#1}}}
 \newcommand{\NormalTok}[1]{{#1}}
 
 % Continuing on the topic of tables ... (we havent reached `endif`). 
@@ -229,9 +225,7 @@ citecolor=blue,%
 filecolor=blue,%
 linkcolor=blue,%
 urlcolor=blue}
-$if(url)$
 \usepackage{url}
-$endif$
 
 
 
@@ -241,7 +235,6 @@ $endif$
 % commands and drawing packages.  Today we want to import .jpg files we make with 
 % our smart phones or whatever:
 
-$if(graphics)$
 \usepackage{graphicx}
 % -- We will generate all images so they have a width \maxwidth. This means
 % -- that they will get their normal width if they fit onto the page, but
@@ -252,17 +245,7 @@ $if(graphics)$
 % \makeatother
 % \let\Oldincludegraphics\includegraphics
 % \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
-$endif$
 
-
-
-% Section numbering.  
-% Here again is a variable you can specify on the commandline
-% `markdown2pdf my.txt --number-sections --xetex --template=/wherever/this/is -o my.pdf`
-$if(numbersections)$
-$else$
-\setcounter{secnumdepth}{0}
-$endif$
 
 % Footnotes: 
 % Wait, didn't we already discuss the crisis of code in footnotes?  
@@ -313,27 +296,10 @@ $endif$
 % It then concludes the document it has been writing. 
 
 \begin{document}
-
-
-$if(title)$
 \maketitle
-$endif$
 
-$if(toc)$
 \tableofcontents
 
-$endif$
-
-
-$if(alignment)$
-\begin{$alignment$}
-$endif$
-
 $body$
-
-%$if(alignment)$
-\end{$alignment$}
-$endif$
-
 
 \end{document}

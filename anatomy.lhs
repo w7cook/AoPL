@@ -280,11 +280,13 @@ five sample expressions defined above:
 
 Running this main program produces less than satisfactory results:
 
-    4 ==> 4
-    -4+6 ==> 2
-    3--2--7 ==> -2
-    1*8+5 ==> 13
-    1+8*2 ==> 17
+````Java
+4 ==> 4
+-4+6 ==> 2
+3--2--7 ==> -2
+1*8+5 ==> 13
+1+8*2 ==> 17
+````
     
 We are back to the ambiguous expressions that we started with.
 The ambiguity can be resolved by adding parentheses around
@@ -298,9 +300,11 @@ showBinary a op b = paren (show a) ++ op ++ paren (show b)
 
 But the results are still not very satisfying:
 
-    4 ==> 4
-    (-4)+(6) ==> 2
-    (3)-((-2)-(-7)) ==> -2
+````Java
+4 ==> 4
+(-4)+(6) ==> 2
+(3)-((-2)-(-7)) ==> -2
+````
 
 We either have too many or too few parentheses. The right thing to do is
 to check whether parentheses are needed, by comparing the *precedence* of
@@ -324,11 +328,13 @@ addition has precedence 1 and multiplication has precedence 2.
 The add and subtract operators are also modified to include a little more space.
 This definition produces an appealing result:
 
-    4 ==> 4
-    (-4) + 6 ==> 2
-    3 - (-2) - (-7) ==> -2
-    1*(8 + 5) ==> 13
-    1 + 8*2 ==> 17
+````Java
+4 ==> 4
+(-4) + 6 ==> 2
+3 - (-2) - (-7) ==> -2
+1*(8 + 5) ==> 13
+1 + 8*2 ==> 17
+````
 
 The example of formatting expression is a concrete illustration of 
 the complexity of dealing with concrete syntax. The formatter 
@@ -423,11 +429,11 @@ is to compute a result using that value.
 
 What we want is a function that has the following behavior:
 
-* substitute $x$ for 5 in $x+2$   $\longrightarrow$ $5+2$
-* substitute $x$ for 5 in $2$     $\longrightarrow$ $2$
-* substitute $x$ for 5 in $x$     $\longrightarrow$ $5$
-* substitute $x$ for 5 in $x*x+x$ $\longrightarrow$ $5*5+5$
-* substitute $x$ for 5 in $x+y$   $\longrightarrow$ $5+y$
+* substitute $x \mapsto 5$ in $x+2$   $\longrightarrow$ $5+2$
+* substitute $x \mapsto 5$ in $2$     $\longrightarrow$ $2$
+* substitute $x \mapsto 5$ in $x$     $\longrightarrow$ $5$
+* substitute $x \mapsto 5$ in $x*x+x$ $\longrightarrow$ $5*5+5$
+* substitute $x \mapsto 5$ in $x+y$   $\longrightarrow$ $5+y$
 
 Note that if the variable names don't match, they are left alone.
 Given these data types, the process of *substitution* can be defined by cases.
@@ -463,12 +469,14 @@ then the value is
 
 Running these tests produces the following results:
 
-    x + 2 ==> 5 + 2
-    2 ==> 2
-    x ==> 5
-    x*x + x ==> 5*5 + 5
-    x + y ==> 5 + y
-    
+````Java
+x + 2 ==> 5 + 2
+2 ==> 2
+x ==> 5
+x*x + x ==> 5*5 + 5
+x + y ==> 5 + y
+````
+
 It is important to keep in mind that we now have two stages for
 evaluating an expression containing a variable. The first stage
 is to *substitute* the variable for its value, then the second
@@ -524,11 +532,13 @@ leaves the variable alone.
 The test results show that multiple variables are subsituted with
 values, but that unknown variables are left intact:
 
-    x + y ==> 3 + (-1)
-    2 ==> 2
-    x ==> 3
-    x*x + x ==> 3*3 + 3
-    x + 2*y + z ==> 3 + 2*(-1) + z
+````Java
+x + y ==> 3 + (-1)
+2 ==> 2
+x ==> 3
+x*x + x ==> 3*3 + 3
+x + 2*y + z ==> 3 + 2*(-1) + z
+````
 
 Note that it is alsopossible to substitute multiple variables one at a time:
 
@@ -552,28 +562,28 @@ this cabability by allowing definition of *local variables*.
 In C or Java one can define local variables in a declaration:
  
 ````C
-    int x = 3;
-    return 2*x + 5;
+int x = 3;
+return 2*x + 5;
 ````
-    
+
 JavaScript is similar but does not specify the type of the variable:
 
 ````C
-    var x = 3;
-    return 2*x + 5;
+var x = 3;
+return 2*x + 5;
 ````
 
 Haskell and ML define local variables with a |let| expression:
 
 ````
-    let x = 3 in 2*x + 5
+let x = 3 in 2*x + 5
 ````
-    
+
 In the languages the |let| really is an expression, becuase it can be
 used inside other expressions:
 
 ````
-    2 * (let x = 3 in x + 5)
+2 * (let x = 3 in x + 5)
 ````
 
 TODO: note that |where| in Haskell is similar to |let|.
@@ -589,13 +599,13 @@ return x + y;
 and Haskell or ML
 
 ````
-    let x = 3 in let y = x*2 in x + y
+let x = 3 in let y = x*2 in x + y
 ````
 
 which is equivalent to
 
 ````
-    let x = 3 in (let y = x*2 in x + y)
+let x = 3 in (let y = x*2 in x + y)
 ````
 
 In general a |let| expression has the following concrete syntax:
@@ -726,10 +736,10 @@ In the following example, the expression |x\*y\*z| is copied
 three times:
 
 ````
-    let x = 2 in 
-      let y = x+1 in 
-        let z = y+2 in 
-          x*y*z
+let x = 2 in 
+  let y = x+1 in 
+    let z = y+2 in 
+      x*y*z
 ````
 
 The steps are as follows:
@@ -810,7 +820,7 @@ additional bindings. For example, consider the evaluation of this
 expression:
 
 ````
-    let x = 9 in (let x = x*x in x+x)
+let x = 9 in (let x = x*x in x+x)
 ````
 
 Environment                                         Evaluation
@@ -836,8 +846,8 @@ environment. For example, evaluating the following expression
 creates to extensions of the base environment
 
 ````
-    let x = 3 in
-      (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
+let x = 3 in
+  (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
 ````
 
 The first |let| expressions creates an environment |x| $\mapsto$ 3 with a
@@ -893,7 +903,7 @@ conditional expressions of the kind discussed here.
 
 Given a full set of arithmetic operators, some comparison operators 
 (equaltiy |EQ|, less than |LT|, greater than |GT|, less than or equal |LE|),
-plus *and*, *or* and *not* for
+plus |and|, |or| and |not| for
 booleans, it is useful to generalize the abstract syntax to support a general notation
 for binary and unary operators.
 When an expression includes a value it is called a *literal* value. Literals generalize
@@ -1027,13 +1037,15 @@ In addition, new expressions can be defined to represent conditional expressions
 
 Running these test cases with the |test| function defined above yields these results:
 
-    4 ==> 4
-    (-4) - 6 ==> (-10)
-    3 - (-2) - (-7) ==> (-2)
-    1*(8 + 5) ==> 13
-    3 + 8*2 ==> 17
-    if 3 > 1*(8 + 5) then 1 else 0 ==> 0
-    2 + (if 3 <= 0 then 9 else (-5)) ==> (-3)
+````Java
+  4 ==> 4
+  (-4) - 6 ==> (-10)
+  3 - (-2) - (-7) ==> (-2)
+  1*(8 + 5) ==> 13
+  3 + 8*2 ==> 17
+  if 3 > 1*(8 + 5) then 1 else 0 ==> 0
+  2 + (if 3 <= 0 then 9 else (-5)) ==> (-3)
+````
 
  ### Type Errors
 
@@ -1097,7 +1109,7 @@ main expression in a C program is an implicit call to a
 function named |main|. Even if a programming language does support more flexible
 definition of functions, top-level functions are quite common.
 Here is an example of some top-level functions, written in JavaScript:
-    
+
 ````Java
 // compute n raised to the m-th power
 function power(n, m) {
@@ -1238,25 +1250,33 @@ data Exp = ...
 ````
 
 A variable name is tagged as a |Variable| and a function name
-appears in a |Call| expression.         
+appears in a |Call| expression. 
 
 Because the names of function and the names of variables are
 completely distinct, they are said to be in different *namespaces*.
 The sepration of the variable and function namespace is clear
 in the following (silly) example:
 
+````Java
     function pow(pow)
-      if pow <= 0 then 2
-                  else let pow = pow(pow - 1) in
-                          pow * pow(pow - 2)
+      if pow <= 0 then 
+        2
+      else 
+        let pow = pow(pow - 1) in
+          pow * pow(pow - 2)
+````
 
 This is the same as the following function, in which variables
 are renamed to be less confusing:
 
+````Java
     function pow(a)
-      if a <= 0 then 2
-                else let b = pow(a - 1) in
-                        b * pow(b - 2)
+      if a <= 0 then 
+        2
+      else 
+        let b = pow(a - 1) in
+          b * pow(b - 2)
+````
 
 When renaming varibles, the *functions* are *not* renamed. 
 This is because functions and variables are in separate namespaces.
@@ -1333,7 +1353,9 @@ the language, so that functions are *first-class* values.
 
 Consider the following function definition:
 
-    f(x) = x * 2
+````
+f(x) = x * 2
+````
 
 The intent here is to define |f|, but it doesn't really
 say what |f| is, it only says what |f| does when applied to
@@ -1428,10 +1450,13 @@ which we will call the *rule of lambda definition*:
 \ \ \ \ |name var = body| \ \ \ \  $\equiv$  \ \ \ \   |name = \var -> body|
 
 A parameter can always be moved from the left of an 
-equality sign to the right. Haskell convention is to always
-write them on the left of the equals if possible, thus
+equality sign to the right. Haskell programmers prefer
+to write them on the left of the equals if possible, thus
 avoiding explicit use (and somewhat ugly ASCII encoding) of
-lambdas. Since every function definition in Haskell is
+lambdas. Technically in Haskell the |var| can be any
+pattern, but for now we will focus on the case where
+the pattern is just a single variable. (TODO: see later chapter?)
+Since every function definition in Haskell is
 implicitly a lambda expression, you have already been
 using lambdas without realizing it. As the old 
 dishwashing soap commercial said "You are soaking in it."
@@ -1495,7 +1520,7 @@ in the body of the lambda expression.
 
 **Rule of Lambda Invocation** (informal):
 
-($\lambda$*var*. *body*)arg  \ \ \    **evaluates to** \ \ \  *body* with *arg* substituted for *var*
+($\lambda$*var*. *body*)arg  \ \ \ **evaluates to** \ \ \  *body* with *arg* substituted for *var*
 
 For now this is an informal definition. 
 We will make it more precise when we
@@ -1509,7 +1534,7 @@ to explore some examples of first-class functions. Even if you have
 used first-class functions before, you might find these examples
 interesting.
  
- ## Mapping
+ ### Mapping
  
 One of the earliest and widely cited examples of first class functions
 is in the definition of a |map| function, which applies a function to
@@ -1522,9 +1547,19 @@ that inverts the sign of a number, it is easy to quickly negate a list of number
 map negate [1, 3, -7, 0, 12]   -- returns [-1, -3, 7, 0, -12]
 ````
 
-The |map| function takes a function as an argument. Personally, I tend to
+The |map| function takes a function as an argument. You can see that
+|map| takes a function argument by looking at its type:
+
+````
+map :: (a -> b) -> [a] -> [b]
+````
+
+The first argument |a -> b| is a function from |a| to |b| where
+|a| and |b| are arbitrary types. 
+ 
+Personally, I tend to
 use list comprehensions rather than |map|, because list comprehensions give
-a nice name to the items of the. Here is an equivalent example using comprehensions:
+a nice name to the items of the list. Here is an equivalent example using comprehensions:
 
 ````
 [ negate n | n <- [1, 3, -7, 0, 12] ]   -- returns [-1, -3, 7, 0, -12]
@@ -1580,11 +1615,11 @@ is quite different:
 The |lookup| function searches a list environment |envL1| for an appropriate binding.
 An functional environment |envF1| is applied to the name to get the result.
 One benefit of the function environment is that we don't need to know how the bindings are 
-represented. All we need to do is call it to get the desired answer.[^1] There is
+represented. All we need to do is call it to get the desired answer.[^2] There is
 no need to use a |lookup| function, because the functional environment *is* the
 lookup function.
 
-[^1]: This kind of behavioral representation will come again when we discuss object-oriented programming.
+[^2]: This kind of behavioral representation will come again when we discuss object-oriented programming.
 
 The only other thing that is done with an environment is to extend it with 
 additional bindings. Lets define bind functions that add a binding to
@@ -1899,7 +1934,7 @@ function that chooses one of two alternatives.
 --------------------------------------------------------------------
 (everything above this line is relatively stable, but the text below is in flux)
 --------------------------------------------------------------------
-            
+
  #### Natural Numbers
  
 Natural numbers can also be represented functionally.
@@ -1931,7 +1966,7 @@ define a type of *values* because we are going to use
 lambda expressions as the values. For example, the 
 value *true* is represented as a Church boolean:
 
-> true_'9 = Lambda'9 "a" (Lambda'9 "b" (Variable'9 "a"))
+> true'9 = Lambda'9 "a" (Lambda'9 "b" (Variable'9 "a"))
 
 Church defined the semantics of lambda calculus using
 substitution. We introduced substitution for arithmetic
@@ -1951,33 +1986,32 @@ contain variables, we will have to be more careful.
 The first case, for substitution into a variable 
 expression, is the same as previous cases:
 
-> substitute'9 var exp (Variable'9 name) = 
->    if var == name then exp else Variable'9 name
+> substitute'9 var exp target = subst target
+>  where
+>    subst (Variable'9 name) = 
+>      if var == name then exp else Variable'9 name
+
+The second case is function application:
+
+>    subst (Apply'9 fun arg) = 
+>      Apply'9 (subst fun) (subst arg)
 
 The second case is the same as for |let| expressions
 (TODO: reference chapter). Care must be taken to
 properly implement the hole in the scope of the
 outer variable.
 
-> substitute'9 var exp (Lambda'9 name body) = 
->    if var == name 
->    then Lambda'9 name body
->    else Lambda'9 name (substitute'9 var exp body)
+(NOTE: THIS IS NOT RIGHT!!!)
 
+>    subst (Lambda'9 name body) = 
+>      if var == name 
+>      then Lambda'9 name body
+>      else Lambda'9 name (subst body)
 
-
-
-
-
-
-
-
-
+Need to talk about the problem, and solution.
  
  ### Avoiding Name Capture
 
-
- 
  
  
  ## Evaluating First-Class Functions using Evironments

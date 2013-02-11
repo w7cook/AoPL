@@ -3,8 +3,11 @@
 PANDOC := pandoc --no-wrap -sS
 HSCOLOUR := hscolour -lit
 
-main: anatomy.pdf
+pretty: anatomy.pdf
 	open anatomy.pdf
+
+verb: anatomyVerbatim.pdf
+	open anatomyVerbatim.pdf
 
 update: anatomy.pdf anatomyVerbatim.pdf
 	cp anatomyVerbatim.pdf ~/Public/web/Courses/345/anatomyVerbatim.pdf 
@@ -33,8 +36,8 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/\\\\\textbar{}/|/g" \
 		| sed "s/\\\\\textless{}/</g" \
 		| sed "s/\\\\\textgreater{}/>/g" \
-    | sed "s/\\\\\ldots{}/.../g" \
-    | sed "s/\\\\\\textbackslash{}/\\\\/g" \
+		| sed "s/\\\\\ldots{}/.../g" \
+		| sed "s/\\\\\\textbackslash{}/\\\\/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \
