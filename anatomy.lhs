@@ -374,7 +374,7 @@ a |Variable| case.
 An association of a variable $x$ with a value $v$ is called a *binding*,
 which can be written $x \mapsto v$.
 Bindings can be represented in Haskell as a pair. For example, the
-binding of $x \mapsto 5$ can be represented as |("x", 5)|.
+binding of $x \mapsto 5$ can be represented as |(\"x\", 5)|.
 
  ### Variable Discussion
 
@@ -1646,7 +1646,7 @@ be bound many times. Consider a specific example:
 
 Lets execute this program manually. The call to |bindF| has three
 arguments, creating these bindings: 
-|var| $\mapsto$ |"z"|, |val| $\mapsto$ |5|, |env| $\mapsto$ |envF1|.
+|var| $\mapsto$ |\"z\"|, |val| $\mapsto$ |5|, |env| $\mapsto$ |envF1|.
 Substituting these bindings into the definition of |bindF| gives
 
 ````
@@ -1669,7 +1669,7 @@ envF2 testVar = envF1 testVar
 ````
 
 These two versions are the same because of the way Haskell deals
-with functions defined by cases: it tries the first case (argument == |"z"|),
+with functions defined by cases: it tries the first case (argument == |\"z\"|),
 else it tries the second case. Since |bindF| tests for the most
 recently bound variable first, before calling the base environment,
 variables are properly shadowed when redefined.

@@ -10,7 +10,7 @@ update: anatomy.pdf anatomyVerbatim.pdf
 	cp anatomyVerbatim.pdf ~/Public/web/Courses/345/anatomyVerbatim.pdf 
 	cp anatomy.pdf ~/Public/web/Courses/345/Anotomy.pdf 
 	scp anatomyVerbatim.pdf envy.cs.utexas.edu:public_html/Courses/345/anatomyVerbatim.pdf
-	scp anatomy.pdf envy.cs.utexas.edu:public_html/Courses/345/Anotomy.pdf
+	scp anatomy.pdf envy.cs.utexas.edu:public_html/Courses/345/anotomy.pdf
 	
 anatomy.mkd: anatomy.lhs makefile
 	cat anatomy.lhs \
