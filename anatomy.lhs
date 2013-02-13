@@ -1336,7 +1336,7 @@ global functions definitions.
 >       where FunctionDefinition xs body = fromJust (lookup fun funEnv)
 >             env' = zip xs [eval a | a <- args]
 
- # Fist-Class Functions
+ # First-Class Functions
  
 In the last section, function definitions were defined using
 special syntax and only at the top of a program.
@@ -1482,8 +1482,11 @@ but they do exhibit juxtaposition of two expressions.[^1]
 
 [^1]: Church's original presentation of the lambda calculus
 followed the mathemtical convention that all variables were
-single characters. Thus |xy| meant function application, |x y|,
+single characters. Thus |xy| means a function call, |x y|,
 just as |xy| is taken to mean |x*y| in arithmetic expressions.
+Normally in computer science we like to allow variables to
+have long names, so |xy| would be the name of a single variable.
+We don't like it when |foo| means |f(o(o))|.
 
 Haskell has the property that definitions really are
 equations, so that it is legal to substitute |f| for
@@ -1501,7 +1504,8 @@ f(3)
 
 In this form, the function |f| is *applied* to the argument |3|.
 The expression |f(3)| is called a function *application*.
-becomes 
+In this book I use "function call" and "function application" 
+interchangeably.
 
 ````
 -- version B
@@ -1526,6 +1530,25 @@ For now this is an informal definition.
 We will make it more precise when we
 write an evaluator that handles lambda expressions correctly.
 
+ ### Abstract Syntax of Lambda Calculus
+ 
+ Now its time for write a semantics for a language with
+first-class functions. Since we have seen that booleans,
+integers and other data types can be represented by functions,
+there is no reason to include them in the language. What
+remains are just variables, functions (lambda expressions),
+and function application.
+
+> data Exp'9 = Variable'9 String     -- variables
+>          | Lambda'9 String Exp'9   -- function creation
+>          | Apply'9 Exp'9 Exp'9       -- function call
+
+This is exactly the abstract syntax of
+the *lambda calculus*, as defined by Church in the 1930s.
+As we will see in (TODO: reference Church Encodings), we don't need to
+define a type of *values* because we are going to use 
+lambda expressions as the values. 
+ 
  ## Examples of First-Class Functions
  
 Before we begin a full analysis of the semantics of first-class 
@@ -1577,7 +1600,7 @@ The comprehensions used earlier in this document could be replace by invocations
 TODO: make a comment about point-free style?
 
 TODO: is a function that returns a fucntion also called higher order?
- 
+
  ### Representing Evironments as Functions
 
 In Chapter 1, an environment was defined as a list of bindings.
@@ -1946,32 +1969,19 @@ TODO: write this section
 TODO: prove that |let x =| $e$ |in| $b$ is equivalent to
    ($\lambda$|x.|$b$)$e$ 
 
+ #### Others
+
+There are many other uses of first-class functions, including
+callbacks, event handlers, thunks, continuations, etc. 
+
+--------------------BEGIN-HIDE-------------------------
  ## Evaluating First-Class Functions by Substitution
 
-Now its time for write a semantics for a language with
-first-class functions. Since we have seen that booleans,
-integers and other data types can be represented by functions,
-there is no reason to include them in the language. What
-remains are just variables, functions (lambda expressions),
-and function application.
-
-> data Exp'9 = Variable'9 String     -- variables
->          | Lambda'9 String Exp'9   -- function creation
->          | Apply'9 Exp'9 Exp'9       -- function call
-
-This is exactly the abstract syntax of
-the *lambda calculus*, as defined by Church in the 1930s.
-As mentioned in the previous paragraph, we don't need to
-define a type of *values* because we are going to use 
-lambda expressions as the values. For example, the 
-value *true* is represented as a Church boolean:
-
-> true'9 = Lambda'9 "a" (Lambda'9 "b" (Variable'9 "a"))
-
 Church defined the semantics of lambda calculus using
-substitution. We introduced substitution for arithmetic
+substitution. 
+We introduced substitution for arithmetic
 expressions in Chapter 1 so that you would familiar with
-the concept by the time we got here. 
+the concept by the time we got here.
 
 Substitution for
 lambda expressions is a little more complex, however.
@@ -1980,43 +1990,110 @@ values in expressions, but now we will substitute variables
 for expressions in expressions. 
 
 > substitute'9 :: String -> Exp'9 -> Exp'9 -> Exp'9
+> substitute'9 var exp target = subst target
+>  where
+>    -- uses subst function defined in the next few paragraphs
 
 Since expressions can 
 contain variables, we will have to be more careful.
 The first case, for substitution into a variable 
 expression, is the same as previous cases:
 
-> substitute'9 var exp target = subst target
->  where
 >    subst (Variable'9 name) = 
 >      if var == name then exp else Variable'9 name
 
-The second case is function application:
+The second case is substitution into a function call. It just
+substitutes into the function and the argument:
 
 >    subst (Apply'9 fun arg) = 
 >      Apply'9 (subst fun) (subst arg)
 
-The second case is the same as for |let| expressions
-(TODO: reference chapter). Care must be taken to
-properly implement the hole in the scope of the
-outer variable.
+The last case is substitution *into* a lambda expression.
+This case is similar to the case of substitution into
+a |let| epxression (TODO: reference chapter), because
+both a |let| and a lambda introduce a new variable name.
+Here is a first attempt at substituting *into* a lambda
+expression. 
 
-(NOTE: THIS IS NOT RIGHT!!!)
+````
+-- first version is not quite correct
+    subst (Lambda'9 name body) = 
+      if var == name 
+      then Lambda'9 name body
+      else Lambda'9 name (subst body)
+````
+
+This version properly handles *shodowing* of the outer
+|var| by the |name| bound in the lambda: if the names are
+the same, then substitution does not occur in the body.
+
+Consider some cases that this handles correctly:
+
+* Substitute $x \mapsto 5$ in $\lambda f.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda f.f(5)$
+* Substitute $x \mapsto 5$ in $\lambda x.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.f(x)$
+* Substitute $x \mapsto y$ in $\lambda f.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda f.f(y)$
+* Substitute $f \mapsto \lambda z.z+3$ in $\lambda x.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.(\lambda z.z+3)(x)$
+* Substitute $f \mapsto \lambda z.z+3$ in $\lambda z.f(z)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda z.(\lambda z.z+3)(z)$
+
+However, this version does *not* properly handle the case
+where the |exp| being substituted has free variables!
+Here is a case that does not work correctly:
+
+* Substitute $y \mapsto x*2$ in $\lambda x.y+x$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.(x*2)+x$
+
+The problem here is that the $x+1$ in the expression being substituted
+is a free variable, but it becomes bound in the result because it is
+substituted into the body of a lambda that uses the same variable name.
+They aren't really the same variable, even though they have the same name!
+One way to see that they are not the same variable is to rename
+the bound occurrence of $x$ to be some other variable name, $m$.
+
+* Substitute $y \mapsto x*2$ in $\lambda m.y+m$ \ \ \ $\Rightarrow$ \ \ \ $\lambda m.(x*2)+m$
+
+In this case the substitution is correct. 
+
+When a variable that was free ends up becoming bound, it is called *variable capture*.
+*variable capture* has never been a problem in any previous versions of
+substitution that we have discussed, because all previous
+cases of substitution have involved substitution of a
+variable for a *value*, and values do not have variables in them. 
+
+The definition of substitution is it must replace all
+*free* occurrences of a variable with a new value, and that
+all variables that are *free* in either the target or expression
+being substituted must remain free. In other words, substitution must
+avoid variable capture.
+
+The solution to variable capture identified above was to rename
+the bound variable if variable capture is about to happen.
 
 >    subst (Lambda'9 name body) = 
->      if var == name 
+>      if var == name
 >      then Lambda'9 name body
->      else Lambda'9 name (subst body)
+>      else Lambda'9 name' (subst body')
+>        where Lambda'9 name' body' = avoid_capture var exp (Lambda'9 name body)
 
-Need to talk about the problem, and solution.
- 
- ### Avoiding Name Capture
+> avoid_capture var exp (Lambda'9 name body) = 
+>   if elem name (free_vars exp) 
+>   then let name' = new_variable (Apply'9 exp body) in
+>        Lambda'9 name' (substitute'9 name (Variable'9 name') body)
+>   else Lambda'9 name body
 
+TODO: need to define thse property!
+
+> new_variable exp = "foo"
+> free_vars exp = []
  
+ --------------------END-HIDE-------------------------
  
  ## Evaluating First-Class Functions using Evironments
 
-The main problem with lambda expressions is that they 
+Evaluation of first-class functions (lambdas) is
+complicated by the need to properly enforce *lexical scoping*
+rules. Lexical scope means that a variable refers to the
+closest enclosing definition of that variable.
+
+The problem with lambda expressions is that they 
 interact in complex ways with variables that are defined
 outside the function.  
 
@@ -2032,7 +2109,9 @@ aren't any bindings outside the function.
 TODO: ensure proper terminology of paramters, arguments, 
 formal arguments, etc
 
- ### A Non-Solution: Lambdas as Values and Dynamic Scoping
+ ### A Non-Solution: Lambdas as Values
+ 
+ TODO: define *dynamic scope*
  
  #### Undefined Variables
  

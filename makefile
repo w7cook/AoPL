@@ -3,11 +3,11 @@
 PANDOC := pandoc --no-wrap -sS
 HSCOLOUR := hscolour -lit
 
-pretty: anatomy.pdf
-	open anatomy.pdf
-
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
+
+pretty: anatomy.pdf
+	open anatomy.pdf
 
 update: anatomy.pdf anatomyVerbatim.pdf
 	cp anatomyVerbatim.pdf ~/Public/web/Courses/345/anatomyVerbatim.pdf 
