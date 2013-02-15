@@ -191,10 +191,19 @@ $endif$
 % The commented out line below is in the default pandoc  latex.template.
 % Some unpleasantness with table formatting must be corrected.
 
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\newcommand{\StartIncorrect}{\color{Mahogany}}
+\newcommand{\EndIncorrect}{\color{black}}
+
+
 % -- This is needed because raggedright in table elements redefines \\:
 \newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
 \let\PBS=\PreserveBackslash
 
+%subst comment a = "{\it-{}- " a "}"
+%format function = "{\textbf{function}}"
 
 
 % Subscripts:

@@ -4,6 +4,7 @@
 
 
 > --------------------BEGIN-HIDE-------------------------
+> {-# OPTIONS -XRankNTypes #-}
 > import Prelude hiding (LT, GT, EQ)
 > import Data.Maybe
 >
@@ -61,6 +62,12 @@ I point students to the many excellent tutorials on Haskell.
 I recommend
 [Learn You a Haskell for Great Good!](http://learnyouahaskell.com/).
 
+ #### Acknowledgements
+ 
+I thank the students in the spring 2013 semester of CS 345 *Programming Languages*
+at the University of Texas at Austin, who helped out while I was writing the book.
+Special thanks to Chris Roberts and Guy Hawkins for careful proofreading.
+ 
  ## Introduction
 
 In order to understand programming languages, it is useful to spend some time thinking
@@ -105,11 +112,11 @@ any program whose input or output is a program. Familiar examples of metaprogram
 include compilers, interpreters, virtual machines. In this course we will read, write and 
 discuss many metaprograms.
 
- # Expressions, Variables, and First-Order Functions
+ # Expressions, Variables, and First-Order Functions {#Chapter1}
  
  ## Simple Language of Arithmetic
 
-[Chapter1]: A good place to start is analyzing the language of arithmetic, which is 
+A good place to start is analyzing the language of arithmetic, which is 
 familiar to every grade-school child:
 
     4
@@ -139,7 +146,7 @@ clearly using pictures. For example, the following pictures make are a
 clear description of the underlying arithmetic operations specified in the
 expressions given above:
 
-![Graphical illustration of abstract structure](abstract_syntax.eps)
+![Graphical illustration of abstract structure](figures/abstract_syntax.eps)
 
 The last picture represents both the last expressions in the previous example.
 This is because the pictures do not need parentheses, since the grouping
@@ -173,7 +180,7 @@ create five test cases:
 > -- -4 - 6
 > t2 = Add'1 (Number'1 (-4)) (Number'1 6)        
 > -- 3 - (-2) - (-7)  
-> t3 = Subtract'1 (Number'1 3) (Subtract'1 (Number'1 (-2)) (Number'1 (-7)))
+> t3 = Subtract'1 (Subtract'1 (Number'1 3) (Number'1 (-2))) (Number'1 (-7))
 > -- 3 * (8 + 5)
 > t4 = Multiply'1 (Number'1 3) (Add'1 (Number'1 8) (Number'1 5))        
 > -- 3 + 8 * 2
@@ -200,6 +207,8 @@ necessary. But keep in mind that this concise syntax is just
 a short-hand for the real value |Add (Number 3) (Number 7)|.
 As new features are added to the language, both the familar
 concrete syntax and the abstract syntax will be extended.
+
+TODO: talk about meta language: language of study versus language of implementation. Better words?
 
  ### Evaluating Arithmetic Expressions
 
@@ -249,9 +258,7 @@ showBinary a op b = show a ++ op ++ show b
 ````
 
 If you don't know about *instance* declarations in Haskell, please
-go and read about *type classes*.
-
-TODO: need citation here!
+go and read about *type classes*. (TODO: need citation here)
 
 Note that the |show| function for expressions is fairly similar
 to the |eval| function, but it performs string concatenation instead
@@ -575,16 +582,12 @@ return 2*x + 5;
 
 Haskell and ML define local variables with a |let| expression:
 
-````
-let x = 3 in 2*x + 5
-````
+> test1 = let x = 3 in 2*x + 5
 
 In the languages the |let| really is an expression, becuase it can be
 used inside other expressions:
 
-````
-2 * (let x = 3 in x + 5)
-````
+> test2 = 2 * (let x = 3 in x + 5)
 
 TODO: note that |where| in Haskell is similar to |let|.
 
@@ -598,15 +601,11 @@ return x + y;
 
 and Haskell or ML
 
-````
-let x = 3 in let y = x*2 in x + y
-````
+> test3 = let x = 3 in let y = x*2 in x + y
 
 which is equivalent to
 
-````
-let x = 3 in (let y = x*2 in x + y)
-````
+> test4 = let x = 3 in (let y = x*2 in x + y)
 
 In general a |let| expression has the following concrete syntax:
 
@@ -635,7 +634,7 @@ variable is the body of the let in which the variable is defined.
 However, it is possible for a variable to be redefined, which creates
 a hole in the scope of the outer variable:
 
-![Varible Scope](scopes.eps)
+![Varible Scope](figures/scopes.eps)
 
 In this example there are two variables named |x|. Even though
 two variables have the same name, they are not the same variable.
@@ -644,7 +643,7 @@ TODO: talk about *free* versus *bound* variables
 
 TODO: talk about renaming
 
- ### Substituting into |Let| Expressions
+ ### Substituting into |Let| Expressions {#BasicSubst}
 
 When substutiting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
@@ -721,7 +720,7 @@ with local variables.
 > evaluate'3 (Multiply'3 a b)   = evaluate'3 a * evaluate'3 b
 > evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) body)
 
- ## Evaluation using Environments
+ ## Evaluation using Environments {#BasicEvalEnv}
 
 For the basic evaluator substitution and evaluation were 
 completely separate, but the evaluation rule for |let| 
@@ -735,12 +734,10 @@ the body of the inner let expression is copied multiple times.
 In the following example, the expression |x\*y\*z| is copied
 three times:
 
-````
-let x = 2 in 
-  let y = x+1 in 
-    let z = y+2 in 
-      x*y*z
-````
+> test5 = let x = 2 in 
+>   let y = x+1 in 
+>     let z = y+2 in 
+>       x*y*z
 
 The steps are as follows:
 
@@ -764,8 +761,9 @@ fully for each |let| expression, instead the |let|
 expression can add another binding to the list 
 of substitutions being performed.
 
-> evaluate'4 :: Env -> Exp'3 -> Int
-> evaluate'4 env exp = eval exp 
+> -- Evaluate an expression in an environment
+> evaluate'4 :: Exp'3 -> Env -> Int
+> evaluate'4 exp env = eval exp 
 >  where
 >   eval (Number'3 i)      = i
 >   eval (Add'3 a b)       = eval a + eval b
@@ -773,7 +771,7 @@ of substitutions being performed.
 >   eval (Multiply'3 a b)  = eval a * eval b
 
 >   eval (Variable'3 x)    = fromJust (lookup x env)
->   eval (Let'3 x exp body)     = evaluate'4 env' body
+>   eval (Let'3 x exp body)     = evaluate'4 body env' 
 >     where env' = (x, eval exp) : env
 
 The helper function |eval| is defined in the scope of the |env|
@@ -819,9 +817,7 @@ find the most recent enclosind binding for a variable, and igore any
 additional bindings. For example, consider the evaluation of this
 expression:
 
-````
-let x = 9 in (let x = x*x in x+x)
-````
+> test6 = let x = 9 in (let x = x*x in x+x)
 
 Environment                                         Evaluation
 -------------------------------------------         -----------------------------------
@@ -845,10 +841,8 @@ is not changed, so there is no need to reset or restore the previous
 environment. For example, evaluating the following expression 
 creates to extensions of the base environment
 
-````
-let x = 3 in
-  (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
-````
+> test7 = let x = 3 in
+>   (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
 
 The first |let| expressions creates an environment |x| $\mapsto$ 3 with a
 single binding. The next two let expressions create environments 
@@ -959,14 +953,15 @@ perform the actual computations for binary and unary operations, respectively.
 
 > type Env'1 = [(String, Value)]
 >
-> evaluate'5 :: Env'1 -> Exp'4 -> Value
-> evaluate'5 env exp = eval exp 
+> -- Evaluate an expression in an environment
+> evaluate'5 :: Exp'4 -> Env'1 -> Value
+> evaluate'5 exp env = eval exp 
 >   where
 >     eval (Literal'4 v)      = v
 >     eval (Unary'4 op a)     = unary op (eval a)
 >     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
 >     eval (Variable'4 x)     = fromJust (lookup x env)
->     eval (Let'4 x exp body) = evaluate'5 env' body
+>     eval (Let'4 x exp body) = evaluate'5 body env'
 >       where env' = (x, eval exp) : env
 
 The conditional expression first evaluates the condition, forces it to be a boolean, 
@@ -1026,13 +1021,13 @@ In addition, new expressions can be defined to represent conditional expressions
 >                     (Literal'4 (Int (-5))))
 > --------------------BEGIN-HIDE-------------------------
 > main'6 = do
->   test (evaluate'5 []) t1'4
->   test (evaluate'5 []) t2'4
->   test (evaluate'5 []) t3'4
->   test (evaluate'5 []) t4'4
->   test (evaluate'5 []) t5'4
->   test (evaluate'5 []) t6'4
->   test (evaluate'5 []) t7'4
+>   test (\e-> evaluate'5 e []) t1'4
+>   test (\e-> evaluate'5 e []) t2'4
+>   test (\e-> evaluate'5 e []) t3'4
+>   test (\e-> evaluate'5 e []) t4'4
+>   test (\e-> evaluate'5 e []) t5'4
+>   test (\e-> evaluate'5 e []) t6'4
+>   test (\e-> evaluate'5 e []) t7'4
 > --------------------END-HIDE-------------------------
 
 Running these test cases with the |test| function defined above yields these results:
@@ -1080,7 +1075,7 @@ Here are some examples of epxression that generate type errors:
 We will discuss techniques for preventing type errors later, but for now
 it is important to realize that programs may fail at runtime.
 
- ## Top-Level Functions
+ ## Top-Level Functions {#TopLevel}
  
 Functions are familiar to any student of mathematics. The first hint of
 a function in grade school may be some of the standard operators that
@@ -1163,8 +1158,8 @@ series of named functions, each of which has a list of parameter
 names and a body expression. The following data type definitions
 provide a means to represent such programs:
 
-> type FunEnv = [(String, FunctionDefinition)]
-> data FunctionDefinition = FunctionDefinition [String] Exp'6
+> type FunEnv = [(String, Function'6)]
+> data Function'6 = Function'6 [String] Exp'6
 
 A list of function defintions is a *function environment*.
 This list represents a list of bindings of function names
@@ -1186,7 +1181,7 @@ data Exp'6 = ...
 
 As an exmple, here is an encoding of the example program:
 
-> f1 = FunctionDefinition ["n", "m"]
+> f1 = Function'6 ["n", "m"]
 >       (If'6 (Binary'6 EQ (Variable'6 "m") (Literal'6 (Int 0)))
 >           (Literal'6 (Int 1))
 >           (Binary'6 Mul 
@@ -1199,23 +1194,26 @@ As an exmple, here is an encoding of the example program:
 >              (Call'6 "power" [Literal'6 (Int 3),
 >                             Literal'6 (Int 4)])
 
+ ### Evaluating Top-Level Functions {#EvalTopLevel}
+ 
 A new function, |execute|, runs a program. It does so
 by evaluating the main expression in the context of the
 programs' function environment and an empty variable environment:
 
 > execute :: Program -> Value
-> execute (Program funEnv main) = evaluate'6 funEnv [] main
+> execute (Program funEnv main) = evaluate'6 main [] funEnv
 
 The evaluator is extended to take a function environment |funEnv| as
 a additional argument. 
 
 ````
-evaluate'6 :: FunEnv -> Env'1 -> Exp'6 -> Value
-evaluate'6 funEnv env exp = eval exp 
+-- Evaluate an expression in a variable environment with a given function environment
+evaluate'6 :: Exp'6 -> Env'1 -> FunEnv -> Value
+evaluate'6 exp env funEnv = eval exp 
   where
     ...
-     eval (Call'6 fun args)   = evaluate'6 funEnv env' body
-       where FunDef xs body = fromJust (lookup fun funEnv)
+     eval (Call'6 fun args)   = evaluate'6 body env' funEnv
+       where Function'6 xs body = fromJust (lookup fun funEnv)
              env' = zip xs [eval a | a <- args]
 ````
 
@@ -1320,8 +1318,8 @@ global functions definitions.
 >          | Let'6       String Exp'6 Exp'6
 >          | Call'6      String [Exp'6]
 >
-> evaluate'6 :: FunEnv -> Env'1 -> Exp'6 -> Value
-> evaluate'6 funEnv env exp = eval exp 
+> evaluate'6 :: Exp'6 -> Env'1 -> FunEnv -> Value
+> evaluate'6 exp env funEnv = eval exp 
 >   where
 >     eval (Literal'6 v)      = v
 >     eval (Unary'6 op a)     = unary op (eval a)
@@ -1330,15 +1328,15 @@ global functions definitions.
 >                             then (eval b) 
 >                             else (eval c)
 >     eval (Variable'6 x)     = fromJust (lookup x env)
->     eval (Let'6 x exp body) = evaluate'6 funEnv env' body
+>     eval (Let'6 x exp body) = evaluate'6 body env' funEnv
 >       where env' = (x, eval exp) : env
->     eval (Call'6 fun args)   = evaluate'6 funEnv env' body
->       where FunctionDefinition xs body = fromJust (lookup fun funEnv)
+>     eval (Call'6 fun args)   = evaluate'6 body env' funEnv
+>       where Function'6 xs body = fromJust (lookup fun funEnv)
 >             env' = zip xs [eval a | a <- args]
 
  # First-Class Functions
  
-In the last section, function definitions were defined using
+In the [Section on Top-Level Functions](#TopLevel), function definitions were defined using
 special syntax and only at the top of a program.
 The function names and the variable names are in
 different namespaces. One consequence of this is that all
@@ -1387,7 +1385,8 @@ to represent a new operation.
 
  ## Lambda Notation
  
-The standard solution is to use a *lambda expression*, 
+The standard solution is to use a *lambda expression*, or
+*function expression*, 
 which is a special notation for representing a function.
 Here is a solution for |f| using a lambda:
 
@@ -1396,7 +1395,7 @@ Here is a solution for |f| using a lambda:
 The symbol $\lambda$ is the greek letter *lambda*. Just like
 the symbol $\sqrt{\ }$, $\lambda$ has no inherent meaning, but
 is assigned a meaning for our purposes. The general form of a 
-lambda expression is:
+function expression is:
 
 $\lambda$*var*. *body*
 
@@ -1404,14 +1403,14 @@ This represents a function with parameter *var* that computes a
 result defined by the *body* expression. The *var* may of course
 be used within the *body*. In other words, *var* may be 
 free in *body*, but *var* is bound (not free) in $\lambda$*var*. *body*.
-A lambda expression is sometimes called an *abstraction* or a
+A function expression is sometimes called an *abstraction* or a
 *funtion abstraction* (TODO: discuss this more later).
 
 Thus |f =| $\lambda$|x|. |x * 2| means that |f| is defined to be a function of one
 parameter |x| that computes the result |x * 2| when
-applied to an argument. One benefit of lambda expressions
+applied to an argument. One benefit of function expressions
 is that we don't need special syntax to name functions,
-as in the prefious section. Instead, we can use the 
+which was needed in dealing with [top-level functions](#TopLevel). Instead, we can use the 
 existing |let| expressoin to name functions, because
 functions are just another kind of value.
 
@@ -1425,10 +1424,10 @@ calculus has had huge influence on programming languages.
 We will study the lambda calculus in more detail in a 
 later section, but the basic concepts are introduced here.
 
- ### Using Lambdas in Haskell
+ ### Using Lambdas in Haskell {#LambdaDefinition}
  
 Haskell is based directly on the lambda calculus. In 
-fact, the example illustating how to ||solve'' for the
+fact, the example illustating how to "solve" for the
 function |f| can be written in haskell. The following
 definitions are all equivalent in Haskell:
 
@@ -1436,7 +1435,7 @@ definitions are all equivalent in Haskell:
 > f'2 x  = x * 2
 > f'3 = \x -> x * 2
 
-The last example uses Haskell's notation for writing a lambda.
+The last example uses Haskell's notation for writing a lambda expression.
 Because $\lambda$ is not a standard character on most
 keyboards (and it is not part of ASCII), Haskell uses
 an *ASCII art* rendition of $\lambda$ as a backslash |\\|.
@@ -1445,7 +1444,7 @@ by ASCII art |->| for an arrow. The idea is that the function
 maps from |x| to its result, so an arrow makes some sense.
 
 The concept illustrated above is an important general rule,
-which we will call the *rule of lambda definition*:
+which we will call the *Rule of Function Arguments*:
 
 \ \ \ \ |name var = body| \ \ \ \  $\equiv$  \ \ \ \   |name = \var -> body|
 
@@ -1507,58 +1506,70 @@ The expression |f(3)| is called a function *application*.
 In this book I use "function call" and "function application" 
 interchangeably.
 
-````
--- version B
-(\x -> x*2)(3)
-````
+> -- version B
+> test9 = (\x -> x*2)(3)
 
 The A and B versions of this expression are equivalent. The latter is a 
-juxtaposition of a lambda expression |\x->x*2| with its argument, |3|.
-When a lambda is used on its own, without giving it a name, it is
+juxtaposition of a function expression |\x->x*2| with its argument, |3|.
+When a function expression is used on its own, without giving it a name, it is
 called an *anonymous function*. 
 
-The *rule of lambda invocation* says that applying a lambda
+The *Rule of Function Invocation* says that applying a function
 expression to an argument is evaluated by substituting the
-argument in place of the lambda variable everywhere it occurs
-in the body of the lambda expression. 
+argument in place of the function's bound variable everywhere it occurs
+in the body of the function expression. 
 
-**Rule of Lambda Invocation** (informal):
+**Rule of Function Invocation** (informal):
 
 ($\lambda$*var*. *body*)arg  \ \ \ **evaluates to** \ \ \  *body* with *arg* substituted for *var*
 
 For now this is an informal definition. 
 We will make it more precise when we
-write an evaluator that handles lambda expressions correctly.
+write an evaluator that handles function expressions correctly.
 
- ### Abstract Syntax of Lambda Calculus
  
- Now its time for write a semantics for a language with
-first-class functions. Since we have seen that booleans,
-integers and other data types can be represented by functions,
-there is no reason to include them in the language. What
-remains are just variables, functions (lambda expressions),
-and function application.
-
-> data Exp'9 = Variable'9 String     -- variables
->          | Lambda'9 String Exp'9   -- function creation
->          | Apply'9 Exp'9 Exp'9       -- function call
-
-This is exactly the abstract syntax of
-the *lambda calculus*, as defined by Church in the 1930s.
-As we will see in (TODO: reference Church Encodings), we don't need to
-define a type of *values* because we are going to use 
-lambda expressions as the values. 
- 
- ## Examples of First-Class Functions
- 
+ ## Examples of First-Class Functions {#FirstClassExamples}
+  
 Before we begin a full analysis of the semantics of first-class 
 functions, and subsequently implementing them in Haskell, it is useful
 to explore some examples of first-class functions. Even if you have
 used first-class functions before, you might find these examples
 interesting.
  
- ### Mapping
+ ### Function Composition {#Compose}
  
+One of the simplest examples of a using functions as values is
+defining a general operator for *function compositon*. The
+composition $f \circ g$ of two functions $f$ and $g$ is a new function that
+first performs $g$ on an input, then performs $f$ on the result.
+Composition can be defined in Haskell as:
+
+> compose f g = \x -> f(g x)
+
+The two arguments are both functions, and the result of composition is
+also a function. The type of |compose| is
+
+> compose :: (b -> c) -> (a -> b) -> (a -> c)
+ 
+As an example of function composition, consider two functions that
+operate on numbers:
+
+> square n = n * n
+> mulPi m = pi * m
+
+Now using composition we can define a function for computing the area of a circle,
+given the radius:
+
+> areaR = compose mulPi square
+
+To compute the area given the diameter, we can compose this function with a function that
+divides by two:
+
+> areaD = compose areaR (\x -> x / 2)
+
+
+ ### Mapping {#Map}
+  
 One of the earliest and widely cited examples of first class functions
 is in the definition of a |map| function, which applies a function to
 every element of a list, creating a new list with the results.
@@ -1566,9 +1577,7 @@ every element of a list, creating a new list with the results.
 For example, given the standard Haskell function |negate|
 that inverts the sign of a number, it is easy to quickly negate a list of numbers:
 
-````
-map negate [1, 3, -7, 0, 12]   -- returns [-1, -3, 7, 0, -12]
-````
+> testM1 = map negate [1, 3, -7, 0, 12]   -- returns [-1, -3, 7, 0, -12]
 
 The |map| function takes a function as an argument. You can see that
 |map| takes a function argument by looking at its type:
@@ -1584,9 +1593,7 @@ Personally, I tend to
 use list comprehensions rather than |map|, because list comprehensions give
 a nice name to the items of the list. Here is an equivalent example using comprehensions:
 
-````
-[ negate n | n <- [1, 3, -7, 0, 12] ]   -- returns [-1, -3, 7, 0, -12]
-````
+> testm2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   -- returns [-1, -3, 7, 0, -12]
 
 A function that takes another function as an input is called a *higher-order function*.
 Higher-order functions are quite useful, but what I find even more interesting
@@ -1599,11 +1606,11 @@ The comprehensions used earlier in this document could be replace by invocations
 
 TODO: make a comment about point-free style?
 
-TODO: is a function that returns a fucntion also called higher order?
+TODO: is a function that returns a function also called higher order?
 
- ### Representing Evironments as Functions
+ ### Representing Environments as Functions {#EnvAsFun}
 
-In Chapter 1, an environment was defined as a list of bindings.
+In [Chapter 1](#Chapter1), an environment was defined as a list of bindings.
 However, it is often useful to conside the *behavior* of a concept
 rather than its concrete *representation*. The purpose of a
 environment is to map variable names to values. A map is just
@@ -1645,7 +1652,7 @@ lookup function.
 [^2]: This kind of behavioral representation will come again when we discuss object-oriented programming.
 
 The only other thing that is done with an environment is to extend it with 
-additional bindings. Lets define bind functions that add a binding to
+additional bindings. Let's define bind functions that add a binding to
 an environment, represented as lists or functions. For lists, the |bindL| function
 creates a binding |(val, val)| and then prepends it to the front of the list:
 
@@ -1664,7 +1671,9 @@ write a *higher-order* function. A higher-order function is one that
 takes a function as input or returns a function as an result. The
 function |bindF| takes an |EnvF| as an input and returns a new |EnvF|.
 
-> bindF :: String -> Value -> EnvF -> EnvF
+````
+bindF :: String -> Value -> EnvF -> EnvF
+````
 
 Expanding the definition of |EnvF| makes the higher-order nature of |bindF| clear:
 
@@ -1685,7 +1694,7 @@ type |EnvF = String -> Maybe Int|. The other arguments, |var|
 and |val| are the same as for |bindL|: a string and an integer.
 
 The second thing to notice is that the return value (the expression
-on the right side of the | = | sign) is a lambda expression |\testVar -> ...|. 
+on the right side of the | = | sign) is a function expression |\testVar -> ...|. 
 That means the return value is a function. The argument of this 
 function is named |testVar| and the body of the function is a 
 conditional expression. The conditional expression checks if
@@ -1706,17 +1715,15 @@ be bound many times. Consider a specific example:
 > -- version A
 > envF2 = bindF "z" (Int 5) envF1
 
-Lets execute this program manually. The call to |bindF| has three
+Let's execute this program manually. The call to |bindF| has three
 arguments, creating these bindings: 
 |var| $\mapsto$ |\"z\"|, |val| $\mapsto$ |5|, |env| $\mapsto$ |envF1|.
 Substituting these bindings into the definition of |bindF| gives
 
-````
--- version B
-envF2 = \testVar -> if testVar == "z" 
-                    then (Int 5) 
-                    else envF1 testVar
-````
+> -- version B
+> envF2'1 = \testVar -> if testVar == "z" 
+>                     then Just (Int 5) 
+>                     else envF1 testVar
 
 This makes more sense! It says that |envF2| is a function that
 takes a variable name as an argument. It first tests if the 
@@ -1724,11 +1731,9 @@ variable is named |z| and if so it returns 5. Otherwise it returns
 what |envF1| returns for that variable. Another way to write
 this function is
 
-````
--- version C
-envF2 "z" = 5
-envF2 testVar = envF1 testVar
-````
+> -- version C
+> envF2'2 "z" = Just (Int 5)
+> envF2'2 testVar = envF1 testVar
 
 These two versions are the same because of the way Haskell deals
 with functions defined by cases: it tries the first case (argument == |\"z\"|),
@@ -1745,24 +1750,26 @@ list and function environments.
 > emptyEnvF :: EnvF
 > emptyEnvF = \var -> Nothing
 
-The empty function environment |emptyEnvF| is intersting: it
+The empty function environment |emptyEnvF| is interesting: it
 maps every variable name to |Nothing|.
 
 In conclusion, functions can be used to represent environments.
 This example illustrates passing a function as an argument as well
-as returning a function as a value. The environtment-based 
-evaluators in the first chapter could be easily modified to
+as returning a function as a value. The environment-based 
+evaluators for [expressions](#BasicEvalEnv) and [top-level functions](#EvalTopLevel) 
+could be easily modified to
 use functional environments rather than lists of bindings. For
 example, the environment-based evaluation function becomes:
 
-> evaluate'5a :: EnvF -> Exp'4 -> Value
-> evaluate'5a env exp = eval exp 
+> -- Evaluate an expression in a (functional) environment
+> evaluate'5a :: Exp'4 -> EnvF -> Value
+> evaluate'5a exp env = eval exp 
 >   where
 >     eval (Literal'4 v)      = v
 >     eval (Unary'4 op a)     = unary op (eval a)
 >     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
 >     eval (Variable'4 x)     = fromJust (env x)            -- changed
->     eval (Let'4 x exp body) = evaluate'5a env' body
+>     eval (Let'4 x exp body) = evaluate'5a body env'
 >       where env' = bindF x (eval exp) env               -- changed
 
 The result looks better than the previous version, because 
@@ -1776,37 +1783,31 @@ behavior and data is quite blurry.
 
 TODO: define "shadow" and use it in the right places.
 
- ### Multiple Arguments and Currying
+ ### Multiple Arguments and Currying {#Curry}
 
-Lambda expressions always have exactly *one* argument. 
+Functions in the lambda calculus always have exactly *one* argument. 
 If Haskell is based on Lambda calculus, how should we
-understand all the funtions we've defined with multiple arguments? 
+understand all the functions we've defined with multiple arguments? 
 The answer is surprisingly subtle. Let's consider a very 
 simple Haskell function that appears to have two arguments:
 
 > add a b = b + a
 
-In the section above on lambdas, we learned that arguments
+The [Rule of Function Arguments](#LambdaDefinition) for Haskell says that arguments
 on the left of a definition are short-hand for lambdas.
 The |b| argument can be moved to the right hand side to
 get an equivalent definition:
 
-````
-add a = \b -> b + a
-````
+> add'1 a = \b -> b + a
 
 Now the |a| argument can also be moved. We have now
 "solved" for |add|:
 
-````
-add = \a -> \b -> b + a
-````
+> add'2 = \a -> \b -> b + a
 
 It's useful to add parentheses to make the grouping explicit:
 
-````
-add = \a -> (\b -> b + a)
-````
+> add'3 = \a -> (\b -> b + a)
 
 What this means is that |add| is a function of one argument |a|
 whose return value is the function |\b -> b + a|. The function
@@ -1826,7 +1827,8 @@ function:
 > dec = add (-1)   -- \b. b + (-1)
 
 These two functions each take a single argument. 
-The first adds one to its argument. The second subtracts one. For example,
+The first adds one to its argument. The second subtracts one.
+Here are two examples that use the resulting functions:
 
 > eleven = inc 10
 > nine   = dec 10
@@ -1834,22 +1836,16 @@ The first adds one to its argument. The second subtracts one. For example,
 To see how the definition of |inc| works, we can analyze the function call
 |add 1| in more detail. Replacing |add| by its definition yields:
 
-````
-inc = (\a -> (\b -> b + a)) 1
-````
+> inc'1 = (\a -> (\b -> b + a)) 1
 
-The "rule of lambda invocation" says that in this situation, |a| is 
-substituted for |1| in the body |\b -> b + a| to yeild:
+The Rule of Function Invocation says that in this situation, |a| is 
+substituted for |1| in the body |\b -> b + a| to yield:
 
-````
-inc = \b -> b + 1
-````
+> inc'2 = \b -> b + 1
 
-Which is the same (by the rule of lambda definition) as:
+Which is the same (by the [Rule of Function Arguments](#LambdaDefinition)) as:
 
-````
-inc b = b + 1
-````
+> inc'3 b = b + 1
 
 One way to look at what is going on here is that the two arguments
 are split into stages. Normally both arguments are supplied at the same
@@ -1858,26 +1854,22 @@ perform the stages at different times. After completing the first stage
 to create an increment/decrement function, the new increment/decrement function
 can be used many times.
 
-````
-inc 5 + inc 10 + dec 20 + dec 100
-````
+> testinc = inc 5 + inc 10 + dec 20 + dec 100
 
 (remember that this means |(inc 5) + (inc 10) + (dec 20) + (dec 100)|)
 
 Separation of arguments into different stages is exactly the same 
-technique used in the previous section on representing environments
-as funtions. The |bindF| function two three arguments in the first stage,
-and then returned a function of one argument that was invoked in a second
+technique used in the [section on representing environments
+as funtions](#EnvAsFun). The |bindF| function takes three arguments in the first stage,
+and then returns a function of one argument that is invoked in a second
 stage. To make it look nice, the first three arguments were listed to the 
 left of the |=| sign, while the last argument was placed to the right as an
 explicit lambda. However, this choice of staging is just the intended use
 of the function. The function could also have been defined as follows:
 
-````
-bindF var val env testVar = if testVar == var 
-                            then Just val 
-                            else env testVar
-````
+> bindF'1 var val env testVar = if testVar == var 
+>                             then Just val 
+>                             else env testVar
 
 The ability to selectively stage functions suggests a design principle
 for Haskell that is not found in most other languages: *place arguments
@@ -1895,9 +1887,9 @@ These examples are known as Church encodings.
  #### Booleans
 
 Booleans represent a choice between two alternatives. Viewing the 
-boolean itself as a behavior means leads to a view of a boolean as a
+boolean itself as a behavior leads to a view of a boolean as a
 function that chooses between two options. One way to represent a
-choice is by a function with two arguments that turns one or the
+choice is by a function with two arguments that returns one or the
 other of the inputs:
 
 > true  x y = x
@@ -1940,15 +1932,11 @@ return |b| if |a| is true and false otherwise.
 To use a Church boolean, the normal syntax for if expressions is
 completely unnecessary. For example,
 
-````
-if not True then 1 else 2
-````
+> testb1 = if not True then 1 else 2
 
 is replaced by 
 
-````
-(notF true) 1 2
-````
+> testb2 = (notF true) 1 2
 
 This code is not necessarily more readable, but it is concise.
 In effect a Church boolean *is* an if expression: it is a 
@@ -1974,176 +1962,387 @@ TODO: prove that |let x =| $e$ |in| $b$ is equivalent to
 There are many other uses of first-class functions, including
 callbacks, event handlers, thunks, continuations, etc. 
 
---------------------BEGIN-HIDE-------------------------
- ## Evaluating First-Class Functions by Substitution
+ ## Evaluating First-Class Functions using Environments
 
-Church defined the semantics of lambda calculus using
-substitution. 
-We introduced substitution for arithmetic
-expressions in Chapter 1 so that you would familiar with
-the concept by the time we got here.
-
-Substitution for
-lambda expressions is a little more complex, however.
-In the previous approach we substituted variables for
-values in expressions, but now we will substitute variables
-for expressions in expressions. 
-
-> substitute'9 :: String -> Exp'9 -> Exp'9 -> Exp'9
-> substitute'9 var exp target = subst target
->  where
->    -- uses subst function defined in the next few paragraphs
-
-Since expressions can 
-contain variables, we will have to be more careful.
-The first case, for substitution into a variable 
-expression, is the same as previous cases:
-
->    subst (Variable'9 name) = 
->      if var == name then exp else Variable'9 name
-
-The second case is substitution into a function call. It just
-substitutes into the function and the argument:
-
->    subst (Apply'9 fun arg) = 
->      Apply'9 (subst fun) (subst arg)
-
-The last case is substitution *into* a lambda expression.
-This case is similar to the case of substitution into
-a |let| epxression (TODO: reference chapter), because
-both a |let| and a lambda introduce a new variable name.
-Here is a first attempt at substituting *into* a lambda
-expression. 
-
-````
--- first version is not quite correct
-    subst (Lambda'9 name body) = 
-      if var == name 
-      then Lambda'9 name body
-      else Lambda'9 name (subst body)
-````
-
-This version properly handles *shodowing* of the outer
-|var| by the |name| bound in the lambda: if the names are
-the same, then substitution does not occur in the body.
-
-Consider some cases that this handles correctly:
-
-* Substitute $x \mapsto 5$ in $\lambda f.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda f.f(5)$
-* Substitute $x \mapsto 5$ in $\lambda x.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.f(x)$
-* Substitute $x \mapsto y$ in $\lambda f.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda f.f(y)$
-* Substitute $f \mapsto \lambda z.z+3$ in $\lambda x.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.(\lambda z.z+3)(x)$
-* Substitute $f \mapsto \lambda z.z+3$ in $\lambda z.f(z)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda z.(\lambda z.z+3)(z)$
-
-However, this version does *not* properly handle the case
-where the |exp| being substituted has free variables!
-Here is a case that does not work correctly:
-
-* Substitute $y \mapsto x*2$ in $\lambda x.y+x$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.(x*2)+x$
-
-The problem here is that the $x+1$ in the expression being substituted
-is a free variable, but it becomes bound in the result because it is
-substituted into the body of a lambda that uses the same variable name.
-They aren't really the same variable, even though they have the same name!
-One way to see that they are not the same variable is to rename
-the bound occurrence of $x$ to be some other variable name, $m$.
-
-* Substitute $y \mapsto x*2$ in $\lambda m.y+m$ \ \ \ $\Rightarrow$ \ \ \ $\lambda m.(x*2)+m$
-
-In this case the substitution is correct. 
-
-When a variable that was free ends up becoming bound, it is called *variable capture*.
-*variable capture* has never been a problem in any previous versions of
-substitution that we have discussed, because all previous
-cases of substitution have involved substitution of a
-variable for a *value*, and values do not have variables in them. 
-
-The definition of substitution is it must replace all
-*free* occurrences of a variable with a new value, and that
-all variables that are *free* in either the target or expression
-being substituted must remain free. In other words, substitution must
-avoid variable capture.
-
-The solution to variable capture identified above was to rename
-the bound variable if variable capture is about to happen.
-
->    subst (Lambda'9 name body) = 
->      if var == name
->      then Lambda'9 name body
->      else Lambda'9 name' (subst body')
->        where Lambda'9 name' body' = avoid_capture var exp (Lambda'9 name body)
-
-> avoid_capture var exp (Lambda'9 name body) = 
->   if elem name (free_vars exp) 
->   then let name' = new_variable (Apply'9 exp body) in
->        Lambda'9 name' (substitute'9 name (Variable'9 name') body)
->   else Lambda'9 name body
-
-TODO: need to define thse property!
-
-> new_variable exp = "foo"
-> free_vars exp = []
- 
- --------------------END-HIDE-------------------------
- 
- ## Evaluating First-Class Functions using Evironments
+Its now time to define the syntax and semantics of a
+language with first-class functions. Based on the examples
+in the [previous section](#FirstClassExamples), some features are no longer needed.
+For example, `let` expressions are not needed because they
+can be expressed using functions. Functions only need one
+argument, because multi-argument functions can be expressed
+by returning functions from functions. 
 
 Evaluation of first-class functions (lambdas) is
 complicated by the need to properly enforce *lexical scoping*
 rules. Lexical scope means that a variable refers to the
 closest enclosing definition of that variable.
+TODO: move this discussion earlier!
 
-The problem with lambda expressions is that they 
-interact in complex ways with variables that are defined
-outside the function.  
+\StartIncorrect
 
-The problem can be illustrated
-fairly simply:
+ ### A Non-Solution: Function Expressions as Values
 
-|let f = (let n = 10 in| $\lambda$|x|. |n*x) in f(2) + f(3)|
+The first idea for achieving "functions are values" is
+to make function expressions be values. It turns out that
+this "solution" does not really work. 
+The reason I spend so much time 
+discussing an incorrect solution is that understanding
+why the obvious and simple solution is wrong helps to
+motivate and explain the correct solution.
+This section is
+colored red to remind you that the solution it presents
+is *incorrect*. The correct solution is given in
+the [next section, on closures](#Closures). 
 
-For top-level functions, used in the  
-previous section, this is not a problem because there
-aren't any bindings outside the function.
+To try this approach, function expressions 
+are included in the |Value| data type, which 
+allows functions appears a literal values in a program:
 
-TODO: ensure proper terminology of paramters, arguments, 
-formal arguments, etc
+````
+data Value'8 = ...
+           | Function'8 String Exp'8  -- new
+  deriving Eq
+````
 
- ### A Non-Solution: Lambdas as Values
+The two components of a function expression |Function| are
+the *bound variable* |String| and the *body expression* |Exp|.
+This new kind of value for functions looks a little strange.
+Its not like the others.
+
+We normally think of values as things that a simple data,
+like integers, strings, booleans, and dates. Up until now, this is
+what values have been. Up until now, values have not
+contained *expressions* in them. On the other hand, we
+are committed to making functions be values, and the body of
+a function is necessarily an expression, so one way or the
+other values are going to contain expressions.
+
+TODO: the call expression discussion is really not part of this *incorrect*
+solution, so it could be moved out? The only problem is that the
+code assumes that functions are literals, which is not the code
+in the correct version. Sigh.
+
+The call expression changes slightly from the version with
+top-level functions. Instead of the *name* of the funtion
+to be called, the |Call| expression now contains an expression |Exp|
+for both the function and the argument:
+
+````
+data Exp'8 = ...
+         | Call'8      Exp'8 Exp'8         -- changed
+  deriving Eq
+````
+
+To clarify the effect of this change, consider these two versions
+of a simple program, written using top-level functions or 
+first-class functions:
+
+Top-Level Functions (A)  First-Class Functions (B)
+-----------------------  ----------------------
+|function f(x) x*x|      |let f = |$\lambda$|x. x*x in|
+|f(10)|                  \ \ \ \ |f(10)|
+
+The explicit abstract syntax for example (A) is:
+
+> testP1 = Program 
+>   [("f", Function'6 ["x"] 
+>            (Binary'6 Mul (Variable'6 "x")
+>                        (Variable'6 "x")))]
+>   (Call'6 "f" [Literal'6 (Int 10)])
+
+The explicit abstract syntax for example (B) is:
+
+> testP2 = 
+>  Let'8 "f" (Literal'8 (Function'8 "x" 
+>                       (Binary'8 Mul (Variable'8 "x")
+>                                   (Variable'8 "x"))))
+>    (Call'8 (Variable'8 "f") (Literal'8 (Int'8 10)))
+
+Note that the function in the |Call| is string |\"f\"|
+in the first version, but is an expression |Variable'8 "f"|
+in the second version.
+
+In many cases the
+first expression (the function) will be *variable* that 
+names the function to be called. Since there is no longer any
+special function environment, the names of functions are looked
+up in the normal variable environment. (TODO: should this come
+earlier?) 
+TODO: example where function to be called is not a variable.
+
+The first few cases for evaluation are exactly the same
+as before. In particular, evaluating a literal value is
+the same, although now the literal value might be a function.
+
+````
+evaluate'8 :: Exp'8 -> Env'8 -> Value'8
+evaluate'8 exp env = eval exp 
+  where
+    eval (Literal'8 v)      = v
+    ...
+````
+
+Calling a function works almost the same as the case for
+function calls in the [language with top-level functions](#TopLevel). 
+Here is the code:
+
+````
+    eval (Call'8 fun arg)   = evaluate'8 body env'
+      where Function'8 x body = eval fun
+            env' = bindF x (eval arg) env
+````
+
+To evaluate a function call |Call'8 fun arg|,
+
+ 1. First evaluate |eval fun| the function |fun| of the call.
+ 2. Use pattern matching to ensure that the result of step 1 is a |Function| value,
+     binding |x| and |body| to the argument name and body of the function.
+ 3. Evaluate the actual argument (|eval arg|) and then extend the environment |env|
+    with a binding between the function parameter |x| and the argument value: 
+   
+    |bindF x (eval arg) env|
+ 4. Evaluate the |body| of the function in the extended environment |env'|:
+
+    |evaluate'8 env' body|
+    
+Note that this explanation jumps around in the source code. The explanation follows
+the sequence of data dependencies in the code: what logically needs to be evaluated first,
+rather than the order in which expressions are written. Since Haskell is a lazy language,
+it will actually evaluate the expressions in a completely different order!
+
+The main difference from the case of [top-level functions](#TopLevel) is that the
+function is computed by calling |eval fun| rather than
+|lookup fun funEnv|. The other difference is that functions
+now only have one argument, while we allowed multiple arguments
+in the previous case.
+
+> --------------------BEGIN-HIDE-------------------------
+> data Value'8 = Int'8  Int
+>            | Bool'8 Bool
+>            | Function'8 String Exp'8  -- new
+>   deriving Eq
+>
+> data Exp'8 = Literal'8   Value'8
+>          | Unary'8     UnaryOp Exp'8
+>          | Binary'8    BinaryOp Exp'8 Exp'8
+>          | If'8        Exp'8 Exp'8 Exp'8
+>          | Variable'8  String
+>          | Let'8       String Exp'8 Exp'8
+>          | Call'8      Exp'8 Exp'8         -- changed
+>   deriving Eq
+>
+> evaluate'8 :: Exp'8 -> Env'8 -> Value'8
+> evaluate'8 exp env = eval exp 
+>   where  -- TODO: not needed to show this code here?
+>     eval (Literal'8 v)      = v
+>     eval (Unary'8 op a)     = unary'8 op (eval a)
+>     eval (Binary'8 op a b)  = binary'8 op (eval a) (eval b)
+>     eval (If'8 a b c)       = if fromBool'8 (eval a) 
+>                             then (eval b) 
+>                             else (eval c)
+>     eval (Let'8 x exp body) = evaluate'8 body env'
+>       where env' = bindF x (eval exp) env
+>     eval (Variable'8 x)     = fromJust (env x)
+
+> type Env'8 = String -> Maybe Value'8
+>
+> fromBool'8 (Bool'8 b) = b
+>
+> unary'8 Not (Bool'8 b) = Bool'8 (not b)
+> unary'8 Neg (Int'8 i)  = Int'8 (-i)
+>
+> binary'8 Add (Int'8 a)  (Int'8 b)  = Int'8 (a + b)
+> binary'8 Sub (Int'8 a)  (Int'8 b)  = Int'8 (a - b)
+> binary'8 Mul (Int'8 a)  (Int'8 b)  = Int'8 (a * b)
+> binary'8 Div (Int'8 a)  (Int'8 b)  = Int'8 (a `div` b)
+> binary'8 And (Bool'8 a) (Bool'8 b) = Bool'8 (a && b)
+> binary'8 Or  (Bool'8 a) (Bool'8 b) = Bool'8 (a || b)
+> binary'8 LT  (Int'8 a)  (Int'8 b)  = Bool'8 (a < b)
+> binary'8 LE  (Int'8 a)  (Int'8 b)  = Bool'8 (a <= b)
+> binary'8 GE  (Int'8 a)  (Int'8 b)  = Bool'8 (a >= b)
+> binary'8 GT  (Int'8 a)  (Int'8 b)  = Bool'8 (a > b)
+> binary'8 EQ  a        b        = Bool'8 (a == b)
+> --------------------END-HIDE-------------------------
+
+The key question is: **why doesn't the code given above work?**
+There are two problems. One has to do with returning functions
+as values, and the other with passing functions as arguments.
+They both involve the handling of free variables in the
+function expression.
+
+ #### Problems with Returning Functions as Values
+
+Let's look at the problem of returning functions as values first.
+The section on [Multiple Arguments](#Curry) showed how a two-argument
+function could be implemented by writing a function that takes 
+one argument, but then returns a function that takes the second
+argument. Here is a small program that illustrates this technique:
+
+> teste1 = let add = \a -> (\b -> b + a) in add 3 2
+
+This program is encoded in our language as follows:
+
+> testE2 = 
+>  Let'8 "add" (Literal'8 (Function'8 "a" 
+>              (Literal'8 (Function'8 "b"
+>                 (Binary'8 Add (Variable'8 "b")
+>                             (Variable'8 "a"))))))
+>              (Call'8 (Call'8 (Variable'8 "add")
+>                              (Literal'8 (Int'8 3)))
+>                    (Literal'8 (Int'8 2)))
+
+Rather than work with the ugly constructor syntax in 
+Haskell, we will continue to use the convention of writing
+|b + a| to mean |(Binary'8 Add (Variable'8 "b") (Variable'8 "a"))|.
+
+Here is how evaluation of this sample program proceeds:
+
+ 1. Evaluate |let add = \a -> (\b -> b + a) in add 3 2|
+ 2. Bind |add| $\mapsto$ |\a -> (\b -> b + a)|
+ 3. Call |(add 3) 2|
+     a. Call |add 3|
+     b. Evaluate the variable |add|, which looks it up in the 
+        environment to get |\a -> (\b -> b + a)|
+     c. Bind |a| $\mapsto$ |3|
+     d. Return |\b -> b + a| as result of |add 3|
+ 4. Call |\b -> b + a| on argument |2|
+     a. Bind |b| $\mapsto$ |2|
+     b. Evaluate |b + a|
+     c. Look up |b| to get |2|
+     d. Look up |a| to get... **unbound variable!**                
+
+To put this more concisely, the problem arises because the call to |add 3| 
+returns |\b -> b + a|. But this function expression is not well defined because
+it has a free variable |a|. What happened to the binding for |a|? It had
+a value in Steps 12 through 14 of the explanation above. But this 
+binding is lost when returning the literal |\b -> b + a|. The problem doesn't 
+exhibit itself until the function is called.
+
+The problems with returning literal function expressions as values is that
+bindings for free variables that occur in the function are lost, leading
+to later unbound variable errors. Again, this problem arises because
+we are trying to treat function expressions as *literals*, as if they 
+were number or booleans. But function expressions are different because
+they contain variables, so care must be taken to avoid losing the
+bindings for the variables.
+
+ #### Problems with Rebinding Variables
+
+A second problem can arise when passing functions as values. This 
+problem can occur, for example, when [composing two functions](#Compose),
+[mapping a function over a list](#Map), or many other situations.
+Here is a program that illustrates the problem.
+
+> testP = let k = 2 in
+>   let double = \n -> k * n in
+>     let k = 9 in
+>       double k
+
+The correct answer, which is produced if you run this program in Haskell,
+is 18. The key point is that |k| is equal to |2| in the body of |double|,
+becuase that occurence of |k| is within the scope of the first |let|.
+Evaluating this function with the evaluator given above produces |81|,
+which is not correct.
+In summary, the evaluation of this expression proceeds as follows:
+
+ 1. Bind |k| $\mapsto$ |2|
+ 2. Bind |double| $\mapsto$ |\n -> k * n|
+ 3. Bind |k| $\mapsto$ |9|
+ 4. Call |double k|
+    a. Bind |n| $\mapsto$ |9|
+    b. Evaluate body |k * n|
+    c. Result is |81| given |k=9| and |n=9|
+       
+The problem is that when |k| is looked up in step 4b, the
+most recent binding for |k| is |9|. This binding is based on the
+*control flow* of the program, not on the *lexical* structure.
+Looking up variables based on control flow is called *dynamic binding*.
  
- TODO: define *dynamic scope*
- 
- #### Undefined Variables
- 
- #### Variable Capture
+\EndIncorrect
 
- ### The Right Solution: Closures
+ ### A Correct Solution: Closures {#Closures}
 
-A *closure* is an interrupted substitution.
+As we saw in the previous section, the problem with using a 
+function expession as a value is that the bindings of the free variables
+in the function expression are either lost or may be overwritten.
+The solution is to *preserve the bindings that existed at the
+point when the function was defined*. The mechanism for doing
+this is called a *closure*. A closure is a combination of a 
+function expression and an environment. Rather than think of
+a function expression as a function value, instead think of it 
+as a part of the program that *creates* a function. The actual
+function value is represented by a closure, which captures the
+current environment at the point when the function expression is
+executed.
 
-Closure definition: 
+To implement this idea, we revise the definition of |Exp|
+and |Value|. First we add function expressions as a new kind
+of expression:
+
+````
+data Exp'7 = ....
+         | Function'7 String Exp'7      -- new
+````
+
+As before, the two components of a function expression are
+the *bound variable* |String| and the *body expression* |Exp|.
+Function exprssions resemble |let| expressions, so they fit
+in well with the other kinds of expressions.
+
+The next step is to introduce *closures* as a new kind of value.
+Closures have all the same information as a funtion expressions
+(which we previously tried to add as values), but they have
+one important difference: closures also contain an environment.
 
 ````
 data Value'7 = ...
            | Closure'7 String Exp'7 Env'7  -- new
 ````
 
-````
-data Exp'7 = ....
-         | Function'7  String Exp'7      -- new
-         | Call'7      Exp'7 Exp'7         -- changed
-````
+The three parts of a closure are the *bound variable* |String|,
+the *function body* |Exp|, and *the closure environment* |Env|.
+The bound variable and function body are the same as the
+components of a function expression.
+
+With these data types, we can now define a correct evaluator for
+first-class functions using environments. As before, the
+|evaluate| function 
 
 ````
-evaluate'7 :: Env'7 -> Exp'7 -> Value'7
-evaluate'7 env exp = eval exp 
+-- Evaluate an expression in an environment
+evaluate'7 :: Exp'7 -> Env'7 -> Value'7
+evaluate'7 exp env = eval exp 
   where
     ...
     eval (Function'7 x body) = Closure'7 x body env
-    eval (Call'7 fun arg)   = evaluate'7 env'' body
+````
+
+````
+    eval (Call'7 fun arg)   = evaluate'7 body env''
       where Closure'7 x body env' = eval fun
             env'' = (x, eval arg) : env'
 ````
+ ## Environment Diagrams
+
+ ### Example 1
+
+```` 
+let k = 2 in
+  let double = \n -> k * n in
+    let k = 9 in
+      double k
+```` 
+ 
+![Environment Diagram 1](figures/env1.eps)
+ 
+ ### Example 2
+
+````
+let add = \a -> (\b -> b + a) in (add 3) 2
+````
+
+![Environment Diagram 2](figures/env2.eps)
+ 
  
  ## Recursive Functions
  
@@ -2206,6 +2405,137 @@ Here is the full code:
 > binary'7 GT  (Int'7 a)  (Int'7 b)  = Bool'7 (a > b)
 > binary'7 EQ  a        b        = Bool'7 (a == b)
 > --------------------END-HIDE-------------------------
+ 
+ 
+--------------------BEGIN-HIDE-------------------------
+ ## Evaluating First-Class Functions by Substitution
+ 
+ Now its time for write a semantics for a language with
+first-class functions. Since we have seen that booleans,
+integers and other data types can be represented by functions,
+there is no reason to include them in the language. What
+remains are just variables, functions (lambda expressions),
+and function application.
+
+> data Exp'9 = Variable'9 String     -- variables
+>          | Function'9 String Exp'9   -- function creation
+>          | Call'9 Exp'9 Exp'9       -- function call
+
+This is exactly the abstract syntax of
+the *lambda calculus*, as defined by Church in the 1930s.
+As we will see in (TODO: reference Church Encodings), we don't need to
+define a type of *values* because we are going to use 
+lambda expressions as the values. 
+
+Church defined the semantics of lambda calculus using
+substitution. 
+We introduced substitution for arithmetic
+expressions in [Chapter 1](#BasicSubst) so that you would familiar with
+the concept by the time we got here.
+
+Substitution for
+lambda expressions is a little more complex, however.
+In the previous approach we substituted variables for
+values in expressions, but now we will substitute variables
+for expressions in expressions. 
+
+> substitute'9 :: String -> Exp'9 -> Exp'9 -> Exp'9
+> substitute'9 var exp target = subst target
+>  where
+>    -- uses subst function defined in the next few paragraphs
+
+Since expressions can 
+contain variables, we will have to be more careful.
+The first case, for substitution into a variable 
+expression, is the same as previous cases:
+
+>    subst (Variable'9 name) = 
+>      if var == name then exp else Variable'9 name
+
+The second case is substitution into a function call. It just
+substitutes into the function and the argument:
+
+>    subst (Call'9 fun arg) = 
+>      Call'9 (subst fun) (subst arg)
+
+The last case is substitution *into* a lambda expression.
+This case is similar to the case of substitution into
+a |let| epxression (TODO: reference chapter), because
+both a |let| and a lambda introduce a new variable name.
+Here is a first attempt at substituting *into* a lambda
+expression. 
+
+````
+-- first version is not quite correct
+    subst (Function'9 name body) = 
+      if var == name 
+      then Function'9 name body
+      else Function'9 name (subst body)
+````
+
+This version properly handles *shodowing* of the outer
+|var| by the |name| bound in the lambda: if the names are
+the same, then substitution does not occur in the body.
+
+Consider some cases that this handles correctly:
+
+* Substitute $x \mapsto 5$ in $\lambda f.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda f.f(5)$
+* Substitute $x \mapsto 5$ in $\lambda x.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.f(x)$
+* Substitute $x \mapsto y$ in $\lambda f.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda f.f(y)$
+* Substitute $f \mapsto \lambda z.z+3$ in $\lambda x.f(x)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.(\lambda z.z+3)(x)$
+* Substitute $f \mapsto \lambda z.z+3$ in $\lambda z.f(z)$ \ \ \ $\Rightarrow$ \ \ \ $\lambda z.(\lambda z.z+3)(z)$
+
+However, this version does *not* properly handle the case
+where the |exp| being substituted has free variables!
+Here is a case that does not work correctly:
+
+* Substitute $y \mapsto x*2$ in $\lambda x.y+x$ \ \ \ $\Rightarrow$ \ \ \ $\lambda x.(x*2)+x$
+
+The problem here is that the $x+1$ in the expression being substituted
+is a free variable, but it becomes bound in the result because it is
+substituted into the body of a lambda that uses the same variable name.
+They aren't really the same variable, even though they have the same name!
+One way to see that they are not the same variable is to rename
+the bound occurrence of $x$ to be some other variable name, $m$.
+
+* Substitute $y \mapsto x*2$ in $\lambda m.y+m$ \ \ \ $\Rightarrow$ \ \ \ $\lambda m.(x*2)+m$
+
+In this case the substitution is correct. 
+
+When a variable that was free ends up becoming bound, it is called *variable capture*.
+*variable capture* has never been a problem in any previous versions of
+substitution that we have discussed, because all previous
+cases of substitution have involved substitution of a
+variable for a *value*, and values do not have variables in them. 
+
+The definition of substitution is it must replace all
+*free* occurrences of a variable with a new value, and that
+all variables that are *free* in either the target or expression
+being substituted must remain free. In other words, substitution must
+avoid variable capture.
+
+The solution to variable capture identified above was to rename
+the bound variable if variable capture is about to happen.
+
+>    subst (Function'9 name body) = 
+>      if var == name
+>      then Function'9 name body
+>      else Function'9 name' (subst body')
+>        where Function'9 name' body' = avoid_capture var exp (Function'9 name body)
+
+> avoid_capture var exp (Function'9 name body) = 
+>   if elem name (free_vars exp) 
+>   then let name' = new_variable (Call'9 exp body) in
+>        Function'9 name' (substitute'9 name (Variable'9 name') body)
+>   else Function'9 name body
+
+TODO: need to define thse property!
+
+> new_variable exp = "foo"
+> free_vars exp = []
+ 
+ --------------------END-HIDE-------------------------
+ 
  
 > --------------------BEGIN-HIDE-------------------------
 

@@ -15,17 +15,22 @@ update: anatomy.pdf anatomyVerbatim.pdf
 	scp anatomyVerbatim.pdf envy.cs.utexas.edu:public_html/Courses/345/anatomyVerbatim.pdf
 	scp anatomy.pdf envy.cs.utexas.edu:public_html/Courses/345/anotomy.pdf
 	
-anatomy.mkd: anatomy.lhs makefile
+anatomy.mkd: anatomy.lhs makefile template.tex
 	cat anatomy.lhs \
 	 | sed "s/^ #/#/" \
 	 | sed "s/'[0-9][0-9a-z]*//g" \
+	 | sed "s/^> test[^=]* =/>/g" \
 	 | sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
 	 > anatomy.mkd
 
 anatomy.htm: anatomy.mkd
 	cat anatomy.mkd \
+   | sed "s/||/VERTICAL_BAR/g" \
+   | sed "/|/s/\\\\//g" \
+   | sed "s/|/\`/g" \
+   | sed "s/VERTICAL_BAR/|/g" \
 	 | $(PANDOC) --toc -f markdown+lhs -t html -c hscolour.css --chapters \
-	 | sed "s/.eps/.png/" \
+	 | sed "s/\\.eps/.png/" \
 	 > anatomy.htm
 
 temp.lhs: anatomy.mkd template.tex
