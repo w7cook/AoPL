@@ -1,98 +1,16 @@
 %!TEX TS-program = xelatex
 \documentclass[12pt]{book}  
 
-% The declaration of the document class:
-
-% The second line here, i.e.
-% \documentclass[12pt]{scrartcl} 
-% is a standard LaTeX document class declaration: 
-% we say what kind of document we are making in curly brackets, 
-% and specify any options in square brackets.
-
-% (The previous line is a pseudo-comment, declaring that we will
-% use the special XeTeX machinery for its more extensive font list
-% and its use of unicode; 
-% in general, LaTeX 'comments' like this one
-%  begin with % and end with a linebreak.)
-
-% Note that there we have nothing in the nature of a template;
-% it's just a standard bit of LaTeX pandoc will copy unaltered into the 
-% LaTeX file it is writing.  But suppose you wrote something
-% more akin to the corresponding line in Pandoc's default 
-% latex.template file, say:
-
-% \documentclass$if(fontsize)$[$fontsize$]$endif${scrartcl}
-
-% then you would have invented a 'variable', fontsize, 
-% and could write things like 
-
-% `markdown2pdf my.txt --xetex --variable=fontsize:12pt -o my.pdf` or
-% `pandoc -r markdown -w html my.txt -s --xetex --variable=fontsize:24pt -o my.tex`. 
-
-% If we specified --variable-fontsize:12, then template substitution
-% would yield a LaTeX document beginning
-% \documentclass[12pt]{scrarcl}
-% which is just what we said anyway. 
-% But we could also specify a different fontsize.
-
-% I don't use this `--variable=....`functionality myself; 
-% I have a couple of basic templates I call with 
-% `--template=whatever.template` which I can also 
-% easily inspect to adjust things like font size as I please. 
-
-% While we are discussing the declaration of the document class...
-% here's an alternative command for two column landscape, 
-% not bad for some purposes. (If you strike the word 'landscape' 
-% you will have two narrow newspaperlike
-% columns; scientists like that, becausee irrationality must
-% show itself somewhere):
-%\documentclass[12pt,twocolumn,landscape]{scrartcl} 
-% Columns are too close together in LaTeX so we add this 
-% `columnsep` command:
-%\setlength{\columnsep}{.5in}
-
-
-
-
-% Symbols: 
-% Pandoc imports the extensive `amsmath` collection of symbols 
-% for typesetting ordinary math.  
 \usepackage{amsmath}
-% if you use exotic symbols you need to import specific packages, eg. for
-% electrical engineering diagrams, musical notation, exotic currency symbols,
-% the unspeakable rites of freemasonry etc.
 
-
-% `babel`: 
-% The `babel` package, among other things, lets you determine what 
-% language you are using in a given stretch of text, so that typesetting 
-% will go well. Here we specify that mostly, we are speaking English:
 \usepackage[english]{babel}
-
-
-% Margins, etc:
-% the `geometry` package makes for convenient adjusting of margins, which is what
-% you asked about.  Of course it can do much more, even make coffee for you:
 \usepackage{geometry}
 \geometry{verbose,letterpaper,tmargin=3cm,bmargin=3cm,lmargin=3cm,rmargin=3cm}
-% so if you just keep a copy of this template in the directory you are working in, you
-% can adjust the margins by going into this file and messing with the margins.
-% the syntax is very unforgiving, but permits 3cm and 2.5in and some other things.
 
 %include lhs2TeX.fmt
 
-% Font:
-% Here I set my main font, which is an Apple Corporation Exclusive, golly. 
-
 % \setmainfont{Hoefler Text}
 % \setromanfont[Mapping=tex-text,Contextuals={NoWordInitial,NoWordFinal,NoLineInitial,NoLineFinal},Ligatures={NoCommon}]{Hoefler Text}
-
-% Hoefler Text is okay, but note the long discussion of 'contextuals' which is necessary to cools off 
-% some of its show-offy properties. (You can make your essay look like the 
-% Declaration of Independence by specifying e.g. Ligatures={Rare} )
-% If you have a copy you might try it; as it is
-% I will comment it out and supply something more certain to be around:
-
 
 % Properly one should specify a sanserif font and a monospace font
 % see e.g. the example of Kieran Healy:
@@ -100,23 +18,7 @@
 % \setsansfont[Mapping=tex-text]{Minion Pro} 
 % \setmonofont[Mapping=tex-text,Scale=0.8]{Pragmata}
 
-% But I hate sanserif fonts, and anyway there are defaults.
-
-
-
-
-% I'm puzzled why I have this foonote speciality, 
-% I wonder if it's part of my problem I've been having, but wont look
-% into it now. 
 \usepackage[flushmargin]{footmisc} 
-% \usepackage[hang,flushmargin]{footmisc}
-
-% So much for my personal template.
-
-
-% Everything that follows is copied from the pandoc default template:
-% I will interpolate a few comments, the comments that are in 
-% the default template will be marked % -- 
 
 % Paragraph format:
 % Pandoc prefers unindented paragraphs in the European style:
@@ -126,14 +28,13 @@
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
 
 % Page format:
-\pagestyle{plain}  
-% The default `plain` pagestyle just numbers the pages,
-% whereas  
-% \pagestyle{empty} 
-% would give you no numbering.
-% After one-million man-years of macro-composition, 
-% there are also fancy pagestyles with much wilder options 
-% for headers and footers, of course.
+%\pagestyle{plain}  
+
+\usepackage{fancyhdr}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\pagestyle{fancy}
+\rhead{}
+\rfoot{\today\ \currenttime}
 
 % Footnotes
 % if you have code in your footnotes, the million macro march 
@@ -270,9 +171,6 @@ $endif$
 % Other stuff you specify on the command line:
 % You can include stuff for the header from a file specified on the command line;
 % I've never done this, but that stuff will go here:
-$for(header-includes)$
-$header-includes$
-$endfor$
 
 % Title, authors, date.
 % If you specified title authors and date at the start of 

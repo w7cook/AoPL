@@ -2,7 +2,6 @@
 % William R. Cook
 % Copyright (C) 2013
 
-
 > --------------------BEGIN-HIDE-------------------------
 > {-# OPTIONS -XRankNTypes #-}
 > import Prelude hiding (LT, GT, EQ)
@@ -66,7 +65,7 @@ I recommend
  
 I thank the students in the spring 2013 semester of CS 345 *Programming Languages*
 at the University of Texas at Austin, who helped out while I was writing the book.
-Special thanks to Chris Roberts and Guy Hawkins for careful proofreading.
+Special thanks to Chris Roberts and Guy Hawkins for corrections.
  
  ## Introduction
 
@@ -112,7 +111,7 @@ any program whose input or output is a program. Familiar examples of metaprogram
 include compilers, interpreters, virtual machines. In this course we will read, write and 
 discuss many metaprograms.
 
- # Expressions, Variables, and First-Order Functions {#Chapter1}
+ # Expressions and Variables {#Chapter1}
  
  ## Simple Language of Arithmetic
 
@@ -167,9 +166,11 @@ Arithmetic expressions can be represented in Haskell with the following data typ
 >          | Add'1        Exp'1 Exp'1
 >          | Subtract'1   Exp'1 Exp'1
 >          | Multiply'1   Exp'1 Exp'1
+>          | Divide'1     Exp'1 Exp'1
 
 This data type defines four representational variants, one for numbers,
-and three for the the binary operators of addition, subtraction, and multiplication.
+and three for the the binary operators of addition, subtraction, multiplication,
+and division.
 A number that appears in a program is called a *literal*.
 
 The five examples given above can be written as values of type |Exp| to 
@@ -221,7 +222,10 @@ defined by cases in Haskell:
 > evaluate'1 (Add'1 a b)       = evaluate'1 a + evaluate'1 b
 > evaluate'1 (Subtract'1 a b)  = evaluate'1 a - evaluate'1 b
 > evaluate'1 (Multiply'1 a b)  = evaluate'1 a * evaluate'1 b
+> evaluate'1 (Divide'1 a b)    = evaluate'1 a `div` evaluate'1 b
 
+In Haskell, a two-argument function like |div| can be used as an 
+infix operator by surrounding it in back-quotes, as |`div`|.
 To test this program we can execute the following main program:
 
 > main'1 = do
@@ -242,11 +246,33 @@ The output is
 This looks pretty good, except that the default |Show| format for
 expressions is quite ugly.
 
+ ### Errors
+ 
+There are many things that can go wrong when evaluating an expression.
+In our current, very simple language, the only error that can arise
+is attempting to divide by zero. For example, consider this small expression:
+
+> testDBZ = evaluate'1 (Divide'1 (Number'1 8) (Number'1 0))
+
+In this case, the |div| operator in
+Haskell will throw a low-level error, which terminates execution of
+the program and prints an error message:
+
+````
+*** Exception: divide by zero
+````
+
+As our language becomes more complex, there will be many more kinds of
+errors that can arise. For now, we will just rely on Haskell to
+terminate the program when these situations arise, 
+but in [Chapter 5](#Monads) we will investigate how to 
+manage errors within our evaluator. 
+
  ### Formatting Expressions
 
 Another way to interpret abstract |Exp| values is as 
 a string that corresponds to our normal way of writing arithmetic
-expressions, with binary operators for |+| and |*|.
+expressions, with binary operators for |+|, |*|, |-| and |/|.
 
 ````
 instance Show Exp where
@@ -254,6 +280,7 @@ instance Show Exp where
   show (Add a b)       = showBinary a "+" b
   show (Subtract a b)  = showBinary a "-" b
   show (Multiply a b)  = showBinary a "*" b
+  show (Divide a b)  = showBinary a "/" b
 showBinary a op b = show a ++ op ++ show b
 ````
 
@@ -327,6 +354,7 @@ addition has precedence 1 and multiplication has precedence 2.
 > showExp level (Add'1 a b)       = showBinary level 1 a " + " b
 > showExp level (Subtract'1 a b)  = showBinary level 1 a " - " b
 > showExp level (Multiply'1 a b)  = showBinary level 2 a "*" b
+> showExp level (Divide'1 a b)    = showBinary level 2 a "/" b
 >
 > showBinary outer inner a op b = 
 >   if inner < outer then paren result else result
@@ -368,6 +396,7 @@ a |Variable| case.
 >          | Add'2      Exp'2 Exp'2
 >          | Subtract'2 Exp'2 Exp'2
 >          | Multiply'2 Exp'2 Exp'2
+>          | Divide'2   Exp'2 Exp'2
 >          | Variable'2 String        -- added
 > --------------------BEGIN-HIDE-------------------------
 >    deriving Eq
@@ -378,6 +407,7 @@ a |Variable| case.
 > showExp'2 level (Add'2 a b)       = showBinary'2 level 1 a " + " b
 > showExp'2 level (Subtract'2 a b)  = showBinary'2 level 1 a " - " b
 > showExp'2 level (Multiply'2 a b)  = showBinary'2 level 2 a "*" b
+> showExp'2 level (Divide'2 a b)    = showBinary'2 level 2 a "/" b
 > showExp'2 level (Variable'2 a)    = a
 > showBinary'2 outer inner a op b = 
 >   if inner < outer then paren result else result
@@ -432,8 +462,9 @@ we will not discuss them directly in these notes. For our purposes, we will
 assume that we already know the value of the variable, and that the problem 
 is to compute a result using that value. 
 
- ## Evaluation by Substitution
+ ## Substitution
 
+Substitution is used to replace a varible with a value in an expression.
 What we want is a function that has the following behavior:
 
 * substitute $x \mapsto 5$ in $x+2$   $\longrightarrow$ $5+2$
@@ -453,6 +484,7 @@ The following Haskell function implements this behavior:
 >   subst (Add'2 a b)       = Add'2 (subst a) (subst b) 
 >   subst (Subtract'2 a b)  = Subtract'2 (subst a) (subst b)
 >   subst (Multiply'2 a b)  = Multiply'2 (subst a) (subst b)
+>   subst (Divide'2 a b)    = Divide'2 (subst a) (subst b)
 >   subst (Variable'2 name) = if var == name 
 >                           then Number'2 val 
 >                           else Variable'2 name
@@ -467,7 +499,7 @@ then the value is
 
 > x = Variable'2 "x"
 > y = Variable'2 "y"
-> main'4 = do 
+> main'4 = do
 >   test (substitute1 ("x", 5)) (Add'2 x (Number'2 2))
 >   test (substitute1 ("x", 5)) (Number'2 2)
 >   test (substitute1 ("x", 5)) x
@@ -516,6 +548,7 @@ environments rather than single bindings:
 >   subst (Add'2 a b)       = Add'2 (subst a) (subst b) 
 >   subst (Subtract'2 a b)  = Subtract'2 (subst a) (subst b)
 >   subst (Multiply'2 a b)  = Multiply'2 (subst a) (subst b)
+>   subst (Divide'2 a b)    = Divide'2 (subst a) (subst b)
 >   subst (Variable'2 name) = 
 >     case lookup name env of
 >       Just val -> Number'2 val 
@@ -687,6 +720,41 @@ evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) bo
  
 TODO: need some test cases here
  
+ ### Undefined Variable Errors
+ 
+With the introduction of variables into our language, we have created
+the possibiliy for a new kind of error: attempting to evaluate an expression
+containing a variable that does not have a value. For example, these
+expressions all contain undefined variables:
+
+````
+x + 3
+let x = 2 in x * y
+(let x = 3 in x) * x
+````
+
+What will happen when these expressions are evaluated? Note that we have
+not defined a case for evaluating a variable. This is because all variables
+should be substituted for values before evaluation takes place. If a variable
+is not substituted then it is undefined. Since no case is defined for
+|evaluate| of a |Variable|, Haskell terminates the program and prints this
+error message:
+
+````
+ *** Exception: anatomy.lhs: Non-exhaustive patterns in function evaluate'3
+````
+
+The fact that a variable is undefined is a *static* property of the
+program: whether a variables is undefined depends only on the text of the program, 
+not upon the particular data that the program is manipulating. This is different
+from the first error case we identified, namely divide by zero. It is normal for
+divide by zero to depend upon the particular data that the program is manipulating,
+so it is a *dynamic* error. Of course, it might be possible to identify, just from
+examining the text of a program, that it will always divide by zero. Alternatively,
+it may be the case that the code containing an undefined variable is never 
+executed at runtime. Thus the boundary between static and dynamic errors is not
+absolute. We will discuss this issue in more detail (TODO: reference to chapter on Types).
+
  ### Summary
 
 Here is the full code evaluation using substitution of a language
@@ -696,6 +764,7 @@ with local variables.
 >          | Add'3        Exp'3 Exp'3
 >          | Subtract'3   Exp'3 Exp'3
 >          | Multiply'3   Exp'3 Exp'3
+>          | Divide'3     Exp'3 Exp'3
 >          | Variable'3   String
 >          | Let'3        String Exp'3 Exp'3    
 >
@@ -705,6 +774,7 @@ with local variables.
 >   subst (Add'3 a b)       = Add'3 (subst a) (subst b) 
 >   subst (Subtract'3 a b)  = Subtract'3 (subst a) (subst b)
 >   subst (Multiply'3 a b)  = Multiply'3 (subst a) (subst b)
+>   subst (Divide'3 a b)    = Divide'3 (subst a) (subst b)
 >   subst (Variable'3 name) = if var == name 
 >                           then Number'3 val 
 >                           else Variable'3 name
@@ -718,6 +788,7 @@ with local variables.
 > evaluate'3 (Add'3 a b)        = evaluate'3 a + evaluate'3 b
 > evaluate'3 (Subtract'3 a b)   = evaluate'3 a - evaluate'3 b
 > evaluate'3 (Multiply'3 a b)   = evaluate'3 a * evaluate'3 b
+> evaluate'3 (Divide'3 a b)     = evaluate'3 a `div` evaluate'3 b
 > evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) body)
 
  ## Evaluation using Environments {#BasicEvalEnv}
@@ -769,10 +840,11 @@ of substitutions being performed.
 >   eval (Add'3 a b)       = eval a + eval b
 >   eval (Subtract'3 a b)  = eval a - eval b
 >   eval (Multiply'3 a b)  = eval a * eval b
+>   eval (Divide'3 a b)    = eval a `div` eval b
 
 >   eval (Variable'3 x)    = fromJust (lookup x env)
->   eval (Let'3 x exp body)     = evaluate'4 body env' 
->     where env' = (x, eval exp) : env
+>   eval (Let'3 x exp body)     = evaluate'4 body newEnv 
+>     where newEnv = (x, eval exp) : env
 
 The helper function |eval| is defined in the scope of the |env|
 argument of the main |evaluate| function. Since the environment
@@ -783,9 +855,9 @@ calls |evaluate| rather than |eval|.
 
 The case for |Let| first evaluates the bound expression in the
 current environment |ev e|, then it creates a new 
-environment |env'| with that binds |x| to the value of
+environment |newEnv| with that binds |x| to the value of
 the bound expressions. It then evaluates the body |b| in the
-new environment |env'|.
+new environment |newEnv|.
 
 The steps in evaluation with environments do not copy the expression:
 
@@ -807,7 +879,7 @@ $\emptyset$                                         |2| $\Rightarrow$ |2|
                                                     { evaluate body of let }
 |z| $\mapsto$ 5, |y| $\mapsto$ 3, |x| $\mapsto$ 2   |x\*y\*z| $\Rightarrow$ |70|
 
-In the |Let| case of |eval|, a new environment |env'| is created and used
+In the |Let| case of |eval|, a new environment |newEnv| is created and used
 as the environment for evaluation of the body |b|. 
 
 The new environments
@@ -854,7 +926,13 @@ single binding. The next two let expressions create environments
 Internally Haskell allows these two environments to share the definition
 of the original environment |x| $\mapsto$ 3.
 
-TODO: point out that |fromJust| and |prim| don't handle all cases.
+The Haskell function |fromJust| raises an exception if its
+argument is |Nothing|, which occurs when the variable named
+by |x| is not found in the environment |env|. This is where
+undefined variable errors arise in this evaluator.
+
+TODO: define *exception*?
+
 
  ## More Kinds of Data: Booleans and Conditionals
 
@@ -961,8 +1039,8 @@ perform the actual computations for binary and unary operations, respectively.
 >     eval (Unary'4 op a)     = unary op (eval a)
 >     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
 >     eval (Variable'4 x)     = fromJust (lookup x env)
->     eval (Let'4 x exp body) = evaluate'5 body env'
->       where env' = (x, eval exp) : env
+>     eval (Let'4 x exp body) = evaluate'5 body newEnv
+>       where newEnv = (x, eval exp) : env
 
 The conditional expression first evaluates the condition, forces it to be a boolean, 
 and then evaluates either the *then* or *else* expression.
@@ -989,6 +1067,8 @@ and the arguments to compute the result of basic operations.
 > binary GE  (Int a)  (Int b)  = Bool (a >= b)
 > binary GT  (Int a)  (Int b)  = Bool (a > b)
 > binary EQ  a        b        = Bool (a == b)
+
+TODO: talk about strictness!
 
 Using the new format, here are the expressions for the test
 cases given above:
@@ -1075,7 +1155,7 @@ Here are some examples of epxression that generate type errors:
 We will discuss techniques for preventing type errors later, but for now
 it is important to realize that programs may fail at runtime.
 
- ## Top-Level Functions {#TopLevel}
+ # Functions
  
 Functions are familiar to any student of mathematics. The first hint of
 a function in grade school may be some of the standard operators that
@@ -1094,7 +1174,7 @@ A function allows a computation to be written down once and reused many times.
 
 TODO: explain why this is about "first-order" and "top-level" functions.
  
- ### Top-Level Function Definitions
+ ## Top-Level Function Definitions
 
 Some programming languages, including C and ACL2, allow functions to be defined only 
 at the top level of the program. The "top level" means outside of
@@ -1212,9 +1292,9 @@ evaluate'6 :: Exp'6 -> Env'1 -> FunEnv -> Value
 evaluate'6 exp env funEnv = eval exp 
   where
     ...
-     eval (Call'6 fun args)   = evaluate'6 body env' funEnv
+     eval (Call'6 fun args)   = evaluate'6 body newEnv funEnv
        where Function'6 xs body = fromJust (lookup fun funEnv)
-             env' = zip xs [eval a | a <- args]
+             newEnv = zip xs [eval a | a <- args]
 ````
 
 Evaluation of a call expression performs the following steps:
@@ -1222,9 +1302,9 @@ Evaluation of a call expression performs the following steps:
 1. Look up the function definition by name |lookup fun funEnv|,
    to get the functions' parameter list |xs| and |body|.
 2. Evaluate the actual arguments |[eval a BAR a <- args]| to get a list of values
-3. Create a new envionment |env'| by zipping together the 
+3. Create a new envionment |newEnv| by zipping together the 
     parameter names with the actual argument values.
-4. Evaluate the function |body| in the new environment |env'|
+4. Evaluate the function |body| in the new environment |newEnv|
 
 TODO: work out an example to illustrate evaluation of functions?
 
@@ -1305,10 +1385,15 @@ because the function definitions can be used in any expression,
 including in the body of the functions themselves. This means that
 all functions have *global scope*. 
  
+ ### Stack Diagrams
+
+TODO: illustrate how stacks work in languages that don't have
+first-class functions
+ 
  ### Summary
  
 Here is the full code for the evaluator supporting
-global functions definitions.
+top-level functions definitions.
 
 > data Exp'6 = Literal'6   Value
 >          | Unary'6     UnaryOp Exp'6
@@ -1328,13 +1413,13 @@ global functions definitions.
 >                             then (eval b) 
 >                             else (eval c)
 >     eval (Variable'6 x)     = fromJust (lookup x env)
->     eval (Let'6 x exp body) = evaluate'6 body env' funEnv
->       where env' = (x, eval exp) : env
->     eval (Call'6 fun args)   = evaluate'6 body env' funEnv
+>     eval (Let'6 x exp body) = evaluate'6 body newEnv funEnv
+>       where newEnv = (x, eval exp) : env
+>     eval (Call'6 fun args)   = evaluate'6 body newEnv funEnv
 >       where Function'6 xs body = fromJust (lookup fun funEnv)
->             env' = zip xs [eval a | a <- args]
+>             newEnv = zip xs [eval a | a <- args]
 
- # First-Class Functions
+ ## First-Class Functions
  
 In the [Section on Top-Level Functions](#TopLevel), function definitions were defined using
 special syntax and only at the top of a program.
@@ -1769,8 +1854,8 @@ example, the environment-based evaluation function becomes:
 >     eval (Unary'4 op a)     = unary op (eval a)
 >     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
 >     eval (Variable'4 x)     = fromJust (env x)            -- changed
->     eval (Let'4 x exp body) = evaluate'5a body env'
->       where env' = bindF x (eval exp) env               -- changed
+>     eval (Let'4 x exp body) = evaluate'5a body newEnv
+>       where newEnv = bindF x (eval exp) env               -- changed
 
 The result looks better than the previous version, because 
 it does not have spurious references to list funtions |lookup|
@@ -2087,9 +2172,9 @@ function calls in the [language with top-level functions](#TopLevel).
 Here is the code:
 
 ````
-    eval (Call'8 fun arg)   = evaluate'8 body env'
+    eval (Call'8 fun arg)   = evaluate'8 body newEnv
       where Function'8 x body = eval fun
-            env' = bindF x (eval arg) env
+            newEnv = bindF x (eval arg) env
 ````
 
 To evaluate a function call |Call'8 fun arg|,
@@ -2101,9 +2186,9 @@ To evaluate a function call |Call'8 fun arg|,
     with a binding between the function parameter |x| and the argument value: 
    
     |bindF x (eval arg) env|
- 4. Evaluate the |body| of the function in the extended environment |env'|:
+ 4. Evaluate the |body| of the function in the extended environment |newEnv|:
 
-    |evaluate'8 env' body|
+    |evaluate'8 newEnv body|
     
 Note that this explanation jumps around in the source code. The explanation follows
 the sequence of data dependencies in the code: what logically needs to be evaluated first,
@@ -2140,8 +2225,8 @@ in the previous case.
 >     eval (If'8 a b c)       = if fromBool'8 (eval a) 
 >                             then (eval b) 
 >                             else (eval c)
->     eval (Let'8 x exp body) = evaluate'8 body env'
->       where env' = bindF x (eval exp) env
+>     eval (Let'8 x exp body) = evaluate'8 body newEnv
+>       where newEnv = bindF x (eval exp) env
 >     eval (Variable'8 x)     = fromJust (env x)
 
 > type Env'8 = String -> Maybe Value'8
@@ -2305,8 +2390,8 @@ The bound variable and function body are the same as the
 components of a function expression.
 
 With these data types, we can now define a correct evaluator for
-first-class functions using environments. As before, the
-|evaluate| function 
+first-class functions using environments. The first step is to
+*create a closure* when evaluating a function expression.
 
 ````
 -- Evaluate an expression in an environment
@@ -2317,12 +2402,54 @@ evaluate'7 exp env = eval exp
     eval (Function'7 x body) = Closure'7 x body env
 ````
 
+The resulting closure is the value that represents a 
+function. The function expression |Function'7 x body|
+is not actually a function itself, it is an 
+expression that *creates* a function when executed.
+Once a closure value has been created, it can be bound
+to a variable just like any other value, or passed to
+a function or returned as the result of a function.
+Closures are values.
+
+Since closures represent functions, 
+the only thing you can *do* with a closure is *call* it.
+The case for evaluating a function call starts by
+analyzing the function call expression, |eval (Call'7 fun arg)|.
+This pattern sayt that call expression has two components: 
+a function |fun| and
+an argument |arg|. Here is the code for this case:
+
 ````
-    eval (Call'7 fun arg)   = evaluate'7 body env''
-      where Closure'7 x body env' = eval fun
-            env'' = (x, eval arg) : env'
+    eval (Call'7 fun arg)   = evaluate'7 body newEnv
+      where Closure'7 x body closeEnv = eval fun
+            newEnv = (x, eval arg) : closeEnv
 ````
+
+The code starts by evaluating both the function part |fun| to
+produce a value. The |where| clause
+|Closure'7 x body newEnv = eval fun| says that the result of 
+evaluating |fun| must be a closure, and the variables |x|,
+|body|, and |newEnv| are bound to the parts of the closure.
+If the result is not a closure, Haskell throws a runtime error.
+
+Next the environment from the closure |newEnv| is extended to
+include a new binding |(x, eval arg)| of the function parameter
+to the value of the argument expression. The new environment is
+called |newEnv|. At a high level, the environment is the same
+environment that existed when the function was created, together
+with a binding for the function parameter.
+
+Finally, the |body| of the function is evaluated in this new
+environment, |evaluate'7 body newEnv|.
+
+TODO: give an example of how this runs?
+
  ## Environment Diagrams
+
+The behavior of this evaluator is quite complex, but its 
+operation on specific programs can be illustrated by showing
+all the enviroments and closures created during its execution,
+together with the relationships between these structures.
 
  ### Example 1
 
@@ -2342,17 +2469,10 @@ let add = \a -> (\b -> b + a) in (add 3) 2
 ````
 
 ![Environment Diagram 2](figures/env2.eps)
- 
- 
- ## Recursive Functions
- 
- ### Recursive Functions and Fixed-Points
- 
- ### Self Application
 
  ## Summary of First-Class Functions
-  
-Here is the full code:
+ 
+Here is the full code for first-class functions with recursive definitions:
 
 > data Value'7 = Int'7  Int
 >            | Bool'7 Bool
@@ -2371,8 +2491,8 @@ Here is the full code:
 >          | Call'7      Exp'7 Exp'7         -- changed
 >   deriving Eq
 >
-> evaluate'7 :: Env'7 -> Exp'7 -> Value'7
-> evaluate'7 env exp = eval exp 
+> evaluate'7 :: Exp'7 -> Env'7 -> Value'7
+> evaluate'7 exp env = eval exp 
 >   where
 >     eval (Literal'7 v)      = v
 >     eval (Unary'7 op a)     = unary'7 op (eval a)
@@ -2381,12 +2501,12 @@ Here is the full code:
 >                             then (eval b) 
 >                             else (eval c)
 >     eval (Variable'7 x)     = fromJust (lookup x env)
->     eval (Let'7 x exp body) = evaluate'7 env' body
->       where env' = (x, eval exp) : env
->     eval (Function'7 x body) = Closure'7 x body env   -- new
->     eval (Call'7 fun arg)   = evaluate'7 env'' body   -- changed
->       where Closure'7 x body env' = eval fun
->             env'' = (x, eval arg) : env'
+>     eval (Let'7 x exp body) = evaluate'7 body newEnv 
+>       where newEnv = (x, eval exp) : env
+>     eval (Function'7 x body) = Closure'7 x body env     -- new
+>     eval (Call'7 fun arg)   = evaluate'7 body newEnv    -- changed
+>       where Closure'7 x body closeEnv = eval fun
+>             newEnv = (x, eval arg) : closeEnv
 > --------------------BEGIN-HIDE-------------------------
 > fromBool'7 (Bool'7 b) = b
 >
@@ -2406,6 +2526,379 @@ Here is the full code:
 > binary'7 EQ  a        b        = Bool'7 (a == b)
 > --------------------END-HIDE-------------------------
  
+ # Recursive Definitions
+
+One problem consquence of using a simple |let| expression to define functions
+is that it is no longer possible to define *recursive functions*, which 
+were supported in the [Section on Top-Level Functions](#TopLevel). A recursive
+function is a function that calls itself within its own definition.
+For example, consider this definition of the factorial function:
+
+> testLet = 
+>   let fact = \n -> if n == 0 then 1 else n * fact(n-1) 
+>   in fact(10)
+
+The |fact| function is recursive because it calls |fact| within its definition.
+
+The problem with our existing language implementation is that
+the scope of the variable |fact| is the body of the 
+|let| expression, which is |fact(10)|, so while the use of |fact| in
+|fact(10)| is in scope, the other use in |fact(n-1)| is *not* in scope.
+(TODO: wordy)
+
+To solve this problem, we need to change how we understand the |let|
+expression: the scope of the bound variable must be both the body
+of the let, and the bound expression that provides a definition for 
+the variable. This means that the variable can be defined in terms of
+itself. This is exactly what we want for recursive functions, but it
+can cause problems. For example, 
+
+> testLet3 = let x = x + 1 in x
+
+This is now syntactically correct, as the bound variable |x| is in scope
+for the expression |x + 1|. However, such a program is either meaningless, or
+it can be understood to mean "infinite loop". There are similar cases that
+are meaningful. For example, this program is meaningful:
+
+> testLet2 = 
+>   let x = y + 1
+>       y = 99
+>   in x * y
+
+This example includes two bindings at the same time (which we do not
+currently support. TODO: see homework?). 
+In this case the result is |9900| because |x = 100| and
+|y = 99|. It works because the binding expression for |x|, namely |y + 1|, 
+is in the scope of |y|. 
+
+--------------------BEGIN-HIDE-------------------------
+If we convert this program to our abstract syntax, it comes out as:
+
+> testLet1 = Let'7
+>  "fact" (Function'7 "n" 
+>     (If'7 (Binary'7 EQ (Variable'7 "n") (Literal'7 (Int'7 0)))
+>         (Literal'7 (Int'7 1))
+>         (Binary'7 Mul (Variable'7 "n") 
+>                     (Call'7 (Variable'7 "fact") 
+>                           (Binary'7 Sub (Variable'7 "n") (Literal'7 (Int'7 1)))))))
+>  (Call'7 (Variable'7 "fact") (Literal'7 (Int'7 10)))
+> --------------------END-HIDE-------------------------
+
+ ## Semantics of Recursion
+ 
+A more fundamental question is *what does a recursive definition* **mean**?
+In grade school we get used to dealing with equations that have the same 
+variable on both sides of an equal sign. For example, consider this simple
+equation:
+
+$a = 1 + 3a$
+
+Our instinct, honed over many years of practice, is to "solve for *a*".
+
+* $a = 1 + 3a$
+* *{ subtract $3a$ from both sides }*
+* $-2a = 1$
+* *{ divide both sides by $-2$ }*
+* $a = -1/2$
+
+I feel a little silly going through this in detail (although I have spent a lot
+of time recently practicing algebra with my son, so I know how hard it is to master).
+The point is that the definition of |fact| has exactly the same form:
+
+> fact = \n -> if n == 0 then 1 else n * fact(n-1) 
+
+This is an equation where |fact| appears on both sides, just as $a$ appears
+on both sides in $a = 1 + 3a$. The question is: *how do we solve for |fact|*?
+It's not so easy, because we don't have algebraic rules to divide by lambda
+and subtract conditionals, to get both occurences of |fact| onto the same
+side of the equation. We are going to have to take another approach.
+
+The first thing to notice is that |fact| is a function, and like most functions
+it is an *infinite* structure. This 
+makes sense in senveral ways. It is infinite in the sense that it defines 
+the factorial for every natural number, and there is an infinity of natural numbers. 
+If you consider the grade-school definition of
+a funtion as a set of pairs, then the set of pairs in the factorial function is
+infinite. 
+
+Finally, and most importantly for us, if you consider |fact| as a 
+computational method or rule, then the computational rule has an unbounded
+number of steps that it can perform. We can count the steps: first it performs
+an equality comparison |n == 0|, then it either stops or it performs a subtraction 
+|n-1| and then *performs the steps recursively*, then when it is done with that
+it performs a multiplication |n * ...|. In other words, given a natural number $n$
+the computation will perform $3n + 1$ steps. Since it will handle any natural number,
+there is no bound on the number of steps it performs. If you tried to write out
+the steps that might be performed, then the list of steps would be infinite. 
+
+ ### Three Analyses of Recursion
+ 
+In what follows we will explore three ways to understand recursion. The first
+explanation just allows us to define recursive |let| expression by using 
+the capabilities for recursion that are built into Haskell. This explanation is
+elegant and concise, but not very satisfying (like pure sugar!). The problem is
+that we have just relied on recursion in Haskell, so we don't really have an
+explanation of recursion. The second explanation is a practical introduction to the
+concept of fixed points. This solution can also be implemented elegantly in Haskell,
+and has the benefit of providing a mathematically sound explanation of recursive
+definitions. While fixed points can be implemented directly, they are not the
+most efficient approach, especially in conventional languages. As a result, we will
+consider a third implementation, based on self application. This explanation is
+messy but practical. In fact, it is the basis for real-world implementations of
+C++ and Java. A fouth explanation will be given when we talk about implementing
+languages in traditional imperative languages.
+
+ ## Understanding Recursion using Haskell Recursion
+ 
+Haskell makes it easy to create infinite structures and functions. Understanding
+how this works can help us in implementing our language. We've already seen many
+examples of recursive functions in Haskell: for example, every |evaluate| function
+we have defined is recursive. However, Haskell also allows creation of recursive
+data structures. For example, this line creates an infinite list of 2's:
+
+> twos = 2 : twos
+
+Remember that the |:| operator adds an item to the front of a list. 
+This means that |twos| is a list with |2| concatenated onto the front of 
+the list |twos|. In other words, |twos| is an infinite list of 2's:
+
+````
+twos = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ... ]
+````
+
+It's also possible to make infinite lists that change:
+
+> numbers = 0 : [ n + 1 | n <- numbers ]
+
+This creates an infinite list of the natural numbers:
+
+````
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, ...]
+````
+
+All these definitions work in Haskell because of *laziness*. 
+Haskell creates an internal representation of a potentially infinite
+value, but it only creates as much of the value as the program actually
+needs. If you try to use all of |two| or |numbers| then the result will
+be an infinite loop that never stops. However, if the program only
+needs the first 10 items of |twos| or |numbers| then only the first
+10 elements of the infinite value will be created.
+
+Interestingly, Haskell also accepts the algebraic expression that
+we discussed earlier:
+
+> a = 1 + 3 * a
+
+Haskell considers this a valid program, but it does *not* solve for |a|.
+Instead it treats the definition as a computational rule: to evaluate
+|a|, add one to three times the value of |a|, which requires evaluating
+|a|, and so on, again, and again, and again. The result is an infinite loop. 
+The quickest way to write an infinite loop is:
+
+> inf = inf
+
+TODO: make pictures to illustrate the cyclic values in this section.
+
+Attempting to use this value leads to an immediate infinite loop[^3]. If the
+value is not used, then it has no effect on the program results.
+
+[^3]: Oddly enough, this kind of |inf| value is not useless! It
+has some legitimate uses in debugging Haskell programs (more on this later).
+
+It is not always easy to determine if a value will loop infinitely or not.
+One rule of thumb is that if the recursive variable is used *within* a
+data constructor (e.g. |:|) or inside a function (in the body of a lambda), 
+then it will probably not loop infinitely. This is because both 
+data construtors and functions are lazy in Haskell. 
+
+ ### Using Results of Functions as Arguments
+ 
+TODO: consider discussing this example. Here is an outline:
+
+A type for trees:
+
+> data Tree = Leaf Int | Branch Tree Tree
+>   deriving Show
+
+An example tree:
+
+> t1 = Branch (Branch (Leaf 5) (Leaf 3)) 
+>             (Leaf (-99))
+
+Computing the minimum and maximum of a tree:
+
+> minTree (Leaf n) = n
+> minTree (Branch a b) = min (minTree a) (minTree b)
+
+> maxTree (Leaf n) = n
+> maxTree (Branch a b) = max (maxTree a) (maxTree b)
+
+Point out that computing both requires two traversals.
+
+Computing minimum and maximum at the same time.
+
+> minMax (Leaf n) = (n, n)
+> minMax (Branch a b) = (min min1 min2, max max1 max2)
+>   where (min1, max1) = minMax a
+>         (min2, max2) = minMax b
+
+|minMax| is an example of *fusing* two funtions together.
+
+Another operation: copying a tree and replacing all the 
+leaves with a specific integer value:
+
+> repTree x (Leaf n) = Leaf x
+> repTree x (Branch a b) = Branch (repTree x a) (repTree x b)
+
+Now for our key puzzle: replacing every leaf in a tree with
+the minimum value of the tree:
+
+> repMinA tree = repTree (minTree tree) tree
+
+This requires two traversals. It seems to truly *require* two
+traversals the minimum must be identified before the process
+of replacement can begin.
+
+But lets fuze them anyway:
+TODO: need to develop this in a few more steps! Here is a 
+helper function:
+
+> repMin' (Leaf n, r) = (n, Leaf r)
+> repMin' (Branch a b, r) = (min min1 min2, Branch newTree1 newTree2)
+>   where (min1, newTree1) = repMin' (a, r)
+>        (min2, newTree2) = repMin' (b, r)
+
+Finally to do the replacement with the minimum:
+
+> repMin tree = newTree
+>    where (min, newTree) = repMin'(tree, min) 
+
+Note how one of the results of the function call, the |min| value,
+is passed as an argument to the function call itself!
+
+TODO: Explain how this works, and give a picture.
+
+> --------------------BEGIN-HIDE-------------------------
+> main'10 = do
+>   print t1
+>   print (minTree t1)
+>   print (maxTree t1)
+>   print (minMax t1)
+>   print (repMin' (t1, 9999))
+>   print (repMin t1)
+> --------------------END-HIDE-------------------------
+
+
+ ### Implementing Recursive |Let| with Haskell
+ 
+We now have everything we need to implement recursive |let|
+expressions. In the Section on [Evaluation using Environments](#BasicEvalEnv),
+|let| was defined as follows:
+
+````
+eval (Let'4 x exp body) = evaluate'5 body newEnv
+   where newEnv = (x, eval exp) : env
+````
+
+The problem here is that the bound expression |exp| is evaluated
+in the parent environment |env|. To allow the bound variable |x| to
+be used within the expression |exp|, the expression must be evaluated
+in the new environment. Fortunately this is easy to implment
+in Haskell:
+
+````
+eval (Let'7 x exp body) = evaluate'7 body newEnv
+  where newEnv = (x, evaluate'7 exp newEnv) : env
+````
+
+We simply pass the new environment being as an argument to the
+evaluation function that is used during the creation of the new environment!
+It may see odd to use the result of a function as one of its arguments.
+However, as we have seen, Haskell allows such definitions. 
+
+The explanation of recursion in Haskell is almost too simple.
+In fact, it is too simple: it involved changing 6 characters in the
+code for the non-recursive program. The problem is that we haven't really
+explained recursion in a detailed way, because we have simply
+used Haskell's recursion mechanism to implement recursive
+|let| expressions in our language. The question remains: how
+does recursion work?
+
+TODO: come up with a *name* for the little language we are defining
+and exploring. PLAI uses names like ArithC and ExprC.
+
+ ## Understanding Recursion with Fixed Points
+
+Another way to explain recursion is by using the mathematical
+concept of a fixed point. A *fixed point* of a function $f$ 
+if a value $x$ where $x = f(x)$. If you think of a function as
+a transformation on values, then fixed points are values that
+are unchanged by the function. For example, if the function
+represents a rotation (imagine simple rotation of a book on a table)
+then the fixed point is the center of the rotation... that is
+the point on the book that is unchanged by rotating it.
+If you really did rotate a book, you'd probably push your finger
+down in the middle, then rotate the book around your finger.
+The spot under your finger is the fixed point of the rotation
+function.
+
+TODO: nice picture of the book and the fixed point?
+
+Fixed-points can also be identified for simple mathematical
+functions:
+
+*function*                    *fixed point(s)*
+--------------------          --------------------
+$f_1(x) = 10 - x$             $5$
+$f_2(x) = x^2$                $0, 1$
+$f_3(x) = 1 + \cfrac{1}{x}$   $1.6180339887...$
+$f_4(x) = 4$                  $4$
+$f_5(x) = x$                  all values
+$f_6(x) = x + 1$              no finite numbers
+
+As you can see, some functions have one fixed point.
+Some functions have multiple fixed points. Others have
+an infinite number of fixed points, while some don't have
+any at all.
+The fixed point of $f_3$ is the *golden ratio*, 
+also known as $\phi$.
+
+Fixed points are useful because they can provide a 
+general approach to solving equations where a variable
+appears on both sides of an equation. Consider this simple
+equation:
+
+$x = 10 - x$
+
+Rather than performing the normal algebraic manipulation
+to solve it, we can instead reformulate it by rewriting
+the right hand side as a call to a new helper function, $f$:
+
+$f(x) = 10 - x$
+
+Given this function, we can now rewrite the original equation
+using $f$ to get:
+
+$x = f(x)$
+
+But we know that a value $x$ that has the property $x = f(x)$
+can be defined as a fixed point of $f$. If we had a general
+function $\mathbf{fix}$ for computing fixed points of functions, then
+we could rewrite our equation as:
+
+$x = \mathbf{fix}(f)$
+
+The curious thing about this definition is that we have
+*solved* for $x$, in the sense that we have an equation where
+$x$ appears only on the left of the equation. 
+
+
+
+
+
+
+ ## Understanding Recursion with Self-Application
+
  
 --------------------BEGIN-HIDE-------------------------
  ## Evaluating First-Class Functions by Substitution
@@ -2539,7 +3032,9 @@ TODO: need to define thse property!
  
 > --------------------BEGIN-HIDE-------------------------
 
- # Computational Strategies 
+
+
+ # Pervasive Computational Strategies {#Monads}
  
  ## Two Example Strategies
  
