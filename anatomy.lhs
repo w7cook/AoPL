@@ -3450,68 +3450,47 @@ TODO: need to define these property!
  
 > --------------------BEGIN-HIDE-------------------------
 
-
-
  # Pervasive Computational Strategies {#Monads}
- 
  ## Two Example Strategies
- 
  ### Failure
- 
  ### Mutable State
- 
  ### Identifying a Common Pattern
- 
- ## Defining Computational Strategies with Monads
-
+ ## Defining Computational Strategies as Monads
  ### The Monad Pattern
-
  ### Maybe Monad
- 
  ### State Monad
- 
  ### List Monad
-
  ### Special Kinds of States: Readers and Writers
- 
- ### Order of Evaluation
-   Strict versus non-strict
-   Lazy
- 
+ ## Order of Evaluation
+ ### Strict versus non-strict
+ ### Lazy
+
+ # Domain-Specific Languages
  ## Parsing
- 
- # Alternative Approaches to Semantics
- 
- # Rule-based Specifications
- 
- # Small-step semantics
+ ## Attribute grammars
+ ## State machines (???)
  
  # Abstract Interpretation and Types
- 
  ## Abstract Interpretation
- 
- ## Type Checking
- 
+ ## Type Checking 
  ## Soundness Proofs
  ### Progress
  ### Preservation
  
- # Data Abstraction
+ # Data Abstraction (content from essay)
+ ## Abstract Data Types 
+ ## Objects (content from essay and partial evaluation paper)
+ ### Inheritance & Delegation
  
- ## Abstract Data Types
- 
- ## Objects
- 
+ # Alternative Approaches to Semantics
+ ## Rule-based Specifications
+ ## Small-step semantics
+
  # Additional Topics
- 
  ## Algebra and Coalgebra
- 
  ## Partial Evaluation
- 
  ## Continuations
- 
  ## Memory Management (??)
- 
  
  > --------------------END-HIDE-------------------------
  
