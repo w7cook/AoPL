@@ -63,11 +63,12 @@ I recommend
 or the
 [Gentle Introduction To Haskell](http://www.haskell.org/tutorial/).
 
- #### Acknowledgements
+ #### Acknowledgments
  
 I thank the students in the spring 2013 semester of CS 345 *Programming Languages*
 at the University of Texas at Austin, who helped out while I was writing the book.
-Special thanks to Chris Roberts and Guy Hawkins for corrections.
+Special thanks to Chris Roberts and Guy Hawkins for corrections. Tyler Allman Young
+contributed by taking notes in class. Chris Cotter improved the makefile.
  
  ## Introduction
 
@@ -120,12 +121,14 @@ discuss many metaprograms.
 A good place to start is analyzing the language of arithmetic, which is 
 familiar to every grade-school child:
 
-    4
-    -5+6
-    3--2--7
-    3*(8+5)
-    3+(8*2)
-    3+8*2
+````Java
+4
+-5+6
+3--2--7
+3*(8+5)
+3+(8*2)
+3+8*2
+````
 
 These are examples of arithmetic *expressions*. The rules for understanding
 such expressions are surprisingly complex. For example, in the third expression
@@ -208,7 +211,7 @@ For now expressions will be written using the
 concise and familiar concrete syntax $3+7$, adding parentheses where
 necessary. But keep in mind that this concise syntax is just
 a short-hand for the real value |Add (Number 3) (Number 7)|.
-As new features are added to the language, both the familar
+As new features are added to the language, both the familiar
 concrete syntax and the abstract syntax will be extended.
 
 TODO: talk about meta language: language of study versus language of implementation. Better words?
@@ -467,7 +470,7 @@ is to compute a result using that value.
 
  ## Substitution
 
-Substitution replaces a varible with a value in an expression.
+Substitution replaces a variable with a value in an expression.
 Here are some examples of substitution:
 
 * substitute $x \mapsto 5$ in $x+2$   $\longrightarrow$ $5+2$
@@ -533,7 +536,7 @@ evaluating $2*x+y$ where $x=3$ and $y=-2$. A collection of bindings
 is called an *environment*.
 
 Since a binding is represented as a pair, an environment can be 
-represented as a list of pairs. The envronment mentioned above
+represented as a list of pairs. The environment mentioned above
 would be 
 
 > e1 = [ ("x", 3), ("y", -1) ]
@@ -572,7 +575,7 @@ leaves the variable alone.
 >   test (substitute e1) (Add'2 (Multiply'2 x x) x)
 >   test (substitute e1) (Add'2 x (Add'2 (Multiply'2 (Number'2 2) y) z))
 
-The test results show that multiple variables are subsituted with
+The test results show that multiple variables are substituted with
 values, but that unknown variables are left intact:
 
 ````Java
@@ -583,7 +586,7 @@ x*x + x ==> 3*3 + 3
 x + 2*y + z ==> 3 + 2*(-1) + z
 ````
 
-Note that it is alsopossible to substitute multiple variables one at a time:
+Note that it is also possible to substitute multiple variables one at a time:
 
 > substitute'2 env exp = foldr substitute1 exp env
 
@@ -600,7 +603,7 @@ in a list, starting with a given initial value.
 So far all variables have been defined *outside*
 the expression itself. It is also useful to allow variables to be 
 defined *within* an expression. Most programming languages support
-this cabability by allowing definition of *local variables*.
+this capability by allowing definition of *local variables*.
 
 In C or Java one can define local variables in a declaration:
  
@@ -620,7 +623,7 @@ Haskell and ML define local variables with a |let| expression:
 
 > test1 = let x = 3 in 2*x + 5
 
-In the languages the |let| really is an expression, becuase it can be
+In the languages the |let| really is an expression, because it can be
 used inside other expressions:
 
 > test2 = 2 * (let x = 3 in x + 5)
@@ -670,7 +673,7 @@ variable is the body of the let in which the variable is defined.
 However, it is possible for a variable to be redefined, which creates
 a hole in the scope of the outer variable:
 
-![Varible Scope](figures/scopes.eps)
+![Variable Scope](figures/scopes.eps)
 
 In this example there are two variables named |x|. Even though
 two variables have the same name, they are not the same variable.
@@ -681,9 +684,9 @@ TODO: talk about renaming
 
  ### Substituting into |Let| Expressions {#BasicSubst}
 
-When substutiting a variable into an expression, care must
+When substituting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
-In particular, when subsituting for *x* in an expressions, if
+In particular, when substituting for *x* in an expressions, if
 there is an expression of the form |let| *x* |=| *e* |in| *body* then
 *x* should be substituted within *e* but not in *body*. 
 Because *x* is redefined, the *body* is a hole in the scope of *x*.
@@ -802,7 +805,7 @@ expressions involves substitution.
 
 One consequence of this
 rule is that the body of every let expression is copied, 
-because substitution creates a copy of the expession with
+because substitution creates a copy of the expression with
 variables substituted. When let expressions are *nested*,
 the body of the inner let expression is copied multiple times.
 In the following example, the expression |x\*y\*z| is copied
@@ -829,7 +832,7 @@ substitute z $\mapsto$ 5 in body     |2\*3\*5|
 evaluate body                        |2\*3\*5| $\Rightarrow$ |30|
 
 While this is a reasonable approach it is not necessary. We
-have already seen that multiple varialbes can be substituted
+have already seen that multiple variables can be substituted
 at the same time. Rather than performing the substitution
 fully for each |let| expression, instead the |let| 
 expression can add another binding to the list 
@@ -888,7 +891,7 @@ as the environment for evaluation of the body |b|.
 The new environments
 add the additional bindings to the *front* of the list of environments.
 Since |lookup| searches an environment list from left to right, it will
-find the most recent enclosind binding for a variable, and igore any
+find the most recent enclosing binding for a variable, and ignore any
 additional bindings. For example, consider the evaluation of this
 expression:
 
@@ -968,7 +971,7 @@ concrete syntax:
 
 |if| *test* |then| *true-part* |else| *false-part*
 
-A conditional expression allows selection of one of two diffent values
+A conditional expression allows selection of one of two different values
 based on whether a boolean is true or false. Note that a conditional *expression* is
 expected to produce a value. This is different from the conditional *statement* 
 found in many languages (most notably C and Java), which executes one of two blocks but
@@ -977,17 +980,17 @@ does not produce a value. In these languages, conditional expressions are writte
 conditional expressions of the kind discussed here.
 
 Given a full set of arithmetic operators, some comparison operators 
-(equaltiy |EQ|, less than |LT|, greater than |GT|, less than or equal |LE|),
+(equality |EQ|, less than |LT|, greater than |GT|, less than or equal |LE|),
 plus |and|, |or| and |not| for
 booleans, it is useful to generalize the abstract syntax to support a general notation
 for binary and unary operators.
 When an expression includes a value it is called a *literal* value. Literals generalize
 the case of |Number| used above to include constants in an arithmetic expression.
-The conditional expression is somtimes called a *ternary* operator because it has three arguments.
+The conditional expression is sometimes called a *ternary* operator because it has three arguments.
 But since there is only one ternary operator, and also because a conditional expression
 is fairly special, it is included directly as |If| expression.
 These changes are implemented in the
-following definition for the abstact syntax |Exp|:
+following definition for the abstract syntax |Exp|:
 
 > data BinaryOp = Add | Sub | Mul | Div | And | Or 
 >               | GT | LT | LE | GE | EQ
@@ -1130,21 +1133,21 @@ Running these test cases with the |test| function defined above yields these res
 Now that our language supports two kinds of values, it is possible for
 an expression to get *type errors*. A type error occurs when evaluation of
 an expression attempts to perform an operation but one or more of the 
-values involaved are not the right type. For example, attemping to add an
+values involved are not the right type. For example, attempting to add an
 integer and a boolean value, as in |3 + True|, leads to a type error.
 
 In our Haskell program, type errors exhibit themselves in the 
 |binary| and |unary| functions, which match certain legal patterns of
 operations, but leave illegal combinations of operations and arguments
-undefined.  Attemping to evaluate |3 + True| results in a call to
+undefined.  Attempting to evaluate |3 + True| results in a call to
 |binary Add (Int 3) (Bool True)|, which is not one of the patterns
-handled by the |binary| funtion. As a result, Haskell generates a 
+handled by the |binary| function. As a result, Haskell generates a 
 *Non-exhaustive pattern* error:
 
     Main> evaluate'5 [] (Binary'4 Add (Literal'4 (Int 3)) (Literal'4 (Bool True)))
     *** Exception: Non-exhaustive patterns in function binary
 
-Here are some examples of epxression that generate type errors:
+Here are some examples of expression that generate type errors:
 
 > -- if 3 then 5 else 8
 > err1 = If'4 (Literal'4 (Int 3)) (Literal'4 (Int 5)) (Literal'4 (Int 8))
@@ -1232,7 +1235,7 @@ begin with a keyword |function| or |def|. Other languages require brackets
 |{| ... |}| around the body of the function. 
 These functions are less powerful than Haskell, because they take a
 simple parameter list rather than a full patterns. But this simple form
-of function defined above captures the essense of function definition
+of function defined above captures the essence of function definition
 in many languages.
 
 A call to a function is an expression that has the following concrete syntax:
@@ -1248,7 +1251,7 @@ provide a means to represent such programs:
 > type FunEnv = [(String, Function'6)]
 > data Function'6 = Function'6 [String] Exp'6
 
-A list of function defintions is a *function environment*.
+A list of function definitions is a *function environment*.
 This list represents a list of bindings of function names
 to function definitions. 
 
@@ -1266,7 +1269,7 @@ data Exp'6 = ...
          | Call'6      String [Exp'6]
 ````
 
-As an exmple, here is an encoding of the example program:
+As an example, here is an encoding of the example program:
 
 > f1 = Function'6 ["n", "m"]
 >       (If'6 (Binary'6 EQ (Variable'6 "m") (Literal'6 (Int 0)))
@@ -1309,7 +1312,7 @@ Evaluation of a call expression performs the following steps:
 1. Look up the function definition by name |lookup fun funEnv|,
    to get the functions' parameter list |xs| and |body|.
 2. Evaluate the actual arguments |[eval a BAR a <- args]| to get a list of values
-3. Create a new envionment |newEnv| by zipping together the 
+3. Create a new environment |newEnv| by zipping together the 
     parameter names with the actual argument values.
 4. Evaluate the function |body| in the new environment |newEnv|
 
@@ -1339,7 +1342,7 @@ appears in a |Call| expression.
 
 Because the names of function and the names of variables are
 completely distinct, they are said to be in different *namespaces*.
-The sepration of the variable and function namespace is clear
+The separation of the variable and function namespace is clear
 in the following (silly) example:
 
 ````Java
@@ -1363,7 +1366,7 @@ are renamed to be less confusing:
           b * pow(b - 2)
 ````
 
-When renaming varibles, the *functions* are *not* renamed. 
+When renaming variables, the *functions* are *not* renamed. 
 This is because functions and variables are in separate namespaces.
 
 Another consequence of the separation between variable and
@@ -1377,7 +1380,7 @@ completely different meanings, which are distinguished only by
 context. English has many homonyms, including 'stalk' and 'left'.
 In our expression language, the first |pow| must mean the
 function because it appears in front of a parenthesis where
-a function mame is expected, while
+a function name is expected, while
 the second |pow| must be a variable because it appears where
 an expression is expected.
 
@@ -1496,14 +1499,14 @@ result defined by the *body* expression. The *var* may of course
 be used within the *body*. In other words, *var* may be 
 free in *body*, but *var* is bound (not free) in $\lambda$*var*. *body*.
 A function expression is sometimes called an *abstraction* or a
-*funtion abstraction* (TODO: discuss this more later).
+*function abstraction* (TODO: discuss this more later).
 
 Thus |f =| $\lambda$|x|. |x * 2| means that |f| is defined to be a function of one
 parameter |x| that computes the result |x * 2| when
 applied to an argument. One benefit of function expressions
 is that we don't need special syntax to name functions,
 which was needed in dealing with [top-level functions](#TopLevel). Instead, we can use the 
-existing |let| expressoin to name functions, because
+existing |let| expression to name functions, because
 functions are just another kind of value.
 
 Lambda notation was invented in 1930s by 
@@ -1519,8 +1522,8 @@ later section, but the basic concepts are introduced here.
  ### Using Lambdas in Haskell {#LambdaDefinition}
  
 Haskell is based directly on the lambda calculus. In 
-fact, the example illustating how to "solve" for the
-function |f| can be written in haskell. The following
+fact, the example illustrating how to "solve" for the
+function |f| can be written in Haskell. The following
 definitions are all equivalent in Haskell:
 
 > f'1(x) = x * 2
@@ -1572,7 +1575,7 @@ as |(f)n| or |(f)(n)|. There are no spaces in these examples,
 but they do exhibit juxtaposition of two expressions.[^1]
 
 [^1]: Church's original presentation of the lambda calculus
-followed the mathemtical convention that all variables were
+followed the mathematical convention that all variables were
 single characters. Thus |xy| means a function call, |x y|,
 just as |xy| is taken to mean |x*y| in arithmetic expressions.
 Normally in computer science we like to allow variables to
@@ -1631,7 +1634,7 @@ interesting.
  ### Function Composition {#Compose}
  
 One of the simplest examples of a using functions as values is
-defining a general operator for *function compositon*. The
+defining a general operator for *function composition*. The
 composition $f \circ g$ of two functions $f$ and $g$ is a new function that
 first performs $g$ on an input, then performs $f$ on the result.
 Composition can be defined in Haskell as:
@@ -1703,7 +1706,7 @@ TODO: is a function that returns a function also called higher order?
  ### Representing Environments as Functions {#EnvAsFun}
 
 In [Chapter 1](#Chapter1), an environment was defined as a list of bindings.
-However, it is often useful to conside the *behavior* of a concept
+However, it is often useful to consider the *behavior* of a concept
 rather than its concrete *representation*. The purpose of a
 environment is to map variable names to values. A map is just
 another name for a function. Thus it is 
@@ -1795,7 +1798,7 @@ and otherwise it calls the function |env| with |testVar| as an
 argument.
 
 The key to understanding how this works is to keep in mind that
-there are two very diferent *times* or *contexts* involved
+there are two very different *times* or *contexts* involved
 in |bindF|. The first time is when the environment is being
 extended with a new binding. At this time the arguments
 |var|, |val|, and |env| are determined. The second important
@@ -1865,7 +1868,7 @@ example, the environment-based evaluation function becomes:
 >       where newEnv = bindF x (eval exp) env               -- changed
 
 The result looks better than the previous version, because 
-it does not have spurious references to list funtions |lookup|
+it does not have spurious references to list functions |lookup|
 and |:|, which are really just a distraction from the
 fundamental nature of environments as maps from names to values.
 We can still think of environments as 'data'.
@@ -1952,7 +1955,7 @@ can be used many times.
 
 Separation of arguments into different stages is exactly the same 
 technique used in the [section on representing environments
-as funtions](#EnvAsFun). The |bindF| function takes three arguments in the first stage,
+as functions](#EnvAsFun). The |bindF| function takes three arguments in the first stage,
 and then returns a function of one argument that is invoked in a second
 stage. To make it look nice, the first three arguments were listed to the 
 left of the |=| sign, while the last argument was placed to the right as an
@@ -2115,7 +2118,7 @@ code assumes that functions are literals, which is not the code
 in the correct version. Sigh.
 
 The call expression changes slightly from the version with
-top-level functions. Instead of the *name* of the funtion
+top-level functions. Instead of the *name* of the function
 to be called, the |Call| expression now contains an expression |Exp|
 for both the function and the argument:
 
@@ -2332,7 +2335,7 @@ Here is a program that illustrates the problem.
 
 The correct answer, which is produced if you run this program in Haskell,
 is 18. The key point is that |k| is equal to |2| in the body of |double|,
-becuase that occurence of |k| is within the scope of the first |let|.
+because that occurrence of |k| is within the scope of the first |let|.
 Evaluating this function with the evaluator given above produces |81|,
 which is not correct.
 In summary, the evaluation of this expression proceeds as follows:
@@ -2355,7 +2358,7 @@ Looking up variables based on control flow is called *dynamic binding*.
  ### A Correct Solution: Closures {#Closures}
 
 As we saw in the previous section, the problem with using a 
-function expession as a value is that the bindings of the free variables
+function expiation as a value is that the bindings of the free variables
 in the function expression are either lost or may be overwritten.
 The solution is to *preserve the bindings that existed at the
 point when the function was defined*. The mechanism for doing
@@ -2378,11 +2381,11 @@ data Exp'7 = ....
 
 As before, the two components of a function expression are
 the *bound variable* |String| and the *body expression* |Exp|.
-Function exprssions resemble |let| expressions, so they fit
+Function expressions resemble |let| expressions, so they fit
 in well with the other kinds of expressions.
 
 The next step is to introduce *closures* as a new kind of value.
-Closures have all the same information as a funtion expressions
+Closures have all the same information as a function expressions
 (which we previously tried to add as values), but they have
 one important difference: closures also contain an environment.
 
@@ -2422,7 +2425,7 @@ Since closures represent functions,
 the only thing you can *do* with a closure is *call* it.
 The case for evaluating a function call starts by
 analyzing the function call expression, |eval (Call'7 fun arg)|.
-This pattern sayt that call expression has two components: 
+This pattern says that call expression has two components: 
 a function |fun| and
 an argument |arg|. Here is the code for this case:
 
@@ -2451,13 +2454,54 @@ environment, |evaluate'7 body newEnv|.
 
 TODO: give an example of how this runs?
 
- ## Environment Diagrams
+ ## Environment/Closure Diagrams
 
 The behavior of this evaluator is quite complex, but its 
 operation on specific programs can be illustrated by showing
-all the enviroments and closures created during its execution,
+all the environments and closures created during its execution,
 together with the relationships between these structures.
 
+An Environment/Closure Diagram is a picture that shows 
+the closures and environments created during execution of an 
+expression.
+
+* Start State 
+
+    Set current environment to empty environment $\emptyset$
+
+* Case |Let x e body|
+    1.  Draw binding box for |x| with unknown value
+
+        Set parent of new binding to be the current environment
+    2.  Create the diagram for bound expression |e|
+
+        Put the value of |e| into the binding as the value of |x|
+    3.  Set current environment to be the new binding
+    4.  Draw diagram for |body| and remember value
+    5.  Set current environment back to what it was before
+
+* Case |Call fun arg|
+    1.  Draw diagram for |fun|
+
+        Result must be a closure with variable |x|, |body| and |env| 
+    2.  Make binding for argument using name |x| from closure
+
+        Set parent of new binding to be the environment of the closure |env|
+    3.  Draw diagram for |arg| 
+
+        Put the value into the new binding as the value of |x|
+    4.  Set current environment to be the new binding
+    5.  Draw diagram for |body| and remember value
+    6.  Set current environment back to what it was before
+
+* Case |Var x|
+    1.  Look up the valuable in the current environment
+    
+* Case |Function x e|
+    1.  Make a closure with variable |x|, body |e|
+
+        Set the environment of the closure to be the current environment
+     
  ### Example 1
 
 ```` 
@@ -2535,7 +2579,7 @@ Here is the full code for first-class functions with recursive definitions:
  
  # Recursive Definitions
 
-One problem consquence of using a simple |let| expression to define functions
+One consequence of using a simple |let| expression to define functions
 is that it is no longer possible to define *recursive functions*, which 
 were supported in the [Section on Top-Level Functions](#TopLevel). A recursive
 function is a function that calls itself within its own definition.
@@ -2617,15 +2661,15 @@ The point is that the definition of |fact| has exactly the same form:
 This is an equation where |fact| appears on both sides, just as $a$ appears
 on both sides in $a = 1 + 3a$. The question is: *how do we solve for |fact|*?
 It's not so easy, because we don't have algebraic rules to divide by lambda
-and subtract conditionals, to get both occurences of |fact| onto the same
+and subtract conditionals, to get both occurrences of |fact| onto the same
 side of the equation. We are going to have to take another approach.
 
 The first thing to notice is that |fact| is a function, and like most functions
 it is an *infinite* structure. This 
-makes sense in senveral ways. It is infinite in the sense that it defines 
+makes sense in several ways. It is infinite in the sense that it defines 
 the factorial for every natural number, and there is an infinity of natural numbers. 
 If you consider the grade-school definition of
-a funtion as a set of pairs, then the set of pairs in the factorial function is
+a function as a set of pairs, then the set of pairs in the factorial function is
 infinite. 
 
 Finally, and most importantly for us, if you consider |fact| as a 
@@ -2653,7 +2697,7 @@ most efficient approach, especially in conventional languages. As a result, we w
 consider a third implementation, based on self application. This explanation is
 messy but practical. In fact, it is the basis for real-world implementations of
 C++ and Java. A forth explanation 
-A fouth explanation, 
+A fourth explanation, 
 languages in traditional imperative languages.
 
  ## Understanding Recursion using Haskell Recursion {#Cyclic}
@@ -2717,7 +2761,7 @@ It is not always easy to determine if a value will loop infinitely or not.
 One rule of thumb is that if the recursive variable is used *within* a
 data constructor (e.g. |:|) or inside a function (in the body of a lambda), 
 then it will probably not loop infinitely. This is because both 
-data construtors and functions are lazy in Haskell. 
+data constructors and functions are lazy in Haskell. 
 
  ### Using Results of Functions as Arguments
  
@@ -2750,7 +2794,7 @@ Computing minimum and maximum at the same time.
 >   where (min1, max1) = minMax a
 >         (min2, max2) = minMax b
 
-|minMax| is an example of *fusing* two funtions together.
+|minMax| is an example of *fusing* two functions together.
 
 Another operation: copying a tree and replacing all the 
 leaves with a specific integer value:
@@ -2812,7 +2856,7 @@ eval (Let'4 x exp body) = evaluate'5 body newEnv
 The problem here is that the bound expression |exp| is evaluated
 in the parent environment |env|. To allow the bound variable |x| to
 be used within the expression |exp|, the expression must be evaluated
-in the new environment. Fortunately this is easy to implment
+in the new environment. Fortunately this is easy to implement
 in Haskell:
 
 ````
@@ -2836,6 +2880,25 @@ does recursion work?
 TODO: come up with a *name* for the little language we are defining
 and exploring. PLAI uses names like ArithC and ExprC.
 
+ #### Recursive Definitions in Environment/Closure Diagrams
+ 
+For the case of recursive bindings, the only difference is that the
+order of step 2 and 3 is swapped:
+
+* Case **Recursive** |Let x e body|
+    1.  Draw binding box for |x| with unknown value
+        Set parent of new binding to be the current environment
+    2.  Set current environment to be the new binding
+    3.  Create the diagram for bound expression |e|
+        Put the value of |e| into the binding as the value of |x|
+    4.  Draw diagram for |body| and remember value
+    5.  Set current environment back to what it was before
+
+Note that in this case the binding in Step 3 becomes the current
+environment *before* it is fully defined. 
+
+TODO: examples here 
+
  ## Understanding Recursion with Fixed Points
 
 Another way to explain recursion is by using the mathematical
@@ -2854,7 +2917,7 @@ function.
 There is a large body of theory about fixed points, including 
 applications in mathematics and fundamental theorems (see 
 the Knaster Tarski theorem), but I'm going to avoid the math
-and give a practical disucssion of fixed-points with examples.
+and give a practical discussion of fixed-points with examples.
 TODO: give citations to appropriate books.
 
 TODO: nice picture of the book and the fixed point? Use a fun
@@ -2895,7 +2958,7 @@ equation using a new helper function, $g$:
 $g(x) = 10 - x$
 
 Functions created in this way are called *generators* for 
-recursive equaitons.
+recursive equations.
 Given the generator $g$, the original equation can be rewritten as:
 
 $x = g(x)$
@@ -3044,7 +3107,7 @@ generate recursive structures. One way to think about them is that
 the function performs *one step* in the creation of a infinite
 structure, and then the |fix| function repeats that step over
 and over until the full infinite structure is created. Consider
-what happens when the output of the funtion is applied to the
+what happens when the output of the function is applied to the
 input of the previous iteration. The results are 
 |[]|, |[2]|, |[2,2]|, |[2,2,2]|, |[2,2,2,2]|, ...
 At each step the result is a better approximation of the final
@@ -3094,6 +3157,14 @@ better approximation of the final answer.
 
  ### Fixed Points of Higher-Order Functions
 
+TODO: text explaining how to implement |fact| using fix.
+
+> g_fact = \f -> \n -> if n == 0 then 1 else n * f(n-1) 
+
+> fact'6 = fix g_fact
+
+more...
+
  ### A Recursive Definition of |fix|
 
 Haskell allows an elegant definition of |fix| using recursion, which
@@ -3115,7 +3186,7 @@ use its argument.
 
  ### A Non-Recursive Definition of |fix|
 
-It is also possible to define |fix| non-recurisvely, by using *self application*.
+It is also possible to define |fix| non-recursively, by using *self application*.
 Self application is when a function is applied to itself. 
 This works because functions are values, so a function can be 
 passed as an argument to itself. For example, consider the identity
@@ -3130,7 +3201,7 @@ applied to any value, it can be applied to itself:
 > testID = id(id)   -- returns id
 
 Self application is not a very common technique, but it is certainly
-intersting. Here is a higher-order function that takes a function
+interesting. Here is a higher-order function that takes a function
 as an argument and immediately applies the function to itself:
 
 ````
@@ -3147,14 +3218,12 @@ in a Haskell compile-time error:
     Occurs check: cannot construct the infinite type: t1 = t1 -> t0
 
 Many other languages allow |stamp| to be defined, either using more complex or
-weaker type systems. Dynamic languages do not have any prblem defining |stamp|.
+weaker type systems. Dynamic languages do not have any problem defining |stamp|.
 For example, here is a definition of |stamp| in JavaScript:
 
 ````Java
 stamp = function (f) { return f(f); }
 ````
-
-
 
 The interesting question is what happens when
 |stamp| is applied to itself: |stamp(stamp)|. This call binds |f| to |stamp|
@@ -3196,11 +3265,58 @@ $\lambda g. (\lambda x. g(x x)) (\lambda x. g(x x))$,
 but this is the same as the version given above with
 the definition of |stamp| expanded.
 
+A second problem with this definition of |fix| is that it
+*diverges*, or creates an infinite loop, when executed
+in non-lazy languages. Thus it cannot be used in Haskell
+because of self-application, and it cannot be used in
+most other languages because of strict evaluation. A
+non-strict version can be defined:
 
+Y = |stamp|($\lambda$f.($\lambda$x.f($\lambda$v.(|stamp| x v))))
+
+Finally, explicit fixed points involve creation of
+many closures.
 
  ## Understanding Recursion with Self-Application
 
+Another way to implement recursion is by writing
+self-application directly into a function. For 
+example, here is a non-recursive version of fact
+based on integrated self-application, defined in JavaScript.
 
+````
+fact_s = function (f, n) {
+  if (n == 0)
+    return 1;
+  else
+    return n * f(f, n - 1);
+}
+````
+
+To call this function, it is necessary to pass itself
+as an argument to itself:
+
+````
+fact_s(fact_s, 10);
+```` 
+
+This definition builds the self-application into
+the |fact_s| function, rather than separating it
+into a generator and a fixed point function.
+One way to derive |fact_s| is from the self-applicative
+|fix| function. Remember that
+
+````
+fact = stamp (g_fact . stamp)
+````
+
+|fact_s| is created by *merging* |g_fact| with |stamp|.
+The other use of |stamp| indicates that |fact_s| must be 
+applied to itself to compute a factorial.
+
+One interesting thing about this final implementation
+strategy is that it is *exactly* the strategy used in
+the actual implementation of languages like C++ and Java.
  
 --------------------BEGIN-HIDE-------------------------
  ## Evaluating First-Class Functions by Substitution
@@ -3255,7 +3371,7 @@ substitutes into the function and the argument:
 
 The last case is substitution *into* a lambda expression.
 This case is similar to the case of substitution into
-a |let| epxression (TODO: reference chapter), because
+a |let| expression (TODO: reference chapter), because
 both a |let| and a lambda introduce a new variable name.
 Here is a first attempt at substituting *into* a lambda
 expression. 
@@ -3268,7 +3384,7 @@ expression.
       else Function'9 name (subst body)
 ````
 
-This version properly handles *shodowing* of the outer
+This version properly handles *shadowing* of the outer
 |var| by the |name| bound in the lambda: if the names are
 the same, then substitution does not occur in the body.
 
@@ -3324,7 +3440,7 @@ the bound variable if variable capture is about to happen.
 >        Function'9 name' (substitute'9 name (Variable'9 name') body)
 >   else Function'9 name body
 
-TODO: need to define thse property!
+TODO: need to define these property!
 
 > new_variable exp = "foo"
 > free_vars exp = []
@@ -3399,12 +3515,4 @@ TODO: need to define thse property!
  
  > --------------------END-HIDE-------------------------
  
-
-
-
-
-
-
- 
- 
- 
+ # References

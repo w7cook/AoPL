@@ -1,0 +1,11 @@
+*.pdf
+anatomy.mkd
+temp.lhs
+*.aux
+*.out
+*.log
+anatomyVerbatim.tex
+anatomyVerbatim.toc
+anatomy.ptb
+anatomy.tex
+anatomy.toc
