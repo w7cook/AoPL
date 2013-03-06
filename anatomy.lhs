@@ -4,10 +4,10 @@
 
 > --------------------BEGIN-HIDE-------------------------
 > {-# OPTIONS -XRankNTypes #-}
-> import Prelude hiding (LT, GT, EQ)
+> import Prelude hiding (LT, GT, EQ, id)
 > import Data.Maybe
 >
-> main_list = [main'1, main'2, main'4, main'5, check1, main'6]
+> main_list = [main'1, main'2, main'4, main'5, check1, main'6, main'10]
 > main = do
 >   sequence [ do
 >     putStrLn ("---- " ++ show i ++ " ----")
@@ -59,7 +59,9 @@ including first-class functions and monads. As background resources,
 I point students to the many excellent tutorials on Haskell. 
 [Search Google for "Haskell Tutorial" to find one](https://www.google.com/search?q=Haskell+Tutorial). 
 I recommend
-[Learn You a Haskell for Great Good!](http://learnyouahaskell.com/).
+[Learn You a Haskell for Great Good!](http://learnyouahaskell.com/)
+or the
+[Gentle Introduction To Haskell](http://www.haskell.org/tutorial/).
 
  #### Acknowledgements
  
@@ -202,7 +204,7 @@ Writing these data constructors explicitly is not something that we enjoy doing,
 but for now it is useful to
 be very explicit about the representation of our programs.
 
-For now we will continue to write expressions using the 
+For now expressions will be written using the 
 concise and familiar concrete syntax $3+7$, adding parentheses where
 necessary. But keep in mind that this concise syntax is just
 a short-hand for the real value |Add (Number 3) (Number 7)|.
@@ -226,7 +228,7 @@ defined by cases in Haskell:
 
 In Haskell, a two-argument function like |div| can be used as an 
 infix operator by surrounding it in back-quotes, as |`div`|.
-To test this program we can execute the following main program:
+Here is a main program that tests evaluation:
 
 > main'1 = do
 >   putStrLn "Evaluating the following expression:"
@@ -263,7 +265,7 @@ the program and prints an error message:
 ````
 
 As our language becomes more complex, there will be many more kinds of
-errors that can arise. For now, we will just rely on Haskell to
+errors that can arise. For now, we will rely on Haskell to
 terminate the program when these situations arise, 
 but in [Chapter 5](#Monads) we will investigate how to 
 manage errors within our evaluator. 
@@ -289,8 +291,8 @@ go and read about *type classes*. (TODO: need citation here)
 
 Note that the |show| function for expressions is fairly similar
 to the |eval| function, but it performs string concatenation instead
-of numeric operations. Since we will be testing many different
-kinds of functions, it is useful to write a generalized test function.
+of numeric operations. To test many different
+kinds of functions, it is useful to define a generalized test function.
 
 > test fun input = do 
 > --------------------BEGIN-HIDE-------------------------
@@ -340,11 +342,11 @@ But the results are still not very satisfying:
 (3)-((-2)-(-7)) ==> -2
 ````
 
-We either have too many or too few parentheses. The right thing to do is
+There are either too many or too few parentheses. The right thing to do is
 to check whether parentheses are needed, by comparing the *precedence* of
 an operator with the *precedence* of the operators nested within it.
 Multiplication |\*| has higher precedence than addition |+| because 
-we interpret |1+2\*3| as |1+(2\*3)| not |(1+2)\*3|. In what follows, 
+|1+2\*3| means |1+(2\*3)| not |(1+2)\*3|. In what follows, 
 addition has precedence 1 and multiplication has precedence 2.
 
 > instance Show Exp'1 where
@@ -373,8 +375,8 @@ This definition produces an appealing result:
 
 The example of formatting expression is a concrete illustration of 
 the complexity of dealing with concrete syntax. The formatter 
-converts abstract syntax into readable text. In a later chapter
-we will develop a *parser* for expressions, which converts text into
+converts abstract syntax into readable text. A later chapter
+presents a *parser* for expressions, which converts text into
 abstract syntax.
 
  ## Variables
@@ -386,8 +388,9 @@ For example, young students learn to evaluate $x+2$ where $x=5$.
 The rule is to substitute every occurrence of $x$ with the value $5$
 and the perform the required arithmetic computations.
 
-To program this in Haskell, we the first thing we need is a representation for
-expressions with variables. Since the name of a variable "x" can be represented
+To program this in Haskell, the first thing needed is to extend
+the abstract syntax of expressions to include variables.
+Since the name of a variable "x" can be represented
 as a string of characters, it is easy to represent variables as an additional
 kind of expression. The following data definition modifies |Exp| to include
 a |Variable| case.
@@ -464,8 +467,8 @@ is to compute a result using that value.
 
  ## Substitution
 
-Substitution is used to replace a varible with a value in an expression.
-What we want is a function that has the following behavior:
+Substitution replaces a varible with a value in an expression.
+Here are some examples of substitution:
 
 * substitute $x \mapsto 5$ in $x+2$   $\longrightarrow$ $5+2$
 * substitute $x \mapsto 5$ in $2$     $\longrightarrow$ $2$
@@ -516,7 +519,7 @@ x*x + x ==> 5*5 + 5
 x + y ==> 5 + y
 ````
 
-It is important to keep in mind that we now have two stages for
+It is important to keep in mind that there are now two stages for
 evaluating an expression containing a variable. The first stage
 is to *substitute* the variable for its value, then the second
 stage is to *evaluate* the resulting arithmetic expression.
@@ -594,7 +597,7 @@ in a list, starting with a given initial value.
 
  ### Local Variables
 
-So far we have only considered variables that are defined *outside*
+So far all variables have been defined *outside*
 the expression itself. It is also useful to allow variables to be 
 defined *within* an expression. Most programming languages support
 this cabability by allowing definition of *local variables*.
@@ -722,8 +725,8 @@ TODO: need some test cases here
  
  ### Undefined Variable Errors
  
-With the introduction of variables into our language, we have created
-the possibiliy for a new kind of error: attempting to evaluate an expression
+With the introduction of variables into our language, a new kind of
+error can arise: attempting to evaluate an expression
 containing a variable that does not have a value. For example, these
 expressions all contain undefined variables:
 
@@ -733,8 +736,8 @@ let x = 2 in x * y
 (let x = 3 in x) * x
 ````
 
-What will happen when these expressions are evaluated? Note that we have
-not defined a case for evaluating a variable. This is because all variables
+What will happen when these expressions are evaluated? The definition of
+|evaluate| does not include a case for evaluating a variable. This is because all variables
 should be substituted for values before evaluation takes place. If a variable
 is not substituted then it is undefined. Since no case is defined for
 |evaluate| of a |Variable|, Haskell terminates the program and prints this
@@ -747,13 +750,13 @@ error message:
 The fact that a variable is undefined is a *static* property of the
 program: whether a variables is undefined depends only on the text of the program, 
 not upon the particular data that the program is manipulating. This is different
-from the first error case we identified, namely divide by zero. It is normal for
-divide by zero to depend upon the particular data that the program is manipulating,
-so it is a *dynamic* error. Of course, it might be possible to identify, just from
+from the divide by zero error, which depends upon the particular data that the program is manipulating.
+As a result, divide by zero is a *dynamic* error. Of course, it might be possible to identify, just from
 examining the text of a program, that it will always divide by zero. Alternatively,
 it may be the case that the code containing an undefined variable is never 
 executed at runtime. Thus the boundary between static and dynamic errors is not
-absolute. We will discuss this issue in more detail (TODO: reference to chapter on Types).
+absolute. The issue of static versus dynamic properties of programs
+is discussed in more detail later (TODO: reference to chapter on Types).
 
  ### Summary
 
@@ -1199,9 +1202,13 @@ function main() {
 }
 ````
 
+------BEGIN-HIDE-------
+edited "we" up to this point
+------END-HIDE---------
+
 This code resembles C or Java, but without types.
-The expression language we are developing does not need
-return statements, because every expression automatically returns
+Our expression language does not need
+|return| statements, because every expression automatically returns
 a value. A similar program can be written in Haskell, also
 without return statements:
 
@@ -2645,15 +2652,16 @@ definitions. While fixed points can be implemented directly, they are not the
 most efficient approach, especially in conventional languages. As a result, we will
 consider a third implementation, based on self application. This explanation is
 messy but practical. In fact, it is the basis for real-world implementations of
-C++ and Java. A fouth explanation will be given when we talk about implementing
+C++ and Java. A forth explanation 
+A fouth explanation, 
 languages in traditional imperative languages.
 
- ## Understanding Recursion using Haskell Recursion
+ ## Understanding Recursion using Haskell Recursion {#Cyclic}
  
 Haskell makes it easy to create infinite structures and functions. Understanding
 how this works can help us in implementing our language. We've already seen many
-examples of recursive functions in Haskell: for example, every |evaluate| function
-we have defined is recursive. However, Haskell also allows creation of recursive
+examples of recursive functions in Haskell: for example, every version of
+|evaluate| has been recursive. However, Haskell also allows creation of recursive
 data structures. For example, this line creates an infinite list of 2's:
 
 > twos = 2 : twos
@@ -2684,8 +2692,8 @@ be an infinite loop that never stops. However, if the program only
 needs the first 10 items of |twos| or |numbers| then only the first
 10 elements of the infinite value will be created.
 
-Interestingly, Haskell also accepts the algebraic expression that
-we discussed earlier:
+Interestingly, Haskell also accepts the algebraic expression 
+discussed earlier:
 
 > a = 1 + 3 * a
 
@@ -2722,7 +2730,7 @@ A type for trees:
 
 An example tree:
 
-> t1 = Branch (Branch (Leaf 5) (Leaf 3)) 
+> testTr = Branch (Branch (Leaf 5) (Leaf 3)) 
 >             (Leaf (-99))
 
 Computing the minimum and maximum of a tree:
@@ -2766,7 +2774,7 @@ helper function:
 > repMin' (Leaf n, r) = (n, Leaf r)
 > repMin' (Branch a b, r) = (min min1 min2, Branch newTree1 newTree2)
 >   where (min1, newTree1) = repMin' (a, r)
->        (min2, newTree2) = repMin' (b, r)
+>         (min2, newTree2) = repMin' (b, r)
 
 Finally to do the replacement with the minimum:
 
@@ -2780,18 +2788,19 @@ TODO: Explain how this works, and give a picture.
 
 > --------------------BEGIN-HIDE-------------------------
 > main'10 = do
->   print t1
->   print (minTree t1)
->   print (maxTree t1)
->   print (minMax t1)
->   print (repMin' (t1, 9999))
->   print (repMin t1)
+>   print testTr
+>   print (minTree testTr)
+>   print (maxTree testTr)
+>   print (minMax testTr)
+>   print (repMin' (testTr, 9999))
+>   print (repMin testTr)
 > --------------------END-HIDE-------------------------
 
 
  ### Implementing Recursive |Let| with Haskell
- 
-We now have everything we need to implement recursive |let|
+
+The powerful techniques for recursive definition illustrated
+in the previous section are sufficient to implement recursive |let|
 expressions. In the Section on [Evaluation using Environments](#BasicEvalEnv),
 |let| was defined as follows:
 
@@ -2811,7 +2820,7 @@ eval (Let'7 x exp body) = evaluate'7 body newEnv
   where newEnv = (x, evaluate'7 exp newEnv) : env
 ````
 
-We simply pass the new environment being as an argument to the
+The new environment being created is passed as an argument to the
 evaluation function that is used during the creation of the new environment!
 It may see odd to use the result of a function as one of its arguments.
 However, as we have seen, Haskell allows such definitions. 
@@ -2842,25 +2851,34 @@ down in the middle, then rotate the book around your finger.
 The spot under your finger is the fixed point of the rotation
 function.
 
-TODO: nice picture of the book and the fixed point?
+There is a large body of theory about fixed points, including 
+applications in mathematics and fundamental theorems (see 
+the Knaster Tarski theorem), but I'm going to avoid the math
+and give a practical disucssion of fixed-points with examples.
+TODO: give citations to appropriate books.
+
+TODO: nice picture of the book and the fixed point? Use a fun
+book, like "Theory of Lambda Conversion".
+
+ ### Fixed Points of Numeric Functions
 
 Fixed-points can also be identified for simple mathematical
 functions:
 
-*function*                    *fixed point(s)*
---------------------          --------------------
-$f_1(x) = 10 - x$             $5$
-$f_2(x) = x^2$                $0, 1$
-$f_3(x) = 1 + \cfrac{1}{x}$   $1.6180339887...$
-$f_4(x) = 4$                  $4$
-$f_5(x) = x$                  all values
-$f_6(x) = x + 1$              no finite numbers
+*function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  *fixed point(s)*
+--------------------                     --------------------
+$i_{10}(x) = 10 - x$                     $5$
+$square(x) = x^2$                        $0, 1$
+$g_\phi(x) = 1 + \cfrac{1}{x}$           $1.6180339887...$
+$k_4(x) = 4$                             $4$
+$id(x) = x$                              all values are fixed points
+$inc(x) = x + 1$                         no fixed points
 
 As you can see, some functions have one fixed point.
 Some functions have multiple fixed points. Others have
 an infinite number of fixed points, while some don't have
 any at all.
-The fixed point of $f_3$ is the *golden ratio*, 
+The fixed point of $g_\phi$ is the *golden ratio*, 
 also known as $\phi$.
 
 Fixed points are useful because they can provide a 
@@ -2871,33 +2889,317 @@ equation:
 $x = 10 - x$
 
 Rather than performing the normal algebraic manipulation
-to solve it, we can instead reformulate it by rewriting
-the right hand side as a call to a new helper function, $f$:
+to solve it, consider expressing the right side of the
+equation using a new helper function, $g$:
 
-$f(x) = 10 - x$
+$g(x) = 10 - x$
 
-Given this function, we can now rewrite the original equation
-using $f$ to get:
+Functions created in this way are called *generators* for 
+recursive equaitons.
+Given the generator $g$, the original equation can be rewritten as:
 
-$x = f(x)$
+$x = g(x)$
 
-But we know that a value $x$ that has the property $x = f(x)$
-can be defined as a fixed point of $f$. If we had a general
-function $\mathbf{fix}$ for computing fixed points of functions, then
-we could rewrite our equation as:
+Any value $x$ that satisfies $x = g(x)$ is a fixed point of $g$. 
+Conversely, any fixed point of $g$ is a solution to the original
+equation. This means that finding a solution to the original equation
+is equivalent to finding a fixed point for $g$. Imagine that
+there was a magic function |fix| that could automatically find
+a fixed point for any function[^4]. Then one way to find a fixed point
+of $g$ would be to use |fix|, by calling |fix|$(g)$.
+Then the solution to the equation above could be rewritten using |fix|:
 
-$x = \mathbf{fix}(f)$
+$x =$ |fix|$(g)$
 
-The curious thing about this definition is that we have
-*solved* for $x$, in the sense that we have an equation where
-$x$ appears only on the left of the equation. 
+[^4]: The function |fix| is often called $Y$. For further reading,
+see @ScottDataTypes, @GunterPL, @WhyY and @thomas2006end.
+
+This result looks like a *solution* for $x$, in the sense that 
+it is an equation where
+$x$ appears only by itself on the left of the equation. Any equation
+where a variable appears by itself on the left and anywhere
+on the right side of the
+equation, can be rewritten as a fixed point equation.
+
+Note that |fix| is a higher-order function: it takes a
+function as an input, and returns a value as a result.
+
+The problem is that the solution relies on |fix|, a function that
+hasn't been defined yet, and maybe cannot be defined. Is it
+possible to automatically find a fixed point of any function?
+Does the function |fix| exist? Can it be defined?
+
+ ### Fixed Points by Iterative Application
+ 
+It turns out that there is no way to find fixed points for
+*any* arbitrary function $f$, but for a certain class of
+well behaved functions, it *is* possible to compute fixed points
+automatically. In this case, "well behaved" means that
+the function converges on the solution when applied repeatedly.
+For example, consider function $g_\phi$ defined above:
+
+$g_\phi(x) = 1 + \cfrac{1}{x}$ 
+
+Consider multiple invocations of $g_\phi$ starting
+with $g_\phi(1)$. The following table summarizes this 
+process. The first column represents the iteration number,
+which starts at one and increases with each iteration.
+The second column is a representation of the computation 
+as an explicit *power* of a function. The power of a function
+$f^n(x)$ means to apply $f$ repeatedly until it has been
+performed $n$ times, passing the result of one call as the
+input of the next call. For example, $f^3(x)$ means $f(f(f(x)))$.
+The next column shows just the application of $g_\phi$ to the
+previous result. The final column gives the result for that
+iteration.
+
+\#  power            previous                     result
+--  ---------------- -------------------------- - ------------
+ 1  $g_\phi^{1}(1) $ $g_\phi(1)               $ = 2
+ 2  $g_\phi^{2}(1) $ $g_\phi(2)               $ = 1.5
+ 3  $g_\phi^{3}(1) $ $g_\phi(1.5)             $ = 1.6666666667
+ 4  $g_\phi^{4}(1) $ $g_\phi(1.66666666666667)$ = 1.6
+ 5  $g_\phi^{5}(1) $ $g_\phi(1.6)             $ = 1.625
+ 6  $g_\phi^{6}(1) $ $g_\phi(1.625)           $ = 1.6153846154
+ 7  $g_\phi^{7}(1) $ $g_\phi(1.61538461538462)$ = 1.619047619
+ 8  $g_\phi^{8}(1) $ $g_\phi(1.61904761904762)$ = 1.6176470588
+ 9  $g_\phi^{9}(1) $ $g_\phi(1.61764705882353)$ = 1.6181818182
+10  $g_\phi^{10}(1)$ $g_\phi(1.61818181818182)$ = 1.6179775281
+11  $g_\phi^{11}(1)$ $g_\phi(1.61797752808989)$ = 1.6180555556
+12  $g_\phi^{12}(1)$ $g_\phi(1.61805555555556)$ = 1.6180257511
+13  $g_\phi^{13}(1)$ $g_\phi(1.61802575107296)$ = 1.6180371353
+14  $g_\phi^{14}(1)$ $g_\phi(1.61803713527851)$ = 1.6180327869
+15  $g_\phi^{15}(1)$ $g_\phi(1.61803278688525)$ = 1.6180344478
+16  $g_\phi^{16}(1)$ $g_\phi(1.61803444782168)$ = 1.6180338134
+17  $g_\phi^{17}(1)$ $g_\phi(1.61803381340013)$ = 1.6180340557
+
+TODO: create a little plot of this function convergence.
+
+The result converges on $1.6180339887...$
+which is the value of $\phi$. It turns out that iterating
+$g_\phi$ converges on $\phi$ for any starting number.
+The fixed point is the *limit* of applying the 
+transformation function $g_\phi$ infinitely many times.
+One way to express the fixed point is 
+
+|fix|$(f) = f^\infty(start)$
+
+This means the application of $f$ an infinite number of
+times to some starting value. Finding the right starting
+value can be difficult. In some cases any starting value will
+work, but in other cases it's important to use a particular
+value. In the theory of fixed points, (TODO: discuss the theory
+somewhere), the initial value is the bottom of an appropriate
+lattice. 
+
+The fixed point of some, but not all, functions 
+can be computed by repeated function application. Here are
+the results for this technique, when applied to the examples
+given above:
+
+*function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  result for repeated invocation
+--------------------                     --------------------
+$inv_{10}(x) = 10 - x$                   infinite loop
+$square(x) = x^2$                        infinite loop
+$g_\phi(x) = 1 + \cfrac{1}{x}$           $1.6180339887...$
+$const_4(x) = 4$                         $4$
+$id(x) = x$                              infinite loop
+$inc(x) = x + 1$                         infinite loop
+
+Only two of the six examples worked. Fixed points are not a general
+method for solving numeric equations. 
+
+ ### Fixed Points for Recursive Structures
+
+The infinite recursive structures discussed in
+[Section on Haskell Recursion](#Cyclic) can also be defined using fixed points:
+
+> g_twos l = 2 : l
+
+The function |g_twos| is a non-recursive function that adds a 2 to the front
+of a list. Here are some test cases for applying |g_twos| to various lists:
+
+input                   output            input = output
+------------------      ------------      ----------------
+|[]|                    |[2]|             no
+|[1]|                   |[2,1]|           no
+|[3,4,5]|               |[2,3,4,5]|       no
+|[2,2,2,2,2]|           |[2,2,2,2,2,2]|   no
+|[2,2,2,...]|           |[2,2,2,...]|     *yes*
+
+The function |g_twos| can be applied to any list. If it is applied to 
+any finite list, then the input and output lists cannot be the same
+because the output is one element longer then the input. This is not a
+problem for infinite lists, because adding an item to the front of
+an infinite list is still an infinite list. Adding a 2 onto the front
+of an infinite list of 2s will return an infinite list of 2s. Thus
+an infinite list of 2s is a fixed point of |g_twos|.
+
+````
+fix(g_twos) = [2,2,2,...]
+````
+
+Functions used in this way are called generators because they
+generate recursive structures. One way to think about them is that
+the function performs *one step* in the creation of a infinite
+structure, and then the |fix| function repeats that step over
+and over until the full infinite structure is created. Consider
+what happens when the output of the funtion is applied to the
+input of the previous iteration. The results are 
+|[]|, |[2]|, |[2,2]|, |[2,2,2]|, |[2,2,2,2]|, ...
+At each step the result is a better approximation of the final
+solution.
+
+The second example, a recursive definition
+that creates a list containing the natural numbers, is more interesting:
+
+> g_numbers ns = 0 : [ n + 1 | n <- ns ]
+
+This function takes a list as an input, it adds one to each item in the 
+list and then puts a |0| on the front of the list.
+
+Here are the result when applied to the same test cases listed above:
+
+input                   output            input = output
+------------------      ------------      ----------------
+|[]|                    |[0]|             no
+|[1]|                   |[0,2]|           no
+|[3,4,5]|               |[0,4,5,6]|       no
+|[2,2,2,2,2]|           |[0,3,3,3,3,3]|   no
+|[2,2,2,...]|           |[0,3,3,3,...]|   no
+
+A more interesting set of test cases involves starting with the empty
+list, then using each function result as the next test case:
+
+input                   output                 input = output
+------------------      ------------           ----------------
+|[]|                    |[0]|                  no
+|[0]|                   |[0,1]|                no
+|[0,1]|                 |[0,1,2]|              no
+|[0,1,2]|               |[0,1,2,3]|            no
+|[0,1,2,3]|             |[0,1,2,3,4]|          no
+|[0,1,2,3,4]|           |[0,1,2,3,4,5]|        no
+|[0,1,2,3,4,5,...]|     |[0,1,2,3,4,5,6,...]|  *yes*
+
+The only list that is unchanged after applying |g_numbers|
+is the list of natural numbers:
+
+````
+fix(g_numbers) = [0,1,2,3,4,5,...]
+````
+
+By staring with the empty list and then applying |g_numbers| repeatedly,
+the result eventually converges on the fixed point. Each step is a 
+better approximation of the final answer.
+
+ ### Fixed Points of Higher-Order Functions
+
+ ### A Recursive Definition of |fix|
+
+Haskell allows an elegant definition of |fix| using recursion, which
+avoids the issue of selecting a starting value for the iteration.
+
+> fix g = g (fix g)
+
+This definition is beautiful because it is a direct translation of the
+original mathematic definition of a fixed point: |fix|$(f)$ is a value $x$ such
+that $x = f(x)$. Substituting |fix|$(f)$ for $x$ gives the definition
+above. 
+
+From an algorithmic viewpoint, the definition of only works because of
+lazy evaluation in Haskell. To compute |fix g| Haskell evaluates
+|g (fix g)| but does not immediately evaluate the argument |fix g|.
+Remember that arguments in Haskell are only evaluated if they are *needed*.
+Instead it begins evaluating the body of |g|, which may or may not 
+use its argument.
+
+ ### A Non-Recursive Definition of |fix|
+
+It is also possible to define |fix| non-recurisvely, by using *self application*.
+Self application is when a function is applied to itself. 
+This works because functions are values, so a function can be 
+passed as an argument to itself. For example, consider the identity
+function, which simply returns its argument:
+
+> id x = x
+
+The identity function can be applied to *any* value, because it doesn't
+do anything with the argument other than return it. Since it can be
+applied to any value, it can be applied to itself:
+
+> testID = id(id)   -- returns id
+
+Self application is not a very common technique, but it is certainly
+intersting. Here is a higher-order function that takes a function
+as an argument and immediately applies the function to itself:
+
+````
+stamp f = f(f)
+````
+
+Unfortunately, the |stamp| function cannot be coded in Haskell, because it is
+rejected by Haskell's type system. When a function of type $a \rightarrow b$ 
+is applied to itself, the argument type $a$ must be equivalent to $a \rightarrow b$.
+There are no types in the Haskell type system that can express a solution
+to type equation $a = a \rightarrow b$. Attempting to define |stamp| results
+in a Haskell compile-time error:
+
+    Occurs check: cannot construct the infinite type: t1 = t1 -> t0
+
+Many other languages allow |stamp| to be defined, either using more complex or
+weaker type systems. Dynamic languages do not have any prblem defining |stamp|.
+For example, here is a definition of |stamp| in JavaScript:
+
+````Java
+stamp = function (f) { return f(f); }
+````
 
 
 
+The interesting question is what happens when
+|stamp| is applied to itself: |stamp(stamp)|. This call binds |f| to |stamp|
+and then executes |f(f)| which is |stamp(stamp)|. The effect is an 
+immediate infinite loop, where stamp is applied to itself over and over
+again. What is interesting is that |stamp| is not recursive, and it does
+not have a while loop. But it manages to generate an infinite loop anyway.
+
+Given the ability to loop infinitely, it is also possible to execute
+a function infinitely many times.
+
+````
+fix g = stamp (g . stamp)
+````
+
+TODO: explain composition (|.|) operator
+
+Here are the steps in executing |fix| for a function |g|:
+
+* |fix g|
+
+    { definition of |fix|}
+* = |stamp (g . stamp)|
+
+    { definition of |stamp|}
+* = |(g . stamp)(g . stamp)|
+
+    { definition of |.|}
+* = |g(stamp(g . stamp))|
+
+    { definition of |fix|}
+* = |g(fix g)|
+
+This version of |fix| uses self-application to create
+a self-replicating program, which is then harnessed as
+an engine to invoke a function infinitely many times.
+This version of |fix| is traditionally written as 
+$\lambda g. (\lambda x. g(x x)) (\lambda x. g(x x))$,
+but this is the same as the version given above with
+the definition of |stamp| expanded.
 
 
 
  ## Understanding Recursion with Self-Application
+
 
  
 --------------------BEGIN-HIDE-------------------------

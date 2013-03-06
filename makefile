@@ -1,6 +1,6 @@
 .SUFFIXES: .lhs .mkd .htm .tex .pdf
 
-PANDOC := pandoc --no-wrap -sS
+PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib 
 HSCOLOUR := hscolour -lit
 
 verb: anatomyVerbatim.pdf
@@ -15,7 +15,7 @@ update: anatomy.pdf anatomyVerbatim.pdf
 	scp anatomyVerbatim.pdf envy.cs.utexas.edu:public_html/Courses/345/anatomyVerbatim.pdf
 	scp anatomy.pdf envy.cs.utexas.edu:public_html/Courses/345/anotomy.pdf
 	
-anatomy.mkd: anatomy.lhs makefile template.tex
+anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib
 	cat anatomy.lhs \
 	 | sed "s/^ #/#/" \
 	 | sed "s/'[0-9][0-9a-z]*//g" \
@@ -43,6 +43,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/\\\\\textgreater{}/>/g" \
 		| sed "s/\\\\\ldots{}/.../g" \
 		| sed "s/\\\\\\textbackslash{}/\\\\/g" \
+    | sed "/|/s/\\\\_/_/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \
