@@ -1,5 +1,7 @@
 .SUFFIXES: .lhs .mkd .htm .tex .pdf
 
+.PHONY: verb pretty update clean
+
 PANDOC := pandoc --no-wrap -sS
 HSCOLOUR := hscolour -lit
 
@@ -38,11 +40,11 @@ temp.lhs: anatomy.mkd template.tex
 		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex --chapters \
 		| sed "s/{verbatim}/{spec}/g" \
 		| sed "s/@/@@/g" \
-		| sed "s/\\\\\textbar{}/|/g" \
-		| sed "s/\\\\\textless{}/</g" \
-		| sed "s/\\\\\textgreater{}/>/g" \
-		| sed "s/\\\\\ldots{}/.../g" \
-		| sed "s/\\\\\\textbackslash{}/\\\\/g" \
+		| sed "s/\\\\textbar{}/|/g" \
+		| sed "s/\\\\textless{}/</g" \
+		| sed "s/\\\\textgreater{}/>/g" \
+		| sed "s/\\\\ldots{}/.../g" \
+		| sed "s/\\\\textbackslash{}/\\\\/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \
@@ -54,11 +56,11 @@ anatomyVerbatim.pdf: temp.lhs
 	| sed "s/\\\\char'10/\\\\char92{}/g" \
 	| sed "s/\\\\\char'06/\\\\char60{}\\\\char45{}/g" \
 	| sed "s/\\\\\char'36/==/g" \
-	| sed "s/\\\\\char'00/./g" \
-	| sed "s/\\\\\char'05/not/g" \
-	| sed "s/\\\\\char'04/and/g" \
-	| sed "s/\\\\\char'37/or/g" \
-	| sed "s/\\\\\char'24/forall/g" \
+	| sed "s/\\\\char'00/./g" \
+	| sed "s/\\\\char'05/not/g" \
+	| sed "s/\\\\char'04/and/g" \
+	| sed "s/\\\\char'37/or/g" \
+	| sed "s/\\\\char'24/forall/g" \
 	> anatomyVerbatim.tex
 	pdflatex anatomyVerbatim.tex && pdflatex anatomyVerbatim.tex && pdflatex anatomyVerbatim.tex
 
@@ -68,4 +70,11 @@ anatomyCheck.tex: temp.lhs
 anatomy.pdf: temp.lhs
 	lhs2TeX --poly temp.lhs > anatomy.tex
 	pdflatex anatomy.tex && pdflatex anatomy.tex && pdflatex anatomy.tex
+
+clean:
+	rm -rf abstract_syntax-eps-converted-to.pdf anatomy.mkd \
+		anatomyVerbatim.aux anatomyVerbatim.log anatomyVerbatim.out \
+		anatomyVerbatim.pdf anatomyVerbatim.tex anatomyVerbatim.toc \
+		scopes-eps-converted-to.pdf temp.lhs anatomy.pdf anatomy.tex \
+		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb
 	
