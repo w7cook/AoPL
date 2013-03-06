@@ -2,7 +2,7 @@
 
 .PHONY: verb pretty update clean
 
-PANDOC := /root/.cabal/bin/pandoc --no-wrap -sS
+PANDOC := pandoc --no-wrap -sS
 HSCOLOUR := hscolour -lit
 
 verb: anatomyVerbatim.pdf
