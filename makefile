@@ -45,7 +45,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/\\\\textgreater{}/>/g" \
 		| sed "s/\\\\ldots{}/.../g" \
 		| sed "s/\\\\textbackslash{}/\\\\/g" \
-    | sed "/|/s/\\\\_/_/g" \
+		| sed "/|/s/\\\\_/_/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \
@@ -55,8 +55,8 @@ anatomyVerbatim.pdf: temp.lhs
 	lhs2TeX --tt temp.lhs \
 	| sed "s/\\\\char'31/\\\\char45{}\\\\char62{}/g" \
 	| sed "s/\\\\char'10/\\\\char92{}/g" \
-	| sed "s/\\\\\char'06/\\\\char60{}\\\\char45{}/g" \
-	| sed "s/\\\\\char'36/==/g" \
+	| sed "s/\\\\char'06/\\\\char60{}\\\\char45{}/g" \
+	| sed "s/\\\\char'36/==/g" \
 	| sed "s/\\\\char'00/./g" \
 	| sed "s/\\\\char'05/not/g" \
 	| sed "s/\\\\char'04/and/g" \
