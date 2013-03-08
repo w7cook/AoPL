@@ -2044,55 +2044,75 @@ In effect a Church boolean *is* an if expression: it is a
 function that chooses one of two alternatives.
 
  #### Natural Numbers
+
+> --------------------BEGIN-HIDE-------------------------
+% Chris Cotter <ccotter@utexas.edu>
+% source: http://en.wikipedia.org/wiki/Church_encoding
+> ------END-HIDE---------
  
 Natural numbers can also be represented functionally. The Church encoding
 of natural numbers is known as \emph{Church Numerals}. The idea behind
-Church Numerals is relatex to the Peano axioms of arithmetic. The Peano
+Church Numerals is related to the Peano axioms of arithmetic. The Peano
 axioms define a constant $0$ as the \emph{first} natural number and a
-\emph{successor} function. |succ| takes a natural number and returns the
-\emph{next} natural number. For example,
+\emph{successor} function, $succ$. $succ$ takes a natural number and returns
+the \emph{next} natural number. For example,
 
-\begin{array}
-1 = succ(0)
-2 = succ(1) = succ(succ(0))
-3 = succ(2) = succ(succ(succ(0)))
-n = succ^n(0)
-\end{array}
+$1 = succ(0)$ \\
+
+$2 = succ(1) = succ(succ(0))$ \\
+
+$3 = succ(2) = succ(succ(succ(0)))$ \\
+
+$n = succ^n(0)$
 
 The last equation uses the notation $succ^n$, which means to apply the
 successor function $n$ times. Basic arithmetic can be carried out by
 applying the following relations.
 
-\begin{array}
-f^(n+m)(x) = f^n(f^m(x))
-f^(n*m)(x) = (f^n)^m(x)
-\end{array}
+$f^{n+m}(x) = f^n(f^m(x))$ \\
 
-Functionally, we can represent the natural number $0$ as follows.
+$f^{n*m}(x) = (f^n)^m(x)$
+
+Functionally, we can represent the Church numerals as functions of two
+arguments, |f| and |x|. Thus, a Church numeral is a lambda, not a concrete
+value like |0| or |1|. The Church numeral |0| applies |f| zero times to
+|x|. Similarly, |1| applies |f| once to |x|.
 
 > zero = \f -> \x -> x
+> one = \f -> \x -> f x
+> two = \f -> \x -> f (f x)
+> three = \f -> \x -> f (f (f x))
 
-Natural numbers are functions of two arguments. |f| is the successor function,
-and |x| is the first natural number, $0$. In Haskell we can write the generic
-type for natural numbers as
+Note that |f| and |x| have no restrictions. To demonstrate Church numerals, let
+us evaluate |three| by setting |f| to the successor function |(+1)| and |x|
+to |0|.
+
+> three (+1) 0 -- evaluates to 3
+
+To further demonstrate the flexibility, suppose we want our Church numerals to
+start with |[]| as the base value, and our succcessor function to append
+the character |'A'| to the begining of the list.
+
+> three ('A':) [] -- evaluates to "AAA"
+
+In Haskell we can write the generic type for Church numerals as
 
 > type ChurchN = forall a. (a -> a) -> a -> a
 
-We can represent $1$, $2$, and $3$ in Haskell as
-
-> one :: ChurchN
-> one = \f -> \x -> f x
-> two :: ChurchN
-> two = \f -> \x -> f (f x)
-> three :: ChurchN
-> three = \f -> \x -> f (f (f x))
-
-If we are given a Haskell |Integer|, we can represent any natural number
-with the following Haskell definition.
+If we are given a Haskell |Integer|, we can represent the equivalent Church
+numeral with the following Haskell definition.
 
 > church n :: Integer -> ChurchN
 > church 0 = \f -> \x -> x
 > church n = \f -> \x -> f (church (n-1) f x)
+
+To retrieve the |Integer| value of a Church numeral, we can evaluate
+the lamdba using the usual successor and base value.
+
+> unchurch :: ChurchN -> Integer
+> unchurch n = n (+1) 0
+> 5 == (unchurch (church 5)) -- this evaluates to True
+
 
 We define addition and multiplication in Haskell by using the above
 arithmetic relations.
@@ -2102,12 +2122,12 @@ arithmetic relations.
 > mul :: ChurchN -> ChurchN -> ChurchN
 > mul n m = \f -> n (m f)
 
-In Haskell, to retrieve the |Integer| value of a natural number lambda,
-we use the following function.
+We can use these functions to produce simple arithmetic equations.
 
-> unchurch :: ChurchN -> Integer
-> unchurch n = n (\x -> x + 1) 0
-> 5 == (unchurch (church 5))
+> x = church 10
+> y = church 5
+> z = church 2
+> a = plus x (mul y z) -- is equivalent to church 20
 
 --------------------------------------------------------------------
 (everything above this line is relatively stable, but the text below is in flux)
