@@ -2056,6 +2056,16 @@ axioms define a constant $0$ as the \emph{first} natural number and a
 1 = succ(0)
 2 = succ(1) = succ(succ(0))
 3 = succ(2) = succ(succ(succ(0)))
+n = succ^n(0)
+\end{array}
+
+The last equation uses the notation $succ^n$, which means to apply the
+successor function $n$ times. Basic arithmetic can be carried out by
+applying the following relations.
+
+\begin{array}
+f^(n+m)(x) = f^n(f^m(x))
+f^(n*m)(x) = (f^n)^m(x)
 \end{array}
 
 Functionally, we can represent the natural number $0$ as follows.
@@ -2084,7 +2094,20 @@ with the following Haskell definition.
 > church 0 = \f -> \x -> x
 > church n = \f -> \x -> f (church (n-1) f x)
 
-TODO arithmetic add/subtract/etc
+We define addition and multiplication in Haskell by using the above
+arithmetic relations.
+
+> plus :: ChurchN -> ChurchN -> ChurchN
+> plus n m = n f (m f x)
+> mul :: ChurchN -> ChurchN -> ChurchN
+> mul n m = \f -> n (m f)
+
+In Haskell, to retrieve the |Integer| value of a natural number lambda,
+we use the following function.
+
+> unchurch :: ChurchN -> Integer
+> unchurch n = n (\x -> x + 1) 0
+> 5 == (unchurch (church 5))
 
 --------------------------------------------------------------------
 (everything above this line is relatively stable, but the text below is in flux)
