@@ -2062,9 +2062,9 @@ Functionally, we can represent the natural number $0$ as follows.
 
 > zero = \f -> \x -> x
 
-Natural numbers are functions of two arguments. |f| is the successor
-function, and |x| is the first natural number, $0$. Thus, in Haskell we
-can write the generic type for natural numbers as
+Natural numbers are functions of two arguments. |f| is the successor function,
+and |x| is the first natural number, $0$. In Haskell we can write the generic
+type for natural numbers as
 
 > type ChurchN = forall a. (a -> a) -> a -> a
 
