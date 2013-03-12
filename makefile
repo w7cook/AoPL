@@ -77,5 +77,6 @@ clean:
 		anatomyVerbatim.aux anatomyVerbatim.log anatomyVerbatim.out \
 		anatomyVerbatim.pdf anatomyVerbatim.tex anatomyVerbatim.toc \
 		scopes-eps-converted-to.pdf temp.lhs anatomy.pdf anatomy.tex \
-		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb
+		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb \
+		anatomy.htm
 	
