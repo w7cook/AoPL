@@ -27,10 +27,10 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib
 
 anatomy.htm: anatomy.mkd
 	cat anatomy.mkd \
-   | sed "s/||/VERTICAL_BAR/g" \
+   | sed "s/||/VERTICAL_BARZ/g" \
    | sed "/|/s/\\\\//g" \
-   | sed "s/|/\`/g" \
-   | sed "s/VERTICAL_BAR/|/g" \
+   | perl -pe 's/\|(.*?)\|/\`$$1\`/g;' \
+   | sed "s/VERTICAL_BARZ/||/g" \
 	 | $(PANDOC) --toc -f markdown+lhs -t html -c hscolour.css --chapters \
 	 | sed "s/\\.eps/.png/" \
 	 > anatomy.htm
@@ -78,5 +78,5 @@ clean:
 		anatomyVerbatim.pdf anatomyVerbatim.tex anatomyVerbatim.toc \
 		scopes-eps-converted-to.pdf temp.lhs anatomy.pdf anatomy.tex \
 		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb \
-		anatomy.htm
+		anatomy.htm anatomyCheck.tex
 	
