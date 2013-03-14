@@ -4,6 +4,7 @@
 
 PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib 
 HSCOLOUR := hscolour -lit
+NEWLINE!=cat foo.txt
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
@@ -33,10 +34,13 @@ anatomy.htm: anatomy.mkd
    | sed "s/VERTICAL_BAR/|/g" \
 	 | $(PANDOC) --toc -f markdown+lhs -t html -c hscolour.css --chapters \
 	 | sed "s/\\.eps/.png/" \
+	 | sed "s/<p>/~<p>/g" | sed "s/<pre/~<pre/g" | tr "~" "\n" \
 	 > anatomy.htm
 
 temp.lhs: anatomy.mkd template.tex
 	cat anatomy.mkd \
+    | sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
+    | sed "s/%[a-zA-Z0-9][a-zA-Z0-9]*//g" \
 		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex --chapters \
 		| sed "s/{verbatim}/{spec}/g" \
 		| sed "s/@/@@/g" \
