@@ -27,10 +27,10 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib
 
 anatomy.htm: anatomy.mkd
 	cat anatomy.mkd \
-   | sed "s/||/VERTICAL_BAR/g" \
+   | sed "s/||/VERTICAL_BARZ/g" \
    | sed "/|/s/\\\\//g" \
-   | sed "s/|/\`/g" \
-   | sed "s/VERTICAL_BAR/|/g" \
+   | perl -pe 's/\|(.*?)\|/\`$$1\`/g;' \
+   | sed "s/VERTICAL_BARZ/||/g" \
 	 | $(PANDOC) --toc -f markdown+lhs -t html -c hscolour.css --chapters \
 	 | sed "s/\\.eps/.png/" \
 	 > anatomy.htm
@@ -45,7 +45,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/\\\\textgreater{}/>/g" \
 		| sed "s/\\\\ldots{}/.../g" \
 		| sed "s/\\\\textbackslash{}/\\\\/g" \
-    | sed "/|/s/\\\\_/_/g" \
+		| sed "/|/s/\\\\_/_/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \
@@ -55,8 +55,8 @@ anatomyVerbatim.pdf: temp.lhs
 	lhs2TeX --tt temp.lhs \
 	| sed "s/\\\\char'31/\\\\char45{}\\\\char62{}/g" \
 	| sed "s/\\\\char'10/\\\\char92{}/g" \
-	| sed "s/\\\\\char'06/\\\\char60{}\\\\char45{}/g" \
-	| sed "s/\\\\\char'36/==/g" \
+	| sed "s/\\\\char'06/\\\\char60{}\\\\char45{}/g" \
+	| sed "s/\\\\char'36/==/g" \
 	| sed "s/\\\\char'00/./g" \
 	| sed "s/\\\\char'05/not/g" \
 	| sed "s/\\\\char'04/and/g" \
@@ -77,5 +77,6 @@ clean:
 		anatomyVerbatim.aux anatomyVerbatim.log anatomyVerbatim.out \
 		anatomyVerbatim.pdf anatomyVerbatim.tex anatomyVerbatim.toc \
 		scopes-eps-converted-to.pdf temp.lhs anatomy.pdf anatomy.tex \
-		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb
+		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb \
+		anatomy.htm anatomyCheck.tex
 	

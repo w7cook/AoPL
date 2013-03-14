@@ -657,10 +657,10 @@ evaluate the body of the expression
 In Haskell, a |let| expression can be represented by adding
 another case to the definition of expressions:
 
-````
+\begin{code}
 data Exp'3 = ...
          | Let'3 String Exp'3 Exp'3  
-````
+\end{code}
 
 where the string is the variable name, the first Exp is the bound expression
 and the second expression is the body.
@@ -766,36 +766,38 @@ is discussed in more detail later (TODO: reference to chapter on Types).
 Here is the full code evaluation using substitution of a language
 with local variables.
  
-> data Exp'3 = Number'3     Int
->          | Add'3        Exp'3 Exp'3
->          | Subtract'3   Exp'3 Exp'3
->          | Multiply'3   Exp'3 Exp'3
->          | Divide'3     Exp'3 Exp'3
->          | Variable'3   String
->          | Let'3        String Exp'3 Exp'3    
->
-> substitute1'3 (var, val) exp = subst exp 
->  where
->   subst (Number'3 i)      = Number'3 i
->   subst (Add'3 a b)       = Add'3 (subst a) (subst b) 
->   subst (Subtract'3 a b)  = Subtract'3 (subst a) (subst b)
->   subst (Multiply'3 a b)  = Multiply'3 (subst a) (subst b)
->   subst (Divide'3 a b)    = Divide'3 (subst a) (subst b)
->   subst (Variable'3 name) = if var == name 
->                           then Number'3 val 
->                           else Variable'3 name
->   subst (Let'3 x exp body)  = Let'3 x (subst exp) body'
->     where body' = if x == var 
->                   then body
->                   else subst body
+\begin{code}
+data Exp'3 = Number'3     Int
+         | Add'3        Exp'3 Exp'3
+         | Subtract'3   Exp'3 Exp'3
+         | Multiply'3   Exp'3 Exp'3
+         | Divide'3     Exp'3 Exp'3
+         | Variable'3   String
+         | Let'3        String Exp'3 Exp'3    
 
-> evaluate'3 :: Exp'3 -> Int
-> evaluate'3 (Number'3 i)       = i
-> evaluate'3 (Add'3 a b)        = evaluate'3 a + evaluate'3 b
-> evaluate'3 (Subtract'3 a b)   = evaluate'3 a - evaluate'3 b
-> evaluate'3 (Multiply'3 a b)   = evaluate'3 a * evaluate'3 b
-> evaluate'3 (Divide'3 a b)     = evaluate'3 a `div` evaluate'3 b
-> evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) body)
+substitute1'3 (var, val) exp = subst exp 
+ where
+  subst (Number'3 i)      = Number'3 i
+  subst (Add'3 a b)       = Add'3 (subst a) (subst b) 
+  subst (Subtract'3 a b)  = Subtract'3 (subst a) (subst b)
+  subst (Multiply'3 a b)  = Multiply'3 (subst a) (subst b)
+  subst (Divide'3 a b)    = Divide'3 (subst a) (subst b)
+  subst (Variable'3 name) = if var == name 
+                          then Number'3 val 
+                          else Variable'3 name
+  subst (Let'3 x exp body)  = Let'3 x (subst exp) body'
+    where body' = if x == var 
+                  then body
+                  else subst body
+
+evaluate'3 :: Exp'3 -> Int
+evaluate'3 (Number'3 i)       = i
+evaluate'3 (Add'3 a b)        = evaluate'3 a + evaluate'3 b
+evaluate'3 (Subtract'3 a b)   = evaluate'3 a - evaluate'3 b
+evaluate'3 (Multiply'3 a b)   = evaluate'3 a * evaluate'3 b
+evaluate'3 (Divide'3 a b)     = evaluate'3 a `div` evaluate'3 b
+evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) body)
+\end{code}
 
  ## Evaluation using Environments {#BasicEvalEnv}
 
@@ -948,9 +950,11 @@ Until now our expressions have always returned |Int| results, because
 they have only performed arithmetic computations. The type |Value| 
 is defined to support multiple different kinds of values:
 
-> data Value = Int  Int
->            | Bool Bool
->  deriving Eq
+\begin{code}
+data Value = Int  Int
+           | Bool Bool
+ deriving Eq
+\end{code}
 
 > --------------------BEGIN-HIDE-------------------------
 > instance Show Value where
@@ -1264,10 +1268,10 @@ Any of the expressions can contain calls to the top-level
 functions. A call has a function name and a list
 of actual argument expressions:
 
-````
+\begin{code}
 data Exp'6 = ...
          | Call'6      String [Exp'6]
-````
+\end{code}
 
 As an example, here is an encoding of the example program:
 
@@ -1331,11 +1335,11 @@ The certainty about where to look up a name comes from the
 the fact that the names appear in completely different places
 in the abstract syntax:
 
-````
+\begin{code}
 data Exp = ...
      | Variable'6  String         -- variable name
      | Call'6      String [Exp'6]   -- function name
-````
+\end{code}
 
 A variable name is tagged as a |Variable| and a function name
 appears in a |Call| expression. 
@@ -1688,7 +1692,9 @@ Personally, I tend to
 use list comprehensions rather than |map|, because list comprehensions give
 a nice name to the items of the list. Here is an equivalent example using comprehensions:
 
-> testm2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   -- returns [-1, -3, 7, 0, -12]
+\begin{code}
+testm2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   -- returns [-1, -3, 7, 0, -12]
+\end{code}
 
 A function that takes another function as an input is called a *higher-order function*.
 Higher-order functions are quite useful, but what I find even more interesting
@@ -2037,15 +2043,95 @@ This code is not necessarily more readable, but it is concise.
 In effect a Church boolean *is* an if expression: it is a 
 function that chooses one of two alternatives.
 
+ #### Natural Numbers
+
+> --------------------BEGIN-HIDE-------------------------
+% Chris Cotter <ccotter@utexas.edu>
+% source: http://en.wikipedia.org/wiki/Church_encoding
+> ------END-HIDE---------
+ 
+Natural numbers can also be represented functionally. The Church encoding
+of natural numbers is known as \emph{Church Numerals}. The idea behind
+Church Numerals is related to the Peano axioms of arithmetic. The Peano
+axioms define a constant $0$ as the \emph{first} natural number and a
+\emph{successor} function, $succ$. $succ$ takes a natural number and returns
+the \emph{next} natural number. For example,
+
+$1 = succ(0)$ \\
+
+$2 = succ(1) = succ(succ(0))$ \\
+
+$3 = succ(2) = succ(succ(succ(0)))$ \\
+
+$n = succ^n(0)$
+
+The last equation uses the notation $succ^n$, which means to apply the
+successor function $n$ times. Basic arithmetic can be carried out by
+applying the following relations.
+
+$f^{n+m}(x) = f^n(f^m(x))$ \\
+
+$f^{n*m}(x) = (f^n)^m(x)$
+
+Functionally, we can represent the Church numerals as functions of two
+arguments, |f| and |x|. Thus, a Church numeral is a lambda, not a concrete
+value like |0| or |1|. The Church numeral |0| applies |f| zero times to
+|x|. Similarly, |1| applies |f| once to |x|.
+
+> zero = \f -> \x -> x
+> one = \f -> \x -> f x
+> two = \f -> \x -> f (f x)
+> three = \f -> \x -> f (f (f x))
+
+Note that |f| and |x| have no restrictions. To demonstrate Church numerals, let
+us evaluate |three| by setting |f| to the successor function |(+1)| and |x|
+to |0|.
+
+> three (+1) 0 -- evaluates to 3
+
+To further demonstrate the flexibility, suppose we want our Church numerals to
+start with |[]| as the base value, and our succcessor function to append
+the character |'A'| to the begining of the list.
+
+> three ('A':) [] -- evaluates to "AAA"
+
+In Haskell we can write the generic type for Church numerals as
+
+> type ChurchN = forall a. (a -> a) -> a -> a
+
+If we are given a Haskell |Integer|, we can represent the equivalent Church
+numeral with the following Haskell definition.
+
+> church n :: Integer -> ChurchN
+> church 0 = \f -> \x -> x
+> church n = \f -> \x -> f (church (n-1) f x)
+
+To retrieve the |Integer| value of a Church numeral, we can evaluate
+the lamdba using the usual successor and base value.
+
+> unchurch :: ChurchN -> Integer
+> unchurch n = n (+1) 0
+> 5 == (unchurch (church 5)) -- this evaluates to True
+
+
+We define addition and multiplication in Haskell by using the above
+arithmetic relations.
+
+> plus :: ChurchN -> ChurchN -> ChurchN
+> plus n m = n f (m f x)
+> mul :: ChurchN -> ChurchN -> ChurchN
+> mul n m = \f -> n (m f)
+
+We can use these functions to produce simple arithmetic equations.
+
+> x = church 10
+> y = church 5
+> z = church 2
+> a = plus x (mul y z) -- is equivalent to church 20
+
 --------------------------------------------------------------------
 (everything above this line is relatively stable, but the text below is in flux)
 --------------------------------------------------------------------
-
- #### Natural Numbers
- 
-Natural numbers can also be represented functionally.
-
-TODO: write this section
 
  ### Relationship between Let and Functions
  
@@ -2093,11 +2179,11 @@ To try this approach, function expressions
 are included in the |Value| data type, which 
 allows functions appears a literal values in a program:
 
-````
+\begin{code}
 data Value'8 = ...
            | Function'8 String Exp'8  -- new
   deriving Eq
-````
+\end{code}
 
 The two components of a function expression |Function| are
 the *bound variable* |String| and the *body expression* |Exp|.
@@ -2122,11 +2208,11 @@ top-level functions. Instead of the *name* of the function
 to be called, the |Call| expression now contains an expression |Exp|
 for both the function and the argument:
 
-````
+\begin{code}
 data Exp'8 = ...
          | Call'8      Exp'8 Exp'8         -- changed
   deriving Eq
-````
+\end{code}
 
 To clarify the effect of this change, consider these two versions
 of a simple program, written using top-level functions or 
@@ -2374,10 +2460,10 @@ To implement this idea, we revise the definition of |Exp|
 and |Value|. First we add function expressions as a new kind
 of expression:
 
-````
+\begin{code}
 data Exp'7 = ....
          | Function'7 String Exp'7      -- new
-````
+\end{code}
 
 As before, the two components of a function expression are
 the *bound variable* |String| and the *body expression* |Exp|.
@@ -2389,10 +2475,10 @@ Closures have all the same information as a function expressions
 (which we previously tried to add as values), but they have
 one important difference: closures also contain an environment.
 
-````
+\begin{code}
 data Value'7 = ...
            | Closure'7 String Exp'7 Env'7  -- new
-````
+\end{code}
 
 The three parts of a closure are the *bound variable* |String|,
 the *function body* |Exp|, and *the closure environment* |Env|.
@@ -2504,20 +2590,20 @@ expression.
      
  ### Example 1
 
-```` 
+\begin{code}
 let k = 2 in
   let double = \n -> k * n in
     let k = 9 in
       double k
-```` 
+\end{code}
  
 ![Environment Diagram 1](figures/env1.eps)
  
  ### Example 2
 
-````
+\begin{code}
 let add = \a -> (\b -> b + a) in (add 3) 2
-````
+\end{code}
 
 ![Environment Diagram 2](figures/env2.eps)
 
