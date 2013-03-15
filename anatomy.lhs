@@ -2221,11 +2221,13 @@ top-level functions. Instead of the *name* of the function
 to be called, the |Call| expression now contains an expression |Exp|
 for both the function and the argument: %A8
 
-````
-data Exp'8 = ...
-         | Call'8      Exp'8 Exp'8         -- changed
-  deriving Eq
-````
+> data Value'8 = Scalar'8 Value
+>            | Function'8 String Exp'8  -- new
+>   deriving Eq
+
+To create the new value type, the simpler type of basic |Value|
+is included with the tag |Scalar|. A *scalar* value is a simple
+basic primitive value.
 
 To clarify the effect of this change, consider these two versions
 of a simple program, written using top-level functions or
@@ -2251,7 +2253,7 @@ The explicit abstract syntax for example (B) is: %A14
 >  Let'8 "f" (Literal'8 (Function'8 "x"
 >                       (Binary'8 Mul (Variable'8 "x")
 >                                   (Variable'8 "x"))))
->    (Call'8 (Variable'8 "f") (Literal'8 (Int'8 10)))
+>    (Call'8 (Variable'8 "f") (Literal'8 (Scalar'8 (Int 10))))
 > -- %A15
 
 Note that the function in the |Call| is string |\"f\"|
@@ -2313,11 +2315,6 @@ now only have one argument, while we allowed multiple arguments
 in the previous case. %A27
 
 > --------------------BEGIN-HIDE-------------------------
-> data Value'8 = Int'8  Int
->            | Bool'8 Bool
->            | Function'8 String Exp'8  -- new
->   deriving Eq
->
 > data Exp'8 = Literal'8   Value'8
 >          | Unary'8     UnaryOp Exp'8
 >          | Binary'8    BinaryOp Exp'8 Exp'8
@@ -2326,6 +2323,8 @@ in the previous case. %A27
 >          | Let'8       String Exp'8 Exp'8
 >          | Call'8      Exp'8 Exp'8         -- changed
 >   deriving Eq
+>
+> type Env'8 = String -> Maybe Value'8
 >
 > evaluate'8 :: Exp'8 -> Env'8 -> Value'8
 > evaluate'8 exp env = eval exp
@@ -2339,28 +2338,16 @@ in the previous case. %A27
 >     eval (Let'8 x exp body) = evaluate'8 body newEnv
 >       where newEnv = bindF x (eval exp) env
 >     eval (Variable'8 x)     = fromJust (env x)
-> -- %A28
-
-> type Env'8 = String -> Maybe Value'8
+>     eval (Call'8 fun arg)   = evaluate'8 body newEnv
+>       where Function'8 x body = eval fun
+>             newEnv = bindF x (eval arg) env
 >
-> fromBool'8 (Bool'8 b) = b
+> fromBool'8 (Scalar'8 (Bool b)) = b
 >
-> unary'8 Not (Bool'8 b) = Bool'8 (not b)
-> unary'8 Neg (Int'8 i)  = Int'8 (-i)
->
-> binary'8 Add (Int'8 a)  (Int'8 b)  = Int'8 (a + b)
-> binary'8 Sub (Int'8 a)  (Int'8 b)  = Int'8 (a - b)
-> binary'8 Mul (Int'8 a)  (Int'8 b)  = Int'8 (a * b)
-> binary'8 Div (Int'8 a)  (Int'8 b)  = Int'8 (a `div` b)
-> binary'8 And (Bool'8 a) (Bool'8 b) = Bool'8 (a && b)
-> binary'8 Or  (Bool'8 a) (Bool'8 b) = Bool'8 (a || b)
-> binary'8 LT  (Int'8 a)  (Int'8 b)  = Bool'8 (a < b)
-> binary'8 LE  (Int'8 a)  (Int'8 b)  = Bool'8 (a <= b)
-> binary'8 GE  (Int'8 a)  (Int'8 b)  = Bool'8 (a >= b)
-> binary'8 GT  (Int'8 a)  (Int'8 b)  = Bool'8 (a > b)
-> binary'8 EQ  a        b        = Bool'8 (a == b)
-> --------------------END-HIDE-------------------------
+> unary'8 op (Scalar'8 a) = Scalar'8 (unary op a)
+> binary'8 op (Scalar'8 a) (Scalar'8 b) = Scalar'8 (binary op a b)
 > -- %A29
+> --------------------END-HIDE-------------------------
 
 The key question is: **why doesn't the code given above work?**
 There are two problems. One has to do with returning functions
@@ -2387,8 +2374,8 @@ This program is encoded in our language as follows: %Prob4
 >                 (Binary'8 Add (Variable'8 "b")
 >                             (Variable'8 "a"))))))
 >              (Call'8 (Call'8 (Variable'8 "add")
->                              (Literal'8 (Int'8 3)))
->                    (Literal'8 (Int'8 2)))
+>                              (Literal'8 (Scalar'8 (Int 3))))
+>                    (Literal'8 (Scalar'8 (Int 2))))
 > -- %Prob5
 
 Rather than work with the ugly constructor syntax in
@@ -2495,10 +2482,10 @@ Closures have all the same information as a function expressions
 (which we previously tried to add as values), but they have
 one important difference: closures also contain an environment. %A6
 
-````
-data Value'7 = ...
-           | Closure'7 String Exp'7 Env'7  -- new
-````
+> data Value'7 = Scalar'7 Value
+>            | Closure'7 String Exp'7 Env'7  -- new
+>   deriving (Eq, Show)
+>
 
 The three parts of a closure are the *bound variable* |String|,
 the *function body* |Exp|, and *the closure environment* |Env|.
@@ -2649,13 +2636,6 @@ let m = 2 in
 
 Here is the full code for first-class functions with non-recursive definitions: %Summ2
 
-> data Value'7 = Int'7  Int
->            | Bool'7 Bool
->            | Closure'7 String Exp'7 Env'7  -- new
->   deriving (Eq, Show)
->
-> type Env'7 = [(String, Value'7)]
->
 > data Exp'7 = Literal'7   Value'7
 >          | Unary'7     UnaryOp Exp'7
 >          | Binary'7    BinaryOp Exp'7 Exp'7
@@ -2665,6 +2645,8 @@ Here is the full code for first-class functions with non-recursive definitions: 
 >          | Function'7  String Exp'7      -- new
 >          | Call'7      Exp'7 Exp'7         -- changed
 >   deriving (Eq, Show)
+>
+> type Env'7 = [(String, Value'7)]
 >
 > evaluate'7 :: Exp'7 -> Env'7 -> Value'7
 > evaluate'7 exp env = eval exp
@@ -2682,24 +2664,11 @@ Here is the full code for first-class functions with non-recursive definitions: 
 >     eval (Call'7 fun arg)   = evaluate'7 body newEnv    -- changed
 >       where Closure'7 x body closeEnv = eval fun
 >             newEnv = (x, eval arg) : closeEnv
-> --------------------BEGIN-HIDE-------------------------
-> fromBool'7 (Bool'7 b) = b
 >
-> unary'7 Not (Bool'7 b) = Bool'7 (not b)
-> unary'7 Neg (Int'7 i)  = Int'7 (-i)
+> fromBool'7 (Scalar'7 (Bool b)) = b
 >
-> binary'7 Add (Int'7 a)  (Int'7 b)  = Int'7 (a + b)
-> binary'7 Sub (Int'7 a)  (Int'7 b)  = Int'7 (a - b)
-> binary'7 Mul (Int'7 a)  (Int'7 b)  = Int'7 (a * b)
-> binary'7 Div (Int'7 a)  (Int'7 b)  = Int'7 (a `div` b)
-> binary'7 And (Bool'7 a) (Bool'7 b) = Bool'7 (a && b)
-> binary'7 Or  (Bool'7 a) (Bool'7 b) = Bool'7 (a || b)
-> binary'7 LT  (Int'7 a)  (Int'7 b)  = Bool'7 (a < b)
-> binary'7 LE  (Int'7 a)  (Int'7 b)  = Bool'7 (a <= b)
-> binary'7 GE  (Int'7 a)  (Int'7 b)  = Bool'7 (a >= b)
-> binary'7 GT  (Int'7 a)  (Int'7 b)  = Bool'7 (a > b)
-> binary'7 EQ  a        b        = Bool'7 (a == b)
-> --------------------END-HIDE-------------------------
+> unary'7 op (Scalar'7 a) = Scalar'7 (unary op a)
+> binary'7 op (Scalar'7 a) (Scalar'7 b) = Scalar'7 (binary op a b)
 > -- %Summ3
 
  # Recursive Definitions
@@ -2755,12 +2724,12 @@ If we convert this program to our abstract syntax, it comes out as: %Recu11
 
 > testLet1 = Let'7
 >  "fact" (Function'7 "n"
->     (If'7 (Binary'7 EQ (Variable'7 "n") (Literal'7 (Int'7 0)))
->         (Literal'7 (Int'7 1))
+>     (If'7 (Binary'7 EQ (Variable'7 "n") (Literal'7 (Scalar'7 (Int 0))))
+>         (Literal'7 (Scalar'7 (Int 1)))
 >         (Binary'7 Mul (Variable'7 "n")
 >                     (Call'7 (Variable'7 "fact")
->                           (Binary'7 Sub (Variable'7 "n") (Literal'7 (Int'7 1)))))))
->  (Call'7 (Variable'7 "fact") (Literal'7 (Int'7 10)))
+>                           (Binary'7 Sub (Variable'7 "n") (Literal'7 (Scalar'7 (Int 1))))))))
+>  (Call'7 (Variable'7 "fact") (Literal'7 (Scalar'7 (Int 10))))
 > --------------------END-HIDE-------------------------
 > -- %Recu12
 
@@ -3565,10 +3534,10 @@ function must be updated to signal divide by zero:
 
 ````
 checked_binary :: BinaryOp -> Value'7 -> Value'7 -> Checked Value'7
-checked_binary Div (Int'7 a)  (Int'7 b)  = 
+checked_binary Div (Scalar'7 (Int a))  (Scalar'7 (Int b))  = 
   if b == 0 
   then Error "Divide by zero" 
-  else Good (Int'7 (a `div` b))
+  else Good (Scalar'7 (Int (a `div` b)))
 checked_binary op a b = Good (binary'7 op a b)
 ````
 
@@ -3585,7 +3554,7 @@ the condition is either an error or is not a boolean value:
 >         Error msg -> Error msg
 >         Good v ->
 >           case v of 
->             Bool'7 t -> eval (if t then b else c)
+>             Scalar'7 (Bool t) -> eval (if t then b else c)
 >             o    -> Error ("Condition value " ++ show o ++ " not a boolean")
 
 Recursive let expressions are the most complex. The problem is that an 
@@ -3608,10 +3577,10 @@ creation of the new environment fails.
 > -- %Summ3 
 
 > checked_binary :: BinaryOp -> Value'7 -> Value'7 -> Checked Value'7
-> checked_binary Div (Int'7 a)  (Int'7 b)  = 
+> checked_binary Div (Scalar'7 (Int a)) (Scalar'7 (Int b)) = 
 >   if b == 0 
 >   then Error "Divide by zero" 
->   else Good (Int'7 (a `div` b))
+>   else Good (Scalar'7 (Int (a `div` b)))
 > checked_binary op a b = Good (binary'7 op a b)
 > --------------------END-HIDE-------------------------
 
@@ -3625,7 +3594,7 @@ The result of evaluation is:
 
 Or for divide by zero:    
 
-> testDBZ = evaluate'10 (Binary'7 Div (Literal'7 (Int'7 3)) (Literal'7 (Int'7 0)) ) []
+> testDBZ2 = evaluate'10 (Binary'7 Div (Literal'7 (Scalar'7 (Int 3))) (Literal'7 (Scalar'7 (Int 0))) ) []
 
 The result of evaluation is:
 
@@ -3659,7 +3628,7 @@ The code is valid in C, Java or JavaScript:
 
 ````Java
 x = 1;
-for (i = 1; i <= 10; i = i + 1) {
+for (i = 2; i <= 5; i = i + 1) {
   x = x * i;
 }
 ````
@@ -3668,7 +3637,7 @@ It declares a local variable named |x| with inital value |1|
 and then performs an iteration where the variable |i| changes
 from 1 to 10. On each iteration of the loop the variable |x|
 is multiplied by |i|. The result of |x| a the end is the 
-factorial of 10.
+factorial of 5, namely 120.
 
 Another typical example of mutable state is modification of
 data structures. The following code, written in JavaScript, 
@@ -3735,7 +3704,7 @@ as follows, using mutable cells:
 
 ````Java
 x = Mutable(1);
-for (i = Mutable(1); !i <= 10; i := !i + 1) {
+for (i = Mutable(2); !i <= 5; i := !i + 1) {
   x := !x * !i;
 }
 ````
@@ -3757,10 +3726,9 @@ represented by any unique set of labels, one convenient representation for
 addresses is as integers. Using integers as addresses is also similar to the
 use of integers for addresses in a computer memory.
 
-> data Value'9 = Int'9  Int
->            | Bool'9 Bool
->            | Closure'9 String Exp'7 Env'7
->            | Address'9 Int        -- new
+> data Value'9 = Scalar'9 Value
+>            | Closure'9 String Exp'9 Env'9
+>            | Address Int        -- new
 >   deriving (Eq, Show)
 
 When writing programs and values, it is usefull to distinguish addresses 
@@ -3780,62 +3748,293 @@ are expressed.
  #### Memory
  
 The current value of all mutable cells used in a program can be represented 
-a map from addresses to values. Such a map is directly analogous
-to the *memory* of a computer system, which can be thought of as
-a map from addresses to 8 bits of data. A change to the memory, caused
-by storing a new value into an address, can be implemented by creating
-a new memory map that has a different value for one of its addresses.
+in many different ways. Logically, a memory is a map or association of
+addresses to values. The same techniques used for environments could
+be used for memories, as a list of pairs or a function. 
+Memory can also be represented as a function mapping integers
+to values, similar to the [representation of environments as functions](#EnvAsFun).
 
-A memory is very similar to an environment, except that a memory
-maps addresses to values, while an environment maps variables to values.
+But since addresses are integers, one natural
+representation is as a list or array of values, where the address is
+the position or index of the value. 
+Such an array is directly analogous
+to the *memory* of a computer system, which can be thought of as
+an array of 8 bit values. In this chapter memory will be implemented
+as a list of values, although many other representations are certainly
+possible.
+
+> type Memory = [Value'9]
+
+One complication is that the memory must be able to *grow* by adding
+new addresses. The initial empty memory is the empty list |[]|.
+The first address added is zero [@0]. The next address is one to 
+create a memory [@1, @0]. In general a memory with $n$ cells will
+have addresses [$n-1$, ..., 1, 0]. 
 Here is an example memory, with two addresses:
 
-> testM1 = [(1, Value'7 (Int' 11)), (2, Value'7 (Int' 3628800))] 
+````
+[Value'7 (Scalar'7 (Int 6)), Value'7 (Scalar'7 (Int 120))] 
+````
 
-This memory has value 11 at address 1 and value 3628800 at address 2.
+This memory has value 6 at address 1 and value 120 at address 0.
 More concisely, this memory can be written as
 
-$[1 \mapsto 11, 2 \mapsto 3628800]$.
+[11, 120]
 
 This memory could be the result of executing the factorial program given above,
-under the assumption that |i| is bound to address 1 and |x| is bound to address 2.
-The environment would be:
+under the assumption that |i| is bound to address 1 and |x| is bound to address 0.
+An appropriate environment is:
 
-[|i| $\mapsto$ @1, |x| $\mapsto$ @2].
+[|i| $\mapsto$ @1, |x| $\mapsto$ @0]
 
-TODO: discuss type of memory
+During the execution of the program that computes the factorial of 5, there
+are 10 different memory configurations that are created:
 
-> type Memory = [(Int, Value'9)]
+Step                    Memory                  
+-------------------     ------------------------------------------
+*start*                 $[]$
+|x = Mutable(1);|       $[1]$
+|i = Mutable(2);|       $[2, 1]$
+|x = !x * !i;|          $[2, 2]$
+|i = !i + 1;|           $[3, 2]$
+|x = !x * !i;|          $[3, 6]$
+|i = !i + 1;|           $[4, 6]$
+|x = !x * !i;|          $[4, 24]$
+|i = !i + 1;|           $[5, 24]$
+|x = !x * !i;|          $[5, 120]$
+|i = !i + 1;|           $[6, 120]$
 
- ### Encoding Mutation in Functional Languages
+ ### Pure Functional Operations on Memory
+
+The two fundamental operations on memory are memory *access*,
+which looks up the contents of a memory cell, and *update*, which
+modifies the contents of a memory cell. 
+
+ #### Access
  
-Mutable state is not possible in pure functional
-languages, including Haskell, because there is no way to modify a
-data structure or variable value after is has been constructed
-or bound. 
+The memory |access| function takes a memory address $i$
+and a memory (list) and returns the item of the list at position
+$i$ counting from the right of the list.
+The Haskell function |!!| returns the $n$th item of a list,
+so it almost serves as an implemenetation for the memory |access|
+function. However, the |!!| function counts from the *left* of the
+list, not the right. To compute an index from the right of a list,
+the index must be subtracted from the length of the list:
 
+> access i mem = mem !! (length mem - i - 1)
+
+ #### Update 
+ 
+It is not possible to actually *change* memory in pure functional
+languages, including Haskell, because there is no way to modify a
+data structure after is has been constructed.
 But it is possible to compute a new data struture
 that is based on an existing one. This is the notion of 
 *functional update* or *functional change*: a function can
 act as a transformation of a value into a new value.
+A functional update to memory is a function of type |Memory -> Memory|
+Such functions take a memory as input and create a *new* memory
+as an output. The new memory is typically nearly identical to the
+input memory, but with a small change.
 
-TODO: describe store, and lookup
+For example, the |update| operator on memory replaces the
+contents of a single address with a new value.
 
-> store :: Int -> Value'9 -> Memory -> Memory
-> store address value memory = (address, value) : delete address memory
+> update :: Int -> Value'9 -> Memory -> Memory
+> update addr val mem = 
+>   let (before, _:after) = splitAt (length mem - addr - 1) mem in
+>     before ++ [val] ++ after
 
-So for example, a function to add 1 to the value stored at
-address 1 can be written
+The |update| function works by splitting the memory into the part
+before the address and the part starting with the address |addr|. The pattern
+$_:after$ binds $after$ to be the memory after the address. The |update|
+function then recreates a new memory containing the before part,
+the updated memory cell, and the after part. The function
+is innefficient because it has to copy all the memory cells it has scanned up to that
+point! We are not worried about efficiency, however, so just relax. It is 
+fast enough.
 
-> incAdd1 = store 1 (10 * fromInt (lookup memory 1)) 
+Using |access| and |update| it is possible to define interesting *transformations*
+on memory.
+For example, the function |mul10| multiplies the contents of a memory address by 10:
 
-This function has type 
+> mul10 addr mem = 
+>   let n = fromInt (access addr mem) in
+>     update addr (toValue (10 * n)) mem
+>
+> fromInt (Scalar'9 (Int n)) = n
+> toValue n = (Scalar'9 (Int n))
+
+Here is an example calling |mul10| on a memory with 4 cells:
+
+> testMul10 = mul10 1 [toValue 3, toValue 4, toValue 5, toValue 6]
+
+The result is 
+
+    [Scalar'9 (Int 3), Scalar'9 (Int 4), Scalar'9 (Int 50), Scalar'9 (Int 6)]
+
+The fact that |mul10| is a transformation on memory is evident from its type:
+
+> mul10 :: Int -> Memory -> Memory
+
+This means that |mul10| takes an memory address as an input and returns
+a function that transforms an input memory into an output memory. 
+
+ ### Semantics of a Language with Mutation
+
+The first step in creating a function with mutable cells is to add
+abstract syntax for the three operations on mutable cells. The following
+table defines the abstract syntax:
+
+Operation        Abstract Syntax    Meaning
+---------------- ------------------ -----------------------
+|Mutable(e)|     |Mutable e|        Allocate memory
+|!a|             |Access a|         Accesses memory
+|a := e|         |Assign a e|       Updates memory
+
+The abstract syntax is added to the data type representing expressions in
+our language:
 
 ````
-incAdd1 :: Memory -> Memory
+data Exp'9 = ...
+         | Mutable'9   Exp'9         -- new 
+         | Access'9    Exp'9         -- new
+         | Assign'9    Exp'9 Exp'9   -- new 
 ````
 
-TODO: Finish this...
+TODO: Explain basic strategy, of returning new value and memory.
+
+````
+    eval (Mutable'9 e) mem = 
+      let (ev, mem') = eval e mem
+          i = newAddress mem'
+      in
+          (Address i, update i ev mem')
+````
+
+> newAddress mem = length mem
+
+TODO: explain
+
+````
+    eval (Access'9 a) mem = 
+      let (Address i, mem') = eval a mem in
+          (access i mem', mem')
+````
+
+TODO: explain
+
+````
+    eval (Assign'9 a e) mem = 
+      let (Address i, mem') = eval a mem in
+        let (ev, mem'') = eval e mem' in
+          (ev, update i ev mem'')
+````
+
+The interesting thing is that even parts of the evaluator
+that have nothing to do with mutable cells have to be 
+copmletely rewritten:
+
+````
+    eval (Binary'9 op a b) mem =
+      let (av, mem') = eval a mem in
+        let (bv, mem'') = eval b mem' in
+          (binary'9 op av bv, mem'')
+````
+
+ ### Summary of Mutable State
+
+Again, the take-away should be that mutation is messy when
+programmed in this way. Mutation affects every part of the
+evaluation process, even for parts that are not involved
+with creating or manipulating mutable cells.
+
+Here is the complete code for mutable cells.
+
+> data Exp'9 = Literal'9   Value'9
+>          | Unary'9     UnaryOp Exp'9
+>          | Binary'9    BinaryOp Exp'9 Exp'9
+>          | If'9        Exp'9 Exp'9 Exp'9
+>          | Variable'9  String
+>          | Let'9       String Exp'9 Exp'9
+>          | Function'9  String Exp'9
+>          | Call'9      Exp'9 Exp'9
+>          | Mutable'9   Exp'9         -- new 
+>          | Access'9    Exp'9         -- new
+>          | Assign'9    Exp'9 Exp'9   -- new 
+>   deriving (Eq, Show)
+>
+> type Env'9 = [(String, Value'9)]
+>
+
+All the existing parts of the evaluator are modified:
+
+> evaluate'9 :: Exp'9 -> Env'9 -> Memory -> (Value'9, Memory)
+> evaluate'9 exp env mem = eval exp mem
+>   where
+>     eval (Literal'9 v) mem    = (v, mem)
+>     eval (Unary'9 op a) mem   = 
+>       let (av, mem') = eval a mem in
+>         (unary'9 op av, mem')
+>     eval (Binary'9 op a b) mem =
+>       let (av, mem') = eval a mem in
+>         let (bv, mem'') = eval b mem' in
+>           (binary'9 op av bv, mem'')
+>     eval (If'9 a b c) mem =
+>       let (av, mem') = eval a mem in
+>         eval (if fromBool'9 av then b else c) mem'
+>     eval (Variable'9 x) mem = (fromJust (lookup x env), mem)
+>     eval (Let'9 x e body) mem =
+>       let (ev, mem') = eval e mem
+>           newEnv = (x, ev) : env
+>       in
+>         evaluate'9 body newEnv mem'
+>     eval (Function'9 x body) mem = (Closure'9 x body env, mem)
+>     eval (Call'9 f a) mem  = 
+>       let (Closure'9 x body closeEnv, mem') = eval a mem
+>           (av, mem'') = eval a mem'
+>           newEnv = (x, av) : closeEnv
+>       in
+>           evaluate'9 body newEnv mem''
+
+Here are the mutation-specific parts of the evaluator:
+
+>     eval (Mutable'9 e) mem = 
+>       let (ev, mem') = eval e mem
+>           i = newAddress mem'
+>       in
+>           (Address i, update i ev mem')
+>     eval (Access'9 a) mem = 
+>       let (Address i, mem') = eval a mem in
+>           (access i mem', mem')
+>     eval (Assign'9 a e) mem = 
+>       let (Address i, mem') = eval a mem in
+>         let (ev, mem'') = eval e mem' in
+>           (ev, update i ev mem'')
+>
+> fromBool'9 (Scalar'9 (Bool b)) = b
+>
+> unary'9 op (Scalar'9 a) = Scalar'9 (unary op a)
+> binary'9 op (Scalar'9 a) (Scalar'9 b) = Scalar'9 (binary op a b)
+
+ ## Abstracting Computational Strategies
+ 
+At first glance it does not seem there is anything that can be
+done about the messy coding involved in implementing errors
+and mutable state. These features are *aspects* of the evaluation
+process, because they effect all the code of the evaluator, not
+just the part that directly involves the new feature. 
+
+What is worse is that combining the code for errors and mutable
+state is not possible without writing yet another completely 
+different implementation. The *feature* of our evaluator are not
+implemented in a modular way.
+
+One solution to this problem is to use a *monad*. That is the
+subject of this section!
+
+
+
 
  # More Chapters on the way...
  ## Abstract Interpretation and Types
