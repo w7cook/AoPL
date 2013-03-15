@@ -70,7 +70,8 @@ I thank the students in the spring 2013 semester of CS 345 *Programming Language
 at the University of Texas at Austin, who helped out while I was writing the book.
 Special thanks to Chris Roberts and Guy Hawkins for corrections and Aiden Song 
 for careful proofreading. Tyler Allman Young
-captured notes in class. Chris Cotter improved the makefile. %Ackn2
+captured notes in class. Chris Cotter improved the makefile and wrote the initial
+text for some sections. %Ackn2
 
  ## Introduction
 
@@ -2121,7 +2122,7 @@ true and |b| as arguments. %Bool10
 You get the idea. Calling |a| with |b| and false as arguments will
 return |b| if |a| is true and false otherwise. %Bool12
 
-To use a Church boolean, the normal syntax for if expressions is
+To use a Church boolean, the normal syntax for |if| expressions is
 completely unnecessary. For example, %Bool13
 
 > testb1 = if not True then 1 else 2
@@ -2133,7 +2134,7 @@ is replaced by %Bool15
 > -- %Bool16
 
 This code is not necessarily more readable, but it is concise.
-In effect a Church boolean *is* an if expression: it is a
+In effect a Church boolean *is* an |if| expression: it is a
 function that chooses one of two alternatives. %Bool17
 
  #### Natural Numbers
@@ -2145,11 +2146,11 @@ axioms define a constant $0$ as the \emph{first} natural number and a
 \emph{successor} function, $succ$. $succ$ takes a natural number and returns
 the \emph{next} natural number. For example,
 
-$1 = succ(0)$ \\
+$1 = succ(0)$
 
-$2 = succ(1) = succ(succ(0))$ \\
+$2 = succ(1) = succ(succ(0))$
 
-$3 = succ(2) = succ(succ(succ(0)))$ \\
+$3 = succ(2) = succ(succ(succ(0)))$
 
 $n = succ^n(0)$
 
@@ -2157,7 +2158,7 @@ The last equation uses the notation $succ^n$, which means to apply the
 successor function $n$ times. Basic arithmetic can be carried out by
 applying the following relations.
 
-$f^{n+m}(x) = f^n(f^m(x))$ \\
+$f^{n+m}(x) = f^n(f^m(x))$
 
 $f^{n*m}(x) = (f^n)^m(x)$
 
@@ -4109,7 +4110,7 @@ implemented in a modular way.
 One solution to this problem is to use a *monad*. That is the
 subject of this section!
 
-
+ TODO: finish section
 
 
  # More Chapters on the way...
