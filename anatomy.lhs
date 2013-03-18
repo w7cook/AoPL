@@ -1711,7 +1711,6 @@ For now this is an informal definition.
 We will make it more precise when we
 write an evaluator that handles function expressions correctly. %Func12
 
-
  ## Examples of First-Class Functions {#FirstClassExamples}
 
 Before we begin a full analysis of the semantics of first-class
@@ -3584,17 +3583,17 @@ consider extensions that have a general impact on every part of the
 language. Some examples are error handling, tracing of code,
 and mutable state. %Comp2
 
- ## Handling Errors
+ ## Errors
 
-Error handling
-is a pervasiave feature of a language, beause it affects
+Errors are an important aspect of computation. They 
+are typically a pervasiave feature of a language, beause they affects
 the way that every expression is evaluated. For example,
 the expression |a+b| may not cause any errors,
 but if evaluating |a| or |b| can cause an error,
 then the evaluation of |a+b| will have to deal with the
 possiblity that |a| or |b| is an error. %Hand2
 
-Error handling is a notorious problem in programming languages.
+Error propagation is a notorious problem in programming languages.
 When coding in C, everyone agrees that the return codes of
 all system calls should be checked to make sure that an error
 did not occur. However, most C programs don't check the return
@@ -3615,7 +3614,7 @@ representing the type of the good value. The |Checked| type has two constructors
 |Good| and |Error|. The |Good| constructor takes a value of type |a|
 and labels it as good. The |Error| constructor has an error message. %Hand6
 
-To keep things simple and focused on error handling,
+To keep things simple and focused on errors,
 this section will only consider expressions
 with literals, varibles, binary operators. This smaller language is
 similar to the one that was introduced at the beginning of the book.
@@ -3749,13 +3748,19 @@ is messy and tedious. The code for binary operators has to deal with
 errors, even though most binary operators don't have anything to do with
 error handling. %Hand35
 
- ### Exercise: Complete Error Handling
+ ### Exercise: Complete Error Propagation
 
-Extend the evaluator with error handling to implement the
+Extend the evaluator with error propagation for the
 remaining expression cases, including
 |if|, |let|, and function definition/calls.
 As a bonus, implement error checking for recursive |let|
 expressions. %Exer5
+
+ ### Exercise: Error Handling
+
+In the code given above, all errors cause the program to terminate execution.
+Extend the language with a |try|/|catch| expression that allows
+errors to be caught and handled within a program. %Exer6
 
  ## Mutable State
 
