@@ -12,11 +12,14 @@ verb: anatomyVerbatim.pdf
 pretty: anatomy.pdf
 	open anatomy.pdf
 
-update: anatomy.pdf anatomyVerbatim.pdf
+update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm
 	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf 
 	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf 
-	scp anatomyVerbatim.pdf envy.cs.utexas.edu:public_html/anatomy/anatomyVerbatim.pdf
-	scp anatomy.pdf envy.cs.utexas.edu:public_html/anatomy/anatomy.pdf
+	cp anatomy.htm ~/Public/web/anatomy/anatomy.htm
+	mkdir -p	~/Public/web/anatomy/figures
+	cp figures/*.png ~/Public/web/anatomy/figures
+	cp -r cc ~/Public/web/anatomy
+	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 	
 anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib
 	cat anatomy.lhs \
@@ -28,19 +31,30 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib
 
 anatomy.htm: anatomy.mkd
 	cat anatomy.mkd \
-   | sed "s/||/VERTICAL_BAR/g" \
-   | sed "/|/s/\\\\//g" \
-   | perl -pe 's/\|(.*?)\|/\`$$1\`/g;' \
-   | sed "s/VERTICAL_BAR/||/g" \
-	 | $(PANDOC) --toc -f markdown+lhs -t html -c hscolour.css --chapters \
+	 | sed "s/||/VERTICAL_BAR/g" \
+	 | perl -pe 's/\|(.*?)\|/\`$$1\`/g;' \
+	 | sed "s/VERTICAL_BAR/||/g" \
+	 > foo.mkd 
+	cat foo.mkd \
+	 | $(PANDOC) --number-sections --toc -f markdown+lhs -t html --css cc/commentCloud.css --chapters \
 	 | sed "s/\\.eps/.png/" \
+	 > foo2.mkd 
+	cat foo2.mkd \
+   | perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)/ <a href='' id='Comment:\$$1' ><\\/a>/g" \
+   | perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
+	 | sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
+	 | sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
 	 | sed "s/<p>/~<p>/g" | sed "s/<pre/~<pre/g" | tr "~" "\n" \
 	 > anatomy.htm
+	 mkdir -p cc
+	 cp ../CommentCloud/*.js cc
+	 cp ../CommentCloud/*.css cc
 
 temp.lhs: anatomy.mkd template.tex
 	cat anatomy.mkd \
-    | sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
-    | sed "s/%[a-zA-Z0-9][a-zA-Z0-9]*//g" \
+		| sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
+		| sed "/^%[a-zA-Z0-9][a-zA-Z0-9]*/d" \
+		| sed "s/%[a-zA-Z0-9][a-zA-Z0-9]*//g" \
 		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex --chapters \
 		| sed "s/{verbatim}/{spec}/g" \
 		| sed "s/@/@@/g" \
@@ -49,7 +63,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/\\\\textgreater{}/>/g" \
 		| sed "s/\\\\ldots{}/.../g" \
 		| sed "s/\\\\textbackslash{}/\\\\/g" \
-    | sed "/|/s/\\\\_/_/g" \
+		| sed "/|/s/\\\\_/_/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \
