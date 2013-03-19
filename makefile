@@ -12,6 +12,11 @@ verb: anatomyVerbatim.pdf
 pretty: anatomy.pdf
 	open anatomy.pdf
 
+tags: anatomy.lhs
+	cp anatomy.lhs archive`date "+%m%d%H%M%Y%S"`.lhs
+	ruby tags.rb > new.lhs
+	cp new.lhs anatomy.lhs
+	
 update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm
 	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf 
 	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf 
@@ -32,16 +37,16 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib
 anatomy.htm: anatomy.mkd
 	cat anatomy.mkd \
 	 | sed "s/||/VERTICAL_BAR/g" \
-	 | perl -pe 's/\|(.*?)\|/\`$$1\`/g;' \
+	 | perl -pe 's/\|([^ ][^|]*)\|/\`$$1\`/g;' \
 	 | sed "s/VERTICAL_BAR/||/g" \
 	 > foo.mkd 
 	cat foo.mkd \
-	 | $(PANDOC) --number-sections --toc -f markdown+lhs -t html --css cc/commentCloud.css --chapters \
+	 | $(PANDOC) --mathjax --number-sections --toc -f markdown+lhs -t html --css cc/commentCloud.css --chapters \
 	 | sed "s/\\.eps/.png/" \
 	 > foo2.mkd 
 	cat foo2.mkd \
-   | perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)/ <a href='' id='Comment:\$$1' ><\\/a>/g" \
-   | perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
+	 | perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)/ <a href='' id='Comment:\$$1' ><\\/a>/g" \
+	 | perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
 	 | sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
 	 | sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
 	 | sed "s/<p>/~<p>/g" | sed "s/<pre/~<pre/g" | tr "~" "\n" \

@@ -1561,7 +1561,7 @@ argument |x| computes the value |x * 2|.
 *But we don't have a solution for* |f|, because |f| does
 not appear on the left side of an equation by itself.
 To 'solve for |f|' we need some new notation, just the
-way that the square root symbol $\sqrt{\ }$ was introduced
+way that the square root symbol $\sqrt{x}$ was introduced
 to represent a new operation. %Firs11
 
  ## Lambda Notation
@@ -1574,7 +1574,7 @@ Here is a solution for |f| using a lambda: %Lamb2
 |f =| $\lambda$|x|. |x * 2| %Lamb3
 
 The symbol $\lambda$ is the greek letter *lambda*. Just like
-the symbol $\sqrt{\ }$, $\lambda$ has no inherent meaning, but
+the symbol $\sqrt{x}$, $\lambda$ has no inherent meaning, but
 is assigned a meaning for our purposes. The general form of a
 function expression is: %Lamb4
 
@@ -3585,7 +3585,7 @@ and mutable state. %Comp2
 
  ## Errors
 
-Errors are an important aspect of computation. They 
+Errors are an important aspect of computation. They
 are typically a pervasiave feature of a language, beause they affects
 the way that every expression is evaluated. For example,
 the expression |a+b| may not cause any errors,
@@ -4212,7 +4212,6 @@ subject of this section! %Abst13
  ## Partial Evaluation
  ## Memory Management
 
-
 --------------------BEGIN-HIDE-------------------------
  # Pervasive Computational Strategies {#Monads}
  ## Strategies
@@ -4224,15 +4223,12 @@ subject of this section! %Abst13
  ### Maybe Monad
  ### State Monad
  ### List Monad
+ ## Monad case study: Parsing
+ 
  ### Special Kinds of States: Readers and Writers
  ## Order of Evaluation
  ### Strict versus non-strict
  ### Lazy
-
- # Domain-Specific Languages
- ## Parsing
- ## Attribute grammars
- ## State machines (???)
 
  # Abstract Interpretation and Types
  ## Abstract Interpretation
@@ -4255,6 +4251,12 @@ subject of this section! %Abst13
  ## Partial Evaluation
  ## Memory Management (??)
  ## Continuations
+ 
+ # Domain-Specific Languages
+ ## Parsing
+ ## Attribute grammars
+ ## State machines (???)
+
 --------------------END-HIDE-------------------------
 
  # References
