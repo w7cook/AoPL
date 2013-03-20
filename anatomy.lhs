@@ -29,21 +29,27 @@ students of the undergraduate programming languages course at UT. %What2
 
 I'm writing these notes because I want to teach the theory of programming
 languages with a practical focus, but I don't want to use Scheme (or ML) as the
-host language. Thus many excellent books do not fit my needs, including
-[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs)
-by Shriram Krishnamurthi,
-[*Essentials of Programming Languages*](http://www.cs.indiana.edu/eopl)
-by Daniel P. Friedman, Mitchell Wand, and Christopher T. Haynes,
-or [*Concepts in Programming Languages*](http://theory.stanford.edu/~jcm/books.html)
-by John C. Mitchell.
-Last year I asked Shriram if he would let me create an official
-version of his textbook in Haskell, but he said "no."
-Recently I realized that his book is published under Creative Commons license,
-so I could create a derivative work from it. Shriram even offered
-to let me have the source code, but in the end I decided to write a new book.
-The title of this book is derived from another great book,
+host language. 
+Thus many excellent books do not fit my needs, including
+[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs) [@sk],
+[*Essentials of Programming Languages*](http://www.cs.indiana.edu/eopl) [@Friedman:2008:EPL:1378240]
+or [*Concepts in Programming Languages*](http://theory.stanford.edu/~jcm/books.html) [@Mitchell:2001:CPL:580408]. %Why2
+
+This book uses Haskell, a pure functional language. 
+Phil Wadler [@Wadler:1987:CAS:24697.24706] gives some good reasons why to prefer Haskell
+over Scheme in his review of Structure and Interpretation of 
+Computer Programs [@Abelson:1996:SIC:547755]. I agree with most but not
+all of his points. For example, I do not care much for the fact that Haskell is
+lazy. None of the examples in this book rely upon this feature. %Why3
+
+I believe Haskell is particularly well suited to writing interpreters.
+But one must be careful to read Haskell code as one would read poetry, not
+the way one would read a romance novel. Ponder each line and extract its
+deep meaning. Don't skim unless you are pretty sure what you are doing. %Why4
+
+The title of this book is derived from one of my favorite books, 
 [*The Anatomy of Lisp*](http://www.amazon.com/Anatomy-Lisp-McGraw-Hill-computer-science/dp/007001115X)
-by John Allen. %Why2
+[@Allen:1978:AL:542865]. %Why5
 
  ### Who?
 
@@ -67,7 +73,7 @@ or the
 
 I thank the students in the spring 2013 semester of CS 345 *Programming Languages*
 at the University of Texas at Austin, who helped out while I was writing the book.
-Special thanks to Chris Roberts and Guy Hawkins for corrections and Aiden Song
+Special thanks to Jeremy Siek, Chris Roberts and Guy Hawkins for corrections and Aiden Song
 for careful proofreading. Tyler Allman Young
 captured notes in class. Chris Cotter improved the makefile and wrote the initial
 text for some sections. %Ackn2
@@ -177,8 +183,8 @@ Arithmetic expressions can be represented in Haskell with the following data typ
 >          | Divide'1     Exp'1 Exp'1
 > -- %Abst3
 
-This data type defines four representational variants, one for numbers,
-and three for the the binary operators of addition, subtraction, multiplication,
+This data type defines five representational variants, one for numbers,
+and four for the the binary operators of addition, subtraction, multiplication,
 and division.
 A number that appears in a program is called a *literal*. %Abst4
 
@@ -187,16 +193,21 @@ create five test cases: %Abst5
 
 > -- 4
 > t1 = Number'1 4
+
 > -- -5 + 6
 > t2 = Add'1 (Number'1 (-5)) (Number'1 6)
+
 > -- 3 - (-2) - (-7)
 > t3 = Subtract'1 (Subtract'1 (Number'1 3) (Number'1 (-2))) (Number'1 (-7))
+
 > -- 3 * (8 + 5)
 > t4 = Multiply'1 (Number'1 3) (Add'1 (Number'1 8) (Number'1 5))
+
 > -- 3 + 8 * 2
 > t5 = Add'1 (Number'1 3) (Multiply'1 (Number'1 8) (Number'1 2))
-> -- %Abst6
 
+Each test case is preceded by a comment giving the concise notation for
+the corresponding expression.
 NOTE: It is not legal to write |Add (-4) 6| because |-4| and |6|
 are of type |Int| not |Exp|. Also, Haskell requires parentheses
 around negative numbers, for some reason. %Abst7
@@ -286,9 +297,7 @@ of numeric operations. To test many different
 kinds of functions, it is useful to define a generalized test function. %Form5
 
 > test fun input = do
-> --------------------BEGIN-HIDE-------------------------
 >   putStr "    "
-> --------------------END-HIDE-------------------------
 >   putStr (show input)
 >   putStr " ==> "
 >   putStrLn (show (fun input))
@@ -373,7 +382,7 @@ This definition produces an appealing result: %Form19
 %Form22
 ````
 
-The example of formatting expression is a concrete illustration of
+The example of formatting expressions is a concrete illustration of
 the complexity of dealing with concrete syntax. The formatter
 converts abstract syntax into readable text. A later chapter
 presents a *parser* for expressions, which converts text into
@@ -472,14 +481,14 @@ single context, is called *mutation*.
 This seems like a major difference between programming language
 variables and mathematical variables. However, if you think about things
 in a slightly different way then it is possible to unify these two
-apparently conflicting means for "variable". As a preview, we will keep
+apparently conflicting meanings for "variable". As a preview, we will keep
 the idea of variables having a fixed binding, but introduce the concept
 of a *mutable container* that can change over time. The
 variable will then be bound to the container. The variable's binding will
 not change (it will remain bound to the same container), but the contents
 of the container will change.  %Vari6
 
-Mutatable variables this will be discussed in full later.
+Mutatable variables are discussed in full later (TODO: reference).
 For now, just remember that a variable has a fixed binding to a value
 in a given context.  %Vari7
 
@@ -518,6 +527,10 @@ The following Haskell function implements this behavior: %Subs8
 >                           then Number'2 val
 >                           else Variable'2 name
 > -- %Subs9
+
+The |subst| helper function is introduced avoid repeating the |var| and |val|
+parameters for each of the specific cases of substituation. The |var| and |val|
+parameters are the same for all substitutions within an expression.
 
 The first case says that substituting a variable for a value in
 a literal expression leaves the literal unchanged. The next three cases define
@@ -715,7 +728,7 @@ a hole in the scope of the outer variable: %Scop2
 
 ![Variable Scope](figures/scopes.eps) %Scop3
 
-In this example there are two variables named |x|. Even though
+In this example (Figure 2.2) there are two variables named |x|. Even though
 two variables have the same name, they are not the same variable. %Scop4
 
 TODO: talk about *free* versus *bound* variables %Scop5
@@ -796,7 +809,8 @@ error message: %Unde4
 
 The fact that a variable is undefined is a *static* property of the
 program: whether a variable is undefined depends only on the text of the program,
-not upon the particular data that the program is manipulating. This is different
+not upon the particular data that the program is manipulating. (TODO: accurate example
+of static versus dynamic?) This is different
 from the divide by zero error, which depends upon the particular data that the program is manipulating.
 As a result, divide by zero is a *dynamic* error. Of course, it might be possible to identify, just from
 examining the text of a program, that it will always divide by zero. Alternatively,
@@ -878,7 +892,7 @@ evaluate bound expression            |3+2| $\Rightarrow$ |5|
 substitute z $\mapsto$ 5 in body     |2\*3\*5|
 evaluate body                        |2\*3\*5| $\Rightarrow$ |30|  %Eval35
 
-While this is a reasonable approach it is not necessary. We
+While this is a reasonable approach it is not efficient. We
 have already seen that multiple variables can be substituted
 at the same time. Rather than performing the substitution
 fully for each |let| expression, instead the |let|
