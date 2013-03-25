@@ -29,15 +29,15 @@ students of the undergraduate programming languages course at UT. %What2
 
 I'm writing these notes because I want to teach the theory of programming
 languages with a practical focus, but I don't want to use Scheme (or ML) as the
-host language. 
+host language.
 Thus many excellent books do not fit my needs, including
 [*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs) [@sk],
 [*Essentials of Programming Languages*](http://www.cs.indiana.edu/eopl) [@Friedman:2008:EPL:1378240]
 or [*Concepts in Programming Languages*](http://theory.stanford.edu/~jcm/books.html) [@Mitchell:2001:CPL:580408]. %Why2
 
-This book uses Haskell, a pure functional language. 
+This book uses Haskell, a pure functional language.
 Phil Wadler [@Wadler:1987:CAS:24697.24706] gives some good reasons why to prefer Haskell
-over Scheme in his review of Structure and Interpretation of 
+over Scheme in his review of Structure and Interpretation of
 Computer Programs [@Abelson:1996:SIC:547755]. I agree with most but not
 all of his points. For example, I do not care much for the fact that Haskell is
 lazy. None of the examples in this book rely upon this feature. %Why3
@@ -47,7 +47,7 @@ But one must be careful to read Haskell code as one would read poetry, not
 the way one would read a romance novel. Ponder each line and extract its
 deep meaning. Don't skim unless you are pretty sure what you are doing. %Why4
 
-The title of this book is derived from one of my favorite books, 
+The title of this book is derived from one of my favorite books,
 [*The Anatomy of Lisp*](http://www.amazon.com/Anatomy-Lisp-McGraw-Hill-computer-science/dp/007001115X)
 [@Allen:1978:AL:542865]. %Why5
 
@@ -74,14 +74,14 @@ or the
 I thank the students in the spring 2013 semester of CS 345 *Programming Languages*
 at the University of Texas at Austin, who helped out while I was writing the book.
 Special thanks to Jeremy Siek, Chris Roberts and Guy Hawkins for corrections and Aiden Song
-for careful proofreading. Tyler Allman Young
+and Monty Zukowski for careful proofreading. Tyler Allman Young
 captured notes in class. Chris Cotter improved the makefile and wrote the initial
 text for some sections. %Ackn2
 
  ## Introduction
 
 In order to understand programming languages, it is useful to spend some time thinking
-about *languages* in general. Usually we treat language like the air we breath:
+about *languages* in general. Usually we treat language like the air we breathe:
 it is everywhere but it is invisible. I say that language is invisible because we are
 usually more focused on the message, or the content, that is being conveyed than
 on the structure and mechanisms of the language itself. Even when we focus on
@@ -193,18 +193,23 @@ create five test cases: %Abst5
 
 > -- 4
 > t1 = Number'1 4
+> -- %Abst1
 
 > -- -5 + 6
 > t2 = Add'1 (Number'1 (-5)) (Number'1 6)
+> -- %Abst6
 
 > -- 3 - (-2) - (-7)
 > t3 = Subtract'1 (Subtract'1 (Number'1 3) (Number'1 (-2))) (Number'1 (-7))
+> -- %Abst15
 
 > -- 3 * (8 + 5)
 > t4 = Multiply'1 (Number'1 3) (Add'1 (Number'1 8) (Number'1 5))
+> -- %Abst16
 
 > -- 3 + 8 * 2
 > t5 = Add'1 (Number'1 3) (Multiply'1 (Number'1 8) (Number'1 2))
+> -- %Abst17
 
 Each test case is preceded by a comment giving the concise notation for
 the corresponding expression.
@@ -516,8 +521,7 @@ Given these data types, the process of *substitution* can be defined by cases.
 The following Haskell function implements this behavior: %Subs8
 
 > substitute1:: (String, Int) -> Exp'2 -> Exp'2
-> substitute1 (var, val) exp = subst exp
->  where
+> substitute1 (var, val) exp = subst exp where
 >   subst (Number'2 i)      = Number'2 i
 >   subst (Add'2 a b)       = Add'2 (subst a) (subst b)
 >   subst (Subtract'2 a b)  = Subtract'2 (subst a) (subst b)
@@ -530,7 +534,7 @@ The following Haskell function implements this behavior: %Subs8
 
 The |subst| helper function is introduced avoid repeating the |var| and |val|
 parameters for each of the specific cases of substituation. The |var| and |val|
-parameters are the same for all substitutions within an expression.
+parameters are the same for all substitutions within an expression. %Subs19
 
 The first case says that substituting a variable for a value in
 a literal expression leaves the literal unchanged. The next three cases define
@@ -832,8 +836,7 @@ with local variables. %Summ2
 >          | Variable'3   String
 >          | Let'3        String Exp'3 Exp'3
 >
-> substitute1'3 (var, val) exp = subst exp
->  where
+> substitute1'3 (var, val) exp = subst exp where
 >   subst (Number'3 i)      = Number'3 i
 >   subst (Add'3 a b)       = Add'3 (subst a) (subst b)
 >   subst (Subtract'3 a b)  = Subtract'3 (subst a) (subst b)
@@ -901,8 +904,7 @@ of substitutions being performed.  %Eval36
 
 > -- Evaluate an expression in an environment
 > evaluate'4 :: Exp'3 -> Env -> Int
-> evaluate'4 exp env = eval exp
->  where
+> evaluate'4 exp env = eval exp where
 >   eval (Number'3 i)      = i
 >   eval (Add'3 a b)       = eval a + eval b
 >   eval (Subtract'3 a b)  = eval a - eval b
@@ -1111,8 +1113,7 @@ perform the actual computations for binary and unary operations, respectively. %
 >
 > -- Evaluate an expression in an environment
 > evaluate'5 :: Exp'4 -> Env'1 -> Value
-> evaluate'5 exp env = eval exp
->   where
+> evaluate'5 exp env = eval exp where
 >     eval (Literal'4 v)      = v
 >     eval (Unary'4 op a)     = unary op (eval a)
 >     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
@@ -1386,8 +1387,7 @@ a additional argument.  %Eval43
 ````
 -- Evaluate an expression in a variable environment with a given function environment
 evaluate'6 :: Exp'6 -> Env'1 -> FunEnv -> Value
-evaluate'6 exp env funEnv = eval exp
-  where
+evaluate'6 exp env funEnv = eval exp where
     ...
      eval (Call'6 fun args)   = evaluate'6 body newEnv funEnv
        where Function'6 xs body = fromJust (lookup fun funEnv)
@@ -1505,8 +1505,7 @@ top-level functions definitions.  %Summ1
 >          | Call'6      String [Exp'6]
 >
 > evaluate'6 :: Exp'6 -> Env'1 -> FunEnv -> Value
-> evaluate'6 exp env funEnv = eval exp
->   where
+> evaluate'6 exp env funEnv = eval exp where
 >     eval (Literal'6 v)      = v
 >     eval (Unary'6 op a)     = unary op (eval a)
 >     eval (Binary'6 op a b)  = binary op (eval a) (eval b)
@@ -1681,7 +1680,8 @@ single characters. Thus |xy| means a function call, |x y|,
 just as |xy| is taken to mean |x*y| in arithmetic expressions.
 Normally in computer science we like to allow variables to
 have long names, so |xy| would be the name of a single variable.
-We don't like it when |foo| means |f(o(o))|.  %Func13
+We don't like it when |foo| means |f o o|, which in Haskell
+means |(f(o))(o)|.  %Func13
 
 Haskell has the property that definitions really are
 equations, so that it is legal to substitute |f| for
@@ -1981,8 +1981,7 @@ example, the environment-based evaluation function becomes: %Repr33
 
 > -- Evaluate an expression in a (functional) environment
 > evaluate'5a :: Exp'4 -> EnvF -> Value
-> evaluate'5a exp env = eval exp
->   where
+> evaluate'5a exp env = eval exp where
 >     eval (Literal'4 v)      = v
 >     eval (Unary'4 op a)     = unary op (eval a)
 >     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
@@ -2404,8 +2403,7 @@ the same, although now the literal value might be a function. %A18
 
 ````
 evaluate'8 :: Exp'8 -> Env'8 -> Value'8
-evaluate'8 exp env = eval exp
-  where
+evaluate'8 exp env = eval exp where
     eval (Literal'8 v)      = v
     ...
 %A34
@@ -2632,8 +2630,7 @@ first-class functions using environments. The first step is to
 ````
 -- Evaluate an expression in an environment
 evaluate'7 :: Exp'7 -> Env'7 -> Value'7
-evaluate'7 exp env = eval exp
-  where
+evaluate'7 exp env = eval exp where
     ...
     eval (Function'7 x body) = Closure'7 x body env
 %A44
@@ -2787,8 +2784,7 @@ Here is the full code for first-class functions with non-recursive definitions: 
 > type Env'7 = [(String, Value'7)]
 >
 > evaluate'7 :: Exp'7 -> Env'7 -> Value'7
-> evaluate'7 exp env = eval exp
->   where
+> evaluate'7 exp env = eval exp where
 >     eval (Literal'7 v)      = v
 >     eval (Unary'7 op a)     = unary'7 op (eval a)
 >     eval (Binary'7 op a b)  = binary'7 op (eval a) (eval b)
@@ -3626,7 +3622,14 @@ a new data type that has two possibilities: either a
 The declaration defines a generic |Checked| type that has a parameter |a|
 representing the type of the good value. The |Checked| type has two constructors,
 |Good| and |Error|. The |Good| constructor takes a value of type |a|
-and labels it as good. The |Error| constructor has an error message. %Hand6
+and labels it as good. The |Error| constructor has an error message.
+The following figure is an abstraction illustration of a |Checked| value,
+which represents a computation that may eather be a good value or an error.
+%Hand6
+
+![A computation that may produce an error.](figures/ErrroShape.eps) %Err9
+
+ ### Errors in Basic Expressions
 
 To keep things simple and focused on errors,
 this section will only consider expressions
@@ -3638,8 +3641,7 @@ type of the |evaluate| function must be changed to return an |Error|
 value: %Hand7
 
 > evaluate'10 :: Exp'7 -> Env'7 -> Checked Value'7
-> evaluate'10 exp env = eval exp
->   where
+> evaluate'10 exp env = eval exp where
 >     eval (Literal'7 v)      = Good v
 > -- %Hand8
 
@@ -3654,6 +3656,8 @@ so it evaluating a variable may return an error: %Hand10
 >          Nothing -> Error ("Variable " ++ x ++ " undefined")
 >          Just v  -> Good v
 > -- %Hand11
+
+ ### Errors from Multiple Sub-epxressions
 
 The case for binary operations is more interesting.
 Here is the original rule for evaluating binary expressions: %Hand12
@@ -3681,55 +3685,22 @@ This definition for |eval| of a binary operator handles the first two situations
 
 Now it should be clear why error return codes are not always checked. What was
 originally a one-line program is now 8 lines and uses additional temporary
-variables. The |binary| helper
-function must be updated to signal divide by zero: %Hand16
+variables. When multiple sub-expressions can generate errors, it is necessary
+to *compose* multiple error checks together. The situation in the case of
+|Binary| operations is illustrated in the following figue: %Hand16
 
-````
-checked_binary :: BinaryOp -> Value'7 -> Value'7 -> Checked Value'7
-checked_binary Div (Scalar'7 (Int a))  (Scalar'7 (Int b))  =
-  if b == 0
-  then Error "Divide by zero"
-  else Good (Scalar'7 (Int (a `div` b)))
-checked_binary op a b = Good (binary'7 op a b)
-%Hand17
-````
+![Composing computations that may produce errors.](figures/ErrorBind.eps) %Err10
 
-All the other cases are the same as before, so |checked_binary|
-calls |binary| and then tags the resulting value as |Good|. %Hand18
+This figure illustrates the composition of two sub-expressions |A| and |B|
+which represent computations of checked values. The composition of the two
+computations is a new computation that also has the shape of a checked value.
+If either |A| or |B| outputs an error, then the resulting computation signals
+an errors. The arrow from |A| to the top of |B| represents passing the good
+value from |A| into |B| as an extra input. This means that |B| can depend
+upon the good value of |A|. But |B| is never invoked if |A| signals an error. %Erro1
 
---------------------BEGIN-HIDE------------------------- %Hand19
-
-An |if| expression must deal with the possibility that
-the condition is either an error or is not a boolean value: %Hand20
-
->     eval (If'7 a b c) =
->       case eval a of
->         Error msg -> Error msg
->         Good v ->
->           case v of
->             Scalar'7 (Bool t) -> eval (if t then b else c)
->             o    -> Error ("Condition value " ++ show o ++ " not a boolean")
-> -- %Hand21
-
-Recursive let expressions are the most complex. The problem is that an
-error during evaluation can cause the new environement to be bad. Having a
-bad environment is a problem because it cannot be used for evaluation. %Hand22
-
->     eval (Let'7 x exp body) =
->         case newEnv of
->           Error msg -> Error msg
->           Good goodEnv -> evaluate'10 body goodEnv
->       where newEnv = case evaluate'10 exp (fix_env newEnv) of
->                         Error msg -> Error msg
->                         Good val -> Good ((x, val) : env)
-> -- %Hand23
-
-To solve this problem a dummy environment is used in case the
-creation of the new environment fails. %Hand24
-
-> fix_env (Error _ ) = []
-> fix_env (Good env) = env
-> -- %Hand1
+The |binary| helper
+function must be updated to signal divide by zero: %Hand22
 
 > checked_binary :: BinaryOp -> Value'7 -> Value'7 -> Checked Value'7
 > checked_binary Div (Scalar'7 (Int a)) (Scalar'7 (Int b)) =
@@ -3737,7 +3708,12 @@ creation of the new environment fails. %Hand24
 >   then Error "Divide by zero"
 >   else Good (Scalar'7 (Int (a `div` b)))
 > checked_binary op a b = Good (binary'7 op a b)
-> --------------------END-HIDE-------------------------
+> -- %Hand17
+
+All the other cases are the same as before, so |checked_binary|
+calls |binary| and then tags the resulting value as |Good|. %Hand18
+
+ ### Examples of Errors
 
 Evaluating an expression may now return an error for unbound variables: %Hand27
 
@@ -3762,19 +3738,25 @@ is messy and tedious. The code for binary operators has to deal with
 errors, even though most binary operators don't have anything to do with
 error handling. %Hand35
 
- ### Exercise: Complete Error Propagation
+ ### Exercise: Complete Error Propagation (was 5.1.1)
 
 Extend the evaluator with error propagation for the
 remaining expression cases, including
-|if|, |let|, and function definition/calls.
+|if|, non-recursive |let|, and function definition/calls.
 As a bonus, implement error checking for recursive |let|
 expressions. %Exer5
 
- ### Exercise: Error Handling
+ ### Exercise: Error Handling (was 5.1.2)
 
 In the code given above, all errors cause the program to terminate execution.
 Extend the language with a |try|/|catch| expression that allows
 errors to be caught and handled within a program. %Exer6
+
+ ### Exercise: Multiple Bindings and Arguments
+
+If you really want to experience how messy it is to explicitly program
+error handling, implement error propogation where |let| expressions
+can have multiple bindings, and functions can have multiple arguments. %Exer1
 
  ## Mutable State
 
@@ -3848,7 +3830,7 @@ An address identifies a mutable container that stores a single value,
 but whose contents can change over time. The storage identified by an
 address is sometimes called a *cell*. You can think of it as a *box*
 that contains a value.  Addresses are sometimes called *locations*.
-(Note that the concept of an adress of a mutable container is also used in
+(Note that the concept of an address of a mutable container is also used in
 ML and BLISS for mutable values, where they are known as |ref| values. This is
 also closely related to the concept of an address of a memory cell, as it appears
 in assembly language or C). %Addr3
@@ -3914,18 +3896,20 @@ are expressed. %Addr13
 
  #### Memory
 
-The current value of all mutable cells used in a program can be represented
-in many different ways. Logically, a memory is a map or association of
+The current value of all mutable cells used in a program is called
+*memory*. Logically, a memory is a map or association of
 addresses to values. The same techniques used for environments could
 be used for memories, as a list of pairs or a function.
 Memory can also be represented as a function mapping integers
 to values, similar to the [representation of environments as functions](#EnvAsFun). %Memo2
+Note that a memory is also sometimes called a *store*, based on the idea
+that is provides a form of *storage*. %Memo12
 
-But since addresses are integers, one natural
+Since addresses are integers, one natural
 representation is as a list or array of values, where the address is
 the position or index of the value.
 Such an array is directly analogous
-to the *memory* of a computer system, which can be thought of as
+to the memory of a computer system, which can be thought of as
 an array of 8 bit values. In this chapter memory will be implemented
 as a list of values, although many other representations are certainly
 possible. %Memo3
@@ -3936,25 +3920,25 @@ possible. %Memo3
 One complication is that the memory must be able to *grow* by adding
 new addresses. The initial empty memory is the empty list |[]|.
 The first address added is zero [@0]. The next address is one to
-create a memory [@1, @0]. In general a memory with $n$ cells will
-have addresses [$n-1$, ..., 1, 0].
+create a memory [@0, @1]. In general a memory with $n$ cells will
+have addresses [@0, @1, ..., @$n-1$].
 Here is an example memory, with two addresses: %Memo5
 
 ````
-[Value'7 (Scalar'7 (Int 6)), Value'7 (Scalar'7 (Int 120))]
+[Value'7 (Scalar'7 (Int 120)), Value'7 (Scalar'7 (Int 6))]
 %Memo6
 ````
 
-This memory has value 6 at address 1 and value 120 at address 0.
+This memory has value 120 at address 0 and value 6 at address 1.
 More concisely, this memory can be written as %Memo7
 
-[11, 120] %Memo8
+[120, 11] %Memo8
 
 This memory could be the result of executing the factorial program given above,
-under the assumption that |i| is bound to address 1 and |x| is bound to address 0.
+under the assumption that |x| is bound to address 0 and |i| is bound to address 1.
 An appropriate environment is: %Memo9
 
-[|i| $\mapsto$ @1, |x| $\mapsto$ @0] %Memo10
+[|x| $\mapsto$ @0, |i| $\mapsto$ @1] %Memo10
 
 During the execution of the program that computes the factorial of 5, there
 are 10 different memory configurations that are created: %Memo11
@@ -3963,15 +3947,15 @@ Step                    Memory
 -------------------     ------------------------------------------
 *start*                 $[]$
 |x = Mutable(1);|       $[1]$
-|i = Mutable(2);|       $[2, 1]$
+|i = Mutable(2);|       $[1, 2]$
 |x = !x * !i;|          $[2, 2]$
-|i = !i + 1;|           $[3, 2]$
-|x = !x * !i;|          $[3, 6]$
-|i = !i + 1;|           $[4, 6]$
-|x = !x * !i;|          $[4, 24]$
-|i = !i + 1;|           $[5, 24]$
-|x = !x * !i;|          $[5, 120]$
-|i = !i + 1;|           $[6, 120]$ %Memo12
+|i = !i + 1;|           $[2, 3]$
+|x = !x * !i;|          $[6, 3]$
+|i = !i + 1;|           $[6, 4]$
+|x = !x * !i;|          $[24, 4]$
+|i = !i + 1;|           $[24, 5]$
+|x = !x * !i;|          $[120, 5]$
+|i = !i + 1;|           $[120, 6]$ %Memo1
 
  ### Pure Functional Operations on Memory
 
@@ -3990,8 +3974,10 @@ function. However, the |!!| function counts from the *left* of the
 list, not the right. To compute an index from the right of a list,
 the index must be subtracted from the length of the list: %Acce2
 
-> access i mem = mem !! (length mem - i - 1)
+> access i mem = mem !! i
 > -- %Acce3
+
+TODO: rename "access" to be "contents"? %Acce1
 
  #### Update
 
@@ -4012,7 +3998,7 @@ contents of a single address with a new value. %Upda3
 
 > update :: Int -> Value'9 -> Memory -> Memory
 > update addr val mem =
->   let (before, _:after) = splitAt (length mem - addr - 1) mem in
+>   let (before, _:after) = splitAt addr mem in
 >     before ++ [val] ++ after
 > -- %Upda4
 
@@ -4054,6 +4040,58 @@ The fact that |mul10| is a transformation on memory is evident from its type: %U
 This means that |mul10| takes an memory address as an input and returns
 a function that transforms an input memory into an output memory. %Upda14
 
+ ### Stateful Computations
+
+A stateful computation is one that produces a value and *also* accesses
+and potentially updates memory. In changing |evaluate| to be a
+stateful computation, the type must change. Currently |evaluate|
+takes an epxression and an environment and returns a value: %Stat1
+
+````
+evaluate :: Exp -> Env -> Value
+%Stat2
+````
+
+Now that an expression can access memory, the current memory must be
+an input to the evaluation process: %Stat3
+
+````
+evaluate :: Exp -> Env -> Memory -> ...
+%Stat4
+````
+
+The evaluator still produces a value, but it may also return a new
+modified memory. These two requirements, to return a value and a memory,
+can be achieved by returning a *pair* of a value and a new memory: %Stat5
+
+````
+evaluate :: Exp -> Env -> Memory -> (Value, Memory)
+%Stat6
+````
+
+This final type is the type of a *stateful* computation. Since it is
+useful to talk about, we will give it a name: %Stat7
+
+> type Stateful t = Memory -> (Value'9, Memory)
+> -- %Stat8
+
+This is a *generic* type for a memory-based computation which returns
+a value of type |t|. Just as in the case of errors, it is useful to
+give a visual form to the shape of a stateful computation: %Stat9
+
+![Shape of a stateful computation.](figures/StatefulShape.eps) %Err11
+
+Thus the final type for |evaluate| is written concisely as: %Stat10
+
+````
+evaluate :: Exp -> Env -> Stateful Value
+%Stat11
+````
+
+This type is very similar to the type given for |evaluate| in the error
+section, where |Checked| was used in place of |Stateful|. This similarity
+is not an accident, as we will see in a later chapter. %Stat12
+
  ### Semantics of a Language with Mutation
 
 The first step in creating a function with mutable cells is to add
@@ -4077,21 +4115,25 @@ data Exp'9 = ...
 %Sema18
 ````
 
-TODO: Explain basic strategy, of returning new value and memory. %Sema19
+The |Mutable(e)| expression creates a new memory cell and returns its
+address. First the expression |e| is evaluated to get the initial value
+of the new memory cell. Evaluating |e| may modify memory, so care must
+be taken to allocat the new cell in the new memory. The address of
+the new memory cell is just the length of the memory. %Sema1
 
 ````
     eval (Mutable'9 e) mem =
-      let (ev, mem') = eval e mem
-          i = newAddress mem'
-      in
-          (Address i, update i ev mem')
+      let (ev, mem') = eval e mem in
+        (Address (length mem'), mem' ++ [ev])
 %Sema20
 ````
 
-> newAddress mem = length mem
-> -- %Sema21
+The access epxression |!a| expression evluates the address
+expression |a| to get an address, then returns the contents of
+the memory at that address. Note that if the |Address i| pattern fails, Haskell
+raises an error. This is another case where error handling, as in the previous
+section, could be used. %Sema19
 
-TODO: explain %Sema22
 
 ````
     eval (Access'9 a) mem =
@@ -4100,7 +4142,10 @@ TODO: explain %Sema22
 %Sema23
 ````
 
-TODO: explain %Sema24
+An assignment statement |a := e| first evaluates the target expression |a|
+to get an address. It is an error if |a| does not evalute to an address.
+Then the source expression |e| is evaluated.
+Evaluating |a| and |e| may update the memory, so %Sema21
 
 ````
     eval (Assign'9 a e) mem =
@@ -4109,6 +4154,8 @@ TODO: explain %Sema24
           (ev, update i ev mem'')
 %Sema25
 ````
+
+ #### Mutable State with Multiple Sub-expressions
 
 The interesting thing is that even parts of the evaluator
 that have nothing to do with mutable cells have to be
@@ -4121,6 +4168,29 @@ copmletely rewritten: %Sema26
           (binary'9 op av bv, mem'')
 %Sema27
 ````
+
+This form of composition is illustrated in the following diagram: %Muta1
+
+![Composing stateful computations.](figures/StatefulBind.eps)  %Muta10
+
+The memory input of the combined expression is passed to |A|. The value out
+and the memory output of |A| are given as inputs to |B|. The final result of
+the composition is the value of |B| and the memory that results from |B|.
+Note that the shape of the overall composition (the thick box) is the same
+as the shape of the basic stateful computations. %Muta11
+
+Similar transformations are needed for |Unary| operations and
+function definitions/calls. %Muta12
+
+Most langauges with mutable state also have *sequences* of expressions,
+of the form |e1; e2; ...; eN|. It would be relatively easy to add a
+semicolon operator to the binary operators. In fact, C has such an
+operator: the expression |e1, e2| evaluates |e1| and then evalutes |e2|.
+The result of the expression is the value of |e2|. The value of |e1|
+is disguarded.
+Note that |let| can also be used to implement sequences of operations:
+|e1; e2| can be represented as |let dummy = e1 in e2| where |dummy| is a
+variable that is not used anywhere in the program. %Muta13
 
  ### Summary of Mutable State
 
@@ -4148,11 +4218,10 @@ Here is the complete code for mutable cells. %Summ6
 >
 > -- %Summ7
 
-All the existing parts of the evaluator are modified: %Summ8
+All the existing cases of the evaluator are modified: %Summ8
 
-> evaluate'9 :: Exp'9 -> Env'9 -> Memory -> (Value'9, Memory)
-> evaluate'9 exp env mem = eval exp mem
->   where
+> evaluate'9 :: Exp'9 -> Env'9 -> Stateful Value'9
+> evaluate'9 exp env mem = eval exp mem where
 >     eval (Literal'9 v) mem    = (v, mem)
 >     eval (Unary'9 op a) mem   =
 >       let (av, mem') = eval a mem in
@@ -4172,7 +4241,7 @@ All the existing parts of the evaluator are modified: %Summ8
 >         evaluate'9 body newEnv mem'
 >     eval (Function'9 x body) mem = (Closure'9 x body env, mem)
 >     eval (Call'9 f a) mem  =
->       let (Closure'9 x body closeEnv, mem') = eval a mem
+>       let (Closure'9 x body closeEnv, mem') = eval f mem
 >           (av, mem'') = eval a mem'
 >           newEnv = (x, av) : closeEnv
 >       in
@@ -4182,10 +4251,8 @@ All the existing parts of the evaluator are modified: %Summ8
 Here are the mutation-specific parts of the evaluator: %Summ10
 
 >     eval (Mutable'9 e) mem =
->       let (ev, mem') = eval e mem
->           i = newAddress mem'
->       in
->           (Address i, update i ev mem')
+>       let (ev, mem') = eval e mem in
+>         (Address (length mem'), mem' ++ [ev])
 >     eval (Access'9 a) mem =
 >       let (Address i, mem') = eval a mem in
 >           (access i mem', mem')
@@ -4199,6 +4266,11 @@ Here are the mutation-specific parts of the evaluator: %Summ10
 > unary'9 op (Scalar'9 a) = Scalar'9 (unary op a)
 > binary'9 op (Scalar'9 a) (Scalar'9 b) = Scalar'9 (binary op a b)
 > -- %Summ11
+
+ ### Exercise: Errors and Mutable State
+
+ Write a version of |evaluate| that supports both error propagation
+ and mutable state. %Exer7
 
  ## Abstracting Computational Strategies
 
@@ -4238,7 +4310,7 @@ subject of this section! %Abst13
  ### State Monad
  ### List Monad
  ## Monad case study: Parsing
- 
+
  ### Special Kinds of States: Readers and Writers
  ## Order of Evaluation
  ### Strict versus non-strict
@@ -4265,7 +4337,7 @@ subject of this section! %Abst13
  ## Partial Evaluation
  ## Memory Management (??)
  ## Continuations
- 
+
  # Domain-Specific Languages
  ## Parsing
  ## Attribute grammars

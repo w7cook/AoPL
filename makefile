@@ -26,7 +26,7 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm
 	cp -r cc ~/Public/web/anatomy
 	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 	
-anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib
+anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps
 	cat anatomy.lhs \
 	 | sed "s/^ #/#/" \
 	 | sed "s/'[0-9][0-9a-z]*//g" \
