@@ -1006,7 +1006,7 @@ undefined variable errors arise in this evaluator. %Eval25
 
 TODO: define *exception*? %Eval26
 
- #### Exercise: Multi-variable |let| expressions
+ #### Exercise 2.1: Multi-variable |let| expressions
 
 Modify the |let| expression to take a list of bindings, rather than a single one.
 Modify the |evaluate| function to handle evaluation of multi-variable |let| expressions. %Exer2
@@ -1520,7 +1520,7 @@ top-level functions definitions.  %Summ1
 >             newEnv = zip xs [eval a | a <- args]
 > -- %Summ12
 
- #### Exercise: Stack-based evaluation
+ #### Exercise 3.1: Stack-based evaluation
 
 Modify the evaluator for top-level functions to use a stack with a list of
 values, rather than an environment. Use a function to look up the position of
@@ -2679,7 +2679,7 @@ environment, |evaluate'7 body newEnv|.  %A55
 
 TODO: give an example of how this runs?  %A56
 
- #### Exercise: Multiple Arguments
+ #### Exercise 3.2: Multiple Arguments
 
 Modify the definition of |Function| and |Call| to allow multiple
 arguments. Modify the |evaluate| function to correctly handle the
@@ -3593,7 +3593,7 @@ consider extensions that have a general impact on every part of the
 language. Some examples are error handling, tracing of code,
 and mutable state. %Comp2
 
- ## Errors
+ ## Error Checking
 
 Errors are an important aspect of computation. They
 are typically a pervasiave feature of a language, beause they affects
@@ -3603,7 +3603,7 @@ but if evaluating |a| or |b| can cause an error,
 then the evaluation of |a+b| will have to deal with the
 possiblity that |a| or |b| is an error. %Hand2
 
-Error propagation is a notorious problem in programming languages.
+Error checking is a notorious problem in programming languages.
 When coding in C, everyone agrees that the return codes of
 all system calls should be checked to make sure that an error
 did not occur. However, most C programs don't check the return
@@ -3629,7 +3629,7 @@ which represents a computation that may eather be a good value or an error.
 
 ![A computation that may produce an error.](figures/ErrroShape.eps) %Err9
 
- ### Errors in Basic Expressions
+ ### Error Checking in Basic Expressions
 
 To keep things simple and focused on errors,
 this section will only consider expressions
@@ -3657,7 +3657,7 @@ so it evaluating a variable may return an error: %Hand10
 >          Just v  -> Good v
 > -- %Hand11
 
- ### Errors from Multiple Sub-epxressions
+ ### Error Checking in Multiple Sub-epxressions
 
 The case for binary operations is more interesting.
 Here is the original rule for evaluating binary expressions: %Hand12
@@ -3738,21 +3738,21 @@ is messy and tedious. The code for binary operators has to deal with
 errors, even though most binary operators don't have anything to do with
 error handling. %Hand35
 
- ### Exercise: Complete Error Propagation (was 5.1.1)
+ #### Exercise 5.1: Complete Error Checking (was 5.1.1)
 
-Extend the evaluator with error propagation for the
+Extend the evaluator with error checking for the
 remaining expression cases, including
 |if|, non-recursive |let|, and function definition/calls.
 As a bonus, implement error checking for recursive |let|
 expressions. %Exer5
 
- ### Exercise: Error Handling (was 5.1.2)
+ #### Exercise 5.2: Error Handling (was 5.1.2)
 
 In the code given above, all errors cause the program to terminate execution.
 Extend the language with a |try|/|catch| expression that allows
 errors to be caught and handled within a program. %Exer6
 
- ### Exercise: Multiple Bindings and Arguments
+ #### Exercise 5.3: Multiple Bindings and Arguments
 
 If you really want to experience how messy it is to explicitly program
 error handling, implement error propogation where |let| expressions
@@ -4267,12 +4267,12 @@ Here are the mutation-specific parts of the evaluator: %Summ10
 > binary'9 op (Scalar'9 a) (Scalar'9 b) = Scalar'9 (binary op a b)
 > -- %Summ11
 
- ### Exercise: Errors and Mutable State
+ ### Exercise 5.6: Errors and Mutable State
 
- Write a version of |evaluate| that supports both error propagation
+ Write a version of |evaluate| that supports both error checking
  and mutable state. %Exer7
 
- ## Abstracting Computational Strategies
+ ## Monads: Abstract Computational Strategies
 
 At first glance it does not seem there is anything that can be
 done about the messy coding involved in implementing errors
@@ -4282,14 +4282,308 @@ just the part that directly involves the new feature. %Abst11
 
 What is worse is that combining the code for errors and mutable
 state is not possible without writing yet another completely
-different implementation. The *feature* of our evaluator are not
+different implementation. The *features* of our evaluator are not
 implemented in a modular way. %Abst12
 
-One solution to this problem is to use a *monad*. That is the
-subject of this section! %Abst13
+The concept of a *monad* provides a framework that allows
+different computational strategies to be invoked in a unform way.
+The rest of this section shows how to derive the monad structure
+from the examples of error handing and mutable state given above.
+The basic strategy is to compare the two examples and do whatever
+is necessary to force them into a common structure, by moving
+details into helper functions. By defining appropraite helper
+functions that have the same interface, the two examples can be
+expressed in a uniform format. %Mona1
 
- TODO: finish section %Abst14
+![Modified Dilbert Cartoon](figures/23956strip.png)  %Mona2
 
+ ### Abstracting Simple Computations
+
+The first step is to examine how the two evaluators deal with
+simple computations that return values. Here are the cases for
+Consider the way that the |Literal| expression is evaluated for
+both the Checked and the Stateful evaluators. %Abst13
+
+Checked                                          \ \ \ \ \ \  Stateful
+------------------------------------------------ ------------ --------------
+|eval :: Exp -> Checked Value|                                |eval :: Exp -> Stateful Value|
+|eval (Literal'7 v) = Good v|                                   |eval (Literal'9 v) mem = (v, mem)| %Abst14
+
+One important point is that literal values never cause errors
+and they do not modify memory. They represent the simple good
+base case for a computation. In monad terminology, this operation
+is called |return| because it describes how to return a value
+from the computation. The return functions for checked and stateful
+comptuations are different, but they both have same interface:
+they take a value as input and output an appropriate checked or
+stateful value. %Abst18
+
+Checked                                          \ \ \ \ \ \  Stateful
+------------------------------------------------ ------------ --------------
+|return|$_C$ |:: Value -> Checked Value|                      |return|$_S$ |:: Value -> Stateful Value|
+|return|$_C$ |v = Good v|                                     |return|$_S$ |v =| $\lambda$ |mem.(v, mem)| %Abst19
+
+Using these return functions, the original |eval| code can be written
+so that the two cases are nearly identical. The details of how to deal
+with the checked or stateful values are hidden in the |return| helper functions. %Abst20
+
+Checked                                          \ \ \ \ \ \  Stateful
+------------------------------------------------ ------------ --------------
+|eval :: Exp -> Checked Value|                                |eval :: Exp -> Stateful Value|
+|eval (Literal'7 v) = return|$_C$ |v|                           |eval (Literal'9 v) = return|$_S$ |v| %Abst21
+
+ ### Abstracting Computation Composition
+
+The next step is to unify the case when there are multiple sub-expressions
+that must be evaluated. The binary operator provides a good example
+of multipe sub-expressions. %Abst22
+
+Checked                                          \ \ \ \ \ \  Stateful
+------------------------------------------------ ------------ --------------
+|eval :: Exp -> Checked Value|                                |eval :: Exp -> Stateful Value|
+|eval (Binary'7 op a b) =|                                      |eval (Binary'9 op a b) =|
+\ \ |case eval a of|                                          \ \ $\lambda$|mem. let (av, mem') = eval a mem in|
+\ \ \ \ |Error msg -> Error msg|                              \ \ \ \ |let (bv, mem'') = eval b mem' in|
+\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ |(binary'9 op av bv, mem'')|
+\ \ \ \ \ \ |case eval b of|
+\ \ \ \ \ \ \ \ |Error msg -> Error msg|
+\ \ \ \ \ \ \ \ |Good bv ->|
+\ \ \ \ \ \ \ \ \ \ |checked_binary op av bv|
+
+In this case computation proceeds in steps: first
+evaluate one expresion (checking errors and updating memory) and then
+evalulating the second expression (checking errors and updating memory as
+appropriate). They both have a similar pattern of code for dealing with
+the evaluation of |a| and |b|. Factoring out the common
+parts as |A| and |F|, the core of the pattern is: %Abst23
+
+Checked                                 \ \ \ \ \ \  Stateful
+--------------------------------------- ------------ ----------------------
+|case| *first-part* |of|                             |let (v, mem') =| *first-part* |in|
+\ \ |Error msg -> Error msg|                         \ \ *next-part* |v| |mem'|
+\ \ |Good v ->| *next-part* |v|
+
+This *first-part* corresponds to |eval a| or |eval b| in both the original
+versions. The *second-part* represents the remainder... just everything that
+appears after the main pattern, but with all the free variables made explicit.
+For the Checked case, the only variable needed in the *second-part* is the
+variable |v| that comes form the |Good| case. For the Stateful case,
+in addition to |v| the *second-part* also requires access to |mem'| %Abst24
+
+These patterns can be made explicit as a special operator that combines
+the two parts, where the second part is a function with the appropriate arguments.
+To be more concrete, these parts are converted into explicit variables.
+The *first-part* is named |A| and the *second-part*, which is a function,
+is named |F|: %Abst25
+
+Checked                                 \ \ \ \ \ \  Stateful
+--------------------------------------- ------------ ----------------------
+|A| $\rhd_C$ |F =|                                   |A| $\rhd_S$ |F|
+\ \ |case A of|                                      \ \ |let (v, mem') = A in|
+\ \ \ \ |Error msg -> Error msg|                     \ \ \ \ |F v mem'|
+\ \ \ \ |Good v -> F v|
+
+These generic operators for Checked $\rhd_C$ and Stateful $\rhd_S$ computations
+abstract away the core pattern composing two Checked or Stateful comptuations.
+The family of operators $\rhd$ are called *bind* operators, because they
+bind together computations. %Abst26
+
+Using these operators, the *original* code can be written in simpler form: %Abst27
+
+Checked:\ \
+  ~ (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+Stateful:\ \ \
+  ~ (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(binary'9 op av bv, mem)|)) %Abst28
+
+All mention of |Error| and |Good| have been removed from the Checked version!
+The error `plumbing' has been hidden. Most of the memory plumbing has been removed
+from the Stateful version, but there is still a little at the end. But the pattern
+that has emerged is the same one that was identified in the previous section, where
+the |return|$_S$ function converts a value (the result of |binary'9 op av bv|) into
+a default stateful computation. To see how this works, consider that %Abst29
+
+|return|$_S$ (|binary'9 op av bv|)\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|mem. (binary'9 op av bv, mem)| %Abst30
+
+Using |return|$_S$ the result is: %Abst31
+
+Checked:\ \
+  ~ (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+Stateful:\ \ \
+  ~ (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|binary'9 op av bv|))) %Abst32
+
+Now all references to memory have been removed in these cases. Of course, in the evaluation
+rules for |Mutable|, assignment, and access there will be explicit references to memory.
+Similarly, in the cases where errors are generated, for example for undefined variables, the
+code will still have to create |Error| values. What we have done here is examine the parts of
+the program that *don't* involve errors or memory, namely literals and binary operators, and
+figured out way to hide the complexity of error checking and mutable memory. This complexity
+has been hidden in two new operators, |return| and bind $\rhd$.
+The type of the bind operators is also interesting: %Abst33
+
+Checked:\ \
+  ~ $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value|
+Stateful:\ \ \
+  ~ $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
+
+It should be clear that an consistent pattern has emerged. This is a *very* abstract
+pattern, which has to do with the struture of the underlying computation: is it a
+checked computation or a stateful computation? Other forms of computation are also
+possible. %Abst35
+
+ ### Monads Defined
+
+A *monad* $m$ is a computational structure that involves three parts: %Mona3
+
+* A generic data type $m$ %Mona4
+* A *return* function |return|$_m :: t \rightarrow m\ t$ %Mona5
+* A *bind* function $\rhd_m :: m\ t \rightarrow (t \rightarrow m\ s) \rightarrow m\ s$ %Mona6
+
+The symbol $m$ gives the name of the monad and also defines the *shape* of the computation.
+A program that uses the monad $m$ is called an $m$-computation.
+Examples of $m$ in the previous section are |Checked| and |Stateful|.
+The instantiation of the generic type $m\ t$ at a particular type $t$
+represents an $m$-computation that produces a value of type $t$. For example, the type |Checked Int|
+represents an error-checked computation tha produces an |Int|. Saying that it is a "checked copmutation"
+implies that it might produce an error rather than an integer. As another example, the type
+|Stateful String| represents a stateful computation that produces a value of type |String|.
+The fact that it is a "stateful computation" implies that there is a memory which is required
+as input to the computation, and that it produces an updated memory in addition to the string result. %Mona7
+
+The |return|$_m$ function specifies how values are converted into $m$-computations. The
+|return|$_m$ function has type $t \rightarrow m\ t$ for any type $t$. What this means is that it
+converts a value of type $t$ into an $m$-computation that just returns the value. It is
+important that the computation *just* returns the value, so, for example, it is not legal for
+the stateful return function to modify memory. Examples of return were given in the previous section. %Mona8
+
+The *bind* function $\rhd_m$ specifies how $m$-computations are combined together. In general
+the behavior of $A \rhd_m F$ is to perform the $m$-computation $A$ and then pass the value
+it produces to the function $F$ to create a second $m$-computation, which is returned as the
+result of the bind operation.
+Note that the $A$ may not produce a value, in which case $F$ is not
+called. This happens, for example, in the |Checked| monad, if $A$ produces an error.
+At a high level, bind combines the computation $A$ with the (parameterized) computation $F$ to
+form a composite computation, which performs the effect of both $A$ and $F$. %Mona9
+
+The type of bind given here is slightly more general than the type of bind used in the previous examples.
+In the previous examples, the type was $m\ t \rightarrow (t \rightarrow m\ t) \rightarrow m\ t$.
+However, it is possible for the return types of the two computations to differ. As long as
+the output of the first computation $A$ can be passed to $F$, there is not problem. %Mona10
+
+TODO: mention the monad laws. %Mona11
+
+ ## Monads in Haskell
+
+The concept of a monad allows pervasive copmutational features, e.g. error checking and
+mutable state, to be defined in using a high-level interface that allows hides the plumbing
+involved in managing errors or state. Unfortunately, the resulting programs are still
+somewhat combersome to work with. Haskell provides special support for working with monads
+that makes them easy to use. %Mona12
+
+ ### The Monad Type Class
+
+Haskell allow monads to be defined very cleanly using *type classes*. The |Monad| class
+has the following definition: %Monad1
+
+````
+class Monad m where
+  (>>=) :: m t -> (t -> m s) -> m s
+  return :: t -> m t
+%Monad2
+````
+
+It say that for a generic type |m| to be a monad, it must have two functions, bind (|>>=|) and
+|return|, with the appropriate types.
+The only difference from the definition given above is that the bind operator is called |>>=|
+rather than $\rhd$. %Monad3
+
+The type |Checked| is an instance of the |Monad| class: %Monad4
+
+> instance Monad Checked where
+>   a >>= f =
+>     case a of
+>       Error msg -> Error msg
+>       Good v -> f v
+>   return v = Good v
+> -- %Monad5
+
+It turns out to be a little more complex to define the stateful monad instance, so this topic
+is delayed until the end of this section. %Monad6
+
+ ### Haskell |do| Notation
+
+Haskell also supports special syntax for writing programs that use monads.
+One problem with the monadic version of the program is apparent in the code for
+evaluation of binary expressions. The code given above is ugly because of the nested
+use of lambda functions. Here an attemp to make the Checked case more reaable: %Hask1
+
+|eval (Binary'7 op a b) =| \
+\ |(eval a)| $\rhd_C$ ($\lambda$|va.| \
+\ \ |(eval b)| $\rhd_C$ ($\lambda$|vb.| \
+\ \ \ |checked_binary op av bv|))
+
+The effect here is for |av| to be bound to the value produced by the |eval a|,
+and for |bv| to be bound to the result of |eval b|. Unfortunately, the variables
+come *to the right* of the expression that produces the value, which is not the way we
+naturally think about binding. Also, the nested lambdas and parenthesis are distracting. %Hask2
+
+Haskell has a special notation, the |do| notations, for the bind operator that allows the variables
+to be written in the right order. Using |do| the program above can be written as follows: %Hask3
+
+````
+eval (Binary'7 op a b) = do
+  av <- eval a
+  bv <- eval b
+  checked_binary op av bv
+%Hask4
+````
+
+Another benefit of the |do| notation is that the bind operator is implicit. Haskell
+type inference and the type class system arrange for the right bind operator to be
+selected automatically. %Hask5
+
+ ## Using Haskell Monads
+
+The messy evaluators for error checking and mutable state can be rewritten much more
+cleanly using monads. %Usin25
+
+ ### Monadic Error Checking
+
+> evaluate'11 :: Exp'7 -> Env'7 -> Checked Value'7
+> evaluate'11 exp env = eval exp where
+>     eval (Literal'7 v)      = return v
+>     eval (Variable'7 x)     =
+>       case lookup x env of
+>         Nothing -> Error ("Variable " ++ x ++ " undefined")
+>         Just v  -> return v
+>     eval (Unary'7 op a) = do
+>       av <- eval a
+>       return (unary'7 op av)
+>     eval (Binary'7 op a b) = do
+>       av <- eval a
+>       bv <- eval b
+>       checked_binary op av bv
+>     eval (If'7 a b c) = do
+>       av <- eval a
+>       eval (if fromBool'7 av then b else c)
+>     eval (Let'7 x e body) = do    -- non-recursive case
+>       ev <- eval e
+>       let newEnv = (x, ev) : env
+>       evaluate'11 body newEnv
+>     eval (Function'7 x body) = return (Closure'7 x body env)
+>     eval (Call'7 fun arg) = do
+>       funv <- eval fun
+>       case funv of
+>         Closure'7 x body closeEnv -> do
+>           argv <- eval arg
+>           let newEnv = (x, argv) : closeEnv
+>           evaluate'11 body newEnv
+>         _ -> Error ("Expected function but found " ++ show funv)
+> -- %Mona13
+
+ ### Monadic Mutable State
+
+TODO: This requires dealing with the need for a "data type" rather than just a
+stateful "type". %Mona14
 
  # More Chapters on the way...
  ## Abstract Interpretation and Types
