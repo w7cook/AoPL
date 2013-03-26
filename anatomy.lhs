@@ -533,7 +533,7 @@ The following Haskell function implements this behavior: %Subs8
 > -- %Subs9
 
 The |subst| helper function is introduced avoid repeating the |var| and |val|
-parameters for each of the specific cases of substituation. The |var| and |val|
+parameters for each of the specific cases of substitution. The |var| and |val|
 parameters are the same for all substitutions within an expression. %Subs19
 
 The first case says that substituting a variable for a value in
@@ -2225,8 +2225,8 @@ three (+1) 0 -- evaluates to 3
 ````
 
 To further demonstrate the flexibility, suppose we want our Church numerals to
-start with |[]| as the base value, and our succcessor function to append
-the character |'A'| to the begining of the list. %Natu14
+start with |[]| as the base value, and our successor function to append
+the character |'A'| to the beginning of the list. %Natu14
 
 ````
 three ('A':) [] -- evaluates to "AAA"
@@ -2247,7 +2247,7 @@ numeral with the following Haskell definition. %Natu18
 > -- %Natu19
 
 To retrieve the |Integer| value of a Church numeral, we can evaluate
-the lamdba using the usual successor and base value. %Natu20
+the lambda using the usual successor and base value. %Natu20
 
 > unchurch :: ChurchN -> Integer
 > unchurch n = n (+1) 0
@@ -3596,12 +3596,12 @@ and mutable state. %Comp2
  ## Error Checking
 
 Errors are an important aspect of computation. They
-are typically a pervasiave feature of a language, beause they affects
+are typically a pervasive feature of a language, beause they affect
 the way that every expression is evaluated. For example,
 the expression |a+b| may not cause any errors,
 but if evaluating |a| or |b| can cause an error,
 then the evaluation of |a+b| will have to deal with the
-possiblity that |a| or |b| is an error. %Hand2
+possibility that |a| or |b| is an error. %Hand2
 
 Error checking is a notorious problem in programming languages.
 When coding in C, everyone agrees that the return codes of
@@ -3609,7 +3609,7 @@ all system calls should be checked to make sure that an error
 did not occur. However, most C programs don't check the return
 codes, leading to serious problems when things start to go wrong. %Hand3
 
-Errors are pervasiave because any expression
+Errors are pervasive because any expression
 can either return a value or it can signal an error.
 One way to represent this possibility is by defining
 a new data type that has two possibilities: either a
@@ -3624,7 +3624,7 @@ representing the type of the good value. The |Checked| type has two constructors
 |Good| and |Error|. The |Good| constructor takes a value of type |a|
 and labels it as good. The |Error| constructor has an error message.
 The following figure is an abstraction illustration of a |Checked| value,
-which represents a computation that may eather be a good value or an error.
+which represents a computation that may either be a good value or an error.
 %Hand6
 
 ![A computation that may produce an error.](figures/ErrroShape.eps) %Err9
@@ -3633,7 +3633,7 @@ which represents a computation that may eather be a good value or an error.
 
 To keep things simple and focused on errors,
 this section will only consider expressions
-with literals, varibles, binary operators. This smaller language is
+with literals, variables, binary operators. This smaller language is
 similar to the one that was introduced at the beginning of the book.
 More features will be added later.
 Although the syntax of expressions does not have to change, but the
@@ -3657,7 +3657,7 @@ so it evaluating a variable may return an error: %Hand10
 >          Just v  -> Good v
 > -- %Hand11
 
- ### Error Checking in Multiple Sub-epxressions
+ ### Error Checking in Multiple Sub-expressions
 
 The case for binary operations is more interesting.
 Here is the original rule for evaluating binary expressions: %Hand12
@@ -3687,7 +3687,7 @@ Now it should be clear why error return codes are not always checked. What was
 originally a one-line program is now 8 lines and uses additional temporary
 variables. When multiple sub-expressions can generate errors, it is necessary
 to *compose* multiple error checks together. The situation in the case of
-|Binary| operations is illustrated in the following figue: %Hand16
+|Binary| operations is illustrated in the following figure: %Hand16
 
 ![Composing computations that may produce errors.](figures/ErrorBind.eps) %Err10
 
@@ -3755,20 +3755,20 @@ errors to be caught and handled within a program. %Exer6
  #### Exercise 5.3: Multiple Bindings and Arguments
 
 If you really want to experience how messy it is to explicitly program
-error handling, implement error propogation where |let| expressions
+error handling, implement error checking where |let| expressions
 can have multiple bindings, and functions can have multiple arguments. %Exer1
 
  ## Mutable State
 
-A second common pervasic computational strategy, besides
+A second common pervasive computational strategy, besides
 error handling, is the use of *mutable state*. Mutable state
 means means that the state of a program changes or mutates:
 that a variable can be assigned a new value or a part of a
 data structure can be modified. Mutable state is a pervasive
-feature becuase it is something that happens in addition to
+feature because it is something that happens in addition to
 the normal computation of a value or result from a function. %Muta2
 
-Here is one typical example of a program that uses mutable varables.
+Here is one typical example of a program that uses mutable variables.
 The code is valid in C, Java or JavaScript: %Muta3
 
 ````Java
@@ -3779,7 +3779,7 @@ for (i = 2; i <= 5; i = i + 1) {
 %Muta4
 ````
 
-It declares a local variable named |x| with inital value |1|
+It declares a local variable named |x| with initial value |1|
 and then performs an iteration where the variable |i| changes
 from 1 to 10. On each iteration of the loop the variable |x|
 is multiplied by |i|. The result of |x| a the end is the
@@ -3806,7 +3806,7 @@ programming. The point is to explain programming languages, and to code the
 explanation explicitly as an evaluator. Since many
 programming languages allow mutable values, it is important to be able to
 explain mutation. But we cannot *use* mutation to provide the explanation,
-because we have chosen to write the evaluator in Haskell, a pure funtional language.
+because we have chosen to write the evaluator in Haskell, a pure functional language.
 The hope is that detailed and explicit analysis of how mutation
 works in programming languages will
 lead to insights about the costs and benefits of using mutation. %Muta9
@@ -3880,7 +3880,7 @@ use of integers for addresses in a computer memory. %Addr10
 >   deriving (Eq, Show)
 > -- %Addr11
 
-When writing programs and values, it is usefull to distinguish addresses
+When writing programs and values, it is useful to distinguish addresses
 from ordinary integer values. As a convention, addresses will be tagged with
 an "at sign", so that |Address 3| will be written @3. %Addr12
 
@@ -3969,7 +3969,7 @@ The memory |access| function takes a memory address $i$
 and a memory (list) and returns the item of the list at position
 $i$ counting from the right of the list.
 The Haskell function |!!| returns the $n$th item of a list,
-so it almost serves as an implemenetation for the memory |access|
+so it almost serves as an implementation for the memory |access|
 function. However, the |!!| function counts from the *left* of the
 list, not the right. To compute an index from the right of a list,
 the index must be subtracted from the length of the list: %Acce2
@@ -3984,7 +3984,7 @@ TODO: rename "access" to be "contents"? %Acce1
 It is not possible to actually *change* memory in pure functional
 languages, including Haskell, because there is no way to modify a
 data structure after is has been constructed.
-But it is possible to compute a new data struture
+But it is possible to compute a new data structure
 that is based on an existing one. This is the notion of
 *functional update* or *functional change*: a function can
 act as a transformation of a value into a new value.
@@ -4007,7 +4007,7 @@ before the address and the part starting with the address |addr|. The pattern
 $_:after$ binds $after$ to be the memory after the address. The |update|
 function then recreates a new memory containing the before part,
 the updated memory cell, and the after part. The function
-is innefficient because it has to copy all the memory cells it has scanned up to that
+is inefficient because it has to copy all the memory cells it has scanned up to that
 point! We are not worried about efficiency, however, so just relax. It is
 fast enough. %Upda5
 
@@ -4045,7 +4045,7 @@ a function that transforms an input memory into an output memory. %Upda14
 A stateful computation is one that produces a value and *also* accesses
 and potentially updates memory. In changing |evaluate| to be a
 stateful computation, the type must change. Currently |evaluate|
-takes an epxression and an environment and returns a value: %Stat1
+takes an expression and an environment and returns a value: %Stat1
 
 ````
 evaluate :: Exp -> Env -> Value
@@ -4118,7 +4118,7 @@ data Exp'9 = ...
 The |Mutable(e)| expression creates a new memory cell and returns its
 address. First the expression |e| is evaluated to get the initial value
 of the new memory cell. Evaluating |e| may modify memory, so care must
-be taken to allocat the new cell in the new memory. The address of
+be taken to allocate the new cell in the new memory. The address of
 the new memory cell is just the length of the memory. %Sema1
 
 ````
@@ -4128,7 +4128,7 @@ the new memory cell is just the length of the memory. %Sema1
 %Sema20
 ````
 
-The access epxression |!a| expression evluates the address
+The access expression |!a| expression evaluates the address
 expression |a| to get an address, then returns the contents of
 the memory at that address. Note that if the |Address i| pattern fails, Haskell
 raises an error. This is another case where error handling, as in the previous
@@ -4143,7 +4143,7 @@ section, could be used. %Sema19
 ````
 
 An assignment statement |a := e| first evaluates the target expression |a|
-to get an address. It is an error if |a| does not evalute to an address.
+to get an address. It is an error if |a| does not evaluate to an address.
 Then the source expression |e| is evaluated.
 Evaluating |a| and |e| may update the memory, so %Sema21
 
@@ -4159,7 +4159,7 @@ Evaluating |a| and |e| may update the memory, so %Sema21
 
 The interesting thing is that even parts of the evaluator
 that have nothing to do with mutable cells have to be
-copmletely rewritten: %Sema26
+completely rewritten: %Sema26
 
 ````
     eval (Binary'9 op a b) mem =
@@ -4182,12 +4182,12 @@ as the shape of the basic stateful computations. %Muta11
 Similar transformations are needed for |Unary| operations and
 function definitions/calls. %Muta12
 
-Most langauges with mutable state also have *sequences* of expressions,
+Most languages with mutable state also have *sequences* of expressions,
 of the form |e1; e2; ...; eN|. It would be relatively easy to add a
 semicolon operator to the binary operators. In fact, C has such an
-operator: the expression |e1, e2| evaluates |e1| and then evalutes |e2|.
+operator: the expression |e1, e2| evaluates |e1| and then evaluates |e2|.
 The result of the expression is the value of |e2|. The value of |e1|
-is disguarded.
+is discarded.
 Note that |let| can also be used to implement sequences of operations:
 |e1; e2| can be represented as |let dummy = e1 in e2| where |dummy| is a
 variable that is not used anywhere in the program. %Muta13
@@ -4286,12 +4286,12 @@ different implementation. The *features* of our evaluator are not
 implemented in a modular way. %Abst12
 
 The concept of a *monad* provides a framework that allows
-different computational strategies to be invoked in a unform way.
+different computational strategies to be invoked in a uniform way.
 The rest of this section shows how to derive the monad structure
 from the examples of error handing and mutable state given above.
 The basic strategy is to compare the two examples and do whatever
 is necessary to force them into a common structure, by moving
-details into helper functions. By defining appropraite helper
+details into helper functions. By defining appropriate helper
 functions that have the same interface, the two examples can be
 expressed in a uniform format. %Mona1
 
@@ -4314,7 +4314,7 @@ and they do not modify memory. They represent the simple good
 base case for a computation. In monad terminology, this operation
 is called |return| because it describes how to return a value
 from the computation. The return functions for checked and stateful
-comptuations are different, but they both have same interface:
+computations are different, but they both have same interface:
 they take a value as input and output an appropriate checked or
 stateful value. %Abst18
 
@@ -4336,31 +4336,33 @@ Checked                                          \ \ \ \ \ \  Stateful
 
 The next step is to unify the case when there are multiple sub-expressions
 that must be evaluated. The binary operator provides a good example
-of multipe sub-expressions. %Abst22
+of multiple sub-expressions. %Abst22
 
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |eval :: Exp -> Checked Value|                                |eval :: Exp -> Stateful Value|
 |eval (Binary'7 op a b) =|                                      |eval (Binary'9 op a b) =|
-\ \ |case eval a of|                                          \ \ $\lambda$|mem. let (av, mem') = eval a mem in|
-\ \ \ \ |Error msg -> Error msg|                              \ \ \ \ |let (bv, mem'') = eval b mem' in|
-\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ |(binary'9 op av bv, mem'')|
+\ \ |case eval a of|                                          \ \ $\lambda$|mem.let (av, mem') = eval a mem in|
+\ \ \ \ |Error msg -> Error msg|                              \ \ \ \ \ \ \ \ \ \ \ \ \ |let (bv, mem'') = eval b mem' in|
+\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |(binary'9 op av bv, mem'')|
 \ \ \ \ \ \ |case eval b of|
 \ \ \ \ \ \ \ \ |Error msg -> Error msg|
 \ \ \ \ \ \ \ \ |Good bv ->|
 \ \ \ \ \ \ \ \ \ \ |checked_binary op av bv|
 
+TODO: note that the |mem| argument has become a lambda!
+
 In this case computation proceeds in steps: first
-evaluate one expresion (checking errors and updating memory) and then
-evalulating the second expression (checking errors and updating memory as
+evaluate one expression (checking errors and updating memory) and then
+evaluating the second expression (checking errors and updating memory as
 appropriate). They both have a similar pattern of code for dealing with
 the evaluation of |a| and |b|. Factoring out the common
 parts as |A| and |F|, the core of the pattern is: %Abst23
 
 Checked                                 \ \ \ \ \ \  Stateful
 --------------------------------------- ------------ ----------------------
-|case| *first-part* |of|                             |let (v, mem') =| *first-part* |in|
-\ \ |Error msg -> Error msg|                         \ \ *next-part* |v| |mem'|
+|case| *first-part* |of|                             $\lambda$|mem.let (v, mem') =| *first-part* |mem in|
+\ \ |Error msg -> Error msg|                         \ \ \ \ \ \ \ \ \ \ \ *next-part* |v| |mem'|
 \ \ |Good v ->| *next-part* |v|
 
 This *first-part* corresponds to |eval a| or |eval b| in both the original
@@ -4378,22 +4380,25 @@ is named |F|: %Abst25
 
 Checked                                 \ \ \ \ \ \  Stateful
 --------------------------------------- ------------ ----------------------
-|A| $\rhd_C$ |F =|                                   |A| $\rhd_S$ |F|
-\ \ |case A of|                                      \ \ |let (v, mem') = A in|
-\ \ \ \ |Error msg -> Error msg|                     \ \ \ \ |F v mem'|
+|A| $\rhd_C$ |F =|                                   |A| $\rhd_S$ |F =|
+\ \ |case A of|                                      \ \ $\lambda$|mem.let (v, mem') = A mem in|
+\ \ \ \ |Error msg -> Error msg|                     \ \ \ \ \ \ \ \ \ \ \ \ \ |F v mem'|
 \ \ \ \ |Good v -> F v|
 
 These generic operators for Checked $\rhd_C$ and Stateful $\rhd_S$ computations
-abstract away the core pattern composing two Checked or Stateful comptuations.
+abstract away the core pattern composing two Checked or Stateful computations.
 The family of operators $\rhd$ are called *bind* operators, because they
 bind together computations. %Abst26
 
 Using these operators, the *original* code can be written in simpler form: %Abst27
 
 Checked:\ \
-  ~ (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+
+:    (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+
 Stateful:\ \ \
-  ~ (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(binary'9 op av bv, mem)|)) %Abst28
+
+:     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(binary'9 op av bv, mem)|)) %Abst28
 
 All mention of |Error| and |Good| have been removed from the Checked version!
 The error `plumbing' has been hidden. Most of the memory plumbing has been removed
@@ -4407,9 +4412,12 @@ a default stateful computation. To see how this works, consider that %Abst29
 Using |return|$_S$ the result is: %Abst31
 
 Checked:\ \
-  ~ (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+
+:    (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+
 Stateful:\ \ \
-  ~ (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|binary'9 op av bv|))) %Abst32
+
+:     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|binary'9 op av bv|))) %Abst32
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
 rules for |Mutable|, assignment, and access there will be explicit references to memory.
@@ -4421,12 +4429,15 @@ has been hidden in two new operators, |return| and bind $\rhd$.
 The type of the bind operators is also interesting: %Abst33
 
 Checked:\ \
-  ~ $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value|
-Stateful:\ \ \
-  ~ $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
 
+:     $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value|
+
+Stateful:\ \ \
+
+:     $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
+ 
 It should be clear that an consistent pattern has emerged. This is a *very* abstract
-pattern, which has to do with the struture of the underlying computation: is it a
+pattern, which has to do with the structure of the underlying computation: is it a
 checked computation or a stateful computation? Other forms of computation are also
 possible. %Abst35
 
@@ -4443,7 +4454,7 @@ A program that uses the monad $m$ is called an $m$-computation.
 Examples of $m$ in the previous section are |Checked| and |Stateful|.
 The instantiation of the generic type $m\ t$ at a particular type $t$
 represents an $m$-computation that produces a value of type $t$. For example, the type |Checked Int|
-represents an error-checked computation tha produces an |Int|. Saying that it is a "checked copmutation"
+represents an error-checked computation that produces an |Int|. Saying that it is a "checked computation"
 implies that it might produce an error rather than an integer. As another example, the type
 |Stateful String| represents a stateful computation that produces a value of type |String|.
 The fact that it is a "stateful computation" implies that there is a memory which is required
@@ -4473,10 +4484,10 @@ TODO: mention the monad laws. %Mona11
 
  ## Monads in Haskell
 
-The concept of a monad allows pervasive copmutational features, e.g. error checking and
+The concept of a monad allows pervasive computational features, e.g. error checking and
 mutable state, to be defined in using a high-level interface that allows hides the plumbing
 involved in managing errors or state. Unfortunately, the resulting programs are still
-somewhat combersome to work with. Haskell provides special support for working with monads
+somewhat cumbersome to work with. Haskell provides special support for working with monads
 that makes them easy to use. %Mona12
 
  ### The Monad Type Class
@@ -4514,7 +4525,7 @@ is delayed until the end of this section. %Monad6
 Haskell also supports special syntax for writing programs that use monads.
 One problem with the monadic version of the program is apparent in the code for
 evaluation of binary expressions. The code given above is ugly because of the nested
-use of lambda functions. Here an attemp to make the Checked case more reaable: %Hask1
+use of lambda functions. Here an attempt to make the Checked case more readable: %Hask1
 
 |eval (Binary'7 op a b) =| \
 \ |(eval a)| $\rhd_C$ ($\lambda$|va.| \
@@ -4584,6 +4595,7 @@ cleanly using monads. %Usin25
 
 TODO: This requires dealing with the need for a "data type" rather than just a
 stateful "type". %Mona14
+
 
  # More Chapters on the way...
  ## Abstract Interpretation and Types
