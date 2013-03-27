@@ -3743,6 +3743,10 @@ error handling. %Hand35
 Extend the evaluator with error checking for the
 remaining expression cases, including
 |if|, non-recursive |let|, and function definition/calls.
+Ensure that all errors, including pattern match failures,
+are captured by your code and converted to |Error| values,
+rather than causing Haskell execution errors.
+
 As a bonus, implement error checking for recursive |let|
 expressions. %Exer5
 
@@ -4267,7 +4271,7 @@ Here are the mutation-specific parts of the evaluator: %Summ10
 > binary'9 op (Scalar'9 a) (Scalar'9 b) = Scalar'9 (binary op a b)
 > -- %Summ11
 
- ### Exercise 5.6: Errors and Mutable State
+ #### Exercise 5.6: Errors and Mutable State
 
  Write a version of |evaluate| that supports both error checking
  and mutable state. %Exer7
@@ -4350,7 +4354,7 @@ Checked                                          \ \ \ \ \ \  Stateful
 \ \ \ \ \ \ \ \ |Good bv ->|
 \ \ \ \ \ \ \ \ \ \ |checked_binary op av bv|
 
-TODO: note that the |mem| argument has become a lambda!
+TODO: note that the |mem| argument has become a lambda! %Abst36
 
 In this case computation proceeds in steps: first
 evaluate one expression (checking errors and updating memory) and then
@@ -4392,11 +4396,11 @@ bind together computations. %Abst26
 
 Using these operators, the *original* code can be written in simpler form: %Abst27
 
-Checked:\ \
+Checked:\ \ %Abst37
 
-:    (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+:    (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|)) %Abst38
 
-Stateful:\ \ \
+Stateful:\ \ \ %Abst39
 
 :     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(binary'9 op av bv, mem)|)) %Abst28
 
@@ -4411,11 +4415,11 @@ a default stateful computation. To see how this works, consider that %Abst29
 
 Using |return|$_S$ the result is: %Abst31
 
-Checked:\ \
+Checked:\ \ %Abst40
 
-:    (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|))
+:    (|eval a|) $\rhd_C$ ($\lambda$|va. (eval b)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|)) %Abst41
 
-Stateful:\ \ \
+Stateful:\ \ \ %Abst42
 
 :     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|binary'9 op av bv|))) %Abst32
 
@@ -4428,14 +4432,14 @@ figured out way to hide the complexity of error checking and mutable memory. Thi
 has been hidden in two new operators, |return| and bind $\rhd$.
 The type of the bind operators is also interesting: %Abst33
 
-Checked:\ \
+Checked:\ \ %Abst43
 
-:     $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value|
+:     $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
 
-Stateful:\ \ \
+Stateful:\ \ \ %Abst45
 
 :     $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
- 
+
 It should be clear that an consistent pattern has emerged. This is a *very* abstract
 pattern, which has to do with the structure of the underlying computation: is it a
 checked computation or a stateful computation? Other forms of computation are also
@@ -4575,7 +4579,9 @@ cleanly using monads. %Usin25
 >       checked_binary op av bv
 >     eval (If'7 a b c) = do
 >       av <- eval a
->       eval (if fromBool'7 av then b else c)
+>       case av of
+>         Scalar'7 (Bool cond) -> eval (if cond then b else c)
+>         _ -> Error ("Expected boolean but found " ++ show av)
 >     eval (Let'7 x e body) = do    -- non-recursive case
 >       ev <- eval e
 >       let newEnv = (x, ev) : env
