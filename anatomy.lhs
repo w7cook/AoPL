@@ -670,12 +670,12 @@ return 2*x + 5;
 %Loca6
 ````
 
-Haskell and ML define local variables with a |let| expression: %Loca7
+Haskell defines local variables with a |let| expression: %Loca7
 
 > test1 = let x = 3 in 2*x + 5
 > -- %Loca8
 
-In these languages |let| is an expression, because it can be
+In Haskell |let| is an expression, because it can be
 used inside other expressions: %Loca9
 
 > test2 = 2 * (let x = 3 in x + 5)
@@ -692,7 +692,7 @@ return x + y;
 %Loca13
 ````
 
-and Haskell or ML %Loca14
+and in Haskell %Loca14
 
 > test3 = let x = 3 in let y = x*2 in x + y
 > -- %Loca15
