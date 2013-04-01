@@ -743,8 +743,8 @@ TODO: talk about renaming %Scop6
 
 When substituting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
-In particular, when substituting for *x* in an expressions, if
-there is an expression of the form |let| *x* |=| *e* |in| *body* then
+In particular, when substituting for *x* in an expression, if
+the expression is of the form |let| *x* |=| *e* |in| *body* then
 *x* should be substituted within *e* but not in *body*.
 Because *x* is redefined, the *body* is a hole in the scope of *x*.  %Subs1
 
@@ -925,8 +925,8 @@ final case, for |Let|, *does* change the environment so it
 calls |evaluate| rather than |eval|. %Eval10
 
 The case for |Let| first evaluates the bound expression in the
-current environment |ev e|, then it creates a new
-environment |newEnv| with that binds |x| to the value of
+current environment |env|, then it creates a new
+environment |newEnv| that binds |x| to the value of
 the bound expressions. It then evaluates the body |b| in the
 new environment |newEnv|. %Eval11
 
@@ -1213,7 +1213,7 @@ Running these test cases with the |test| function defined above yields these res
 Now that our language supports two kinds of values, it is possible for
 an expression to get *type errors*. A type error occurs when evaluation of
 an expression attempts to perform an operation but one or more of the
-values involved are not the right type. For example, attempting to add an
+values involved are not of the right type. For example, attempting to add an
 integer and a boolean value, as in |3 + True|, leads to a type error. %Type2
 
 In our Haskell program, type errors exhibit themselves in the
