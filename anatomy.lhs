@@ -155,7 +155,7 @@ what negative number are or what subtraction or exponentiation do, but there is
 room for confusion about how to write them down. %Simp5
 
 The conceptual structure of a given expression can be defined much more
-clearly using pictures. For example, the following pictures make are a
+clearly using pictures. For example, the following pictures make a
 clear description of the underlying arithmetic operations specified in the
 expressions given above: %Simp6
 
@@ -297,7 +297,7 @@ If you don't know about *instance* declarations in Haskell, please
 go and read about *type classes*. (TODO: need citation here) %Form4
 
 Note that the |show| function for expressions is fairly similar
-to the |eval| function, but it performs string concatenation instead
+to the |evaluate| function, but it performs string concatenation instead
 of numeric operations. To test many different
 kinds of functions, it is useful to define a generalized test function. %Form5
 
@@ -493,7 +493,7 @@ variable will then be bound to the container. The variable's binding will
 not change (it will remain bound to the same container), but the contents
 of the container will change.  %Vari6
 
-Mutatable variables are discussed in full later (TODO: reference).
+Mutatable variables are discussed in detail later (TODO: reference).
 For now, just remember that a variable has a fixed binding to a value
 in a given context.  %Vari7
 
