@@ -141,7 +141,7 @@ what negative number are or what subtraction or exponentiation do, but there is
 room for confusion about how to write them down. %Simp5
 
 The conceptual structure of a given expression can be defined much more
-clearly using pictures. For example, the following pictures make are a
+clearly using pictures. For example, the following pictures make a
 clear description of the underlying arithmetic operations specified in the
 expressions given above: %Simp6
 
@@ -289,7 +289,7 @@ If you don't know about *instance* declarations in Haskell, please
 go and read about *type classes*. (TODO: need citation here) %Form4
 
 Note that the |show| function for expressions is fairly similar
-to the |eval| function, but it performs string concatenation instead
+to the |evaluate| function, but it performs string concatenation instead
 of numeric operations. To test many different
 kinds of functions, it is useful to define a generalized test function. %Form5
 
@@ -476,7 +476,7 @@ variable will then be bound to the container. The variable's binding will
 not change (it will remain bound to the same container), but the contents
 of the container will change.  %Vari6
 
-Mutatable variables are discussed in full later (TODO: reference).
+Mutatable variables are discussed in detail later (TODO: reference).
 For now, just remember that a variable has a fixed binding to a value
 in a given context.  %Vari7
 
@@ -655,13 +655,13 @@ return 2*x + 5;
 %Loca6
 ````
 
-Haskell and ML define local variables with a |let| expression: %Loca7
+Haskell defines local variables with a |let| expression: %Loca7
 
 INCLUDE:Loca8
 > test1 = let x = 3 in 2*x + 5
 > -- %Loca8
 
-In these languages |let| is an expression, because it can be
+In Haskell |let| is an expression, because it can be
 used inside other expressions: %Loca9
 
 INCLUDE:Loca10
@@ -679,7 +679,7 @@ return x + y;
 %Loca13
 ````
 
-and Haskell or ML %Loca14
+and in Haskell %Loca14
 
 INCLUDE:Loca15
 > test3 = let x = 3 in let y = x*2 in x + y
@@ -732,8 +732,8 @@ TODO: talk about renaming %Scop6
 
 When substituting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
-In particular, when substituting for *x* in an expressions, if
-there is an expression of the form |let| *x* |=| *e* |in| *body* then
+In particular, when substituting for *x* in an expression, if
+the expression is of the form |let| *x* |=| *e* |in| *body* then
 *x* should be substituted within *e* but not in *body*.
 Because *x* is redefined, the *body* is a hole in the scope of *x*.  %Subs1
 
@@ -921,8 +921,8 @@ final case, for |Let|, *does* change the environment so it
 calls |evaluate| rather than |eval|. %Eval10
 
 The case for |Let| first evaluates the bound expression in the
-current environment |ev e|, then it creates a new
-environment |newEnv| with that binds |x| to the value of
+current environment |env|, then it creates a new
+environment |newEnv| that binds |x| to the value of
 the bound expressions. It then evaluates the body |b| in the
 new environment |newEnv|. %Eval11
 
@@ -1175,7 +1175,7 @@ Running these test cases with the |test| function defined above yields these res
 Now that our language supports two kinds of values, it is possible for
 an expression to get *type errors*. A type error occurs when evaluation of
 an expression attempts to perform an operation but one or more of the
-values involved are not the right type. For example, attempting to add an
+values involved are not of the right type. For example, attempting to add an
 integer and a boolean value, as in |3 + True|, leads to a type error. %Type2
 
 In our Haskell program, type errors exhibit themselves in the
