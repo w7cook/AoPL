@@ -249,7 +249,7 @@ infix operator by surrounding it in back-quotes.
 Here is a main program that tests evaluation: %Eval4
 
 INCLUDE:Eval5
-> main = do
+> main'2 = do
 >   putStrLn "Evaluating the following expression:"
 >   putStr "  "
 >   print t3
@@ -284,6 +284,7 @@ INCLUDE:Form10
 >   show (Multiply a b)  = showBinary a "*" b
 >   show (Divide a b)  = showBinary a "/" b
 > showBinary a op b = show a ++ op ++ show b
+> -- %Form10
 
 If you don't know about *instance* declarations in Haskell, please
 go and read about *type classes*. (TODO: need citation here) %Form4
@@ -307,7 +308,7 @@ The following main program invokes |test| to evaluate each of the
 five sample expressions defined above: %Form7
 
 INCLUDE:Form8
-> main = do
+> main'3 = do
 >   test evaluate t1
 >   test evaluate t2
 >   test evaluate t3
@@ -366,7 +367,7 @@ INCLUDE:Form18
 > showExp level (Subtract a b)  = showBinary level 1 a " - " b
 > showExp level (Multiply a b)  = showBinary level 2 a "*" b
 > showExp level (Divide a b)    = showBinary level 2 a "/" b
->
+> 
 > showBinary outer inner a op b =
 >   if inner < outer then paren result else result
 >      where result = showExp inner a ++ op ++ showExp inner b
@@ -531,7 +532,7 @@ then the value is %Subs10
 INCLUDE:Subs11
 > x = Variable "x"
 > y = Variable "y"
-> main = do
+> main'1 = do
 >   test (substitute1 ("x", 5)) (Add x (Number 2))
 >   test (substitute1 ("x", 5)) (Number 2)
 >   test (substitute1 ("x", 5)) x
@@ -603,7 +604,7 @@ leaves the variable alone. %Mult9
 
 INCLUDE:Mult10
 > z = Variable "z"
-> main = do
+> main'2 = do
 >   test (substitute e1) (Add x y)
 >   test (substitute e1) (Number 2)
 >   test (substitute e1) x
@@ -626,7 +627,7 @@ x + 2*y + z ==> 3 + 2*(-1) + z
 Note that it is also possible to substitute multiple variables one at a time: %Mult13
 
 INCLUDE:Mult14
-> substitute'2 env exp = foldr substitute1 exp env
+> substitute1R env exp = foldr substitute1 exp env
 > -- %Mult14
 
 The |foldr fun init list| function applies a given function to each item
@@ -828,7 +829,7 @@ INCLUDE:Summ3
 > -- %Summ3
 
 INCLUDE:Summ19
-> substitute1'3 (var, val) exp = subst exp where
+> substitute1 (var, val) exp = subst exp where
 >   subst (Number i)      = Number i
 >   subst (Add a b)       = Add (subst a) (subst b)
 >   subst (Subtract a b)  = Subtract (subst a) (subst b)
@@ -850,7 +851,7 @@ INCLUDE:Summ4
 > evaluate (Subtract a b)   = evaluate a - evaluate b
 > evaluate (Multiply a b)   = evaluate a * evaluate b
 > evaluate (Divide a b)     = evaluate a `div` evaluate b
-> evaluate (Let x exp body) = evaluate (substitute1'3 (x, evaluate exp) body)
+> evaluate (Let x exp body) = evaluate (substitute1 (x, evaluate exp) body)
 > -- %Summ4
 
  ## Evaluation using Environments {#BasicEvalEnv}
@@ -1020,7 +1021,7 @@ is defined to support multiple different kinds of values: %More2
 INCLUDE:More3
 > data Value = Int  Int
 >            | Bool Bool
->  deriving Eq
+>  deriving (Eq, Show)
 > -- %More3
 
 Some example values are |Bool True| and
@@ -1061,10 +1062,10 @@ INCLUDE:More99
 > data BinaryOp = Add | Sub | Mul | Div | And | Or
 >               | GT | LT | LE | GE | EQ
 >   deriving Eq
->
+> 
 > data UnaryOp = Neg | Not
 >   deriving Eq
->
+> 
 > data Exp = Literal   Value
 >          | Unary     UnaryOp Exp
 >          | Binary    BinaryOp Exp Exp
@@ -1079,7 +1080,7 @@ perform the actual computations for binary and unary operations, respectively. %
 
 INCLUDE:More12
 > type Env = [(String, Value)]
->
+> 
 > -- Evaluate an expression in an environment
 > evaluate :: Exp -> Env -> Value
 > evaluate exp env = eval exp where
@@ -1107,7 +1108,7 @@ and the arguments to compute the result of basic operations. %More15
 INCLUDE:More16
 > unary Not (Bool b) = Bool (not b)
 > unary Neg (Int i)  = Int (-i)
->
+> 
 > binary Add (Int a)  (Int b)  = Int (a + b)
 > binary Sub (Int a)  (Int b)  = Int (a - b)
 > binary Mul (Int a)  (Int b)  = Int (a * b)
@@ -1146,7 +1147,7 @@ In addition, new expressions can be defined to represent conditional expressions
 
 INCLUDE:More98
 > -- if 3 > 3*(8 + 5) then 1 else 0
-> t6 = If (Binary GT (Literal (Int 3)) t4'4)
+> t6 = If (Binary GT (Literal (Int 3)) t4)
 >         (Literal (Int 1))
 >         (Literal (Int 0))
 > -- 2 + (if 3 <= 0 then 9 else -5)
@@ -1331,7 +1332,7 @@ INCLUDE:Top22
 >             (Call "power" [Variable  "n",
 >                            Binary  Sub (Variable  "m")
 >                                          (Literal (Int 1))])))
->
+> 
 > p1 = Program [("power", f1)]
 >              (Call "power" [Literal (Int 3),
 >                             Literal (Int 4)])
@@ -1470,7 +1471,9 @@ INCLUDE:Summ12
 >          | Variable  String
 >          | Let       String Exp Exp
 >          | Call      String [Exp]
->
+>       
+> type Env = [(String, Value)]
+>    
 > evaluate :: Exp -> Env -> FunEnv -> Value
 > evaluate exp env funEnv = eval exp where
 >     eval (Literal v)      = v
@@ -1752,7 +1755,8 @@ For example, given the standard Haskell function |negate|
 that inverts the sign of a number, it is easy to quickly negate a list of numbers: %Mapp3
 
 INCLUDE:Mapp4
-> testM1 = map negate [1, 3, -7, 0, 12]   -- returns [-1, -3, 7, 0, -12]
+> testM1 = map negate [1, 3, -7, 0, 12]   
+> -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp4
 
 The |map| function takes a function as an argument. You can see that
@@ -1771,7 +1775,8 @@ use list comprehensions rather than |map|, because list comprehensions give
 a nice name to the items of the list. Here is an equivalent example using comprehensions: %Mapp8
 
 INCLUDE:Mapp9
-> testm2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   -- returns [-1, -3, 7, 0, -12]
+> testM2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   
+> -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp9
 
 A function that takes another function as an input is called a *higher-order function*.
@@ -1813,6 +1818,7 @@ same environment as a function: %Repr4
 
 INCLUDE:Repl801
 > type EnvF = String -> Maybe Value
+> -- %Repl801
 
 INCLUDE:Repr5
 > envF1 "x"    = Just (Int 3)
@@ -1967,14 +1973,15 @@ use functional environments rather than lists of bindings. For
 example, the environment-based evaluation function becomes: %Repr33
 
 INCLUDE:Repr34
-> evaluatea :: Exp -> EnvF -> Value
-> evaluatea exp env = eval exp where
+> -- Evaluate an expression in a (functional) environment
+> evaluateF :: Exp -> EnvF -> Value
+> evaluateF exp env = eval exp where
 >     eval (Literal v)      = v
 >     eval (Unary op a)     = unary op (eval a)
 >     eval (Binary op a b)  = binary op (eval a) (eval b)
 >     eval (Variable x)     = fromJust (env x)            -- changed
->     eval (Let x exp body) = evaluatea body newEnv
->       where newEnv = bindF x (eval exp) env               -- changed
+>     eval (Let x exp body) = evaluateF body newEnv
+>       where newEnv = bindF x (eval exp) env             -- changed
 > -- %Repr34
 
 The result looks better than the previous version, because
@@ -2007,20 +2014,20 @@ The |b| argument can be moved to the right hand side to
 get an equivalent definition:  %Mult30
 
 INCLUDE:Mult31
-> Add a = \b -> b + a
+> add'1 a = \b -> b + a
 > -- %Mult31
 
 Now the |a| argument can also be moved. We have now
 "solved" for |add|:  %Mult32
 
 INCLUDE:Mult33
-> Add = \a -> \b -> b + a
+> add'2 = \a -> \b -> b + a
 > -- %Mult33
 
 It's useful to add parentheses to make the grouping explicit:  %Mult34
 
 INCLUDE:Mult35
-> Add = \a -> (\b -> b + a)
+> add'3 = \a -> (\b -> b + a)
 > -- %Mult35
 
 What this means is that |add| is a function of one argument |a|
@@ -2360,9 +2367,10 @@ to be called, the |Call| expression now contains an expression |Exp|
 for both the function and the argument: %A8
 
 INCLUDE:A32
-> data Value = Scalar'8 Value
+> data Value = Int  Int
+>            | Bool Bool
 >            | Function String Exp  -- new
->   deriving Eq
+>   deriving (Eq, Show)
 > -- %A32
 
 To create the new value type, the simpler type of basic |Value|
@@ -2395,7 +2403,7 @@ INCLUDE:A15
 >  Let "f" (Literal (Function "x"
 >                       (Binary Mul (Variable "x")
 >                                   (Variable "x"))))
->    (Call (Variable "f") (Literal (Scalar'8 (Int 10))))
+>    (Call (Variable "f") (Literal (Int 10)))
 > -- %A15
 
 Note that the function in the |Call| is string |\"f\"|
@@ -2483,8 +2491,8 @@ INCLUDE:Prob5
 >                 (Binary Add (Variable "b")
 >                             (Variable "a"))))))
 >              (Call (Call (Variable "add")
->                              (Literal (Scalar'8 (Int 3))))
->                    (Literal (Scalar'8 (Int 2))))
+>                              (Literal (Int 3)))
+>                    (Literal (Int 2)))
 > -- %Prob5
 
 Rather than work with the ugly constructor syntax in
@@ -2593,7 +2601,8 @@ Closures have all the same information as a function expressions
 one important difference: closures also contain an environment.  %A46
 
 INCLUDE:A42
-> data Value = Scalar'7 Value
+> data Value = Int  Int
+>            | Bool Bool
 >            | Closure String Exp Env  -- new
 >   deriving (Eq, Show)
 > -- %A42
@@ -2761,15 +2770,15 @@ INCLUDE:Summ14
 >          | Function  String Exp      -- new
 >          | Call      Exp Exp         -- changed
 >   deriving (Eq, Show)
->
+>   
 > type Env = [(String, Value)]
->
+> 
 > evaluate :: Exp -> Env -> Value
 > evaluate exp env = eval exp where
 >     eval (Literal v)      = v
 >     eval (Unary op a)     = unary op (eval a)
 >     eval (Binary op a b)  = binary op (eval a) (eval b)
->     eval (If a b c)       = if fromBool'7 (eval a)
+>     eval (If a b c)       = if fromBool (eval a)
 >                             then eval b
 >                             else eval c
 >     eval (Variable x)     = fromJust (lookup x env)
@@ -2779,11 +2788,8 @@ INCLUDE:Summ14
 >     eval (Call fun arg)   = evaluate body newEnv    -- changed
 >       where Closure x body closeEnv = eval fun
 >             newEnv = (x, eval arg) : closeEnv
->
-> fromBool'7 (Scalar'7 (Bool b)) = b
->
-> Unary op (Scalar'7 a) = Scalar'7 (unary op a)
-> Binary op (Scalar'7 a) (Scalar'7 b) = Scalar'7 (binary op a b)
+> 
+> fromBool ((Bool b)) = b
 > -- %Summ14
 
  # Recursive Definitions
@@ -3426,7 +3432,8 @@ do anything with the argument other than return it. Since it can be
 applied to any value, it can be applied to itself:  %A62
 
 INCLUDE:A63
-> testID = id(id)   -- returns id
+> testID = id(id)   
+> -- returns id
 > -- %A63
 
 Self application is not a very common technique, but it is certainly
@@ -3677,12 +3684,24 @@ The |binary| helper
 function must be updated to signal divide by zero: %Hand22
 
 INCLUDE:Hand17
+> checked_unary :: UnaryOp -> Value -> Checked Value
+> checked_unary Not (Bool b) = Good (Bool (not b))
+> checked_unary Neg (Int i)  = Good (Int (-i))
+> 
 > checked_binary :: BinaryOp -> Value -> Value -> Checked Value
-> checked_binary Div (Scalar'7 (Int a)) (Scalar'7 (Int b)) =
->   if b == 0
->   then Error "Divide by zero"
->   else Good (Scalar'7 (Int (a `div` b)))
-> checked_binary op a b = Good (Binary op a b)
+> checked_binary Add (Int a)  (Int b)  = Good (Int (a + b))
+> checked_binary Sub (Int a)  (Int b)  = Good (Int (a - b))
+> checked_binary Mul (Int a)  (Int b)  = Good (Int (a * b))
+> checked_binary Div (Int a)  (Int 0)  = Error "Divide by zero"
+> checked_binary Div (Int a)  (Int b)  = Good (Int (a `div` b))
+> checked_binary And (Bool a) (Bool b) = Good (Bool (a && b))
+> checked_binary Or  (Bool a) (Bool b) = Good (Bool (a || b))
+> checked_binary LT  (Int a)  (Int b)  = Good (Bool (a < b))
+> checked_binary LE  (Int a)  (Int b)  = Good (Bool (a <= b))
+> checked_binary GE  (Int a)  (Int b)  = Good (Bool (a >= b))
+> checked_binary GT  (Int a)  (Int b)  = Good (Bool (a > b))
+> checked_binary EQ  a        b        = Good (Bool (a == b))
+> checked_binary _   _        _        = Error "Type error"
 > -- %Hand17
 
 All the other cases are the same as before, so |checked_binary|
@@ -3703,7 +3722,7 @@ The result of evaluation is: %Hand29
 Or for divide by zero: %Hand31
 
 INCLUDE:Hand32
-> testDBZ2 = evaluate (Binary Div (Literal (Scalar'7 (Int 3))) (Literal (Scalar'7 (Int 0))) ) []
+> testDBZ2 = evaluate (Binary Div (Literal (Int 3)) (Literal (Int 0)) ) []
 > -- %Hand32
 
 The result of evaluation is: %Hand33
@@ -3722,7 +3741,7 @@ remaining expression cases, including
 |if|, non-recursive |let|, and function definition/calls.
 Ensure that all errors, including pattern match failures,
 are captured by your code and converted to |Error| values,
-rather than causing Haskell execution errors.
+rather than causing Haskell execution errors. %Exer8
 
 As a bonus, implement error checking for recursive |let|
 expressions. %Exer5
@@ -3856,7 +3875,8 @@ addresses is as integers. Using integers as addresses is also similar to the
 use of integers for addresses in a computer memory. %Addr10
 
 INCLUDE:Addr11
-> data Value = Scalar Value
+> data Value = Int  Int
+>            | Bool Bool
 >            | Closure String Exp Env
 >            | Address Int        -- new
 >   deriving (Eq, Show)
@@ -4004,9 +4024,8 @@ INCLUDE:Upda7
 > mul10 addr mem =
 >   let n = fromInt (access addr mem) in
 >     update addr (toValue (10 * n)) mem
->
-> fromInt (Scalar (Int n)) = n
-> toValue n = (Scalar (Int n))
+> fromInt (Int n) = n
+> toValue n = (Int n)
 > -- %Upda7
 
 Here is an example calling |mul10| on a memory with 4 cells: %Upda8
@@ -4203,9 +4222,8 @@ INCLUDE:Summ7
 >          | Access    Exp         -- new
 >          | Assign    Exp Exp   -- new
 >   deriving (Eq, Show)
->
+>   
 > type Env = [(String, Value)]
->
 > -- %Summ7
 
 All the existing cases of the evaluator are modified: %Summ8
@@ -4216,11 +4234,11 @@ INCLUDE:Summ9
 >     eval (Literal v) mem    = (v, mem)
 >     eval (Unary op a) mem   =
 >       let (av, mem') = eval a mem in
->         (Unary op av, mem')
+>         (unary op av, mem')
 >     eval (Binary op a b) mem =
 >       let (av, mem') = eval a mem in
 >         let (bv, mem'') = eval b mem' in
->           (Binary op av bv, mem'')
+>           (binary op av bv, mem'')
 >     eval (If a b c) mem =
 >       let (av, mem') = eval a mem in
 >         eval (if fromBool av then b else c) mem'
@@ -4252,11 +4270,7 @@ INCLUDE:Summ11
 >       let (Address i, mem') = eval a mem in
 >         let (ev, mem'') = eval e mem' in
 >           (ev, update i ev mem'')
->
-> fromBool (Scalar (Bool b)) = b
->
-> Unary op (Scalar a) = Scalar (unary op a)
-> Binary op (Scalar a) (Scalar b) = Scalar (binary op a b)
+> fromBool (Bool b) = b
 > -- %Summ11
 
  #### Exercise 5.6: Errors and Mutable State
@@ -4562,7 +4576,7 @@ INCLUDE:Mona13
 >         Just v  -> return v
 >     eval (Unary op a) = do
 >       av <- eval a
->       return (Unary op av)
+>       checked_unary op av
 >     eval (Binary op a b) = do
 >       av <- eval a
 >       bv <- eval b
@@ -4570,7 +4584,7 @@ INCLUDE:Mona13
 >     eval (If a b c) = do
 >       av <- eval a
 >       case av of
->         Scalar'7 (Bool cond) -> eval (if cond then b else c)
+>         (Bool cond) -> eval (if cond then b else c)
 >         _ -> Error ("Expected boolean but found " ++ show av)
 >     eval (Let x e body) = do    -- non-recursive case
 >       ev <- eval e

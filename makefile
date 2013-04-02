@@ -13,11 +13,13 @@ pretty: anatomy.pdf
 	open anatomy.pdf
 
 updates: new.lhs
-	ruby tags.rb | ruby includes.rb "src/*.hs" ">" > new.lhs
 
-diff: updates
+diff: new.lhs
 	diff anatomy.lhs new.lhs
 	
+new.lhs: anatomy.lhs
+	ruby tags.rb | ruby includes.rb "src/*.hs" ">" > new.lhs
+
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
 	cp new.lhs anatomy.lhs
