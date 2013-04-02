@@ -2,20 +2,6 @@
 % William R. Cook
 % Copyright (C) 2013
 
-> --------------------BEGIN-HIDE-------------------------
-> {-# OPTIONS -XRankNTypes #-}
-> import Prelude hiding (LT, GT, EQ, id)
-> import Data.Maybe
->
-> main_list = [main'1, main'2, main'4, main'5, check1, main'6, main'10]
-> main = do
->   sequence [ do
->     putStrLn ("---- " ++ show i ++ " ----")
->     cmd | (i, cmd) <- zip [1..] main_list]
->   return ()
-> check msg a b = putStrLn (if a == b then "OK" else "*** CHECK " ++ msg ++ " Failed ***")
-> --------------------END-HIDE-------------------------
-
  # Preliminaries
 
  ## Preface
@@ -176,11 +162,12 @@ and deal with concrete syntax later. %Simp9
 
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
-> data Exp'1 = Number'1     Int
->          | Add'1        Exp'1 Exp'1
->          | Subtract'1   Exp'1 Exp'1
->          | Multiply'1   Exp'1 Exp'1
->          | Divide'1     Exp'1 Exp'1
+INCLUDE:Abst3
+> data Exp = Number     Int
+>          | Add        Exp Exp
+>          | Subtract   Exp Exp
+>          | Multiply   Exp Exp
+>          | Divide     Exp Exp
 > -- %Abst3
 
 This data type defines five representational variants, one for numbers,
@@ -191,24 +178,29 @@ A number that appears in a program is called a *literal*. %Abst4
 The five examples given above can be written as values of type |Exp| to
 create five test cases: %Abst5
 
+INCLUDE:Abst1
 > -- 4
-> t1 = Number'1 4
+> t1 = Number 4
 > -- %Abst1
 
+INCLUDE:Abst6
 > -- -5 + 6
-> t2 = Add'1 (Number'1 (-5)) (Number'1 6)
+> t2 = Add (Number (-5)) (Number 6)
 > -- %Abst6
 
+INCLUDE:Abst15
 > -- 3 - (-2) - (-7)
-> t3 = Subtract'1 (Subtract'1 (Number'1 3) (Number'1 (-2))) (Number'1 (-7))
+> t3 = Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
 > -- %Abst15
 
+INCLUDE:Abst16
 > -- 3 * (8 + 5)
-> t4 = Multiply'1 (Number'1 3) (Add'1 (Number'1 8) (Number'1 5))
+> t4 = Multiply (Number 3) (Add (Number 8) (Number 5))
 > -- %Abst16
 
+INCLUDE:Abst17
 > -- 3 + 8 * 2
-> t5 = Add'1 (Number'1 3) (Multiply'1 (Number'1 8) (Number'1 2))
+> t5 = Add (Number 3) (Multiply (Number 8) (Number 2))
 > -- %Abst17
 
 Each test case is preceded by a comment giving the concise notation for
@@ -243,25 +235,27 @@ The normal meaning assigned to arithmetic expressions is the evaluation of the
 arithmetic operators to compute a final answer. This evaluation process is
 defined by cases in Haskell: %Eval2
 
-> evaluate'1 :: Exp'1 -> Int
-> evaluate'1 (Number'1 i)      = i
-> evaluate'1 (Add'1 a b)       = evaluate'1 a + evaluate'1 b
-> evaluate'1 (Subtract'1 a b)  = evaluate'1 a - evaluate'1 b
-> evaluate'1 (Multiply'1 a b)  = evaluate'1 a * evaluate'1 b
-> evaluate'1 (Divide'1 a b)    = evaluate'1 a `div` evaluate'1 b
+INCLUDE:Eval3
+> evaluate :: Exp -> Int
+> evaluate (Number i)      = i
+> evaluate (Add a b)       = evaluate a + evaluate b
+> evaluate (Subtract a b)  = evaluate a - evaluate b
+> evaluate (Multiply a b)  = evaluate a * evaluate b
+> evaluate (Divide a b)    = evaluate a `div` evaluate b
 > -- %Eval3
 
 In Haskell, the two-argument function |div| can be used as an
 infix operator by surrounding it in back-quotes.
 Here is a main program that tests evaluation: %Eval4
 
-> main'1 = do
+INCLUDE:Eval5
+> main = do
 >   putStrLn "Evaluating the following expression:"
 >   putStr "  "
 >   print t3
 >   putStrLn "Produces the following result:"
 >   putStr "  "
->   print (evaluate'1 t3)
+>   print (evaluate t3)
 > -- %Eval5
 
 The output is %Eval6
@@ -282,16 +276,14 @@ Another way to interpret abstract |Exp| values is as
 a string that corresponds to our normal way of writing arithmetic
 expressions, with binary operators for |+|, |*|, |-| and |/|. %Form2
 
-````
-instance Show Exp where
-  show (Number i)      = show i
-  show (Add a b)       = showBinary a "+" b
-  show (Subtract a b)  = showBinary a "-" b
-  show (Multiply a b)  = showBinary a "*" b
-  show (Divide a b)  = showBinary a "/" b
-showBinary a op b = show a ++ op ++ show b
-%Form10
-````
+INCLUDE:Form10
+> instance Show Exp where
+>   show (Number i)      = show i
+>   show (Add a b)       = showBinary a "+" b
+>   show (Subtract a b)  = showBinary a "-" b
+>   show (Multiply a b)  = showBinary a "*" b
+>   show (Divide a b)  = showBinary a "/" b
+> showBinary a op b = show a ++ op ++ show b
 
 If you don't know about *instance* declarations in Haskell, please
 go and read about *type classes*. (TODO: need citation here) %Form4
@@ -301,6 +293,7 @@ to the |eval| function, but it performs string concatenation instead
 of numeric operations. To test many different
 kinds of functions, it is useful to define a generalized test function. %Form5
 
+INCLUDE:Form6
 > test fun input = do
 >   putStr "    "
 >   putStr (show input)
@@ -313,12 +306,13 @@ prints the input and then prints the result of applying the function to the inpu
 The following main program invokes |test| to evaluate each of the
 five sample expressions defined above: %Form7
 
-> main'2 = do
->   test evaluate'1 t1
->   test evaluate'1 t2
->   test evaluate'1 t3
->   test evaluate'1 t4
->   test evaluate'1 t5
+INCLUDE:Form8
+> main = do
+>   test evaluate t1
+>   test evaluate t2
+>   test evaluate t3
+>   test evaluate t4
+>   test evaluate t5
 > -- %Form8
 
 Running this main program produces less than satisfactory results: %Form9
@@ -341,6 +335,7 @@ showBinary a op b = paren (show a) ++ op ++ paren (show b)
 %Form15
 ````
 
+INCLUDE:Form13
 > paren str = "(" ++ str ++ ")"
 > -- %Form13
 
@@ -360,15 +355,17 @@ Multiplication |\*| has higher precedence than addition |+| because
 |1+2\*3| means |1+(2\*3)| not |(1+2)\*3|. In what follows,
 addition has precedence 1 and multiplication has precedence 2. %Form16
 
-> instance Show Exp'1 where
+INCLUDE:Form17
+> instance Show Exp where
 >   show e = showExp 0 e
 > -- %Form17
 
-> showExp level (Number'1 i) = if i < 0 then paren (show i) else show i
-> showExp level (Add'1 a b)       = showBinary level 1 a " + " b
-> showExp level (Subtract'1 a b)  = showBinary level 1 a " - " b
-> showExp level (Multiply'1 a b)  = showBinary level 2 a "*" b
-> showExp level (Divide'1 a b)    = showBinary level 2 a "/" b
+INCLUDE:Form18
+> showExp level (Number i) = if i < 0 then paren (show i) else show i
+> showExp level (Add a b)       = showBinary level 1 a " + " b
+> showExp level (Subtract a b)  = showBinary level 1 a " - " b
+> showExp level (Multiply a b)  = showBinary level 2 a "*" b
+> showExp level (Divide a b)    = showBinary level 2 a "/" b
 >
 > showBinary outer inner a op b =
 >   if inner < outer then paren result else result
@@ -399,7 +396,8 @@ There are many things that can go wrong when evaluating an expression.
 In our current, very simple language, the only error that can arise
 is attempting to divide by zero. For example, consider this small expression: %Erro2
 
-> testDBZ = evaluate'1 (Divide'1 (Number'1 8) (Number'1 0))
+INCLUDE:Erro3
+> testDBZ = evaluate (Divide (Number 8) (Number 0))
 > -- %Erro3
 
 In this case, the |div| operator in
@@ -433,29 +431,14 @@ as a string of characters, it is easy to represent variables as an additional
 kind of expression. The following data definition modifies |Exp| to include
 a |Variable| case. %Vari3
 
-> data Exp'2 = Number'2   Int
->          | Add'2      Exp'2 Exp'2
->          | Subtract'2 Exp'2 Exp'2
->          | Multiply'2 Exp'2 Exp'2
->          | Divide'2   Exp'2 Exp'2
->          | Variable'2 String        -- added
+INCLUDE:Vari99
+> data Exp = Number   Int
+>          | Add      Exp Exp
+>          | Subtract Exp Exp
+>          | Multiply Exp Exp
+>          | Divide   Exp Exp
+>          | Variable String        -- added
 > -- %Vari99
-
-> --------------------BEGIN-HIDE-------------------------
->    deriving Eq
-> instance Show Exp'2 where
->   show e = showExp'2 0 e
->
-> showExp'2 level (Number'2 i) = if i < 0 then paren (show i) else show i
-> showExp'2 level (Add'2 a b)       = showBinary'2 level 1 a " + " b
-> showExp'2 level (Subtract'2 a b)  = showBinary'2 level 1 a " - " b
-> showExp'2 level (Multiply'2 a b)  = showBinary'2 level 2 a "*" b
-> showExp'2 level (Divide'2 a b)    = showBinary'2 level 2 a "/" b
-> showExp'2 level (Variable'2 a)    = a
-> showBinary'2 outer inner a op b =
->   if inner < outer then paren result else result
->      where result = showExp'2 inner a ++ op ++ showExp'2 inner b
-> --------------------END-HIDE-------------------------
 
 An association of a variable $x$ with a value $v$ is called a *binding*,
 which can be written $x \mapsto v$.
@@ -520,16 +503,17 @@ Note that if the variable names don't match, they are left alone.
 Given these data types, the process of *substitution* can be defined by cases.
 The following Haskell function implements this behavior: %Subs8
 
-> substitute1:: (String, Int) -> Exp'2 -> Exp'2
+INCLUDE:Subs9
+> substitute1:: (String, Int) -> Exp -> Exp
 > substitute1 (var, val) exp = subst exp where
->   subst (Number'2 i)      = Number'2 i
->   subst (Add'2 a b)       = Add'2 (subst a) (subst b)
->   subst (Subtract'2 a b)  = Subtract'2 (subst a) (subst b)
->   subst (Multiply'2 a b)  = Multiply'2 (subst a) (subst b)
->   subst (Divide'2 a b)    = Divide'2 (subst a) (subst b)
->   subst (Variable'2 name) = if var == name
->                           then Number'2 val
->                           else Variable'2 name
+>   subst (Number i)      = Number i
+>   subst (Add a b)       = Add (subst a) (subst b)
+>   subst (Subtract a b)  = Subtract (subst a) (subst b)
+>   subst (Multiply a b)  = Multiply (subst a) (subst b)
+>   subst (Divide a b)    = Divide (subst a) (subst b)
+>   subst (Variable name) = if var == name
+>                           then Number val
+>                           else Variable name
 > -- %Subs9
 
 The |subst| helper function is introduced avoid repeating the |var| and |val|
@@ -540,18 +524,19 @@ The first case says that substituting a variable for a value in
 a literal expression leaves the literal unchanged. The next three cases define
 substitution on binary operators as recursively substituting into the sub-expressions
 of the operator. The final case is the only interesting one. It defines
-substitution into a |Variable'2| expression as a choice: if the variable in the
+substitution into a |Variable| expression as a choice: if the variable in the
 expression (|name|) is the *same* as the variable being substituted (|var|)
 then the value is %Subs10
 
-> x = Variable'2 "x"
-> y = Variable'2 "y"
-> main'4 = do
->   test (substitute1 ("x", 5)) (Add'2 x (Number'2 2))
->   test (substitute1 ("x", 5)) (Number'2 2)
+INCLUDE:Subs11
+> x = Variable "x"
+> y = Variable "y"
+> main = do
+>   test (substitute1 ("x", 5)) (Add x (Number 2))
+>   test (substitute1 ("x", 5)) (Number 2)
 >   test (substitute1 ("x", 5)) x
->   test (substitute1 ("x", 5)) (Add'2 (Multiply'2 x x) x)
->   test (substitute1 ("x", 5)) (Add'2 x y)
+>   test (substitute1 ("x", 5)) (Add (Multiply x x) x)
+>   test (substitute1 ("x", 5)) (Add x y)
 > -- %Subs11
 
 Running these tests produces the following results: %Subs12
@@ -582,28 +567,31 @@ Since a binding is represented as a pair, an environment can be
 represented as a list of pairs. The environment mentioned above
 would be %Mult3
 
+INCLUDE:Mult4
 > e1 = [ ("x", 3), ("y", -1) ]
 > -- %Mult4
 
 The corresponding type is %Mult5
 
+INCLUDE:Mult6
 > type Env = [(String, Int)]
 > -- %Mult6
 
 The substitution function is easily modified to work with
 environments rather than single bindings: %Mult7
 
-> substitute:: Env -> Exp'2 -> Exp'2
+INCLUDE:Mult8
+> substitute :: Env -> Exp -> Exp
 > substitute env exp = subst exp where
->   subst (Number'2 i)      = Number'2 i
->   subst (Add'2 a b)       = Add'2 (subst a) (subst b)
->   subst (Subtract'2 a b)  = Subtract'2 (subst a) (subst b)
->   subst (Multiply'2 a b)  = Multiply'2 (subst a) (subst b)
->   subst (Divide'2 a b)    = Divide'2 (subst a) (subst b)
->   subst (Variable'2 name) =
+>   subst (Number i)      = Number i
+>   subst (Add a b)       = Add (subst a) (subst b)
+>   subst (Subtract a b)  = Subtract (subst a) (subst b)
+>   subst (Multiply a b)  = Multiply (subst a) (subst b)
+>   subst (Divide a b)    = Divide (subst a) (subst b)
+>   subst (Variable name) =
 >     case lookup name env of
->       Just val -> Number'2 val
->       Nothing  -> Variable'2 name
+>       Just val -> Number val
+>       Nothing  -> Variable name
 > -- %Mult8
 
 The last case is the only one that is different from the previous
@@ -613,13 +601,14 @@ the corresponding value (|Just val|) or |Nothing| if the variable
 is not found. For the |Nothing| case, the substitute function
 leaves the variable alone. %Mult9
 
-> z = Variable'2 "z"
-> main'5 = do
->   test (substitute e1) (Add'2 x y)
->   test (substitute e1) (Number'2 2)
+INCLUDE:Mult10
+> z = Variable "z"
+> main = do
+>   test (substitute e1) (Add x y)
+>   test (substitute e1) (Number 2)
 >   test (substitute e1) x
->   test (substitute e1) (Add'2 (Multiply'2 x x) x)
->   test (substitute e1) (Add'2 x (Add'2 (Multiply'2 (Number'2 2) y) z))
+>   test (substitute e1) (Add (Multiply x x) x)
+>   test (substitute e1) (Add x (Add (Multiply (Number 2) y) z))
 > -- %Mult10
 
 The test results show that multiple variables are substituted with
@@ -636,16 +625,12 @@ x + 2*y + z ==> 3 + 2*(-1) + z
 
 Note that it is also possible to substitute multiple variables one at a time: %Mult13
 
+INCLUDE:Mult14
 > substitute'2 env exp = foldr substitute1 exp env
 > -- %Mult14
 
 The |foldr fun init list| function applies a given function to each item
 in a list, starting with a given initial value. %Mult15
-
-> --------------------BEGIN-HIDE-------------------------
-> exp1 = Add'2 x (Add'2 (Multiply'2 (Number'2 2) y) z)
-> check1 = check "subst-fold" (substitute e1 exp1) (substitute'2 e1 exp1)
-> --------------------END-HIDE-------------------------
 
  ### Local Variables
 
@@ -672,12 +657,14 @@ return 2*x + 5;
 
 Haskell and ML define local variables with a |let| expression: %Loca7
 
+INCLUDE:Loca8
 > test1 = let x = 3 in 2*x + 5
 > -- %Loca8
 
 In these languages |let| is an expression, because it can be
 used inside other expressions: %Loca9
 
+INCLUDE:Loca10
 > test2 = 2 * (let x = 3 in x + 5)
 > -- %Loca10
 
@@ -694,11 +681,13 @@ return x + y;
 
 and Haskell or ML %Loca14
 
+INCLUDE:Loca15
 > test3 = let x = 3 in let y = x*2 in x + y
 > -- %Loca15
 
 which is equivalent to %Loca16
 
+INCLUDE:Loca17
 > test4 = let x = 3 in (let y = x*2 in x + y)
 > -- %Loca17
 
@@ -714,8 +703,8 @@ In Haskell, a |let| expression can be represented by adding
 another case to the definition of expressions: %Loca21
 
 ````
-data Exp'3 = ...
-         | Let'3 String Exp'3 Exp'3
+data Exp = ...
+         | Let String Exp Exp
 %Loca22
 ````
 
@@ -751,7 +740,7 @@ Because *x* is redefined, the *body* is a hole in the scope of *x*.  %Subs1
 ````
 substitute1'3 (var, val) exp = subst exp
   ...
-  subst (Let'3 x exp body)  = Let'3 x (subst exp) body'
+  subst (Let x exp body)  = Let x (subst exp) body'
     where body' = if x == var
                   then body
                   else subst body
@@ -774,9 +763,9 @@ for variable *x* in the body *b*. Finally, the result of
 substitution is evaluated.  %Eval1
 
 ````
-evaluate'3 :: Exp'3 -> Int
+evaluate :: Exp -> Int
 ...
-evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) body)
+evaluate (Let x exp body) = evaluate (substitute1'3 (x, evaluate exp) body)
 %Eval28
 ````
 
@@ -807,7 +796,7 @@ is not substituted then it is undefined. Since no case is defined for
 error message: %Unde4
 
 ````
- *** Exception: anatomy.lhs: Non-exhaustive patterns in function evaluate'3
+ *** Exception: anatomy.lhs: Non-exhaustive patterns in function evaluate
 %Unde19
 ````
 
@@ -828,36 +817,40 @@ is discussed in more detail later (TODO: reference to chapter on Types). %Unde6
 Here is the full code evaluation using substitution of a language
 with local variables. %Summ2
 
-> data Exp'3 = Number'3     Int
->          | Add'3        Exp'3 Exp'3
->          | Subtract'3   Exp'3 Exp'3
->          | Multiply'3   Exp'3 Exp'3
->          | Divide'3     Exp'3 Exp'3
->          | Variable'3   String
->          | Let'3        String Exp'3 Exp'3
->
+INCLUDE:Summ3
+> data Exp = Number     Int
+>          | Add        Exp Exp
+>          | Subtract   Exp Exp
+>          | Multiply   Exp Exp
+>          | Divide     Exp Exp
+>          | Variable   String
+>          | Let        String Exp Exp
+> -- %Summ3
+
+INCLUDE:Summ19
 > substitute1'3 (var, val) exp = subst exp where
->   subst (Number'3 i)      = Number'3 i
->   subst (Add'3 a b)       = Add'3 (subst a) (subst b)
->   subst (Subtract'3 a b)  = Subtract'3 (subst a) (subst b)
->   subst (Multiply'3 a b)  = Multiply'3 (subst a) (subst b)
->   subst (Divide'3 a b)    = Divide'3 (subst a) (subst b)
->   subst (Variable'3 name) = if var == name
->                           then Number'3 val
->                           else Variable'3 name
->   subst (Let'3 x exp body)  = Let'3 x (subst exp) body'
+>   subst (Number i)      = Number i
+>   subst (Add a b)       = Add (subst a) (subst b)
+>   subst (Subtract a b)  = Subtract (subst a) (subst b)
+>   subst (Multiply a b)  = Multiply (subst a) (subst b)
+>   subst (Divide a b)    = Divide (subst a) (subst b)
+>   subst (Variable name) = if var == name
+>                           then Number val
+>                           else Variable name
+>   subst (Let x exp body)  = Let x (subst exp) body'
 >     where body' = if x == var
 >                   then body
 >                   else subst body
-> -- %Summ3
+> -- %Summ19
 
-> evaluate'3 :: Exp'3 -> Int
-> evaluate'3 (Number'3 i)       = i
-> evaluate'3 (Add'3 a b)        = evaluate'3 a + evaluate'3 b
-> evaluate'3 (Subtract'3 a b)   = evaluate'3 a - evaluate'3 b
-> evaluate'3 (Multiply'3 a b)   = evaluate'3 a * evaluate'3 b
-> evaluate'3 (Divide'3 a b)     = evaluate'3 a `div` evaluate'3 b
-> evaluate'3 (Let'3 x exp body) = evaluate'3 (substitute1'3 (x, evaluate'3 exp) body)
+INCLUDE:Summ4
+> evaluate :: Exp -> Int
+> evaluate (Number i)       = i
+> evaluate (Add a b)        = evaluate a + evaluate b
+> evaluate (Subtract a b)   = evaluate a - evaluate b
+> evaluate (Multiply a b)   = evaluate a * evaluate b
+> evaluate (Divide a b)     = evaluate a `div` evaluate b
+> evaluate (Let x exp body) = evaluate (substitute1'3 (x, evaluate exp) body)
 > -- %Summ4
 
  ## Evaluation using Environments {#BasicEvalEnv}
@@ -874,6 +867,7 @@ the body of the inner let expression is copied multiple times.
 In the following example, the expression |x\*y\*z| is copied
 three times:  %Eval32
 
+INCLUDE:Eval33
 > test5 = let x = 2 in
 >   let y = x+1 in
 >     let z = y+2 in
@@ -902,18 +896,20 @@ fully for each |let| expression, instead the |let|
 expression can add another binding to the list
 of substitutions being performed.  %Eval36
 
+INCLUDE:Eval38
 > -- Evaluate an expression in an environment
-> evaluate'4 :: Exp'3 -> Env -> Int
-> evaluate'4 exp env = eval exp where
->   eval (Number'3 i)      = i
->   eval (Add'3 a b)       = eval a + eval b
->   eval (Subtract'3 a b)  = eval a - eval b
->   eval (Multiply'3 a b)  = eval a * eval b
->   eval (Divide'3 a b)    = eval a `div` eval b
+> evaluate :: Exp -> Env -> Int
+> evaluate exp env = eval exp where
+>   eval (Number i)      = i
+>   eval (Add a b)       = eval a + eval b
+>   eval (Subtract a b)  = eval a - eval b
+>   eval (Multiply a b)  = eval a * eval b
+>   eval (Divide a b)    = eval a `div` eval b
 > -- %Eval38
 
->   eval (Variable'3 x)    = fromJust (lookup x env)
->   eval (Let'3 x exp body)     = evaluate'4 body newEnv
+INCLUDE:Eval9
+>   eval (Variable x)    = fromJust (lookup x env)
+>   eval (Let x exp body)     = evaluate body newEnv
 >     where newEnv = (x, eval exp) : env
 > -- %Eval9
 
@@ -960,6 +956,7 @@ find the most recent enclosing binding for a variable, and ignore any
 additional bindings. For example, consider the evaluation of this
 expression: %Eval15
 
+INCLUDE:Eval16
 > test6 = let x = 9 in (let x = x*x in x+x)
 > -- %Eval16
 
@@ -985,6 +982,7 @@ is not changed, so there is no need to reset or restore the previous
 environment. For example, evaluating the following expression
 creates to extensions of the base environment %Eval19
 
+INCLUDE:Eval20
 > test7 = let x = 3 in
 >   (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
 > -- %Eval20
@@ -1019,16 +1017,11 @@ Until now our expressions have always returned |Int| results, because
 they have only performed arithmetic computations. The type |Value|
 is defined to support multiple different kinds of values: %More2
 
+INCLUDE:More3
 > data Value = Int  Int
 >            | Bool Bool
 >  deriving Eq
 > -- %More3
-
-> --------------------BEGIN-HIDE-------------------------
-> instance Show Value where
->   show (Int i) = if i < 0 then paren (show i) else show i
->   show (Bool b) = show b
-> --------------------END-HIDE-------------------------
 
 Some example values are |Bool True| and
 |Int 3|. We will define additional kinds of values, including functions and lists, later.
@@ -1064,6 +1057,7 @@ is fairly special, it is included directly as |If| expression.
 These changes are implemented in the
 following definition for the abstract syntax |Exp|: %More9
 
+INCLUDE:More99
 > data BinaryOp = Add | Sub | Mul | Div | And | Or
 >               | GT | LT | LE | GE | EQ
 >   deriving Eq
@@ -1071,61 +1065,37 @@ following definition for the abstract syntax |Exp|: %More9
 > data UnaryOp = Neg | Not
 >   deriving Eq
 >
-> data Exp'4 = Literal'4   Value
->          | Unary'4     UnaryOp Exp'4
->          | Binary'4    BinaryOp Exp'4 Exp'4
->          | If'4        Exp'4 Exp'4 Exp'4
->          | Variable'4  String
->          | Let'4       String Exp'4 Exp'4
+> data Exp = Literal   Value
+>          | Unary     UnaryOp Exp
+>          | Binary    BinaryOp Exp Exp
+>          | If        Exp Exp Exp
+>          | Variable  String
+>          | Let       String Exp Exp
 >   deriving Eq
 > -- %More99
-
-> --------------------BEGIN-HIDE-------------------------
-> instance Show BinaryOp where
->   show op = fromJust (lookup op [(Add, " + "), (Sub, " - "), (Mul, "*"), (Div, "/"), (And, "&"), (Or, " | "),
->                                   (LT, " < "), (LE, " <= "), (GE, " >= "), (GT, " > "), (EQ, " = ")])
-> instance Show UnaryOp where
->   show op = fromJust (lookup op [(Neg, "-"), (Not, "not ")])
-> instance Show Exp'4 where
->   show e = showExp'4 0 e
->
-> showExp'4 level (Literal'4 v)     = show v
-> showExp'4 level (Variable'4 a)    = a
-> showExp'4 level (Unary'4 op a)    = show op ++ showExp'4 99 a
-> showExp'4 level (Binary'4 op a b) = showBinary'4 level (precedence op) a op b
-> showExp'4 level (Let'4 x exp body) =
->   if 0 < level then paren result else result
->      where result = "let " ++ x ++ " = " ++ showExp'4 0 exp ++ " in " ++ showExp'4 0 body
-> showExp'4 level (If'4 c a b) =
->   if 0 < level then paren result else result
->      where result = "if " ++ showExp'4 0 c ++ " then " ++ showExp'4 0 a ++ " else " ++ showExp'4 0 b
-> showBinary'4 outer inner a op b =
->   if inner < outer then paren result else result
->      where result = showExp'4 inner a ++ show op ++ showExp'4 inner b
-> precedence op = fromJust (lookup op [(Add, 4), (Sub, 4), (Mul, 5), (Div, 5), (And, 2), (Or, 1),
->                                      (LT, 3), (LE, 3), (GE, 3), (GT, 3), (EQ, 3)])
-> --------------------END-HIDE-------------------------
 
 Evaluation is then defined by cases as before. Two helper functions, |binary| and |unary| (defined below),
 perform the actual computations for binary and unary operations, respectively. %More11
 
-> type Env'1 = [(String, Value)]
+INCLUDE:More12
+> type Env = [(String, Value)]
 >
 > -- Evaluate an expression in an environment
-> evaluate'5 :: Exp'4 -> Env'1 -> Value
-> evaluate'5 exp env = eval exp where
->     eval (Literal'4 v)      = v
->     eval (Unary'4 op a)     = unary op (eval a)
->     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
->     eval (Variable'4 x)     = fromJust (lookup x env)
->     eval (Let'4 x exp body) = evaluate'5 body newEnv
+> evaluate :: Exp -> Env -> Value
+> evaluate exp env = eval exp where
+>     eval (Literal v)      = v
+>     eval (Unary op a)     = unary op (eval a)
+>     eval (Binary op a b)  = binary op (eval a) (eval b)
+>     eval (Variable x)     = fromJust (lookup x env)
+>     eval (Let x exp body) = evaluate body newEnv
 >       where newEnv = (x, eval exp) : env
 > -- %More12
 
 The conditional expression first evaluates the condition, forces it to be a boolean,
 and then evaluates either the *then* or *else* expression. %More13
 
->     eval (If'4 a b c)      = if fromBool (eval a)
+INCLUDE:More14
+>     eval (If a b c)      = if fromBool (eval a)
 >                            then eval b
 >                            else eval c
 > fromBool (Bool b) = b
@@ -1134,6 +1104,7 @@ and then evaluates either the *then* or *else* expression. %More13
 The binary and unary helper functions perform case analysis on the operator
 and the arguments to compute the result of basic operations. %More15
 
+INCLUDE:More16
 > unary Not (Bool b) = Bool (not b)
 > unary Neg (Int i)  = Int (-i)
 >
@@ -1155,45 +1126,36 @@ TODO: talk about strictness! %More17
 Using the new format, here are the expressions for the test
 cases given above: %More18
 
+INCLUDE:More19
 > -- 4
-> t1'4 = Literal'4 (Int 4)
+> t1 = Literal (Int 4)
 > -- -4 - 6
-> t2'4 = Binary'4 Sub (Literal'4 (Int (-4))) (Literal'4 (Int 6))
+> t2 = Binary Sub (Literal (Int (-4))) (Literal (Int 6))
 > -- 3 - (-2) - (-7)
-> t3'4 = Binary'4 Sub (Literal'4 (Int 3))
->                 (Binary'4 Sub (Literal'4 (Int (-2))) (Literal'4 (Int (-7))))
+> t3 = Binary Sub (Literal (Int 3))
+>                 (Binary Sub (Literal (Int (-2))) (Literal (Int (-7))))
 > -- 3*(8 + 5)
-> t4'4 = Binary'4 Mul (Literal'4 (Int 3))
->                 (Binary'4 Add (Literal'4 (Int 8)) (Literal'4 (Int 5)))
+> t4 = Binary Mul (Literal (Int 3))
+>                 (Binary Add (Literal (Int 8)) (Literal (Int 5)))
 > -- 3 + 8 * 2
-> t5'4 = Binary'4 Add (Literal'4 (Int 3))
->                 (Binary'4 Mul (Literal'4 (Int 8)) (Literal'4 (Int 2)))
+> t5 = Binary Add (Literal (Int 3))
+>                 (Binary Mul (Literal (Int 8)) (Literal (Int 2)))
 > -- %More19
 
 In addition, new expressions can be defined to represent conditional expressions: %More20
 
+INCLUDE:More98
 > -- if 3 > 3*(8 + 5) then 1 else 0
-> t6'4 = If'4 (Binary'4 GT (Literal'4 (Int 3)) t4'4)
->         (Literal'4 (Int 1))
->         (Literal'4 (Int 0))
+> t6 = If (Binary GT (Literal (Int 3)) t4'4)
+>         (Literal (Int 1))
+>         (Literal (Int 0))
 > -- 2 + (if 3 <= 0 then 9 else -5)
-> t7'4 = Binary'4 Add (Literal'4 (Int 2))
->                 (If'4 (Binary'4 LE (Literal'4 (Int 3))
->                                         (Literal'4 (Int 0)))
->                     (Literal'4 (Int 9))
->                     (Literal'4 (Int (-5))))
+> t7 = Binary Add (Literal (Int 2))
+>                 (If (Binary LE (Literal (Int 3))
+>                                         (Literal (Int 0)))
+>                     (Literal (Int 9))
+>                     (Literal (Int (-5))))
 > -- %More98
-
-> --------------------BEGIN-HIDE-------------------------
-> main'6 = do
->   test (\e-> evaluate'5 e []) t1'4
->   test (\e-> evaluate'5 e []) t2'4
->   test (\e-> evaluate'5 e []) t3'4
->   test (\e-> evaluate'5 e []) t4'4
->   test (\e-> evaluate'5 e []) t5'4
->   test (\e-> evaluate'5 e []) t6'4
->   test (\e-> evaluate'5 e []) t7'4
-> --------------------END-HIDE-------------------------
 
 Running these test cases with the |test| function defined above yields these results: %More22
 
@@ -1224,19 +1186,20 @@ undefined.  Attempting to evaluate |3 + True| results in a call to
 handled by the |binary| function. As a result, Haskell generates a
 *Non-exhaustive pattern* error: %Type3
 
-    Main> evaluate'5 [] (Binary'4 Add (Literal'4 (Int 3)) (Literal'4 (Bool True)))
+    Main> evaluate [] (Binary Add (Literal (Int 3)) (Literal (Bool True)))
     *** Exception: Non-exhaustive patterns in function binary %Type4
 
 Here are some examples of expression that generate type errors: %Type5
 
+INCLUDE:Type6
 > -- if 3 then 5 else 8
-> err1 = If'4 (Literal'4 (Int 3)) (Literal'4 (Int 5)) (Literal'4 (Int 8))
+> err1 = If (Literal (Int 3)) (Literal (Int 5)) (Literal (Int 8))
 > -- 3 + True
-> err2 = Binary'4 Add (Literal'4 (Int 3)) (Literal'4 (Bool True))
+> err2 = Binary Add (Literal (Int 3)) (Literal (Bool True))
 > -- 3 || True
-> err3 = Binary'4 Or (Literal'4 (Int 3)) (Literal'4 (Bool True))
+> err3 = Binary Or (Literal (Int 3)) (Literal (Bool True))
 > -- -True
-> err4 = Unary'4 Neg (Literal'4 (Bool True))
+> err4 = Unary Neg (Literal (Bool True))
 > -- %Type6
 
 We will discuss techniques for preventing type errors later, but for now
@@ -1331,8 +1294,9 @@ series of named functions, each of which has a list of parameter
 names and a body expression. The following data type definitions
 provide a means to represent such programs: %Top14
 
-> type FunEnv = [(String, Function'6)]
-> data Function'6 = Function'6 [String] Exp'6
+INCLUDE:Top15
+> type FunEnv = [(String, Function)]
+> data Function = Function [String] Exp
 > -- %Top15
 
 A list of function definitions is a *function environment*.
@@ -1342,7 +1306,8 @@ to function definitions. %Top16
 A program is then a function environment together with a
 main expression: %Top17
 
-> data Program = Program FunEnv Exp'6
+INCLUDE:Top18
+> data Program = Program FunEnv Exp
 > -- %Top18
 
 Any of the expressions can contain calls to the top-level
@@ -1350,25 +1315,26 @@ functions. A call has a function name and a list
 of actual argument expressions: %Top19
 
 ````
-data Exp'6 = ...
-         | Call'6      String [Exp'6]
+data Exp = ...
+         | Call      String [Exp]
 %Top20
 ````
 
 As an example, here is an encoding of the example program: %Top21
 
-> f1 = Function'6 ["n", "m"]
->       (If'6 (Binary'6 EQ (Variable'6 "m") (Literal'6 (Int 0)))
->           (Literal'6 (Int 1))
->           (Binary'6 Mul
->             (Variable'6 "n")
->             (Call'6 "power" [Variable'6  "n",
->                            Binary'6  Sub (Variable'6  "m")
->                                          (Literal'6 (Int 1))])))
+INCLUDE:Top22
+> f1 = Function ["n", "m"]
+>       (If (Binary EQ (Variable "m") (Literal (Int 0)))
+>           (Literal (Int 1))
+>           (Binary Mul
+>             (Variable "n")
+>             (Call "power" [Variable  "n",
+>                            Binary  Sub (Variable  "m")
+>                                          (Literal (Int 1))])))
 >
 > p1 = Program [("power", f1)]
->              (Call'6 "power" [Literal'6 (Int 3),
->                             Literal'6 (Int 4)])
+>              (Call "power" [Literal (Int 3),
+>                             Literal (Int 4)])
 > -- %Top22
 
  ### Evaluating Top-Level Functions {#EvalTopLevel}
@@ -1377,20 +1343,20 @@ A new function, |execute|, runs a program. It does so
 by evaluating the main expression in the context of the
 programs' function environment and an empty variable environment:  %Eval39
 
+INCLUDE:Eval41
 > execute :: Program -> Value
-> execute (Program funEnv main) = evaluate'6 main [] funEnv
+> execute (Program funEnv main) = evaluate main [] funEnv
 > -- %Eval41
 
 The evaluator is extended to take a function environment |funEnv| as
 a additional argument.  %Eval43
 
 ````
--- Evaluate an expression in a variable environment with a given function environment
-evaluate'6 :: Exp'6 -> Env'1 -> FunEnv -> Value
-evaluate'6 exp env funEnv = eval exp where
+evaluate :: Exp -> Env -> FunEnv -> Value
+evaluate exp env funEnv = eval exp where
     ...
-     eval (Call'6 fun args)   = evaluate'6 body newEnv funEnv
-       where Function'6 xs body = fromJust (lookup fun funEnv)
+     eval (Call fun args)   = evaluate body newEnv funEnv
+       where Function xs body = fromJust (lookup fun funEnv)
              newEnv = zip xs [eval a | a <- args]
 %Eval31
 ````
@@ -1398,7 +1364,7 @@ evaluate'6 exp env funEnv = eval exp where
 Evaluation of a call expression performs the following steps:  %Eval44
 
 1. Look up the function definition by name |lookup fun funEnv|,
-   to get the functions' parameter list |xs| and |body|. %Eval45
+   to get the function's parameter list |xs| and |body|. %Eval45
 2. Evaluate the actual arguments |[eval a BAR a <- args]| to get a list of values %Eval46
 3. Create a new environment |newEnv| by zipping together the
     parameter names with the actual argument values. %Eval47
@@ -1421,8 +1387,8 @@ in the abstract syntax:  %Eval50
 
 ````
 data Exp = ...
-     | Variable'6  String         -- variable name
-     | Call'6      String [Exp'6]   -- function name
+     | Variable  String         -- variable name
+     | Call      String [Exp]   -- function name
 %Eval37
 ````
 
@@ -1496,27 +1462,28 @@ first-class functions %Stac2
 Here is the full code for the evaluator supporting
 top-level functions definitions.  %Summ1
 
-> data Exp'6 = Literal'6   Value
->          | Unary'6     UnaryOp Exp'6
->          | Binary'6    BinaryOp Exp'6 Exp'6
->          | If'6        Exp'6 Exp'6 Exp'6
->          | Variable'6  String
->          | Let'6       String Exp'6 Exp'6
->          | Call'6      String [Exp'6]
+INCLUDE:Summ12
+> data Exp = Literal   Value
+>          | Unary     UnaryOp Exp
+>          | Binary    BinaryOp Exp Exp
+>          | If        Exp Exp Exp
+>          | Variable  String
+>          | Let       String Exp Exp
+>          | Call      String [Exp]
 >
-> evaluate'6 :: Exp'6 -> Env'1 -> FunEnv -> Value
-> evaluate'6 exp env funEnv = eval exp where
->     eval (Literal'6 v)      = v
->     eval (Unary'6 op a)     = unary op (eval a)
->     eval (Binary'6 op a b)  = binary op (eval a) (eval b)
->     eval (If'6 a b c)       = if fromBool (eval a)
+> evaluate :: Exp -> Env -> FunEnv -> Value
+> evaluate exp env funEnv = eval exp where
+>     eval (Literal v)      = v
+>     eval (Unary op a)     = unary op (eval a)
+>     eval (Binary op a b)  = binary op (eval a) (eval b)
+>     eval (If a b c)       = if fromBool (eval a)
 >                             then eval b
 >                             else eval c
->     eval (Variable'6 x)     = fromJust (lookup x env)
->     eval (Let'6 x exp body) = evaluate'6 body newEnv funEnv
+>     eval (Variable x)     = fromJust (lookup x env)
+>     eval (Let x exp body) = evaluate body newEnv funEnv
 >       where newEnv = (x, eval exp) : env
->     eval (Call'6 fun args)   = evaluate'6 body newEnv funEnv
->       where Function'6 xs body = fromJust (lookup fun funEnv)
+>     eval (Call fun args)   = evaluate body newEnv funEnv
+>       where Function xs body = fromJust (lookup fun funEnv)
 >             newEnv = zip xs [eval a | a <- args]
 > -- %Summ12
 
@@ -1625,6 +1592,7 @@ fact, the example illustrating how to "solve" for the
 function |f| can be written in Haskell. The following
 definitions are all equivalent in Haskell: %Usin2
 
+INCLUDE:Usin3
 > f'1(x) = x * 2
 > f'2 x  = x * 2
 > f'3 = \x -> x * 2
@@ -1741,18 +1709,21 @@ composition $f \circ g$ of two functions $f$ and $g$ is a new function that
 first performs $g$ on an input, then performs $f$ on the result.
 Composition can be defined in Haskell as:  %Func15
 
+INCLUDE:Func17
 > compose f g = \x -> f(g x)
 > -- %Func17
 
 The two arguments are both functions, and the result of composition is
 also a function. The type of |compose| is  %Func18
 
+INCLUDE:Func5
 > compose :: (b -> c) -> (a -> b) -> (a -> c)
 > -- %Func5
 
 As an example of function composition, consider two functions that
 operate on numbers:  %Func19
 
+INCLUDE:Func20
 > square n = n * n
 > mulPi m = pi * m
 > -- %Func20
@@ -1760,15 +1731,16 @@ operate on numbers:  %Func19
 Now using composition we can define a function for computing the area of a circle,
 given the radius:  %Func21
 
+INCLUDE:Func22
 > areaR = compose mulPi square
 > -- %Func22
 
 To compute the area given the diameter, we can compose this function with a function that
 divides by two:  %Func23
 
+INCLUDE:Func24
 > areaD = compose areaR (\x -> x / 2)
 > -- %Func24
-
 
  ### Mapping {#Map}
 
@@ -1779,6 +1751,7 @@ every element of a list, creating a new list with the results. %Mapp2
 For example, given the standard Haskell function |negate|
 that inverts the sign of a number, it is easy to quickly negate a list of numbers: %Mapp3
 
+INCLUDE:Mapp4
 > testM1 = map negate [1, 3, -7, 0, 12]   -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp4
 
@@ -1797,6 +1770,7 @@ Personally, I tend to
 use list comprehensions rather than |map|, because list comprehensions give
 a nice name to the items of the list. Here is an equivalent example using comprehensions: %Mapp8
 
+INCLUDE:Mapp9
 > testm2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp9
 
@@ -1823,6 +1797,7 @@ another name for a function. Thus it is
 very reasonable to think of an environment as a *function* from
 names to values. Consider the environment %Repr2
 
+INCLUDE:Repr3
 > type EnvL = [(String, Value)]
 > envL1 = [("x", Int 3), ("y", Int 4), ("size", Int 10)]
 > -- %Repr3
@@ -1836,7 +1811,10 @@ which allows a function to return a value
 (tagged by |Just|) or |Nothing|. Here is an implementation of the
 same environment as a function: %Repr4
 
+INCLUDE:Repl801
 > type EnvF = String -> Maybe Value
+
+INCLUDE:Repr5
 > envF1 "x"    = Just (Int 3)
 > envF1 "y"    = Just (Int 4)
 > envF1 "size" = Just (Int 10)
@@ -1846,6 +1824,7 @@ same environment as a function: %Repr4
 Looking up the value of a variable in either of these environments
 is quite different: %Repr6
 
+INCLUDE:Repr7
 > x1 = lookup "x" envL1
 > x2 = envF1 "x"
 > -- %Repr7
@@ -1864,12 +1843,14 @@ additional bindings. Let's define bind functions that add a binding to
 an environment, represented as lists or functions. For lists, the |bindL| function
 creates a binding |(val, val)| and then prepends it to the front of the list: %Repr10
 
+INCLUDE:Repr11
 > bindL :: String -> Value -> EnvL -> EnvL
 > bindL var val env = (var, val) : env
 > -- %Repr11
 
 Since |lookup| searches lists from the front, this new binding can shadow existing bindings. %Repr12
 
+INCLUDE:Repr13
 > envL2 = bindL "z" (Int 5) envL1
 >    -- [("z", Int 5), ("x", Int 3), ("y", Int 4), ("size", Int 10)]
 > envL3 = bindL "x" (Int 9) envL1
@@ -1895,6 +1876,7 @@ bindF :: String -> Value -> (String -> Maybe Int) -> (String -> Maybe Int)
 
 The definition of |bindF| is quite different from |bindL|: %Repr18
 
+INCLUDE:Repr19
 > bindF var val env = \testVar -> if testVar == var
 >                                 then Just val
 >                                 else env testVar
@@ -1917,7 +1899,7 @@ argument. %Repr21
 
 The key to understanding how this works is to keep in mind that
 there are two very different *times* or *contexts* involved
-in |bindF|. The first time is when the environment is being
+in |bindF|. The first time is when an environment is being
 extended with a new binding. At this time the arguments
 |var|, |val|, and |env| are determined. The second important
 time is when the newly extended environment is searched for
@@ -1925,6 +1907,7 @@ a particular variable. This is when |testVar| is bound. Since
 the environment can be searched many times, |testVar| will
 be bound many times. Consider a specific example: %Repr22
 
+INCLUDE:Repr23
 > -- version A
 > envF2 = bindF "z" (Int 5) envF1
 > -- %Repr23
@@ -1934,6 +1917,7 @@ arguments, creating these bindings:
 |var| $\mapsto$ |\"z\"|, |val| $\mapsto$ |5|, |env| $\mapsto$ |envF1|.
 Substituting these bindings into the definition of |bindF| gives %Repr24
 
+INCLUDE:Repr25
 > -- version B
 > envF2'1 = \testVar -> if testVar == "z"
 >                     then Just (Int 5)
@@ -1946,6 +1930,7 @@ variable is named |z| and if so it returns 5. Otherwise it returns
 what |envF1| returns for that variable. Another way to write
 this function is %Repr26
 
+INCLUDE:Repr27
 > -- version C
 > envF2'2 "z" = Just (Int 5)
 > envF2'2 testVar = envF1 testVar
@@ -1960,10 +1945,12 @@ variables are properly shadowed when redefined. %Repr28
 It is also useful to consider the *empty* environment for both
 list and function environments. %Repr29
 
+INCLUDE:Repr30
 > emptyEnvL :: EnvL
 > emptyEnvL = []
 > -- %Repr30
 
+INCLUDE:Repr31
 > emptyEnvF :: EnvF
 > emptyEnvF = \var -> Nothing
 > -- %Repr31
@@ -1979,14 +1966,14 @@ could be easily modified to
 use functional environments rather than lists of bindings. For
 example, the environment-based evaluation function becomes: %Repr33
 
-> -- Evaluate an expression in a (functional) environment
-> evaluate'5a :: Exp'4 -> EnvF -> Value
-> evaluate'5a exp env = eval exp where
->     eval (Literal'4 v)      = v
->     eval (Unary'4 op a)     = unary op (eval a)
->     eval (Binary'4 op a b)  = binary op (eval a) (eval b)
->     eval (Variable'4 x)     = fromJust (env x)            -- changed
->     eval (Let'4 x exp body) = evaluate'5a body newEnv
+INCLUDE:Repr34
+> evaluatea :: Exp -> EnvF -> Value
+> evaluatea exp env = eval exp where
+>     eval (Literal v)      = v
+>     eval (Unary op a)     = unary op (eval a)
+>     eval (Binary op a b)  = binary op (eval a) (eval b)
+>     eval (Variable x)     = fromJust (env x)            -- changed
+>     eval (Let x exp body) = evaluatea body newEnv
 >       where newEnv = bindF x (eval exp) env               -- changed
 > -- %Repr34
 
@@ -2010,6 +1997,7 @@ understand all the functions we've defined with multiple arguments?
 The answer is surprisingly subtle. Let's consider a very
 simple Haskell function that appears to have two arguments:  %Mult1
 
+INCLUDE:Mult29
 > add a b = b + a
 > -- %Mult29
 
@@ -2018,18 +2006,21 @@ on the left of a definition are short-hand for lambdas.
 The |b| argument can be moved to the right hand side to
 get an equivalent definition:  %Mult30
 
-> add'1 a = \b -> b + a
+INCLUDE:Mult31
+> Add a = \b -> b + a
 > -- %Mult31
 
 Now the |a| argument can also be moved. We have now
 "solved" for |add|:  %Mult32
 
-> add'2 = \a -> \b -> b + a
+INCLUDE:Mult33
+> Add = \a -> \b -> b + a
 > -- %Mult33
 
 It's useful to add parentheses to make the grouping explicit:  %Mult34
 
-> add'3 = \a -> (\b -> b + a)
+INCLUDE:Mult35
+> Add = \a -> (\b -> b + a)
 > -- %Mult35
 
 What this means is that |add| is a function of one argument |a|
@@ -2046,6 +2037,7 @@ to apply the |add| function to the arguments one at a time.
 For example applying |add| to just one argument returns a new
 function:  %Mult37
 
+INCLUDE:Mult12
 > inc = add 1      -- \b. b + 1
 > dec = add (-1)   -- \b. b + (-1)
 > -- %Mult12
@@ -2054,6 +2046,7 @@ These two functions each take a single argument.
 The first adds one to its argument. The second subtracts one.
 Here are two examples that use the resulting functions:  %Mult38
 
+INCLUDE:Mult39
 > eleven = inc 10
 > nine   = dec 10
 > -- %Mult39
@@ -2061,17 +2054,20 @@ Here are two examples that use the resulting functions:  %Mult38
 To see how the definition of |inc| works, we can analyze the function call
 |add 1| in more detail. Replacing |add| by its definition yields:  %Mult40
 
+INCLUDE:Mult41
 > inc'1 = (\a -> (\b -> b + a)) 1
 > -- %Mult41
 
 The Rule of Function Invocation says that in this situation, |a| is
 substituted for |1| in the body |\b -> b + a| to yield: %Mult17
 
+INCLUDE:Mult18
 > inc'2 = \b -> b + 1
 > -- %Mult18
 
 Which is the same (by the [Rule of Function Arguments](#LambdaDefinition)) as: %Mult19
 
+INCLUDE:Mult20
 > inc'3 b = b + 1
 > -- %Mult20
 
@@ -2082,6 +2078,7 @@ perform the stages at different times. After completing the first stage
 to create an increment/decrement function, the new increment/decrement function
 can be used many times. %Mult21
 
+INCLUDE:Mult22
 > testinc = inc 5 + inc 10 + dec 20 + dec 100
 > -- %Mult22
 
@@ -2096,6 +2093,7 @@ left of the |=| sign, while the last argument was placed to the right as an
 explicit lambda. However, this choice of staging is just the intended use
 of the function. The function could also have been defined as follows: %Mult24
 
+INCLUDE:Mult25
 > bindF'1 var val env testVar = if testVar == var
 >                             then Just val
 >                             else env testVar
@@ -2122,6 +2120,7 @@ function that chooses between two options. One way to represent a
 choice is by a function with two arguments that returns one or the
 other of the inputs: %Bool2
 
+INCLUDE:Bool3
 > true  x y = x
 > false x y = y
 > -- %Bool3
@@ -2131,6 +2130,7 @@ returns its second argument. For example |true 0 1| returns |0| while
 |false \"yes\" \"no\"| returns |\"no\"|.  One way to write the type
 for booleans is a generic type: %Bool4
 
+INCLUDE:Bool5
 > type BooleanF = forall a. a -> a -> a
 > true :: BooleanF
 > false :: BooleanF
@@ -2141,6 +2141,7 @@ Negation of a boolean |b| returns the result of applying |b| to |false|
 and |true|. If |b| is true then it will return the first argument, |false|.
 If |b| is false then it will return the second argument, |true|. %Bool6
 
+INCLUDE:Bool7
 > notF :: BooleanF -> BooleanF
 > notF b = b false true
 > -- %Bool7
@@ -2149,6 +2150,7 @@ The unary function |not| is a higher-order function: it takes a
 functional boolean as an input and returns a functional boolean as
 a result. We can also define binary operations on booleans: %Bool8
 
+INCLUDE:Bool9
 > orF :: BooleanF -> BooleanF -> BooleanF
 > orF a b  = a true b
 > -- %Bool9
@@ -2157,6 +2159,7 @@ The behavior of "or" is to return true if |a| is true, and return |b|
 if |a| is false. It works by calling |a| as a function, passing
 true and |b| as arguments. %Bool10
 
+INCLUDE:Bool11
 > andF :: BooleanF -> BooleanF -> BooleanF
 > andF a b = a b false
 > -- %Bool11
@@ -2167,11 +2170,13 @@ return |b| if |a| is true and false otherwise. %Bool12
 To use a Church boolean, the normal syntax for |if| expressions is
 completely unnecessary. For example, %Bool13
 
+INCLUDE:Bool14
 > testb1 = if not True then 1 else 2
 > -- %Bool14
 
 is replaced by %Bool15
 
+INCLUDE:Bool16
 > testb2 = (notF true) 1 2
 > -- %Bool16
 
@@ -2209,6 +2214,7 @@ arguments, |f| and |x|. Thus, a Church numeral is a lambda, not a concrete
 value like |0| or |1|. The Church numeral |0| applies |f| zero times to
 |x|. Similarly, |1| applies |f| once to |x|. %Natu10
 
+INCLUDE:Natu11
 > zero = \f -> \x -> x
 > one = \f -> \x -> f x
 > two = \f -> \x -> f (f x)
@@ -2235,12 +2241,14 @@ three ('A':) [] -- evaluates to "AAA"
 
 In Haskell we can write the generic type for Church numerals as %Natu16
 
+INCLUDE:Natu17
 > type ChurchN = forall a. (a -> a) -> a -> a
 > -- %Natu17
 
 If we are given a Haskell |Integer|, we can represent the equivalent Church
 numeral with the following Haskell definition. %Natu18
 
+INCLUDE:Natu19
 > church :: Integer -> ChurchN
 > church 0 = \f -> \x -> x
 > church n = \f -> \x -> f (church (n-1) f x)
@@ -2249,6 +2257,7 @@ numeral with the following Haskell definition. %Natu18
 To retrieve the |Integer| value of a Church numeral, we can evaluate
 the lambda using the usual successor and base value. %Natu20
 
+INCLUDE:Natu21
 > unchurch :: ChurchN -> Integer
 > unchurch n = n (+1) 0
 > -- 5 == (unchurch (church 5)) -- this evaluates to True
@@ -2257,6 +2266,7 @@ the lambda using the usual successor and base value. %Natu20
 We define addition and multiplication in Haskell by using the above
 arithmetic relations. %Natu22
 
+INCLUDE:Natu23
 > plus :: ChurchN -> ChurchN -> ChurchN
 > plus n m = \f -> \x -> n f (m f x)
 > mul :: ChurchN -> ChurchN -> ChurchN
@@ -2320,8 +2330,8 @@ are included in the |Value| data type, which
 allows functions appears a literal values in a program: %A3
 
 ````
-data Value'8 = ...
-           | Function'8 String Exp'8  -- new
+data Value = ...
+           | Function String Exp  -- new
   deriving Eq
 %A31
 ````
@@ -2349,8 +2359,9 @@ top-level functions. Instead of the *name* of the function
 to be called, the |Call| expression now contains an expression |Exp|
 for both the function and the argument: %A8
 
-> data Value'8 = Scalar'8 Value
->            | Function'8 String Exp'8  -- new
+INCLUDE:A32
+> data Value = Scalar'8 Value
+>            | Function String Exp  -- new
 >   deriving Eq
 > -- %A32
 
@@ -2369,24 +2380,26 @@ Top-Level Functions (A)  First-Class Functions (B)
 
 The explicit abstract syntax for example (A) is: %A12
 
+INCLUDE:A13
 > testP1 = Program
->   [("f", Function'6 ["x"]
->            (Binary'6 Mul (Variable'6 "x")
->                        (Variable'6 "x")))]
->   (Call'6 "f" [Literal'6 (Int 10)])
+>   [("f", Function ["x"]
+>            (Binary Mul (Variable "x")
+>                        (Variable "x")))]
+>   (Call "f" [Literal (Int 10)])
 > -- %A13
 
 The explicit abstract syntax for example (B) is: %A14
 
+INCLUDE:A15
 > testP2 =
->  Let'8 "f" (Literal'8 (Function'8 "x"
->                       (Binary'8 Mul (Variable'8 "x")
->                                   (Variable'8 "x"))))
->    (Call'8 (Variable'8 "f") (Literal'8 (Scalar'8 (Int 10))))
+>  Let "f" (Literal (Function "x"
+>                       (Binary Mul (Variable "x")
+>                                   (Variable "x"))))
+>    (Call (Variable "f") (Literal (Scalar'8 (Int 10))))
 > -- %A15
 
 Note that the function in the |Call| is string |\"f\"|
-in the first version, but is an expression |Variable'8 "f"|
+in the first version, but is an expression |Variable "f"|
 in the second version. %A16
 
 In many cases the
@@ -2402,9 +2415,9 @@ as before. In particular, evaluating a literal value is
 the same, although now the literal value might be a function. %A18
 
 ````
-evaluate'8 :: Exp'8 -> Env'8 -> Value'8
-evaluate'8 exp env = eval exp where
-    eval (Literal'8 v)      = v
+evaluate :: Exp -> Env -> Value
+evaluate exp env = eval exp where
+    eval (Literal v)      = v
     ...
 %A34
 ````
@@ -2413,14 +2426,13 @@ Calling a function works almost the same as the case for
 function calls in the [language with top-level functions](#TopLevel).
 Here is the code: %A20
 
-````
-    eval (Call'8 fun arg)   = evaluate'8 body newEnv
-      where Function'8 x body = eval fun
-            newEnv = bindF x (eval arg) env
-%A35
-````
+INCLUDE:A35
+>     eval (Call fun arg)   = evaluate body newEnv
+>       where Function x body = eval fun
+>             newEnv = bindF x (eval arg) env
+> -- %A35
 
-To evaluate a function call |Call'8 fun arg|, %A22
+To evaluate a function call |Call fun arg|, %A22
 
  1. First evaluate |eval fun| the function |fun| of the call. %A1
  2. Use pattern matching to ensure that the result of step 1 is a |Function| value,
@@ -2431,7 +2443,7 @@ To evaluate a function call |Call'8 fun arg|, %A22
     |bindF x (eval arg) env| %A38
  4. Evaluate the |body| of the function in the extended environment |newEnv|: %A24
 
-    |evaluate'8 newEnv body| %A25
+    |evaluate newEnv body| %A25
 
 Note that this explanation jumps around in the source code. The explanation follows
 the sequence of data dependencies in the code: what logically needs to be evaluated first,
@@ -2443,40 +2455,6 @@ function is computed by calling |eval fun| rather than
 |lookup fun funEnv|. The other difference is that functions
 now only have one argument, while we allowed multiple arguments
 in the previous case. %A27
-
-> --------------------BEGIN-HIDE-------------------------
-> data Exp'8 = Literal'8   Value'8
->          | Unary'8     UnaryOp Exp'8
->          | Binary'8    BinaryOp Exp'8 Exp'8
->          | If'8        Exp'8 Exp'8 Exp'8
->          | Variable'8  String
->          | Let'8       String Exp'8 Exp'8
->          | Call'8      Exp'8 Exp'8         -- changed
->   deriving Eq
->
-> type Env'8 = String -> Maybe Value'8
->
-> evaluate'8 :: Exp'8 -> Env'8 -> Value'8
-> evaluate'8 exp env = eval exp
->   where  -- TODO: not needed to show this code here?
->     eval (Literal'8 v)      = v
->     eval (Unary'8 op a)     = unary'8 op (eval a)
->     eval (Binary'8 op a b)  = binary'8 op (eval a) (eval b)
->     eval (If'8 a b c)       = if fromBool'8 (eval a)
->                             then eval b
->                             else eval c
->     eval (Let'8 x exp body) = evaluate'8 body newEnv
->       where newEnv = bindF x (eval exp) env
->     eval (Variable'8 x)     = fromJust (env x)
->     eval (Call'8 fun arg)   = evaluate'8 body newEnv
->       where Function'8 x body = eval fun
->             newEnv = bindF x (eval arg) env
->
-> fromBool'8 (Scalar'8 (Bool b)) = b
->
-> unary'8 op (Scalar'8 a) = Scalar'8 (unary op a)
-> binary'8 op (Scalar'8 a) (Scalar'8 b) = Scalar'8 (binary op a b)
-> --------------------END-HIDE-------------------------
 
 The key question is: **why doesn't the code given above work?**
 There are two problems. One has to do with returning functions
@@ -2492,24 +2470,26 @@ function could be implemented by writing a function that takes
 one argument, but then returns a function that takes the second
 argument. Here is a small program that illustrates this technique: %Prob2
 
+INCLUDE:Prob3
 > teste1 = let add = \a -> (\b -> b + a) in add 3 2
 > -- %Prob3
 
 This program is encoded in our language as follows: %Prob4
 
+INCLUDE:Prob5
 > testE2 =
->  Let'8 "add" (Literal'8 (Function'8 "a"
->              (Literal'8 (Function'8 "b"
->                 (Binary'8 Add (Variable'8 "b")
->                             (Variable'8 "a"))))))
->              (Call'8 (Call'8 (Variable'8 "add")
->                              (Literal'8 (Scalar'8 (Int 3))))
->                    (Literal'8 (Scalar'8 (Int 2))))
+>  Let "add" (Literal (Function "a"
+>              (Literal (Function "b"
+>                 (Binary Add (Variable "b")
+>                             (Variable "a"))))))
+>              (Call (Call (Variable "add")
+>                              (Literal (Scalar'8 (Int 3))))
+>                    (Literal (Scalar'8 (Int 2))))
 > -- %Prob5
 
 Rather than work with the ugly constructor syntax in
 Haskell, we will continue to use the convention of writing
-|b + a| to mean |(Binary'8 Add (Variable'8 "b") (Variable'8 "a"))|. %Prob6
+|b + a| to mean |(Binary Add (Variable "b") (Variable "a"))|. %Prob6
 
 Here is how evaluation of this sample program proceeds: %Prob7
 
@@ -2597,8 +2577,8 @@ and |Value|. First we add function expressions as a new kind
 of expression:  %A41
 
 ````
-data Exp'7 = ....
-         | Function'7 String Exp'7      -- new
+data Exp = ....
+         | Function String Exp      -- new
 %A39
 ````
 
@@ -2612,10 +2592,10 @@ Closures have all the same information as a function expressions
 (which we previously tried to add as values), but they have
 one important difference: closures also contain an environment.  %A46
 
-> data Value'7 = Scalar'7 Value
->            | Closure'7 String Exp'7 Env'7  -- new
+INCLUDE:A42
+> data Value = Scalar'7 Value
+>            | Closure String Exp Env  -- new
 >   deriving (Eq, Show)
->
 > -- %A42
 
 The three parts of a closure are the *bound variable* |String|,
@@ -2629,15 +2609,15 @@ first-class functions using environments. The first step is to
 
 ````
 -- Evaluate an expression in an environment
-evaluate'7 :: Exp'7 -> Env'7 -> Value'7
-evaluate'7 exp env = eval exp where
+evaluate :: Exp -> Env -> Value
+evaluate exp env = eval exp where
     ...
-    eval (Function'7 x body) = Closure'7 x body env
+    eval (Function x body) = Closure x body env
 %A44
 ````
 
 The resulting closure is the value that represents a
-function. The function expression |Function'7 x body|
+function. The function expression |Function x body|
 is not actually a function itself, it is an
 expression that *creates* a function when executed.
 Once a closure value has been created, it can be bound
@@ -2648,21 +2628,21 @@ Closures are values.  %A49
 Since closures represent functions,
 the only thing you can *do* with a closure is *call* it.
 The case for evaluating a function call starts by
-analyzing the function call expression, |eval (Call'7 fun arg)|.
+analyzing the function call expression, |eval (Call fun arg)|.
 This pattern says that call expression has two components:
 a function |fun| and
 an argument |arg|. Here is the code for this case:  %A51
 
 ````
-    eval (Call'7 fun arg)   = evaluate'7 body newEnv
-      where Closure'7 x body closeEnv = eval fun
+    eval (Call fun arg)   = evaluate body newEnv
+      where Closure x body closeEnv = eval fun
             newEnv = (x, eval arg) : closeEnv
 %A47
 ````
 
 The code starts by evaluating both the function part |fun| to
 produce a value. The |where| clause
-|Closure'7 x body newEnv = eval fun| says that the result of
+|Closure x body newEnv = eval fun| says that the result of
 evaluating |fun| must be a closure, and the variables |x|,
 |body|, and |newEnv| are bound to the parts of the closure.
 If the result is not a closure, Haskell throws a runtime error.  %A52
@@ -2675,7 +2655,7 @@ environment that existed when the function was created, together
 with a binding for the function parameter.  %A54
 
 Finally, the |body| of the function is evaluated in this new
-environment, |evaluate'7 body newEnv|.  %A55
+environment, |evaluate body newEnv|.  %A55
 
 TODO: give an example of how this runs?  %A56
 
@@ -2771,38 +2751,39 @@ let m = 2 in
 
 Here is the full code for first-class functions with non-recursive definitions:  %Summ13
 
-> data Exp'7 = Literal'7   Value'7
->          | Unary'7     UnaryOp Exp'7
->          | Binary'7    BinaryOp Exp'7 Exp'7
->          | If'7        Exp'7 Exp'7 Exp'7
->          | Variable'7  String
->          | Let'7       String Exp'7 Exp'7
->          | Function'7  String Exp'7      -- new
->          | Call'7      Exp'7 Exp'7         -- changed
+INCLUDE:Summ14
+> data Exp = Literal   Value
+>          | Unary     UnaryOp Exp
+>          | Binary    BinaryOp Exp Exp
+>          | If        Exp Exp Exp
+>          | Variable  String
+>          | Let       String Exp Exp
+>          | Function  String Exp      -- new
+>          | Call      Exp Exp         -- changed
 >   deriving (Eq, Show)
 >
-> type Env'7 = [(String, Value'7)]
+> type Env = [(String, Value)]
 >
-> evaluate'7 :: Exp'7 -> Env'7 -> Value'7
-> evaluate'7 exp env = eval exp where
->     eval (Literal'7 v)      = v
->     eval (Unary'7 op a)     = unary'7 op (eval a)
->     eval (Binary'7 op a b)  = binary'7 op (eval a) (eval b)
->     eval (If'7 a b c)       = if fromBool'7 (eval a)
+> evaluate :: Exp -> Env -> Value
+> evaluate exp env = eval exp where
+>     eval (Literal v)      = v
+>     eval (Unary op a)     = unary op (eval a)
+>     eval (Binary op a b)  = binary op (eval a) (eval b)
+>     eval (If a b c)       = if fromBool'7 (eval a)
 >                             then eval b
 >                             else eval c
->     eval (Variable'7 x)     = fromJust (lookup x env)
->     eval (Let'7 x exp body) = evaluate'7 body newEnv
+>     eval (Variable x)     = fromJust (lookup x env)
+>     eval (Let x exp body) = evaluate body newEnv
 >       where newEnv = (x, eval exp) : env
->     eval (Function'7 x body) = Closure'7 x body env     -- new
->     eval (Call'7 fun arg)   = evaluate'7 body newEnv    -- changed
->       where Closure'7 x body closeEnv = eval fun
+>     eval (Function x body) = Closure x body env     -- new
+>     eval (Call fun arg)   = evaluate body newEnv    -- changed
+>       where Closure x body closeEnv = eval fun
 >             newEnv = (x, eval arg) : closeEnv
 >
 > fromBool'7 (Scalar'7 (Bool b)) = b
 >
-> unary'7 op (Scalar'7 a) = Scalar'7 (unary op a)
-> binary'7 op (Scalar'7 a) (Scalar'7 b) = Scalar'7 (binary op a b)
+> Unary op (Scalar'7 a) = Scalar'7 (unary op a)
+> Binary op (Scalar'7 a) (Scalar'7 b) = Scalar'7 (binary op a b)
 > -- %Summ14
 
  # Recursive Definitions
@@ -2813,6 +2794,7 @@ were supported in the [Section on Top-Level Functions](#TopLevel). A recursive
 function is a function that calls itself within its own definition.
 For example, consider this definition of the factorial function: %Recu2
 
+INCLUDE:Recu3
 > testLet =
 >   let fact = \n -> if n == 0 then 1 else n * fact(n-1)
 >   in fact(10)
@@ -2852,19 +2834,6 @@ currently support. TODO: see homework?).
 In this case the result is |9900| because |x = 100| and
 |y = 99|. It works because the binding expression for |x|, namely |y + 1|,
 is in the scope of |y|. %Recu10
-
---------------------BEGIN-HIDE-------------------------
-If we convert this program to our abstract syntax, it comes out as: %Recu11
-
-> testLet1 = Let'7
->  "fact" (Function'7 "n"
->     (If'7 (Binary'7 EQ (Variable'7 "n") (Literal'7 (Scalar'7 (Int 0))))
->         (Literal'7 (Scalar'7 (Int 1)))
->         (Binary'7 Mul (Variable'7 "n")
->                     (Call'7 (Variable'7 "fact")
->                           (Binary'7 Sub (Variable'7 "n") (Literal'7 (Scalar'7 (Int 1))))))))
->  (Call'7 (Variable'7 "fact") (Literal'7 (Scalar'7 (Int 10))))
-> --------------------END-HIDE-------------------------
 
  ## Semantics of Recursion
 
@@ -3078,7 +3047,7 @@ is passed as an argument to the function call itself! %Usin23
 TODO: Explain how this works, and give a picture. %Usin24
 
 > --------------------BEGIN-HIDE-------------------------
-> main'10 = do
+> main = do
 >   print testTr
 >   print (minTree testTr)
 >   print (maxTree testTr)
@@ -3095,7 +3064,7 @@ expressions. In the Section on [Evaluation using Environments](#BasicEvalEnv),
 |let| was defined as follows: %Impl2
 
 ````
-eval (Let'4 x exp body) = evaluate'5 body newEnv
+eval (Let x exp body) = evaluate body newEnv
    where newEnv = (x, eval exp) : env
 %Impl3
 ````
@@ -3107,8 +3076,8 @@ in the new environment. Fortunately this is easy to implement
 in Haskell: %Impl4
 
 ````
-eval (Let'7 x exp body) = evaluate'7 body newEnv
-  where newEnv = (x, evaluate'7 exp newEnv) : env
+eval (Let x exp body) = evaluate body newEnv
+  where newEnv = (x, evaluate exp newEnv) : env
 %Impl5
 ````
 
@@ -3456,6 +3425,7 @@ The identity function can be applied to *any* value, because it doesn't
 do anything with the argument other than return it. Since it can be
 applied to any value, it can be applied to itself:  %A62
 
+INCLUDE:A63
 > testID = id(id)   -- returns id
 > -- %A63
 
@@ -3615,6 +3585,7 @@ One way to represent this possibility is by defining
 a new data type that has two possibilities: either a
 *good* value or an error. %Hand4
 
+INCLUDE:Hand5
 > data Checked a = Good a | Error String
 >  deriving Show
 > -- %Hand5
@@ -3640,9 +3611,10 @@ Although the syntax of expressions does not have to change, but the
 type of the |evaluate| function must be changed to return an |Error|
 value: %Hand7
 
-> evaluate'10 :: Exp'7 -> Env'7 -> Checked Value'7
-> evaluate'10 exp env = eval exp where
->     eval (Literal'7 v)      = Good v
+INCLUDE:Hand8
+> evaluate :: Exp -> Env -> Checked Value
+> evaluate exp env = eval exp where
+>     eval (Literal v)      = Good v
 > -- %Hand8
 
 Evaluation of a literal can never cause an error. The value is marked
@@ -3651,7 +3623,8 @@ as a |Good| value and returned. %Hand9
 A variable can be undefined,
 so it evaluating a variable may return an error: %Hand10
 
->     eval (Variable'7 x)     =
+INCLUDE:Hand11
+>     eval (Variable x)     =
 >        case lookup x env of
 >          Nothing -> Error ("Variable " ++ x ++ " undefined")
 >          Just v  -> Good v
@@ -3663,7 +3636,7 @@ The case for binary operations is more interesting.
 Here is the original rule for evaluating binary expressions: %Hand12
 
 ````
-     eval (Binary'7 op a b)  = binary'7 op (eval a) (eval b)
+     eval (Binary op a b)  = binary op (eval a) (eval b)
 %Hand13
 ````
 
@@ -3673,7 +3646,8 @@ Finally, the binary operation itself might cause a new error. Thus there are
 three places where errors can arise: in |eval a|, in |eval b|, or in |binary|.
 This definition for |eval| of a binary operator handles the first two situations: %Hand14
 
->     eval (Binary'7 op a b)  =
+INCLUDE:Hand15
+>     eval (Binary op a b)  =
 >         case eval a of
 >           Error msg -> Error msg
 >           Good av ->
@@ -3702,12 +3676,13 @@ upon the good value of |A|. But |B| is never invoked if |A| signals an error. %E
 The |binary| helper
 function must be updated to signal divide by zero: %Hand22
 
-> checked_binary :: BinaryOp -> Value'7 -> Value'7 -> Checked Value'7
+INCLUDE:Hand17
+> checked_binary :: BinaryOp -> Value -> Value -> Checked Value
 > checked_binary Div (Scalar'7 (Int a)) (Scalar'7 (Int b)) =
 >   if b == 0
 >   then Error "Divide by zero"
 >   else Good (Scalar'7 (Int (a `div` b)))
-> checked_binary op a b = Good (binary'7 op a b)
+> checked_binary op a b = Good (Binary op a b)
 > -- %Hand17
 
 All the other cases are the same as before, so |checked_binary|
@@ -3717,7 +3692,8 @@ calls |binary| and then tags the resulting value as |Good|. %Hand18
 
 Evaluating an expression may now return an error for unbound variables: %Hand27
 
-> testUBV = evaluate'10 (Variable'7 "x") []
+INCLUDE:Hand28
+> testUBV = evaluate (Variable "x") []
 > -- %Hand28
 
 The result of evaluation is: %Hand29
@@ -3726,7 +3702,8 @@ The result of evaluation is: %Hand29
 
 Or for divide by zero: %Hand31
 
-> testDBZ2 = evaluate'10 (Binary'7 Div (Literal'7 (Scalar'7 (Int 3))) (Literal'7 (Scalar'7 (Int 0))) ) []
+INCLUDE:Hand32
+> testDBZ2 = evaluate (Binary Div (Literal (Scalar'7 (Int 3))) (Literal (Scalar'7 (Int 0))) ) []
 > -- %Hand32
 
 The result of evaluation is: %Hand33
@@ -3878,8 +3855,9 @@ represented by any unique set of labels, one convenient representation for
 addresses is as integers. Using integers as addresses is also similar to the
 use of integers for addresses in a computer memory. %Addr10
 
-> data Value'9 = Scalar'9 Value
->            | Closure'9 String Exp'9 Env'9
+INCLUDE:Addr11
+> data Value = Scalar Value
+>            | Closure String Exp Env
 >            | Address Int        -- new
 >   deriving (Eq, Show)
 > -- %Addr11
@@ -3918,7 +3896,8 @@ an array of 8 bit values. In this chapter memory will be implemented
 as a list of values, although many other representations are certainly
 possible. %Memo3
 
-> type Memory = [Value'9]
+INCLUDE:Memo4
+> type Memory = [Value]
 > -- %Memo4
 
 One complication is that the memory must be able to *grow* by adding
@@ -3929,7 +3908,7 @@ have addresses [@0, @1, ..., @$n-1$].
 Here is an example memory, with two addresses: %Memo5
 
 ````
-[Value'7 (Scalar'7 (Int 120)), Value'7 (Scalar'7 (Int 6))]
+[Value (Scalar'7 (Int 120)), Value (Scalar'7 (Int 6))]
 %Memo6
 ````
 
@@ -3978,6 +3957,7 @@ function. However, the |!!| function counts from the *left* of the
 list, not the right. To compute an index from the right of a list,
 the index must be subtracted from the length of the list: %Acce2
 
+INCLUDE:Acce3
 > access i mem = mem !! i
 > -- %Acce3
 
@@ -4000,7 +3980,8 @@ input memory, but with a small change. %Upda2
 For example, the |update| operator on memory replaces the
 contents of a single address with a new value. %Upda3
 
-> update :: Int -> Value'9 -> Memory -> Memory
+INCLUDE:Upda4
+> update :: Int -> Value -> Memory -> Memory
 > update addr val mem =
 >   let (before, _:after) = splitAt addr mem in
 >     before ++ [val] ++ after
@@ -4019,25 +4000,28 @@ Using |access| and |update| it is possible to define interesting *transformation
 on memory.
 For example, the function |mul10| multiplies the contents of a memory address by 10: %Upda6
 
+INCLUDE:Upda7
 > mul10 addr mem =
 >   let n = fromInt (access addr mem) in
 >     update addr (toValue (10 * n)) mem
 >
-> fromInt (Scalar'9 (Int n)) = n
-> toValue n = (Scalar'9 (Int n))
+> fromInt (Scalar (Int n)) = n
+> toValue n = (Scalar (Int n))
 > -- %Upda7
 
 Here is an example calling |mul10| on a memory with 4 cells: %Upda8
 
+INCLUDE:Upda9
 > testMul10 = mul10 1 [toValue 3, toValue 4, toValue 5, toValue 6]
 > -- %Upda9
 
 The result is %Upda10
 
-    [Scalar'9 (Int 3), Scalar'9 (Int 4), Scalar'9 (Int 50), Scalar'9 (Int 6)] %Upda11
+    [Scalar (Int 3), Scalar (Int 4), Scalar (Int 50), Scalar (Int 6)] %Upda11
 
 The fact that |mul10| is a transformation on memory is evident from its type: %Upda12
 
+INCLUDE:Upda13
 > mul10 :: Int -> Memory -> Memory
 > -- %Upda13
 
@@ -4076,7 +4060,8 @@ evaluate :: Exp -> Env -> Memory -> (Value, Memory)
 This final type is the type of a *stateful* computation. Since it is
 useful to talk about, we will give it a name: %Stat7
 
-> type Stateful t = Memory -> (Value'9, Memory)
+INCLUDE:Stat8
+> type Stateful t = Memory -> (Value, Memory)
 > -- %Stat8
 
 This is a *generic* type for a memory-based computation which returns
@@ -4112,10 +4097,10 @@ The abstract syntax is added to the data type representing expressions in
 our language: %Sema17
 
 ````
-data Exp'9 = ...
-         | Mutable'9   Exp'9         -- new
-         | Access'9    Exp'9         -- new
-         | Assign'9    Exp'9 Exp'9   -- new
+data Exp = ...
+         | Mutable   Exp         -- new
+         | Access    Exp         -- new
+         | Assign    Exp Exp   -- new
 %Sema18
 ````
 
@@ -4126,7 +4111,7 @@ be taken to allocate the new cell in the new memory. The address of
 the new memory cell is just the length of the memory. %Sema1
 
 ````
-    eval (Mutable'9 e) mem =
+    eval (Mutable e) mem =
       let (ev, mem') = eval e mem in
         (Address (length mem'), mem' ++ [ev])
 %Sema20
@@ -4140,7 +4125,7 @@ section, could be used. %Sema19
 
 
 ````
-    eval (Access'9 a) mem =
+    eval (Access a) mem =
       let (Address i, mem') = eval a mem in
           (access i mem', mem')
 %Sema23
@@ -4152,7 +4137,7 @@ Then the source expression |e| is evaluated.
 Evaluating |a| and |e| may update the memory, so %Sema21
 
 ````
-    eval (Assign'9 a e) mem =
+    eval (Assign a e) mem =
       let (Address i, mem') = eval a mem in
         let (ev, mem'') = eval e mem' in
           (ev, update i ev mem'')
@@ -4166,10 +4151,10 @@ that have nothing to do with mutable cells have to be
 completely rewritten: %Sema26
 
 ````
-    eval (Binary'9 op a b) mem =
+    eval (Binary op a b) mem =
       let (av, mem') = eval a mem in
         let (bv, mem'') = eval b mem' in
-          (binary'9 op av bv, mem'')
+          (Binary op av bv, mem'')
 %Sema27
 ````
 
@@ -4205,70 +4190,73 @@ with creating or manipulating mutable cells. %Summ5
 
 Here is the complete code for mutable cells. %Summ6
 
-> data Exp'9 = Literal'9   Value'9
->          | Unary'9     UnaryOp Exp'9
->          | Binary'9    BinaryOp Exp'9 Exp'9
->          | If'9        Exp'9 Exp'9 Exp'9
->          | Variable'9  String
->          | Let'9       String Exp'9 Exp'9
->          | Function'9  String Exp'9
->          | Call'9      Exp'9 Exp'9
->          | Mutable'9   Exp'9         -- new
->          | Access'9    Exp'9         -- new
->          | Assign'9    Exp'9 Exp'9   -- new
+INCLUDE:Summ7
+> data Exp = Literal   Value
+>          | Unary     UnaryOp Exp
+>          | Binary    BinaryOp Exp Exp
+>          | If        Exp Exp Exp
+>          | Variable  String
+>          | Let       String Exp Exp
+>          | Function  String Exp
+>          | Call      Exp Exp
+>          | Mutable   Exp         -- new
+>          | Access    Exp         -- new
+>          | Assign    Exp Exp   -- new
 >   deriving (Eq, Show)
 >
-> type Env'9 = [(String, Value'9)]
+> type Env = [(String, Value)]
 >
 > -- %Summ7
 
 All the existing cases of the evaluator are modified: %Summ8
 
-> evaluate'9 :: Exp'9 -> Env'9 -> Stateful Value'9
-> evaluate'9 exp env mem = eval exp mem where
->     eval (Literal'9 v) mem    = (v, mem)
->     eval (Unary'9 op a) mem   =
+INCLUDE:Summ9
+> evaluate :: Exp -> Env -> Stateful Value
+> evaluate exp env mem = eval exp mem where
+>     eval (Literal v) mem    = (v, mem)
+>     eval (Unary op a) mem   =
 >       let (av, mem') = eval a mem in
->         (unary'9 op av, mem')
->     eval (Binary'9 op a b) mem =
+>         (Unary op av, mem')
+>     eval (Binary op a b) mem =
 >       let (av, mem') = eval a mem in
 >         let (bv, mem'') = eval b mem' in
->           (binary'9 op av bv, mem'')
->     eval (If'9 a b c) mem =
+>           (Binary op av bv, mem'')
+>     eval (If a b c) mem =
 >       let (av, mem') = eval a mem in
->         eval (if fromBool'9 av then b else c) mem'
->     eval (Variable'9 x) mem = (fromJust (lookup x env), mem)
->     eval (Let'9 x e body) mem =
+>         eval (if fromBool av then b else c) mem'
+>     eval (Variable x) mem = (fromJust (lookup x env), mem)
+>     eval (Let x e body) mem =
 >       let (ev, mem') = eval e mem
 >           newEnv = (x, ev) : env
 >       in
->         evaluate'9 body newEnv mem'
->     eval (Function'9 x body) mem = (Closure'9 x body env, mem)
->     eval (Call'9 f a) mem  =
->       let (Closure'9 x body closeEnv, mem') = eval f mem
+>         evaluate body newEnv mem'
+>     eval (Function x body) mem = (Closure x body env, mem)
+>     eval (Call f a) mem  =
+>       let (Closure x body closeEnv, mem') = eval f mem
 >           (av, mem'') = eval a mem'
 >           newEnv = (x, av) : closeEnv
 >       in
->           evaluate'9 body newEnv mem''
+>           evaluate body newEnv mem''
 > -- %Summ9
 
 Here are the mutation-specific parts of the evaluator: %Summ10
 
->     eval (Mutable'9 e) mem =
+INCLUDE:Summ11
+>     eval (Mutable e) mem =
 >       let (ev, mem') = eval e mem in
 >         (Address (length mem'), mem' ++ [ev])
->     eval (Access'9 a) mem =
+>     eval (Access a) mem =
 >       let (Address i, mem') = eval a mem in
 >           (access i mem', mem')
->     eval (Assign'9 a e) mem =
+>     eval (Assign a e) mem =
 >       let (Address i, mem') = eval a mem in
 >         let (ev, mem'') = eval e mem' in
 >           (ev, update i ev mem'')
 >
-> fromBool'9 (Scalar'9 (Bool b)) = b
+> fromBool (Scalar (Bool b)) = b
 >
-> unary'9 op (Scalar'9 a) = Scalar'9 (unary op a)
-> binary'9 op (Scalar'9 a) (Scalar'9 b) = Scalar'9 (binary op a b)
+> Unary op (Scalar a) = Scalar (unary op a)
+> Binary op (Scalar a) (Scalar b) = Scalar (binary op a b)
 > -- %Summ11
 
  #### Exercise 5.6: Errors and Mutable State
@@ -4311,7 +4299,7 @@ both the Checked and the Stateful evaluators. %Abst13
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |eval :: Exp -> Checked Value|                                |eval :: Exp -> Stateful Value|
-|eval (Literal'7 v) = Good v|                                   |eval (Literal'9 v) mem = (v, mem)| %Abst14
+|eval (Literal v) = Good v|                                   |eval (Literal v) mem = (v, mem)| %Abst14
 
 One important point is that literal values never cause errors
 and they do not modify memory. They represent the simple good
@@ -4334,7 +4322,7 @@ with the checked or stateful values are hidden in the |return| helper functions.
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |eval :: Exp -> Checked Value|                                |eval :: Exp -> Stateful Value|
-|eval (Literal'7 v) = return|$_C$ |v|                           |eval (Literal'9 v) = return|$_S$ |v| %Abst21
+|eval (Literal v) = return|$_C$ |v|                           |eval (Literal v) = return|$_S$ |v| %Abst21
 
  ### Abstracting Computation Composition
 
@@ -4345,10 +4333,10 @@ of multiple sub-expressions. %Abst22
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |eval :: Exp -> Checked Value|                                |eval :: Exp -> Stateful Value|
-|eval (Binary'7 op a b) =|                                      |eval (Binary'9 op a b) =|
+|eval (Binary op a b) =|                                      |eval (Binary op a b) =|
 \ \ |case eval a of|                                          \ \ $\lambda$|mem.let (av, mem') = eval a mem in|
 \ \ \ \ |Error msg -> Error msg|                              \ \ \ \ \ \ \ \ \ \ \ \ \ |let (bv, mem'') = eval b mem' in|
-\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |(binary'9 op av bv, mem'')|
+\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |(Binary op av bv, mem'')|
 \ \ \ \ \ \ |case eval b of|
 \ \ \ \ \ \ \ \ |Error msg -> Error msg|
 \ \ \ \ \ \ \ \ |Good bv ->|
@@ -4402,16 +4390,16 @@ Checked:\ \ %Abst37
 
 Stateful:\ \ \ %Abst39
 
-:     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(binary'9 op av bv, mem)|)) %Abst28
+:     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(Binary op av bv, mem)|)) %Abst28
 
 All mention of |Error| and |Good| have been removed from the Checked version!
 The error `plumbing' has been hidden. Most of the memory plumbing has been removed
 from the Stateful version, but there is still a little at the end. But the pattern
 that has emerged is the same one that was identified in the previous section, where
-the |return|$_S$ function converts a value (the result of |binary'9 op av bv|) into
+the |return|$_S$ function converts a value (the result of |Binary op av bv|) into
 a default stateful computation. To see how this works, consider that %Abst29
 
-|return|$_S$ (|binary'9 op av bv|)\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|mem. (binary'9 op av bv, mem)| %Abst30
+|return|$_S$ (|Binary op av bv|)\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|mem. (Binary op av bv, mem)| %Abst30
 
 Using |return|$_S$ the result is: %Abst31
 
@@ -4421,7 +4409,7 @@ Checked:\ \ %Abst40
 
 Stateful:\ \ \ %Abst42
 
-:     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|binary'9 op av bv|))) %Abst32
+:     (|eval a|) $\rhd_S$ ($\lambda$|va. (eval b)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|Binary op av bv|))) %Abst32
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
 rules for |Mutable|, assignment, and access there will be explicit references to memory.
@@ -4513,6 +4501,7 @@ rather than $\rhd$. %Monad3
 
 The type |Checked| is an instance of the |Monad| class: %Monad4
 
+INCLUDE:Monad5
 > instance Monad Checked where
 >   a >>= f =
 >     case a of
@@ -4531,7 +4520,7 @@ One problem with the monadic version of the program is apparent in the code for
 evaluation of binary expressions. The code given above is ugly because of the nested
 use of lambda functions. Here an attempt to make the Checked case more readable: %Hask1
 
-|eval (Binary'7 op a b) =| \
+|eval (Binary op a b) =| \
 \ |(eval a)| $\rhd_C$ ($\lambda$|va.| \
 \ \ |(eval b)| $\rhd_C$ ($\lambda$|vb.| \
 \ \ \ |checked_binary op av bv|))
@@ -4545,7 +4534,7 @@ Haskell has a special notation, the |do| notations, for the bind operator that a
 to be written in the right order. Using |do| the program above can be written as follows: %Hask3
 
 ````
-eval (Binary'7 op a b) = do
+eval (Binary op a b) = do
   av <- eval a
   bv <- eval b
   checked_binary op av bv
@@ -4563,37 +4552,38 @@ cleanly using monads. %Usin25
 
  ### Monadic Error Checking
 
-> evaluate'11 :: Exp'7 -> Env'7 -> Checked Value'7
-> evaluate'11 exp env = eval exp where
->     eval (Literal'7 v)      = return v
->     eval (Variable'7 x)     =
+INCLUDE:Mona13
+> evaluate :: Exp -> Env -> Checked Value
+> evaluate exp env = eval exp where
+>     eval (Literal v)      = return v
+>     eval (Variable x)     =
 >       case lookup x env of
 >         Nothing -> Error ("Variable " ++ x ++ " undefined")
 >         Just v  -> return v
->     eval (Unary'7 op a) = do
+>     eval (Unary op a) = do
 >       av <- eval a
->       return (unary'7 op av)
->     eval (Binary'7 op a b) = do
+>       return (Unary op av)
+>     eval (Binary op a b) = do
 >       av <- eval a
 >       bv <- eval b
 >       checked_binary op av bv
->     eval (If'7 a b c) = do
+>     eval (If a b c) = do
 >       av <- eval a
 >       case av of
 >         Scalar'7 (Bool cond) -> eval (if cond then b else c)
 >         _ -> Error ("Expected boolean but found " ++ show av)
->     eval (Let'7 x e body) = do    -- non-recursive case
+>     eval (Let x e body) = do    -- non-recursive case
 >       ev <- eval e
 >       let newEnv = (x, ev) : env
->       evaluate'11 body newEnv
->     eval (Function'7 x body) = return (Closure'7 x body env)
->     eval (Call'7 fun arg) = do
+>       evaluate body newEnv
+>     eval (Function x body) = return (Closure x body env)
+>     eval (Call fun arg) = do
 >       funv <- eval fun
 >       case funv of
->         Closure'7 x body closeEnv -> do
+>         Closure x body closeEnv -> do
 >           argv <- eval arg
 >           let newEnv = (x, argv) : closeEnv
->           evaluate'11 body newEnv
+>           evaluate body newEnv
 >         _ -> Error ("Expected function but found " ++ show funv)
 > -- %Mona13
 

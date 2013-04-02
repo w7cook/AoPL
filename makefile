@@ -12,9 +12,14 @@ verb: anatomyVerbatim.pdf
 pretty: anatomy.pdf
 	open anatomy.pdf
 
-tags: anatomy.lhs
-	cp anatomy.lhs archive`date "+%m%d%H%M%Y%S"`.lhs
-	ruby tags.rb > new.lhs
+updates: new.lhs
+	ruby tags.rb | ruby includes.rb "src/*.hs" ">" > new.lhs
+
+diff: updates
+	diff anatomy.lhs new.lhs
+	
+fixup: anatomy.lhs new.lhs
+	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
 	cp new.lhs anatomy.lhs
 	
 update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm
@@ -27,7 +32,8 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm
 	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 	
 anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps
-	cat anatomy.lhs \
+	ruby includes.rb "src/*.hs" ">" < anatomy.lhs \
+	 | sed "/^INCLUDE:/d" \
 	 | sed "s/^ #/#/" \
 	 | sed "s/'[0-9][0-9a-z]*//g" \
 	 | sed "s/^> test[^=]* =/>/g" \
