@@ -62,7 +62,7 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	mkdir -p	~/Public/web/anatomy/figures
 	mkdir -p	~/Public/web/anatomy/code
 	cp figures/*.png ~/Public/web/anatomy/figures
-	cp code/*.hs ~/Public/web/anatomy/code
+	cp code/* ~/Public/web/anatomy/code
 	cp -r cc ~/Public/web/anatomy
 	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 	
@@ -90,7 +90,6 @@ anatomy.htm: anatomy.mkd
 	 | perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
 	 | sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
 	 | sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
-	 | sed "s/<p>/~<p>/g" | sed "s/<pre/~<pre/g" | tr "~" "\n" \
 	 > anatomy.htm
 	 mkdir -p cc
 	 cp ../CommentCloud/*.js cc
