@@ -1,9 +1,9 @@
 # this program computes the start/end line of latex includes for 
 # references to any files
-# usgae: 
+# usage: 
 
 # Example 1 - Read File and close
-def scan(fileName, content)
+def scan(fileName, content, location)
   file = File.new(fileName, "r")
   $stderr << "Scanning '#{fileName}'\n"
   active = {}
@@ -13,9 +13,10 @@ def scan(fileName, content)
       if content[name] || active[name]
         $stderr << "Symbol '#{name}' multiply defined\n"
       else
-        #$stderr << "  Found '#{name}'\n"
+        # $stderr << "  Found '#{name}'\n"
       end
       active[name] = []
+      location[name] = fileName
       hasBeginOrEnd = true
     end
     line.scan(/END\:([a-zA-Z][a-zA-Z0-9]*)/).flatten.each do |name|
@@ -35,16 +36,27 @@ def scan(fileName, content)
   file.close
 end
 
-def process(input, output, marker, content)
+def process(input, output, marker, content, location)
   included = false
   name = ""
   unused = content.keys
+  sectionFiles = []
+  section = ""
   input.each do |line|
+    if line =~ /^ *\#+ /
+      if sectionFiles.size > 0
+        $stderr << "#{section}: #{sectionFiles}\n"
+        sectionFiles = []
+      end
+      section = line.strip
+    end
+      
     if line =~ /INCLUDE\:([a-zA-Z][a-zA-Z0-9]*)/
       name = $1
       output.write(line)
       included = true
       if content[name]
+        sectionFiles << location[name] if !sectionFiles.include? location[name]
         unused.delete(name)
         content[name].each do |out|
           output.write("#{marker} #{out}")
@@ -69,14 +81,15 @@ def process(input, output, marker, content)
 end
 
 content = {}
+location = {}
 
 Dir[ARGV[0]].each do |file| 
-  scan(file, content)
+  scan(file, content, location)
 end
 
 marker = ARGV[1]
 
-process($stdin, $stdout, marker, content)
+process($stdin, $stdout, marker, content, location)
 
 # to run:
 #  ruby "src/*.hs" ">"

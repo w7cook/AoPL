@@ -1,10 +1,29 @@
-.SUFFIXES: .lhs .mkd .htm .tex .pdf
+.SUFFIXES: .lhs .mkd .htm .tex .pdf .hs
 
 .PHONY: verb pretty update clean
 
 PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib 
 HSCOLOUR := hscolour -lit
 NEWLINE!=cat foo.txt
+
+SOURCES=CheckedMonad.hs \
+			ErrorChecking.hs \
+			Examples.hs \
+			FirstClassFunctions.hs \
+			FunExamples.hs \
+			FunctionalEnvironment.hs \
+			IncorrectFunctions.hs \
+			IntBool.hs \
+			Let.hs \
+			LetSubstitute.hs \
+			MutableState.hs \
+			SimpleShow.hs \
+			Simple.hs \
+			SimpleTest.hs \
+			Substitute.hs \
+			TopLevelFunctions.hs \
+			Base.hs \
+
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
@@ -23,13 +42,27 @@ new.lhs: anatomy.lhs
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
 	cp new.lhs anatomy.lhs
-	
-update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm
+
+code/%.hs : src/%.hs makefile
+	cat $< \
+	| sed "/BEGIN:/d" \
+	| sed "/END:/d" \
+	> $@
+	(echo '<pre>'; cat $@; echo '</pre>') \
+  | perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
+  | perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
+  > $@.htm
+
+code:	$(addprefix code/,$(SOURCES))	
+
+update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf 
 	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf 
 	cp anatomy.htm ~/Public/web/anatomy/anatomy.htm
 	mkdir -p	~/Public/web/anatomy/figures
+	mkdir -p	~/Public/web/anatomy/code
 	cp figures/*.png ~/Public/web/anatomy/figures
+	cp code/*.hs ~/Public/web/anatomy/code
 	cp -r cc ~/Public/web/anatomy
 	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 	
@@ -38,7 +71,7 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps
 	 | sed "/^INCLUDE:/d" \
 	 | sed "s/^ #/#/" \
 	 | sed "s/'[0-9][0-9a-z]*//g" \
-	 | sed "s/^> test[^=]* =/>/g" \
+	 | sed "s/^> test[^= ][^= ]* =/>/g" \
 	 | sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
 	 > anatomy.mkd
 

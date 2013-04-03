@@ -160,6 +160,8 @@ and deal with concrete syntax later. %Simp9
 
  ### Abstract Syntax in Haskell
 
+This section describes how to represent abstract syntax using Haskell. The code
+for this section is found in the [Simple](code/Simple.hs.htm) file.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
 INCLUDE:Abst3
@@ -395,7 +397,8 @@ abstract syntax. %Form21
 
 There are many things that can go wrong when evaluating an expression.
 In our current, very simple language, the only error that can arise
-is attempting to divide by zero. For example, consider this small expression: %Erro2
+is attempting to divide by zero. These examples are given in the
+[Simple Examples](code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
 
 INCLUDE:Erro3
 > testDBZ = evaluate (Divide (Number 8) (Number 0))
@@ -429,7 +432,9 @@ To program this in Haskell, the first thing needed is to extend
 the abstract syntax of expressions to include variables.
 Since the name of a variable "x" can be represented
 as a string of characters, it is easy to represent variables as an additional
-kind of expression. The following data definition modifies |Exp| to include
+kind of expression. The code for the section is given in 
+the [Substitute](code/Substitute.hs.htm) file.
+The following data definition modifies |Exp| to include
 a |Variable| case. %Vari3
 
 INCLUDE:Vari99
@@ -1015,7 +1020,8 @@ Modify the |evaluate| function to handle evaluation of multi-variable |let| expr
 In addition to arithmetic computations, it is useful for expressions
 to include conditions and also return different kinds of values.
 Until now our expressions have always returned |Int| results, because
-they have only performed arithmetic computations. The type |Value|
+they have only performed arithmetic computations. The code for this section
+is given in the [Int Bool](code/IntBool.hs.htm) file. The type |Value|
 is defined to support multiple different kinds of values: %More2
 
 INCLUDE:More3
@@ -1233,7 +1239,8 @@ any expression. In this case, the program itself is a list of
 function definitions followed by a main expression. The
 main expression in a C program is an implicit call to a
 function named |main|. Even if a programming language does support more flexible
-definition of functions, top-level functions are quite common.
+definition of functions, top-level functions are quite common. The code
+for this section is given in the [Top Level Functions](code/TopLevelFunctions.hs.htm) file.
 Here is an example of some top-level functions, written in JavaScript: %Top2
 
 ````Java
@@ -1592,7 +1599,11 @@ later section, but the basic concepts are introduced here. %Lamb8
 
 Haskell is based directly on the lambda calculus. In
 fact, the example illustrating how to "solve" for the
-function |f| can be written in Haskell. The following
+function |f| can be written in Haskell. The 
+[Examples](code/Examples.hs.htm) file contains the code for the
+simples examples in this section, while the [Function Examples](code/FunExamples.hs.htm)
+file contains the more complex examples given in the subsections below.
+The following
 definitions are all equivalent in Haskell: %Usin2
 
 INCLUDE:Usin3
@@ -2330,7 +2341,9 @@ motivate and explain the correct solution.
 This section is
 colored red to remind you that the solution it presents
 is *incorrect*. The correct solution is given in
-the [next section, on closures](#Closures). %A2
+the [next section, on closures](#Closures). The code for
+the incorrect soluiton mentioned here is in the 
+[Incorrect Functions](code/IncorrectFunctions.hs.htm) file. %A2
 
 To try this approach, function expressions
 are included in the |Value| data type, which
@@ -2578,7 +2591,8 @@ a function expression as a function value, instead think of it
 as a part of the program that *creates* a function. The actual
 function value is represented by a closure, which captures the
 current environment at the point when the function expression is
-executed.  %A40
+executed. The code for this section is given in the 
+[First-Class Functions](code/FirstClassFunctions.hs.htm) file. %A40
 
 To implement this idea, we revise the definition of |Exp|
 and |Value|. First we add function expressions as a new kind
@@ -3578,7 +3592,8 @@ the way that every expression is evaluated. For example,
 the expression |a+b| may not cause any errors,
 but if evaluating |a| or |b| can cause an error,
 then the evaluation of |a+b| will have to deal with the
-possibility that |a| or |b| is an error. %Hand2
+possibility that |a| or |b| is an error. The full code is
+given in the [Error Checking](code/ErrorChecking.hs.htm) file. %Hand2
 
 Error checking is a notorious problem in programming languages.
 When coding in C, everyone agrees that the return codes of
@@ -3809,7 +3824,8 @@ explain mutation. But we cannot *use* mutation to provide the explanation,
 because we have chosen to write the evaluator in Haskell, a pure functional language.
 The hope is that detailed and explicit analysis of how mutation
 works in programming languages will
-lead to insights about the costs and benefits of using mutation. %Muta9
+lead to insights about the costs and benefits of using mutation. 
+The code for this section is in the [Mutable State](code/MutableState.hs.htm) file. %Muta9
 
  ### Addresses
 
@@ -4525,7 +4541,8 @@ INCLUDE:Monad5
 > -- %Monad5
 
 It turns out to be a little more complex to define the stateful monad instance, so this topic
-is delayed until the end of this section. %Monad6
+is delayed until the end of this section. The code for error checking using monads is
+give in the [Checked Monad](code/CheckedMonad.hs.htm) file. %Monad6
 
  ### Haskell |do| Notation
 
