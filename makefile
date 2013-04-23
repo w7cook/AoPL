@@ -17,6 +17,7 @@ SOURCES=CheckedMonad.hs \
 			Let.hs \
 			LetSubstitute.hs \
 			MutableState.hs \
+			StatefulMonad.hs \
 			SimpleShow.hs \
 			Simple.hs \
 			SimpleTest.hs \

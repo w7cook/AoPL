@@ -36,10 +36,3 @@ showBinary outer inner a op b =
   if inner < outer then paren result else result
      where result = showExp inner a ++ op ++ showExp inner b
 --END:Form18
-
-pExp    = do spaces; pTerm
-pTerm   = pFactor +@ (sym "+" Add      <|> sym "-" Subtract)
-pFactor = pPrim   +@ (sym "*" Multiply <|> sym "/" Divide)
-pPrim   = number `as` Number
-      <|> betweenC '(' pTerm ')' 
-     

@@ -23,11 +23,6 @@ t5 = Add (Number 3) (Multiply (Number 8) (Number 2))
 testDBZ = evaluate (Divide (Number 8) (Number 0))
 --END:Erro3
 
-main'1 = do
-  print $ parse pExp "" "1--7--2"  
-  print $ parse pExp "" " 23*(5 *2+ 2)+ 23 * 3"  
-  print $ parse pExp "" "23*(5 *2+ 2)  + 23 * 3"
-
 --BEGIN:Eval5
 main'2 = do
   putStrLn "Evaluating the following expression:"
@@ -48,7 +43,6 @@ main'3 = do
 --END:Form8
 
 main = do
-  main'1
   main'2
   main'3
 

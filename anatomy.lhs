@@ -161,7 +161,7 @@ and deal with concrete syntax later. %Simp9
  ### Abstract Syntax in Haskell
 
 This section describes how to represent abstract syntax using Haskell. The code
-for this section is found in the [Simple](code/Simple.hs.htm) file.
+for this section is found in the [Simple](http://www.cs.utexas.edu/~wcook/anatomy/code/Simple.hs.htm) file.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
 INCLUDE:Abst3
@@ -398,7 +398,7 @@ abstract syntax. %Form21
 There are many things that can go wrong when evaluating an expression.
 In our current, very simple language, the only error that can arise
 is attempting to divide by zero. These examples are given in the
-[Simple Examples](code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
+[Simple Examples](http://www.cs.utexas.edu/~wcook/anatomy/code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
 
 INCLUDE:Erro3
 > testDBZ = evaluate (Divide (Number 8) (Number 0))
@@ -432,8 +432,8 @@ To program this in Haskell, the first thing needed is to extend
 the abstract syntax of expressions to include variables.
 Since the name of a variable "x" can be represented
 as a string of characters, it is easy to represent variables as an additional
-kind of expression. The code for the section is given in 
-the [Substitute](code/Substitute.hs.htm) file.
+kind of expression. The code for the section is given in
+the [Substitute](http://www.cs.utexas.edu/~wcook/anatomy/code/Substitute.hs.htm) file.
 The following data definition modifies |Exp| to include
 a |Variable| case. %Vari3
 
@@ -456,7 +456,7 @@ binding of $x \mapsto 5$ can be represented as |(\"x\", 5)|. %Vari5
 We are used to calling $x$ and $y$ "variables" without really thinking
 much about what it means to be a "variable". Intuitively a variable is something
 that varies. But what does it mean for a name like $x$ to vary?
-My view on this it that we call them variables because they can have
+My view on this is that we call them variables because they can have
 different values in different contexts. For example, the equation
 $\pi r^2$ defines a relationship between several variables, but
 in the context of a particular word problem, the radius $r$ has a
@@ -1021,7 +1021,7 @@ In addition to arithmetic computations, it is useful for expressions
 to include conditions and also return different kinds of values.
 Until now our expressions have always returned |Int| results, because
 they have only performed arithmetic computations. The code for this section
-is given in the [Int Bool](code/IntBool.hs.htm) file. The type |Value|
+is given in the [Int Bool](http://www.cs.utexas.edu/~wcook/anatomy/code/IntBool.hs.htm) file. The type |Value|
 is defined to support multiple different kinds of values: %More2
 
 INCLUDE:More3
@@ -1240,7 +1240,7 @@ function definitions followed by a main expression. The
 main expression in a C program is an implicit call to a
 function named |main|. Even if a programming language does support more flexible
 definition of functions, top-level functions are quite common. The code
-for this section is given in the [Top Level Functions](code/TopLevelFunctions.hs.htm) file.
+for this section is given in the [Top Level Functions](http://www.cs.utexas.edu/~wcook/anatomy/code/TopLevelFunctions.hs.htm) file.
 Here is an example of some top-level functions, written in JavaScript: %Top2
 
 ````Java
@@ -1599,9 +1599,9 @@ later section, but the basic concepts are introduced here. %Lamb8
 
 Haskell is based directly on the lambda calculus. In
 fact, the example illustrating how to "solve" for the
-function |f| can be written in Haskell. The 
-[Examples](code/Examples.hs.htm) file contains the code for the
-simples examples in this section, while the [Function Examples](code/FunExamples.hs.htm)
+function |f| can be written in Haskell. The
+[Examples](http://www.cs.utexas.edu/~wcook/anatomy/code/Examples.hs.htm) file contains the code for the
+simples examples in this section, while the [Function Examples](http://www.cs.utexas.edu/~wcook/anatomy/code/FunExamples.hs.htm)
 file contains the more complex examples given in the subsections below.
 The following
 definitions are all equivalent in Haskell: %Usin2
@@ -2342,8 +2342,8 @@ This section is
 colored red to remind you that the solution it presents
 is *incorrect*. The correct solution is given in
 the [next section, on closures](#Closures). The code for
-the incorrect soluiton mentioned here is in the 
-[Incorrect Functions](code/IncorrectFunctions.hs.htm) file. %A2
+the incorrect soluiton mentioned here is in the
+[Incorrect Functions](http://www.cs.utexas.edu/~wcook/anatomy/code/IncorrectFunctions.hs.htm) file. %A2
 
 To try this approach, function expressions
 are included in the |Value| data type, which
@@ -2591,8 +2591,8 @@ a function expression as a function value, instead think of it
 as a part of the program that *creates* a function. The actual
 function value is represented by a closure, which captures the
 current environment at the point when the function expression is
-executed. The code for this section is given in the 
-[First-Class Functions](code/FirstClassFunctions.hs.htm) file. %A40
+executed. The code for this section is given in the
+[First-Class Functions](http://www.cs.utexas.edu/~wcook/anatomy/code/FirstClassFunctions.hs.htm) file. %A40
 
 To implement this idea, we revise the definition of |Exp|
 and |Value|. First we add function expressions as a new kind
@@ -3065,16 +3065,6 @@ Note how one of the results of the function call, the |min| value,
 is passed as an argument to the function call itself! %Usin23
 
 TODO: Explain how this works, and give a picture. %Usin24
-
-> --------------------BEGIN-HIDE-------------------------
-> main = do
->   print testTr
->   print (minTree testTr)
->   print (maxTree testTr)
->   print (minMax testTr)
->   print (repMin' (testTr, 9999))
->   print (repMin testTr)
-> --------------------END-HIDE-------------------------
 
  ### Implementing Recursive |Let| with Haskell
 
@@ -3593,7 +3583,7 @@ the expression |a+b| may not cause any errors,
 but if evaluating |a| or |b| can cause an error,
 then the evaluation of |a+b| will have to deal with the
 possibility that |a| or |b| is an error. The full code is
-given in the [Error Checking](code/ErrorChecking.hs.htm) file. %Hand2
+given in the [Error Checking](http://www.cs.utexas.edu/~wcook/anatomy/code/ErrorChecking.hs.htm) file. %Hand2
 
 Error checking is a notorious problem in programming languages.
 When coding in C, everyone agrees that the return codes of
@@ -3824,8 +3814,8 @@ explain mutation. But we cannot *use* mutation to provide the explanation,
 because we have chosen to write the evaluator in Haskell, a pure functional language.
 The hope is that detailed and explicit analysis of how mutation
 works in programming languages will
-lead to insights about the costs and benefits of using mutation. 
-The code for this section is in the [Mutable State](code/MutableState.hs.htm) file. %Muta9
+lead to insights about the costs and benefits of using mutation.
+The code for this section is in the [Mutable State](http://www.cs.utexas.edu/~wcook/anatomy/code/MutableState.hs.htm) file. %Muta9
 
  ### Addresses
 
@@ -4063,7 +4053,7 @@ INCLUDE:Upda13
 This means that |mul10| takes an memory address as an input and returns
 a function that transforms an input memory into an output memory. %Upda14
 
- ### Stateful Computations
+ ### Stateful Computations {#Stateful}
 
 A stateful computation is one that produces a value and *also* accesses
 and potentially updates memory. In changing |evaluate| to be a
@@ -4542,7 +4532,7 @@ INCLUDE:Monad5
 
 It turns out to be a little more complex to define the stateful monad instance, so this topic
 is delayed until the end of this section. The code for error checking using monads is
-give in the [Checked Monad](code/CheckedMonad.hs.htm) file. %Monad6
+give in the [Checked Monad](http://www.cs.utexas.edu/~wcook/anatomy/code/CheckedMonad.hs.htm) file. %Monad6
 
  ### Haskell |do| Notation
 
@@ -4583,6 +4573,8 @@ cleanly using monads. %Usin25
 
  ### Monadic Error Checking
 
+Here is a version of error checking using the |Checked| monad defined above: %Mona14
+
 INCLUDE:Mona13
 > evaluate :: Exp -> Env -> Checked Value
 > evaluate exp env = eval exp where
@@ -4620,9 +4612,93 @@ INCLUDE:Mona13
 
  ### Monadic Mutable State
 
-TODO: This requires dealing with the need for a "data type" rather than just a
-stateful "type". %Mona14
+The full code for the stateful evaluator using monads is
+give in the [Stateful Monad](http://www.cs.utexas.edu/~wcook/anatomy/code/StatefulMonad.hs.htm) file. %Mona15
 
+The main complexity in defining a stateful monad is that monads in Haskell
+can only be defined for |data| types, which have explicit constructor labels.
+It is not possible to define a monad instance for the stateful type
+given in the [Section on Stateful Computations](#Stateful), since it is
+a pure function type: %Mona16
+
+INCLUDE:Stat8
+> type Stateful t = Memory -> (Value, Memory)
+> -- %Stat8
+
+Instead it requires a data type that labels the funtion: %Mona18
+
+INCLUDE:StatefulMonad1
+> data Stateful t = Stateful (Memory -> (t, Memory))
+> -- %StatefulMonad1
+
+The data type is isomorphic to the function type, because it is just
+a type with a label. %Mona19
+
+INCLUDE:StatefulMonad2 %Mona20
+> instance Monad Stateful where
+>   return val = Stateful (\m -> (val, m))
+>   (Stateful c) >>= f = 
+>     Stateful (\m -> 
+>       let (val, m') = c m
+>           Stateful f' = f val
+>       in f' m')
+> -- %StatefulMonad2
+
+Here is a version of evaluator using the |Stateful| monad defined above: %Mona21
+
+INCLUDE:StatefulMonad3 %Mona22
+> evaluate :: Exp -> Env -> Stateful Value
+> evaluate exp env = eval exp where
+>     eval (Literal v) = return v
+>     eval (Unary op a) = do
+>       av <- eval a
+>       return (unary op av)
+>     eval (Binary op a b) = do
+>       av <- eval a
+>       bv <- eval b
+>       return (binary op av bv)
+>     eval (If a b c) = do
+>       Bool cond <- eval a
+>       eval (if cond then b else c)
+>     eval (Let x e body) = do    -- non-recursive case
+>       ev <- eval e
+>       let newEnv = (x, ev) : env
+>       evaluate body newEnv
+>     eval (Variable x) = return (fromJust (lookup x env))
+>     eval (Function x body) = return (Closure x body env)
+>     eval (Call fun arg) = do
+>       Closure x body closeEnv <- eval fun
+>       argv <- eval arg
+>       let newEnv = (x, argv) : closeEnv
+>       evaluate body newEnv
+>     eval (Mutable e) = do
+>       ev <- eval e
+>       newMemory ev        
+>     eval (Access a) = do
+>       Address i <- eval a
+>       readMemory i
+>     eval (Assign a e) = do
+>       Address i <- eval a
+>       ev <- eval e
+>       updateMemory ev i
+>       return ev
+> -- %StatefulMonad3
+
+The evaluate function depends on three helper functions that
+provide basic stateful computations to create memory cells, read memory,
+and udpate memory. %Mona23
+
+INCLUDE:StatefulHelper1 %Mona24
+> newMemory val = Stateful (\mem-> (Address (length mem), mem ++ [val]))
+> -- %StatefulHelper1
+
+INCLUDE:StatefulHelper2 %Mona25
+> readMemory i = Stateful (\mem-> (access i mem, mem))
+> -- %StatefulHelper2
+
+INCLUDE:StatefulHelper3 %Mona26
+> updateMemory val i = Stateful (\mem-> ((), update i val mem))
+> -- %StatefulHelper3
 
  # More Chapters on the way...
  ## Abstract Interpretation and Types
