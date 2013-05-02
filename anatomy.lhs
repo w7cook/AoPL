@@ -3740,7 +3740,7 @@ The following table gives the concrete syntax of these operations. %Addr4
 Operation        Meaning
 ---------------- -----------------------
 |Mutable(e)|     Creates a mutable cell with initial value given by |e|
-|!a|             Accesses the contents stored at address |a|
+|@a|             Accesses the contents stored at address |a|
 |a := e|         Updates the contents at address |a| to be value of expression |e| %Addr5
 
 Using these operations, the factorial program given above can be expressed
@@ -3748,15 +3748,15 @@ as follows, using mutable cells: %Addr6
 
 ````Java
 x = Mutable(1);
-for (i = Mutable(2); !i <= 5; i := !i + 1) {
-  x := !x * !i;
+for (i = Mutable(2); @i <= 5; i := @i + 1) {
+  x := @x * @i;
 }
 %Addr7
 ````
 
 In this model a variable always denotes the address to which it is bound.
 If the variable |x| appears on the right side of an assignment, it must be *dereferenced*
-as |!x|. If the variable appears on the left side of an assignment, it
+as |@x|. If the variable appears on the left side of an assignment, it
 denotes an address that is updated. %Addr8
 
 It should be clear that the *variables* don't actually change in this model.
@@ -3819,9 +3819,9 @@ INCLUDE:Memo4
 
 One complication is that the memory must be able to *grow* by adding
 new addresses. The initial empty memory is the empty list |[]|.
-The first address added is zero [@0]. The next address is one to
-create a memory [@0, @1]. In general a memory with $n$ cells will
-have addresses [@0, @1, ..., @$n-1$].
+The first address added is zero [#0]. The next address is one to
+create a memory [#0, #1]. In general a memory with $n$ cells will
+have addresses [#0, #1, ..., #$n-1$].
 Here is an example memory, with two addresses: %Memo5
 
 > [Value (Scalar'7 (Int 120)), Value (Scalar'7 (Int 6))]
@@ -3836,7 +3836,7 @@ This memory could be the result of executing the factorial program given above,
 under the assumption that |x| is bound to address 0 and |i| is bound to address 1.
 An appropriate environment is: %Memo9
 
-[|x| $\mapsto$ @0, |i| $\mapsto$ @1] %Memo10
+[|x| $\mapsto$ #0, |i| $\mapsto$ #1] %Memo10
 
 During the execution of the program that computes the factorial of 5, there
 are 10 different memory configurations that are created: %Memo11
@@ -3846,14 +3846,14 @@ Step                    Memory
 *start*                 $[]$
 |x = Mutable(1);|       $[1]$
 |i = Mutable(2);|       $[1, 2]$
-|x = !x * !i;|          $[2, 2]$
-|i = !i + 1;|           $[2, 3]$
-|x = !x * !i;|          $[6, 3]$
-|i = !i + 1;|           $[6, 4]$
-|x = !x * !i;|          $[24, 4]$
-|i = !i + 1;|           $[24, 5]$
-|x = !x * !i;|          $[120, 5]$
-|i = !i + 1;|           $[120, 6]$ %Memo1
+|x = @x * @i;|          $[2, 2]$
+|i = @i + 1;|           $[2, 3]$
+|x = @x * @i;|          $[6, 3]$
+|i = @i + 1;|           $[6, 4]$
+|x = @x * @i;|          $[24, 4]$
+|i = @i + 1;|           $[24, 5]$
+|x = @x * @i;|          $[120, 5]$
+|i = @i + 1;|           $[120, 6]$ %Memo1
 
  ### Pure Functional Operations on Memory
 
@@ -3993,7 +3993,7 @@ table defines the abstract syntax: %Sema15
 Operation        Abstract Syntax    Meaning
 ---------------- ------------------ -----------------------
 |Mutable(e)|     |Mutable e|        Allocate memory
-|!a|             |Access a|         Accesses memory
+|@a|             |Access a|         Accesses memory
 |a := e|         |Assign a e|       Updates memory %Sema16
 
 The abstract syntax is added to the data type representing expressions in
@@ -4016,7 +4016,7 @@ the new memory cell is just the length of the memory. %Sema1
 >        (Address (length mem'), mem' ++ [ev])
 > -- %Sema20
 
-The access expression |!a| expression evaluates the address
+The access expression |@a| expression evaluates the address
 expression |a| to get an address, then returns the contents of
 the memory at that address. Note that if the |Address i| pattern fails, Haskell
 raises an error. This is another case where error handling, as in the previous
