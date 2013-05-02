@@ -1100,16 +1100,8 @@ INCLUDE:More98
 
 Running these test cases with the |test| function defined above yields these results: %More22
 
-````Java
-  4 ==> 4
-  (-4) - 6 ==> (-10)
-  3 - (-2) - (-7) ==> (-2)
-  1*(8 + 5) ==> 13
-  3 + 8*2 ==> 17
-  if 3 > 1*(8 + 5) then 1 else 0 ==> 0
-  2 + (if 3 <= 0 then 9 else (-5)) ==> (-3)
-%More23
-````
+INCLUDE:More23
+> -- %More23
 
  ### Type Errors
 
@@ -1142,6 +1134,12 @@ INCLUDE:Type6
 > -- -True
 > err4 = Unary Neg (Literal (BoolV True))
 > -- %Type6
+
+Running these tests produce error messages, but the errors are not
+very descriptive of the problem that actually took place.
+
+INCLUDE:Type6run
+> -- %Type6run
 
 We will discuss techniques for preventing type errors later, but for now
 it is important to realize that programs may fail at runtime. %Type7

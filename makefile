@@ -7,7 +7,8 @@ HSCOLOUR := hscolour -lit
 NEWLINE!=cat foo.txt
 
 TESTS=SimpleTest.hs \
-			SubstituteTest.hs
+			SubstituteTest.hs \
+			IntBoolTest.hs
 
 SOURCES=$(TESTS) \
 			CheckedMonad.hs \

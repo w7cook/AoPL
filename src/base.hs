@@ -1,8 +1,11 @@
 {-# OPTIONS -XFlexibleContexts #-}
 
 module Base where
+import Prelude hiding (catch)
 import Text.Parsec
 import Data.Functor.Identity
+import Control.Exception
+import Text.Groom
 
 ws :: Stream s m Char => ParsecT s u m b -> ParsecT s u m b
 ws op = do
@@ -40,14 +43,24 @@ tagged tag code = do
   putStrLn ("BEGIN" ++ ":" ++ tag)
   code
   putStrLn ("END" ++ ":" ++ tag)
+  putStrLn ""
 
 --BEGIN:Form6
 test fun input = do 
-    putStrLn (show input)
+    putStrLn (groom input)
     putStr " ==> "
-    putStrLn (show (fun input))
+    putStrLn (groom (fun input)) `catch` showError
     putStrLn ""
 --END:Form6
+    
+showError :: SomeException -> IO ()
+showError ex = putStr ("Exception: " ++ trimError (show ex))
+
+trimError e = trim e where
+  trim (':' : ' ' : msg) = msg
+  trim (c:cs) = trim cs
+  trim [] = e
+
 
 -- some parser helpers
 
