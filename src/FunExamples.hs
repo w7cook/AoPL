@@ -36,13 +36,13 @@ testM2 = [ negate n | n <- [1, 3, -7, 0, 12] ]
 
 --BEGIN:Repr3
 type EnvL = [(String, Value)]
-envL1 = [("x", Int 3), ("y", Int 4), ("size", Int 10)]
+envL1 = [("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
 --END:Repr3
 
 --BEGIN:Repr5
-envF1 "x"    = Just (Int 3)
-envF1 "y"    = Just (Int 4)
-envF1 "size" = Just (Int 10)
+envF1 "x"    = Just (IntV 3)
+envF1 "y"    = Just (IntV 4)
+envF1 "size" = Just (IntV 10)
 envF1 _      = Nothing
 --END:Repr5
 
@@ -61,27 +61,27 @@ bindL var val env = (var, val) : env
 
 
 --BEGIN:Repr13
-envL2 = bindL "z" (Int 5) envL1
-   -- [("z", Int 5), ("x", Int 3), ("y", Int 4), ("size", Int 10)]
-envL3 = bindL "x" (Int 9) envL1
-   -- [("x", Int 9), ("x", Int 3), ("y", Int 4), ("size", Int 10)]
+envL2 = bindL "z" (IntV 5) envL1
+   -- [("z", IntV 5), ("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
+envL3 = bindL "x" (IntV 9) envL1
+   -- [("x", IntV 9), ("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
 --END:Repr13
 
 --BEGIN:Repr23
 -- version A
-envF2 = bindF "z" (Int 5) envF1
+envF2 = bindF "z" (IntV 5) envF1
 --END:Repr23
 
 --BEGIN:Repr25
 -- version B
 envF2'1 = \testVar -> if testVar == "z"
-                    then Just (Int 5)
+                    then Just (IntV 5)
                     else envF1 testVar
 --END:Repr25
 
 --BEGIN:Repr27
 -- version C
-envF2'2 "z" = Just (Int 5)
+envF2'2 "z" = Just (IntV 5)
 envF2'2 testVar = envF1 testVar
 --END:Repr27
 

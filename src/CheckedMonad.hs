@@ -32,17 +32,17 @@ evaluate exp env = eval exp where
     eval (If a b c) = do
       av <- eval a
       case av of
-        (Bool cond) -> eval (if cond then b else c)
+        (BoolV cond) -> eval (if cond then b else c)
         _ -> Error ("Expected boolean but found " ++ show av)
     eval (Let x e body) = do    -- non-recursive case
       ev <- eval e
       let newEnv = (x, ev) : env
       evaluate body newEnv
-    eval (Function x body) = return (Closure x body env)
+    eval (Function x body) = return (ClosureV x body env)
     eval (Call fun arg) = do
       funv <- eval fun
       case funv of
-        Closure x body closeEnv -> do
+        ClosureV x body closeEnv -> do
           argv <- eval arg
           let newEnv = (x, argv) : closeEnv
           evaluate body newEnv

@@ -1,8 +1,8 @@
 import Prelude hiding (LT, GT, EQ, id)
 import Data.Maybe
 
-data Value = Int  Int
-           | Bool Bool
+data Value = IntV  Int
+           | BoolV Bool
  deriving (Eq, Show)
 
 data BinaryOp = Add | Sub | Mul | Div | And | Or
@@ -23,17 +23,17 @@ data Program = Program FunEnv Exp
 
 --BEGIN:Top22
 f1 = Function ["n", "m"]
-      (If (Binary EQ (Variable "m") (Literal (Int 0)))
-          (Literal (Int 1))
+      (If (Binary EQ (Variable "m") (Literal (IntV 0)))
+          (Literal (IntV 1))
           (Binary Mul
             (Variable "n")
             (Call "power" [Variable  "n",
                            Binary  Sub (Variable  "m")
-                                         (Literal (Int 1))])))
+                                         (Literal (IntV 1))])))
 
 p1 = Program [("power", f1)]
-             (Call "power" [Literal (Int 3),
-                            Literal (Int 4)])
+             (Call "power" [Literal (IntV 3),
+                            Literal (IntV 4)])
 --END:Top22
 
 --BEGIN:Eval41
@@ -57,7 +57,7 @@ evaluate exp env funEnv = eval exp where
     eval (Literal v)      = v
     eval (Unary op a)     = unary op (eval a)
     eval (Binary op a b)  = binary op (eval a) (eval b)
-    eval (If a b c)       = if fromBool (eval a)
+    eval (If a b c)       = if fromBoolV (eval a)
                             then eval b
                             else eval c
     eval (Variable x)     = fromJust (lookup x env)
@@ -68,29 +68,29 @@ evaluate exp env funEnv = eval exp where
             newEnv = zip xs [eval a | a <- args]
 --END:Summ12
 
-unary Not (Bool b) = Bool (not b)
-unary Neg (Int i)  = Int (-i)
+unary Not (BoolV b) = BoolV (not b)
+unary Neg (IntV i)  = IntV (-i)
 
-binary Add (Int a)  (Int b)  = Int (a + b)
-binary Sub (Int a)  (Int b)  = Int (a - b)
-binary Mul (Int a)  (Int b)  = Int (a * b)
-binary Div (Int a)  (Int b)  = Int (a `div` b)
-binary And (Bool a) (Bool b) = Bool (a && b)
-binary Or  (Bool a) (Bool b) = Bool (a || b)
-binary LT  (Int a)  (Int b)  = Bool (a < b)
-binary LE  (Int a)  (Int b)  = Bool (a <= b)
-binary GE  (Int a)  (Int b)  = Bool (a >= b)
-binary GT  (Int a)  (Int b)  = Bool (a > b)
-binary EQ  a        b        = Bool (a == b)
+binary Add (IntV a)  (IntV b)  = IntV (a + b)
+binary Sub (IntV a)  (IntV b)  = IntV (a - b)
+binary Mul (IntV a)  (IntV b)  = IntV (a * b)
+binary Div (IntV a)  (IntV b)  = IntV (a `div` b)
+binary And (BoolV a) (BoolV b) = BoolV (a && b)
+binary Or  (BoolV a) (BoolV b) = BoolV (a || b)
+binary LT  (IntV a)  (IntV b)  = BoolV (a < b)
+binary LE  (IntV a)  (IntV b)  = BoolV (a <= b)
+binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
+binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
+binary EQ  a         b         = BoolV (a == b)
 
-fromBool (Bool b) = b
+fromBoolV (BoolV b) = b
 
 --BEGIN:A13
 testP1 = Program
   [("f", Function ["x"]
            (Binary Mul (Variable "x")
                        (Variable "x")))]
-  (Call "f" [Literal (Int 10)])
+  (Call "f" [Literal (IntV 10)])
 --END:A13
 
 main = do

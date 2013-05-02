@@ -28,11 +28,3 @@ evaluate exp env = eval exp where
   eval (Let x exp body)     = evaluate body newEnv
     where newEnv = (x, eval exp) : env
 --END:Eval9
-
-data Value = Int  Int
-           | Bool Bool
- deriving Eq
-
-instance Show Value where
-  show (Int i) = if i < 0 then paren (show i) else show i
-  show (Bool b) = show b

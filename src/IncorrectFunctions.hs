@@ -1,21 +1,20 @@
 import Data.Maybe
 import Base
+import FunctionalEnvironment hiding (main)
 
 --BEGIN:A32
-data Value = Int  Int
-           | Bool Bool
+data Value = IntV  Int
+           | BoolV Bool
            | Function String Exp  -- new
   deriving (Eq, Show)
 --END:A32
-
-
 
 --BEGIN:A15
 testP2 =
  Let "f" (Literal (Function "x"
                       (Binary Mul (Variable "x")
                                   (Variable "x"))))
-   (Call (Variable "f") (Literal (Int 10)))
+   (Call (Variable "f") (Literal (IntV 10)))
 --END:A15
 
 data BinaryOp = Add | Sub | Mul | Div | And | Or
@@ -42,7 +41,7 @@ evaluate exp env = eval exp
     eval (Literal v)      = v
     eval (Unary op a)     = unary op (eval a)
     eval (Binary op a b)  = binary op (eval a) (eval b)
-    eval (If a b c)       = if fromBool (eval a)
+    eval (If a b c)       = if fromBoolV (eval a)
                             then eval b
                             else eval c
     eval (Let x exp body) = evaluate body newEnv
@@ -54,7 +53,7 @@ evaluate exp env = eval exp
             newEnv = bindF x (eval arg) env
     --END:A35
 
-fromBool (Bool b) = b
+fromBoolV (BoolV b) = b
 unary op (a) = (unary op a)
 binary op (a) (b) = (binary op a b)
 
@@ -69,8 +68,8 @@ testE2 =
                 (Binary Add (Variable "b")
                             (Variable "a"))))))
              (Call (Call (Variable "add")
-                             (Literal (Int 3)))
-                   (Literal (Int 2)))
+                             (Literal (IntV 3)))
+                   (Literal (IntV 2)))
 --END:Prob5
 
 main = do

@@ -1,7 +1,6 @@
 import Base
 import Simple
 
-
 --BEGIN:Abst1
 -- 4
 t1 = Number 4
@@ -43,7 +42,7 @@ main'3 = do
 --END:Form8
 
 main = do
-  main'2
-  main'3
+  tagged "Eval7" main'2
+  tagged "Form12"main'3
 
   

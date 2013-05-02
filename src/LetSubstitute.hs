@@ -1,4 +1,4 @@
-import Let
+import Let hiding (evaluate)
 
 --BEGIN:Summ19
 substitute1 (var, val) exp = subst exp where

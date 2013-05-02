@@ -34,19 +34,19 @@ number = do
   xs <- ws $ many1 digit
   return (sign * (read xs :: Int))
 
-  
---BEGIN:Form13
-paren str = "(" ++ str ++ ")"
---END:Form13
-
 check msg a b = putStrLn (if a == b then "OK" else "*** CHECK " ++ msg ++ " Failed ***")
 
+tagged tag code = do 
+  putStrLn ("BEGIN" ++ ":" ++ tag)
+  code
+  putStrLn ("END" ++ ":" ++ tag)
+
 --BEGIN:Form6
-test fun input = do
-  putStr "    "
-  putStr (show input)
-  putStr " ==> "
-  putStrLn (show (fun input))
+test fun input = do 
+    putStrLn (show input)
+    putStr " ==> "
+    putStrLn (show (fun input))
+    putStrLn ""
 --END:Form6
 
 -- some parser helpers

@@ -6,16 +6,16 @@ import Data.Maybe
 import MutableState hiding (Stateful, evaluate)
 
 --BEGIN:StatefulMonad1
-data Stateful t = Stateful (Memory -> (t, Memory))
+data Stateful t = ST (Memory -> (t, Memory))
 --END:StatefulMonad1
 
 --BEGIN:StatefulMonad2
 instance Monad Stateful where
-  return val = Stateful (\m -> (val, m))
-  (Stateful c) >>= f = 
-    Stateful (\m -> 
+  return val = ST (\m -> (val, m))
+  (ST c) >>= f = 
+    ST (\m -> 
       let (val, m') = c m
-          Stateful f' = f val
+          ST f' = f val
       in f' m')
 --END:StatefulMonad2
         
@@ -31,16 +31,16 @@ evaluate exp env = eval exp where
       bv <- eval b
       return (binary op av bv)
     eval (If a b c) = do
-      Bool cond <- eval a
+      BoolV cond <- eval a
       eval (if cond then b else c)
     eval (Let x e body) = do    -- non-recursive case
       ev <- eval e
       let newEnv = (x, ev) : env
       evaluate body newEnv
     eval (Variable x) = return (fromJust (lookup x env))
-    eval (Function x body) = return (Closure x body env)
+    eval (Function x body) = return (ClosureV  x body env)
     eval (Call fun arg) = do
-      Closure x body closeEnv <- eval fun
+      ClosureV  x body closeEnv <- eval fun
       argv <- eval arg
       let newEnv = (x, argv) : closeEnv
       evaluate body newEnv
@@ -48,36 +48,36 @@ evaluate exp env = eval exp where
       ev <- eval e
       newMemory ev        
     eval (Access a) = do
-      Address i <- eval a
+      AddressV i <- eval a
       readMemory i
     eval (Assign a e) = do
-      Address i <- eval a
+      AddressV i <- eval a
       ev <- eval e
       updateMemory ev i
       return ev
 --END:StatefulMonad3
 
 --BEGIN:StatefulHelper1
-newMemory val = Stateful (\mem-> (Address (length mem), mem ++ [val]))
+newMemory val = ST (\mem-> (AddressV (length mem), mem ++ [val]))
 --END:StatefulHelper1
 
 --BEGIN:StatefulHelper2
-readMemory i = Stateful (\mem-> (access i mem, mem))
+readMemory i = ST (\mem-> (access i mem, mem))
 --END:StatefulHelper2
 
 --BEGIN:StatefulHelper3
-updateMemory val i = Stateful (\mem-> ((), update i val mem))
+updateMemory val i = ST (\mem-> ((), update i val mem))
 --END:StatefulHelper3
 
-runStateful (Stateful c) = 
+runStateful (ST c) = 
    let (val, mem) = c [] in val
 
-t0 = Let "x" (Literal (Int 99)) (Variable "x")
-t1 = Let "x" (Mutable (Literal (Int 3)))
+t0 = Let "x" (Literal (IntV 99)) (Variable "x")
+t1 = Let "x" (Mutable (Literal (IntV 3)))
          (Access (Variable "x"))
          
 main = do
-  print (runStateful (evaluate (Literal (Int 6)) []))
+  print (runStateful (evaluate (Literal (IntV 6)) []))
   print (runStateful (evaluate t0 []))
   print (runStateful (evaluate t1 []))
   

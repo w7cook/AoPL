@@ -5,10 +5,10 @@ import Base
 import Data.Maybe
 
 --BEGIN:Addr11
-data Value = Int  Int
-           | Bool Bool
-           | Closure String Exp Env
-           | Address Int        -- new
+data Value = IntV  Int
+           | BoolV Bool
+           | ClosureV String Exp Env
+           | AddressV Int        -- new
   deriving (Eq, Show)
 --END:Addr11
 
@@ -29,10 +29,10 @@ update addr val mem =
 
 --BEGIN:Upda7
 mul10 addr mem =
-  let n = fromInt (access addr mem) in
+  let n = fromIntV (access addr mem) in
     update addr (toValue (10 * n)) mem
-fromInt (Int n) = n
-toValue n = (Int n)
+fromIntV (IntV n) = n
+toValue n = (IntV n)
 --END:Upda7
 
 --BEGIN:Upda9
@@ -77,16 +77,16 @@ evaluate exp env mem = eval exp mem where
           (binary op av bv, mem'')
     eval (If a b c) mem =
       let (av, mem') = eval a mem in
-        eval (if fromBool av then b else c) mem'
+        eval (if fromBoolV av then b else c) mem'
     eval (Variable x) mem = (fromJust (lookup x env), mem)
     eval (Let x e body) mem =
       let (ev, mem') = eval e mem
           newEnv = (x, ev) : env
       in
         evaluate body newEnv mem'
-    eval (Function x body) mem = (Closure x body env, mem)
+    eval (Function x body) mem = (ClosureV x body env, mem)
     eval (Call f a) mem  =
-      let (Closure x body closeEnv, mem') = eval f mem
+      let (ClosureV x body closeEnv, mem') = eval f mem
           (av, mem'') = eval a mem'
           newEnv = (x, av) : closeEnv
       in
@@ -94,15 +94,15 @@ evaluate exp env mem = eval exp mem where
 --END:Summ9 BEGIN:Summ11
     eval (Mutable e) mem =
       let (ev, mem') = eval e mem in
-        (Address (length mem'), mem' ++ [ev])
+        (AddressV (length mem'), mem' ++ [ev])
     eval (Access a) mem =
-      let (Address i, mem') = eval a mem in
+      let (AddressV i, mem') = eval a mem in
           (access i mem', mem')
     eval (Assign a e) mem =
-      let (Address i, mem') = eval a mem in
+      let (AddressV i, mem') = eval a mem in
         let (ev, mem'') = eval e mem' in
           (ev, update i ev mem'')
-fromBool (Bool b) = b
+fromBoolV (BoolV b) = b
 --END:Summ11
 
 -- same as in IntBool.hs
@@ -113,17 +113,17 @@ data BinaryOp = Add | Sub | Mul | Div | And | Or
 data UnaryOp = Neg | Not
   deriving (Eq, Show)
 
-unary Not (Bool b) = Bool (not b)
-unary Neg (Int i)  = Int (-i)
+unary Not (BoolV b) = BoolV (not b)
+unary Neg (IntV i)  = IntV (-i)
 
-binary Add (Int a)  (Int b)  = Int (a + b)
-binary Sub (Int a)  (Int b)  = Int (a - b)
-binary Mul (Int a)  (Int b)  = Int (a * b)
-binary Div (Int a)  (Int b)  = Int (a `div` b)
-binary And (Bool a) (Bool b) = Bool (a && b)
-binary Or  (Bool a) (Bool b) = Bool (a || b)
-binary LT  (Int a)  (Int b)  = Bool (a < b)
-binary LE  (Int a)  (Int b)  = Bool (a <= b)
-binary GE  (Int a)  (Int b)  = Bool (a >= b)
-binary GT  (Int a)  (Int b)  = Bool (a > b)
-binary EQ  a        b        = Bool (a == b)
+binary Add (IntV a)  (IntV b)  = IntV (a + b)
+binary Sub (IntV a)  (IntV b)  = IntV (a - b)
+binary Mul (IntV a)  (IntV b)  = IntV (a * b)
+binary Div (IntV a)  (IntV b)  = IntV (a `div` b)
+binary And (BoolV a) (BoolV b) = BoolV (a && b)
+binary Or  (BoolV a) (BoolV b) = BoolV (a || b)
+binary LT  (IntV a)  (IntV b)  = BoolV (a < b)
+binary LE  (IntV a)  (IntV b)  = BoolV (a <= b)
+binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
+binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
+binary EQ  a         b         = BoolV (a == b)

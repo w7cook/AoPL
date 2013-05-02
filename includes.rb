@@ -83,15 +83,17 @@ end
 content = {}
 location = {}
 
-Dir[ARGV[0]].each do |file| 
-  scan(file, content, location)
-end
+marker = ARGV.pop
 
-marker = ARGV[1]
+ARGV.each do |spec|
+  Dir[spec].each do |file| 
+    scan(file, content, location)
+  end
+end
 
 process($stdin, $stdout, marker, content, location)
 
 # to run:
-#  ruby "src/*.hs" ">"
+#  ruby "src/*.hs" "output/*.out" ">"
 
 

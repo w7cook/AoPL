@@ -6,7 +6,11 @@ PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib
 HSCOLOUR := hscolour -lit
 NEWLINE!=cat foo.txt
 
-SOURCES=CheckedMonad.hs \
+TESTS=SimpleTest.hs \
+			SubstituteTest.hs
+
+SOURCES=$(TESTS) \
+			CheckedMonad.hs \
 			ErrorChecking.hs \
 			Examples.hs \
 			FirstClassFunctions.hs \
@@ -18,13 +22,10 @@ SOURCES=CheckedMonad.hs \
 			LetSubstitute.hs \
 			MutableState.hs \
 			StatefulMonad.hs \
-			SimpleShow.hs \
 			Simple.hs \
-			SimpleTest.hs \
 			Substitute.hs \
 			TopLevelFunctions.hs \
-			Base.hs \
-
+			Base.hs
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
@@ -37,8 +38,8 @@ updates: new.lhs
 diff: new.lhs
 	diff anatomy.lhs new.lhs
 	
-new.lhs: anatomy.lhs
-	ruby tags.rb | ruby includes.rb "src/*.hs" ">" > new.lhs
+new.lhs: anatomy.lhs	execute
+	ruby tags.rb | ruby includes.rb "src/*.hs" "output/*.out" ">" > new.lhs
 
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
@@ -50,11 +51,22 @@ code/%.hs : src/%.hs makefile
 	| sed "/END:/d" \
 	> $@
 	(echo '<pre>'; cat $@; echo '</pre>') \
-  | perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
-  | perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
-  > $@.htm
+	| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
+	| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
+	> $@.htm
 
 code:	$(addprefix code/,$(SOURCES))	
+
+code/%.hs : code/%.hs makefile
+	(echo '<pre>'; cat $@; echo '</pre>') \
+	| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
+	| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
+	> $@.htm
+
+output/%.out : code/%.hs makefile
+	cd code; runghc $(notdir $<) > ../output/$(addsuffix .out, $(basename $(notdir $<)))
+
+execute: code $(addprefix output/, $(addsuffix .out, $(basename $(notdir $(TESTS)))))
 
 update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf 
@@ -67,8 +79,8 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp -r cc ~/Public/web/anatomy
 	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 	
-anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps
-	ruby includes.rb "src/*.hs" ">" < anatomy.lhs \
+anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
+	ruby includes.rb "src/*.hs" "output/*.out" ">" < anatomy.lhs \
 	 | sed "/^INCLUDE:/d" \
 	 | sed "s/^ #/#/" \
 	 | sed "s/'[0-9][0-9a-z]*//g" \
