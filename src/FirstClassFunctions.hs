@@ -24,23 +24,33 @@ data Exp = Literal   Value
 type Env = [(String, Value)]
 
 evaluate :: Exp -> Env -> Value
-evaluate exp env = eval exp where
-    eval (Literal v)      = v
-    eval (Unary op a)     = unary op (eval a)
-    eval (Binary op a b)  = binary op (eval a) (eval b)
-    eval (If a b c)       = if fromBoolV (eval a)
-                            then eval b
-                            else eval c
-    eval (Variable x)     = fromJust (lookup x env)
-    eval (Let x exp body) = evaluate body newEnv
-      where newEnv = (x, eval exp) : env
-    eval (Function x body) = ClosureV x body env     -- new
-    eval (Call fun arg)   = evaluate body newEnv    -- changed
-      where ClosureV x body closeEnv = eval fun
-            newEnv = (x, eval arg) : closeEnv
+evaluate (Literal v) env = v
 
-fromBoolV (BoolV b) = b
---END:Summ14
+evaluate (Unary op a) env = 
+  unary op (evaluate a env)
+
+evaluate (Binary op a b) env = 
+  binary op (evaluate a env) (evaluate b env)
+
+evaluate (If a b c) env = 
+  let BoolV test = evaluate a env in
+    if test then evaluate b env
+            else evaluate c env
+
+evaluate (Variable x) env = fromJust (lookup x env)
+
+evaluate (Let x exp body) env = evaluate body newEnv
+  where newEnv = (x, evaluate exp env) : env
+
+--BEGIN:A44
+evaluate (Function x body) env = ClosureV x body env     -- new
+--END:A44
+
+--BEGIN:A47
+evaluate (Call fun arg) env = evaluate body newEnv    -- changed
+  where ClosureV x body closeEnv = evaluate fun env
+        newEnv = (x, evaluate arg env) : closeEnv
+--END:Summ14 END:A47
 
 -- same as in IntBool.hs
 data BinaryOp = Add | Sub | Mul | Div | And | Or

@@ -3,7 +3,7 @@ module StatefulMonad where
 import Prelude hiding (LT, GT, EQ, id)
 import Base
 import Data.Maybe
-import MutableState hiding (Stateful, evaluate)
+import Stateful hiding (Stateful, evaluate)
 
 --BEGIN:StatefulMonad1
 data Stateful t = ST (Memory -> (t, Memory))
@@ -21,40 +21,41 @@ instance Monad Stateful where
         
 --BEGIN:StatefulMonad3
 evaluate :: Exp -> Env -> Stateful Value
-evaluate exp env = eval exp where
-    eval (Literal v) = return v
-    eval (Unary op a) = do
-      av <- eval a
-      return (unary op av)
-    eval (Binary op a b) = do
-      av <- eval a
-      bv <- eval b
-      return (binary op av bv)
-    eval (If a b c) = do
-      BoolV cond <- eval a
-      eval (if cond then b else c)
-    eval (Let x e body) = do    -- non-recursive case
-      ev <- eval e
-      let newEnv = (x, ev) : env
-      evaluate body newEnv
-    eval (Variable x) = return (fromJust (lookup x env))
-    eval (Function x body) = return (ClosureV  x body env)
-    eval (Call fun arg) = do
-      ClosureV  x body closeEnv <- eval fun
-      argv <- eval arg
-      let newEnv = (x, argv) : closeEnv
-      evaluate body newEnv
-    eval (Mutable e) = do
-      ev <- eval e
-      newMemory ev        
-    eval (Access a) = do
-      AddressV i <- eval a
-      readMemory i
-    eval (Assign a e) = do
-      AddressV i <- eval a
-      ev <- eval e
-      updateMemory ev i
-      return ev
+evaluate (Literal v) env = return v
+evaluate (Unary op a) env = do
+  av <- evaluate a env
+  return (unary op av)
+evaluate (Binary op a b) env = do
+  av <- evaluate a env
+  bv <- evaluate b env
+  return (binary op av bv)
+evaluate (If a b c) env = do
+  BoolV cond <- evaluate a env
+  evaluate (if cond then b else c) env
+evaluate (Let x e body) env = do    -- non-recursive case
+  ev <- evaluate e env
+  let newEnv = (x, ev) : env
+  evaluate body newEnv
+evaluate (Variable x) env = 
+  return (fromJust (lookup x env))
+evaluate (Function x body) env = 
+  return (ClosureV  x body env)
+evaluate (Call fun arg) env = do
+  ClosureV  x body closeEnv <- evaluate fun env
+  argv <- evaluate arg env
+  let newEnv = (x, argv) : closeEnv
+  evaluate body newEnv
+evaluate (Mutable e) env = do
+  ev <- evaluate e env
+  newMemory ev        
+evaluate (Access a) env = do
+  AddressV i <- evaluate a env
+  readMemory i
+evaluate (Assign a e) env = do
+  AddressV i <- evaluate a env
+  ev <- evaluate e env
+  updateMemory ev i
+  return ev
 --END:StatefulMonad3
 
 --BEGIN:StatefulHelper1
@@ -72,12 +73,5 @@ updateMemory val i = ST (\mem-> ((), update i val mem))
 runStateful (ST c) = 
    let (val, mem) = c [] in val
 
-t0 = Let "x" (Literal (IntV 99)) (Variable "x")
-t1 = Let "x" (Mutable (Literal (IntV 3)))
-         (Access (Variable "x"))
-         
-main = do
-  print (runStateful (evaluate (Literal (IntV 6)) []))
-  print (runStateful (evaluate t0 []))
-  print (runStateful (evaluate t1 []))
+
   

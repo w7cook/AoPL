@@ -29,19 +29,24 @@ data Exp = Literal   Value
 type Env = [(String, Value)]
 
 -- Evaluate an expression in an environment
+--BEGIN:Stat2
 evaluate :: Exp -> Env -> Value
-evaluate exp env = eval exp where
-    eval (Literal v)      = v
-    eval (Unary op a)     = unary op (eval a)
-    eval (Binary op a b)  = binary op (eval a) (eval b)
-    eval (Variable x)     = fromJust (lookup x env)
-    eval (Let x exp body) = evaluate body newEnv
-      where newEnv = (x, eval exp) : env
+--END:Stat2
+evaluate (Literal v) env      = v
+evaluate (Unary op a) env     = unary op (evaluate a env)
+--BEGIN:Hand13
+evaluate (Binary op a b) env  = binary op (evaluate a env) (evaluate b env)
+--END:Hand13
+evaluate (Variable x) env     = fromJust (lookup x env)
+evaluate (Let x exp body) env = evaluate body newEnv
+  where newEnv = (x, evaluate exp env) : env
 --END:More12 BEGIN:More14
-    eval (If a b c)      = if fromBoolV (eval a)
-                           then eval b
-                           else eval c
-fromBoolV (BoolV b) = b
+evaluate (If a b c) env =
+  let BoolV test = evaluate a env in
+    if test then evaluate b env
+            else evaluate c env
+
+execute exp = evaluate exp []
 --END:More14
 
 --BEGIN:More16

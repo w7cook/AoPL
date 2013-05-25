@@ -46,8 +46,8 @@ tagged tag code = do
   putStrLn ""
 
 --BEGIN:Form6
-test fun input = do 
-    putStrLn (groom input)
+test msg fun input = do 
+    putStrLn (msg ++ " (" ++ groom input ++ ")")
     putStr " ==> "
     putStrLn (groom (fun input)) `catch` showError
     putStrLn ""
@@ -60,7 +60,3 @@ trimError e = trim e where
   trim (':' : ' ' : msg) = msg
   trim (c:cs) = trim cs
   trim [] = e
-
-
--- some parser helpers
-

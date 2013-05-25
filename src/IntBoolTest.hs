@@ -32,13 +32,13 @@ t7 = Binary Add (Literal (IntV 2))
 --END:More98
 
 test1 = do
-  test (\e-> evaluate e []) t1
-  test (\e-> evaluate e []) t2
-  test (\e-> evaluate e []) t3
-  test (\e-> evaluate e []) t4
-  test (\e-> evaluate e []) t5
-  test (\e-> evaluate e []) t6
-  test (\e-> evaluate e []) t7
+  test "execute" execute t1
+  test "execute" execute t2
+  test "execute" execute t3
+  test "execute" execute t4
+  test "execute" execute t5
+  test "execute" execute t6
+  test "execute" execute t7
 
 --BEGIN:Type6
 -- if 3 then 5 else 8
@@ -52,10 +52,10 @@ err4 = Unary Neg (Literal (BoolV True))
 --END:Type6
 
 test2 = do
-  test (\e-> evaluate e []) err1
-  test (\e-> evaluate e []) err2
-  test (\e-> evaluate e []) err3
-  test (\e-> evaluate e []) err4
+  test "execute" execute err1
+  test "execute" execute err2
+  test "execute" execute err3
+  test "execute" execute err4
 
 main = do
   tagged "More23" test1

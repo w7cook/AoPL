@@ -1,40 +1,19 @@
-import Prelude hiding (LT, GT, EQ, id)
+module TopLevelFunctions where
+
+import Prelude hiding (LT, GT, EQ)
 import Data.Maybe
-
-data Value = IntV  Int
-           | BoolV Bool
- deriving (Eq, Show)
-
-data BinaryOp = Add | Sub | Mul | Div | And | Or
-              | GT | LT | LE | GE | EQ
-  deriving Eq
-
-data UnaryOp = Neg | Not
-  deriving Eq
+import IntBool hiding (Exp, Literal, Unary, Binary, If, Variable, Let, evaluate)
 
 --BEGIN:Top15
 type FunEnv = [(String, Function)]
 data Function = Function [String] Exp
+  deriving Show
 --END:Top15
 
 --BEGIN:Top18
 data Program = Program FunEnv Exp
+  deriving Show
 --END:Top18
-
---BEGIN:Top22
-f1 = Function ["n", "m"]
-      (If (Binary EQ (Variable "m") (Literal (IntV 0)))
-          (Literal (IntV 1))
-          (Binary Mul
-            (Variable "n")
-            (Call "power" [Variable  "n",
-                           Binary  Sub (Variable  "m")
-                                         (Literal (IntV 1))])))
-
-p1 = Program [("power", f1)]
-             (Call "power" [Literal (IntV 3),
-                            Literal (IntV 4)])
---END:Top22
 
 --BEGIN:Eval41
 execute :: Program -> Value
@@ -49,50 +28,34 @@ data Exp = Literal   Value
          | Variable  String
          | Let       String Exp Exp
          | Call      String [Exp]
+  deriving Show
       
-type Env = [(String, Value)]
-   
+--BEGIN:Eval59
 evaluate :: Exp -> Env -> FunEnv -> Value
-evaluate exp env funEnv = eval exp where
-    eval (Literal v)      = v
-    eval (Unary op a)     = unary op (eval a)
-    eval (Binary op a b)  = binary op (eval a) (eval b)
-    eval (If a b c)       = if fromBoolV (eval a)
-                            then eval b
-                            else eval c
-    eval (Variable x)     = fromJust (lookup x env)
-    eval (Let x exp body) = evaluate body newEnv funEnv
-      where newEnv = (x, eval exp) : env
-    eval (Call fun args)   = evaluate body newEnv funEnv
-      where Function xs body = fromJust (lookup fun funEnv)
-            newEnv = zip xs [eval a | a <- args]
---END:Summ12
+--END:Eval59
+evaluate (Literal v) env funEnv      = v
 
-unary Not (BoolV b) = BoolV (not b)
-unary Neg (IntV i)  = IntV (-i)
+evaluate (Unary op a) env funEnv     = 
+  unary op (evaluate a env funEnv)
 
-binary Add (IntV a)  (IntV b)  = IntV (a + b)
-binary Sub (IntV a)  (IntV b)  = IntV (a - b)
-binary Mul (IntV a)  (IntV b)  = IntV (a * b)
-binary Div (IntV a)  (IntV b)  = IntV (a `div` b)
-binary And (BoolV a) (BoolV b) = BoolV (a && b)
-binary Or  (BoolV a) (BoolV b) = BoolV (a || b)
-binary LT  (IntV a)  (IntV b)  = BoolV (a < b)
-binary LE  (IntV a)  (IntV b)  = BoolV (a <= b)
-binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
-binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
-binary EQ  a         b         = BoolV (a == b)
+evaluate (Binary op a b) env funEnv  = 
+  binary op (evaluate a env funEnv) (evaluate b env funEnv)
 
-fromBoolV (BoolV b) = b
+evaluate (If a b c) env funEnv       = 
+  let BoolV test = evaluate a env funEnv in
+    if test then evaluate b env funEnv
+            else evaluate c env funEnv
 
---BEGIN:A13
-testP1 = Program
-  [("f", Function ["x"]
-           (Binary Mul (Variable "x")
-                       (Variable "x")))]
-  (Call "f" [Literal (IntV 10)])
---END:A13
+evaluate (Variable x) env funEnv     = fromJust (lookup x env)
 
-main = do
-  print (execute testP1)
+evaluate (Let x exp body) env funEnv = evaluate body newEnv funEnv
+  where newEnv = (x, evaluate exp env funEnv) : env
+
+--BEGIN:Eval31
+evaluate (Call fun args) env funEnv   = evaluate body newEnv funEnv
+  where Function xs body = fromJust (lookup fun funEnv)
+        newEnv = zip xs [evaluate a env funEnv | a <- args]
+--END:Summ12 END:Eval31
+
+
    

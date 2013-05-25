@@ -8,7 +8,9 @@ NEWLINE!=cat foo.txt
 
 TESTS=SimpleTest.hs \
 			SubstituteTest.hs \
-			IntBoolTest.hs
+			IntBoolTest.hs \
+			TopLevelFunctionsTest.hs \
+			StatefulTest.hs
 
 SOURCES=$(TESTS) \
 			CheckedMonad.hs \
@@ -21,7 +23,7 @@ SOURCES=$(TESTS) \
 			IntBool.hs \
 			Let.hs \
 			LetSubstitute.hs \
-			MutableState.hs \
+			Stateful.hs \
 			StatefulMonad.hs \
 			Simple.hs \
 			Substitute.hs \
@@ -125,7 +127,9 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "/|/s/\\\\_/_/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
-		| sed "s/BAR/||/g" \
+    | sed "s/BAR/||/g" \
+    | sed "s/OPENB/{/g" \
+    | sed "s/CLOSEB/}/g" \
 		> temp.lhs
 		 
 anatomyVerbatim.pdf: temp.lhs

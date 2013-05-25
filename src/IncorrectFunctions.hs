@@ -1,6 +1,9 @@
+module IncorrectFunctions where
+
+import Prelude hiding (LT, GT, EQ)
 import Data.Maybe
 import Base
-import FunctionalEnvironment hiding (main)
+import FunctionalEnvironment
 
 --BEGIN:A32
 data Value = IntV  Int
@@ -8,21 +11,6 @@ data Value = IntV  Int
            | Function String Exp  -- new
   deriving (Eq, Show)
 --END:A32
-
---BEGIN:A15
-testP2 =
- Let "f" (Literal (Function "x"
-                      (Binary Mul (Variable "x")
-                                  (Variable "x"))))
-   (Call (Variable "f") (Literal (IntV 10)))
---END:A15
-
-data BinaryOp = Add | Sub | Mul | Div | And | Or
-              | GT | LT | LE | GE | EQ
-  deriving (Eq, Show)
-
-data UnaryOp = Neg | Not
-  deriving (Eq, Show)
 
 data Exp = Literal   Value
          | Unary     UnaryOp Exp
@@ -35,43 +23,45 @@ data Exp = Literal   Value
 
 type Env = String -> Maybe Value
 
+-- most of this is the same as IntBool
+--BEGIN:A34
 evaluate :: Exp -> Env -> Value
-evaluate exp env = eval exp
-  where  -- TODO: not needed to show this code here?
-    eval (Literal v)      = v
-    eval (Unary op a)     = unary op (eval a)
-    eval (Binary op a b)  = binary op (eval a) (eval b)
-    eval (If a b c)       = if fromBoolV (eval a)
-                            then eval b
-                            else eval c
-    eval (Let x exp body) = evaluate body newEnv
-      where newEnv = bindF x (eval exp) env
-    eval (Variable x)     = fromJust (env x)
-    --BEGIN:A35
-    eval (Call fun arg)   = evaluate body newEnv
-      where Function x body = eval fun
-            newEnv = bindF x (eval arg) env
-    --END:A35
+evaluate (Literal v) env      = v
+--END:A34
+evaluate (Unary op a) env     = unary op (evaluate a env)
+evaluate (Binary op a b) env  = binary op (evaluate a env) (evaluate b env)
+evaluate (If a b c) env = 
+  let BoolV test = evaluate a env in
+    if test then evaluate b env
+            else evaluate c env
+evaluate (Let x exp body) env = evaluate body newEnv
+  where newEnv = bindF x (evaluate exp env) env
+evaluate (Variable x) env     = fromJust (env x)
+--BEGIN:A35
+evaluate (Call fun arg) env = evaluate body newEnv
+  where Function x body = evaluate fun env
+        newEnv = bindF x (evaluate arg env) env
+--END:A35
 
-fromBoolV (BoolV b) = b
-unary op (a) = (unary op a)
-binary op (a) (b) = (binary op a b)
+-- Same as IntBool
+data BinaryOp = Add | Sub | Mul | Div | And | Or
+              | GT | LT | LE | GE | EQ
+  deriving (Eq, Show)
 
---BEGIN:Prob3
-teste1 = let add = \a -> (\b -> b + a) in add 3 2
---END:Prob3
+data UnaryOp = Neg | Not
+  deriving (Eq, Show)
 
---BEGIN:Prob5
-testE2 =
- Let "add" (Literal (Function "a"
-             (Literal (Function "b"
-                (Binary Add (Variable "b")
-                            (Variable "a"))))))
-             (Call (Call (Variable "add")
-                             (Literal (IntV 3)))
-                   (Literal (IntV 2)))
---END:Prob5
+unary Not (BoolV b) = BoolV (not b)
+unary Neg (IntV i)  = IntV (-i)
 
-main = do
-  print (evaluate testE2 (\x->Nothing))
-
+binary Add (IntV a)  (IntV b)  = IntV (a + b)
+binary Sub (IntV a)  (IntV b)  = IntV (a - b)
+binary Mul (IntV a)  (IntV b)  = IntV (a * b)
+binary Div (IntV a)  (IntV b)  = IntV (a `div` b)
+binary And (BoolV a) (BoolV b) = BoolV (a && b)
+binary Or  (BoolV a) (BoolV b) = BoolV (a || b)
+binary LT  (IntV a)  (IntV b)  = BoolV (a < b)
+binary LE  (IntV a)  (IntV b)  = BoolV (a <= b)
+binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
+binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
+binary EQ  a         b         = BoolV (a == b)

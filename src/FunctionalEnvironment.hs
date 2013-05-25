@@ -1,12 +1,16 @@
 module FunctionalEnvironment where
 import Data.Maybe
-import IntBool hiding (main)
-
+import IntBool
 
 --BEGIN:Repr31
 emptyEnvF :: EnvF
 emptyEnvF = \var -> Nothing
 --END:Repr31
+
+bindF :: String -> a -> (String -> Maybe a) -> (String -> Maybe a)
+--BEGIN:Repr15
+-- bindF :: String -> Value -> EnvF -> EnvF
+--END:Repr15
 
 --BEGIN:Repr19
 bindF var val env = \testVar -> if testVar == var
@@ -21,15 +25,10 @@ type EnvF = String -> Maybe Value
 --BEGIN:Repr34
 -- Evaluate an expression in a (functional) environment
 evaluateF :: Exp -> EnvF -> Value
-evaluateF exp env = eval exp where
-    eval (Literal v)      = v
-    eval (Unary op a)     = unary op (eval a)
-    eval (Binary op a b)  = binary op (eval a) (eval b)
-    eval (Variable x)     = fromJust (env x)            -- changed
-    eval (Let x exp body) = evaluateF body newEnv
-      where newEnv = bindF x (eval exp) env             -- changed
+evaluateF (Literal v) env      = v
+evaluateF (Unary op a) env     = unary op (evaluateF a env)
+evaluateF (Binary op a b) env  = binary op (evaluateF a env) (evaluateF b env)
+evaluateF (Variable x) env     = fromJust (env x)        -- changed
+evaluateF (Let x exp body) env = evaluateF body newEnv
+  where newEnv = bindF x (evaluateF exp env) env             -- changed
 --END:Repr34
-
-main = 
-  do "need tests here"
-  

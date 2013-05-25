@@ -1,50 +1,50 @@
 module CheckedMonad where
 
 import Prelude hiding (LT, GT, EQ, id)
-import Data.Maybe
 import FirstClassFunctions hiding (evaluate)
 import ErrorChecking hiding (evaluate)
 
 --BEGIN:Monad5
 instance Monad Checked where
+  return v = Good v
   a >>= f =
     case a of
       Error msg -> Error msg
-      Good v -> f v
-  return v = Good v
+      Good v    -> f v
 --END:Monad5
 
 --BEGIN:Mona13
 evaluate :: Exp -> Env -> Checked Value
-evaluate exp env = eval exp where
-    eval (Literal v)      = return v
-    eval (Variable x)     =
-      case lookup x env of
-        Nothing -> Error ("Variable " ++ x ++ " undefined")
-        Just v  -> return v
-    eval (Unary op a) = do
-      av <- eval a
-      checked_unary op av
-    eval (Binary op a b) = do
-      av <- eval a
-      bv <- eval b
-      checked_binary op av bv
-    eval (If a b c) = do
-      av <- eval a
-      case av of
-        (BoolV cond) -> eval (if cond then b else c)
-        _ -> Error ("Expected boolean but found " ++ show av)
-    eval (Let x e body) = do    -- non-recursive case
-      ev <- eval e
-      let newEnv = (x, ev) : env
+evaluate (Literal v) env     = return v
+evaluate (Variable x) env    =
+  case lookup x env of
+    Nothing -> Error ("Variable " ++ x ++ " undefined")
+    Just v  -> return v
+evaluate (Unary op a) env = do
+  av <- evaluate a env
+  checked_unary op av
+--BEGIN:Hask4
+evaluate (Binary op a b) env = do
+  av <- evaluate a env
+  bv <- evaluate b env
+  checked_binary op av bv
+--END:Hask4
+evaluate (If a b c) env = do
+  av <- evaluate a env
+  case av of
+    (BoolV cond) -> evaluate (if cond then b else c) env
+    _ -> Error ("Expected boolean but found " ++ show av)
+evaluate (Let x e body) env = do    -- non-recursive case
+  ev <- evaluate e env
+  let newEnv = (x, ev) : env
+  evaluate body newEnv
+evaluate (Function x body) env = return (ClosureV x body env)
+evaluate (Call fun arg) env = do
+  funv <- evaluate fun env
+  case funv of
+    ClosureV x body closeEnv -> do
+      argv <- evaluate arg env
+      let newEnv = (x, argv) : closeEnv
       evaluate body newEnv
-    eval (Function x body) = return (ClosureV x body env)
-    eval (Call fun arg) = do
-      funv <- eval fun
-      case funv of
-        ClosureV x body closeEnv -> do
-          argv <- eval arg
-          let newEnv = (x, argv) : closeEnv
-          evaluate body newEnv
-        _ -> Error ("Expected function but found " ++ show funv)
+    _ -> Error ("Expected function but found " ++ show funv)
 --END:Mona13

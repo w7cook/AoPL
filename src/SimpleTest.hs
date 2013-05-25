@@ -34,11 +34,11 @@ main'2 = do
 
 --BEGIN:Form8
 main'3 = do
-  test evaluate t1
-  test evaluate t2
-  test evaluate t3
-  test evaluate t4
-  test evaluate t5
+  test "evaluate" evaluate t1
+  test "evaluate" evaluate t2
+  test "evaluate" evaluate t3
+  test "evaluate" evaluate t4
+  test "evaluate" evaluate t5
 --END:Form8
 
 main = do

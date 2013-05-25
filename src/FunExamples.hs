@@ -1,6 +1,6 @@
 {-# OPTIONS -XRankNTypes #-}
-import IntBool hiding (main)
-import FunctionalEnvironment hiding (main)
+import IntBool
+import FunctionalEnvironment
 
 --BEGIN:Func17
 compose f g = \x -> f(g x)

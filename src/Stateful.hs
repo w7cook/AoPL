@@ -1,4 +1,4 @@
-module MutableState where
+module Stateful where
 
 import Prelude hiding (LT, GT, EQ, id)
 import Base
@@ -27,22 +27,6 @@ update addr val mem =
     before ++ [val] ++ after
 --END:Upda4
 
---BEGIN:Upda7
-mul10 addr mem =
-  let n = fromIntV (access addr mem) in
-    update addr (toValue (10 * n)) mem
-fromIntV (IntV n) = n
-toValue n = (IntV n)
---END:Upda7
-
---BEGIN:Upda9
-testMul10 = mul10 1 [toValue 3, toValue 4, toValue 5, toValue 6]
---END:Upda9
-
---BEGIN:Upda13
-mul10 :: Int -> Memory -> Memory
---END:Upda13
-
 --BEGIN:Stat8
 type Stateful t = Memory -> (Value, Memory)
 --END:Stat8
@@ -65,44 +49,60 @@ type Env = [(String, Value)]
 --END:Summ7
 
 --BEGIN:Summ9
+--BEGIN:Stat11
 evaluate :: Exp -> Env -> Stateful Value
-evaluate exp env mem = eval exp mem where
-    eval (Literal v) mem    = (v, mem)
-    eval (Unary op a) mem   =
-      let (av, mem') = eval a mem in
-        (unary op av, mem')
-    eval (Binary op a b) mem =
-      let (av, mem') = eval a mem in
-        let (bv, mem'') = eval b mem' in
-          (binary op av bv, mem'')
-    eval (If a b c) mem =
-      let (av, mem') = eval a mem in
-        eval (if fromBoolV av then b else c) mem'
-    eval (Variable x) mem = (fromJust (lookup x env), mem)
-    eval (Let x e body) mem =
-      let (ev, mem') = eval e mem
-          newEnv = (x, ev) : env
-      in
-        evaluate body newEnv mem'
-    eval (Function x body) mem = (ClosureV x body env, mem)
-    eval (Call f a) mem  =
-      let (ClosureV x body closeEnv, mem') = eval f mem
-          (av, mem'') = eval a mem'
-          newEnv = (x, av) : closeEnv
-      in
-          evaluate body newEnv mem''
---END:Summ9 BEGIN:Summ11
-    eval (Mutable e) mem =
-      let (ev, mem') = eval e mem in
-        (AddressV (length mem'), mem' ++ [ev])
-    eval (Access a) mem =
-      let (AddressV i, mem') = eval a mem in
-          (access i mem', mem')
-    eval (Assign a e) mem =
-      let (AddressV i, mem') = eval a mem in
-        let (ev, mem'') = eval e mem' in
-          (ev, update i ev mem'')
-fromBoolV (BoolV b) = b
+--END:Stat11
+evaluate (Literal v) env mem    = (v, mem)
+
+evaluate (Unary op a) env mem   =
+  let (av, mem') = evaluate a env mem in
+    (unary op av, mem')
+
+--BEGIN:Sema27
+evaluate (Binary op a b) env mem =
+  let (av, mem') = evaluate a env mem in
+    let (bv, mem'') = evaluate b env mem' in
+      (binary op av bv, mem'')
+--END:Sema27
+
+evaluate (If a b c) env mem =
+  let (BoolV test, mem') = evaluate a env mem in
+    evaluate (if test then b else c) env mem'
+
+evaluate (Variable x) env mem = (fromJust (lookup x env), mem)
+
+evaluate (Let x e body) env mem =
+  let (ev, mem') = evaluate e env mem
+      newEnv = (x, ev) : env
+  in
+    evaluate body newEnv mem'
+
+evaluate (Function x body) env mem = (ClosureV x body env, mem)
+
+evaluate (Call f a) env mem  =
+  let (ClosureV x body closeEnv, mem') = evaluate f env mem
+      (av, mem'') = evaluate a env mem'
+      newEnv = (x, av) : closeEnv
+  in
+      evaluate body newEnv mem''
+--END:Summ9 BEGIN:Summ11 BEGIN:Sema20
+evaluate (Mutable e) env mem =
+  let (ev, mem') = evaluate e env mem in
+    (AddressV (length mem'), mem' ++ [ev])
+--END:Sema20
+
+--BEGIN:Sema23
+evaluate (Access a) env mem =
+  let (AddressV i, mem') = evaluate a env mem in
+      (access i mem', mem')
+--END:Sema23
+
+--BEGIN:Sema25
+evaluate (Assign a e) env mem =
+  let (AddressV i, mem') = evaluate a env mem in
+    let (ev, mem'') = evaluate e env mem' in
+      (ev, update i ev mem'')
+--END:Sema25
 --END:Summ11
 
 -- same as in IntBool.hs
