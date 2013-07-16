@@ -108,20 +108,22 @@ any program whose input or output is a program. Familiar examples of metaprogram
 include compilers, interpreters, virtual machines. In this course we will read, write and
 discuss many metaprograms. %Intr7
 
- # Expressions and Variables {#Chapter1}
+ # Expressions, Syntax, and Evaluation {#Chapter1}
+
+ TODO:introduction to these concepts!! %Expr1
 
  ## Simple Language of Arithmetic
 
 A good place to start is analyzing the language of arithmetic, which is
-familiar to every grade-school child: %Simp2
+familiar to every grade-school child. %Simp2
 
 ````Java
 4
 -5+6
 3--2--7
 3*(8+5)
-3+(8*2)
-3+8*2
+1+(8*2)
+1+8*2
 %Simp3
 ````
 
@@ -132,13 +134,13 @@ and fourth mean that the following number is negative. The last two
 examples mean the same thing, because of the rule that multiplication must be
 performed before addition. The third expression is potentially confusing,
 even given knowledge of the rules for operations. It means $(3 - (-2)) - (-7)$
-not $3 - ((-2) - (-7))$ because subtraction associates to the left. %Simp4
+not $3 - ((-2) - (-7))$ because subtraction operations are performed left to right. %Simp4
 
 Part of the problem here is that there is a big difference between our conceptual
-view of what is going on in arithmetic and our particular conventions for expressing
+view of what is going on in arithmetic and our conventions for expressing
 arithmetic expressions in written form. In other words, there isn't any confusion about
 what negative number are or what subtraction or exponentiation do, but there is
-room for confusion about how to write them down. %Simp5
+room for confusion about how to write them down.  %Simp5
 
 The conceptual structure of a given expression can be defined much more
 clearly using pictures. For example, the following pictures make a
@@ -147,21 +149,27 @@ expressions given above: %Simp6
 
 ![Graphical illustration of abstract structure](figures/abstract_syntax.eps) %Simp7
 
-The last picture represents both the last expressions in the previous example.
+These pictures are similar to *sentence diagramming* that is taught in grade school
+to explain the structure of English. %Simp1
+
+The last picture represents the last two expressions in the previous example.
 This is because the pictures do not need parentheses, since the grouping
 structure is explicit. %Simp8
+
+ ## Syntax
 
 The conceptual structure (illustrated by the pictures) is called the *abstract
 syntax* of the language. The particular details and rules for writing expressions
 as strings of characters is called the *concrete syntax*. The abstract
 syntax for arithmetic expressions is very simple, while the concrete syntax
-is quite complex. As a result, for now we will focus on the abstract syntax,
-and deal with concrete syntax later. %Simp9
+is quite complex. To make these concepts more precise, we show how to
+represent abstract syntax as a data structure, and how to define a *parser*, which
+converts from the concrete written form to the abstract syntax. %Simp9
 
  ### Abstract Syntax in Haskell
 
 This section describes how to represent abstract syntax using Haskell. The code
-for this section is found in the [Simple](http://www.cs.utexas.edu/~wcook/anatomy/code/Simple.hs.htm) file.
+for this section is found in the [Simple](./code/Simple.hs.htm) file.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
 INCLUDE:Abst3
@@ -175,7 +183,10 @@ INCLUDE:Abst3
 
 This data type defines five representational variants, one for numbers,
 and four for the the binary operators of addition, subtraction, multiplication,
-and division.
+and division. The symbols |Number|, |Add|, |Subtract| etc are the *constructors*
+of the data type. The types that follow the constructors are the
+components of the data type. Thus a |Number| expression has an integer component,
+while the other constructors all have two expression compoents.
 A number that appears in a program is called a *literal*. %Abst4
 
 The five examples given above can be written as values of type |Exp| to
@@ -192,7 +203,7 @@ INCLUDE:Abst6
 > -- %Abst6
 
 INCLUDE:Abst15
-> -- 3 - (-2) - (-7)
+> -- 3 - -2 - -7
 > t3 = Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
 > -- %Abst15
 
@@ -202,8 +213,8 @@ INCLUDE:Abst16
 > -- %Abst16
 
 INCLUDE:Abst17
-> -- 3 + 8 * 2
-> t5 = Add (Number 3) (Multiply (Number 8) (Number 2))
+> -- 1 + 8 * 2
+> t5 = Add (Number 1) (Multiply (Number 8) (Number 2))
 > -- %Abst17
 
 Each test case is preceded by a comment giving the concise notation for
@@ -215,24 +226,237 @@ around negative numbers, for some reason. %Abst7
 Writing abstract syntax directly in Haskell is certainly very ugly.
 There is approximately a 10-fold expansion in the number of characters
 needed to represent a concept: a 5-character mathematical expression
-|3 + 8 * 2| uses 47 characters to create the corresponding
+|1 + 8 * 2| uses 47 characters to create the corresponding
 Haskell data structure. This is not a defect of Haskell, it is
-merely a side effect of the lack of a proper parser, which we haven't
-developed yet.
-Writing these data constructors explicitly is not something that we enjoy doing,
-but for now it is useful to
-be very explicit about the representation of our programs. %Abst8
+merely because we haven't developed a way to convert concrete syntax
+into abstract syntax. %Abst8
 
-For now expressions will be written using the
-concise and familiar concrete syntax $3+7$, adding parentheses where
-necessary. But keep in mind that this concise syntax is just
-a short-hand for the real value |Add (Number 3) (Number 7)|.
-As new features are added to the language, both the familiar
-concrete syntax and the abstract syntax will be extended. %Abst9
+ ### Concrete Syntax and Grammars
 
-TODO: talk about meta language: language of study versus language of implementation. Better words? %Abst10
+The concrete syntax of a language describes how the abstract
+concepts in the language are represented as text. For example,
+lets consider how to conver the string "3+81*2" into the
+abstract syntax |Add (Number 3) (Multiply (Number 81) (Number 2))|.
+The first step is to break a text up into *tokens*. %Conc1
 
- ### Evaluating Arithmetic Expressions
+ #### Tokens
+
+Tokens are the basic units of a language. In English, for example,
+words are tokens. But English also uses many symbol tokens, including
+".", "!", "?", "(" and ")". In the example  "3 + 81 * 2" the tokens
+are 3, "+", 81, "\*", and 2. It is also important to classify tokens
+by their kind. The tokens 3, 81 and 2 are sequences of digits.
+The tokens "+" and "*" are *symbol* tokens. Tokens are typically
+as simple as possible, and they must be recognizable without considering
+any context. This means that the integer "-23" might not be a good
+token, because it contains the symbol "-", which is also used in
+other contexts. %Toke2
+
+More complex languages may
+have other kinds of tokens (other common kinds of token are *keyword*
+and *identifer* tokens, which are discussed later in the book). %Toke1
+Token kinds are similar to the kinds of words in English, where
+some words are *verbs* and other words are *nouns*. %Toke3
+
+The following data structure is useful for representing basic tokens. %Toke4
+
+INCLUDE:BasicToken %BasicToken
+> data Token = Digits Int
+>            | Symbol String
+> -- %BasicToken
+
+A |Token| is either an integer token or a symbol token with a string.
+For example, the tokens from the string "3 + 81 * 2" are: %Toke6
+
+> Digits 3
+> Symbol "+"
+> Digits 81
+> Symbol "*"
+> Digits 2
+> -- %Toke7
+
+The [Lexer](./code/Lexer.hs.htm) file contains the code for a simple
+lexer that creates tokens in this form. It defines a function |lexer|
+that transforms a string (i.e. a list of characters) into a list of tokens.
+
+The section describes how to create simple grammars using the
+[Happy Parser Generator](http://www.haskell.org/happy/). %Pars1
+
+ #### Grammars
+
+A *grammar* is a set of rules that specify how tokens can be placed together to
+form valid expressions of a language. 
+To create a grammar, it is essential
+to identify and *name* the different parts of the language.
+For example, in English there are many different parts, including 
+*verb*, *noun*, *gerund*, *prepositional phrase*,
+*declarative sentence*, etc. Technically, the parts of a
+language are called *syntactic categories*.
+
+It is certainly possible to 
+be a fluent English speaker without any explicit awareness of
+the rules of English or the names of the syntactic categories.
+How many people can identify a gerund? But understanding
+syntactic categories is useful for studying a language.
+Creating a complete syntax of English is quite difficult,
+and irrelevant to the purpose of this book. But defining a 
+grammar for a (very) small fragment of English 
+is useful to illustrate how grammars work. %Gram1 
+Here is a simple grammar:
+
+> Sentence : Noun Verb | Sentence PrepositionalPhase
+> PrepositionalPhase : Prep Noun
+> Noun : 'Dick' | 'Jane' | 'Spot'
+> Verb : 'runs' | 'talks'
+> Preposition : 'to' | 'with'
+
+The names |Sentence|, |PrepositionalPhase|, |Noun|, |Verb|, and |Preposition| are
+the syntactic categories of this grammar. Each line of
+the grammar is a *rule* that specifies a syntactic category,
+followed by a colon (:) and then sequence of alternative
+forms for that syntactic category. The words in quotes,
+including |Dick|, |Jane|, and |Runs| are the tokens of the
+language. 
+
+Here is a translation of the grammar into English:
+
+* a *sentence* is either:
+    - a *noun* followed by a *verb*, or
+    - a *sentence* followed by a *prepositional phase*
+* a *prepositional phase* is a *preposition* followed by a *noun*
+* a *noun* is one of "Dick", "Jane", or "Spot"
+* a *verb* is either "tuns" or "talks"
+* a *preposition* is either "to" or "with"
+
+Some sentences in the language defined by this grammar are:
+
+> Dick talks
+> Jane runs
+> Dick runs with Spot
+> Dick runs to Jane with Spot
+> Spot runs to Jane to Dick to Jane to Dick
+
+There are also some sentences that don't make much sense:
+
+> Dick talks with Dick
+> Jane runs to Jane to Jane to Jane to Jane
+
+These sentences are *syntactically correct* because they 
+follow the pattern specified by the grammar, but that doesn't 
+ensure that they are meaningful.
+
+Note: computer science literature, 'syntactic categories' are
+often called *nonterminals* while tokens are called *terminals*.
+This comes from the idea that a grammar can be viewed as 
+generating sentences by replacing the left side with the right
+side. As long as the resulting sentence still has syntactic
+categories that haven't been replaced by real words, the
+process is not done (not terminated).
+
+ #### Grammar Actions and Construction of Abstract Syntax
+
+In addition to specifying the set of legal sentences, a grammar
+can also specify the meaning of those sentences. Rather than
+try to specify a meaning for English, here is a simple 
+grammar for arithmetic expressions, which has been annotated
+to specify the meaning that should be associated with each pattern
+in the grammar:
+
+> Exp : digits        { Number $1 }
+>     | '-' digits    { Number (- $2) }
+>     | Exp '+' Exp   { Add $1 $3 }
+>     | Exp '-' Exp   { Subtract $1 $3 }
+>     | Exp '*' Exp   { Multiply $1 $3 }
+>     | Exp '/' Exp   { Divide $1 $3 }
+>     | '(' Exp ')'   { $2 }
+> -- %Gram5
+
+This grammar is similar to the one given above for English, but each
+rule includes an *action* enclosed in curly braces |{...}|. The
+action says what should happen when that rule is recognized.  In this
+case, the action is some Haskell code with calls to *constructors* to
+create the abstract syntax that corresponds to the concrete syntax of the rule.
+The special syntax |$n| in an action means that the value of the |n|*th* item in the
+grammar rule should be used in the action. For example, in the last rule the
+|$2| refers to the second item in the parenthesis rule, which is |Exp|.
+
+Written out explicitly, this grammar means: 
+
+* An *expression* Exp is either
+    - a digit token
+        * which creates a |Number| with the integer value of the digits
+    - a minus sign followed by a digits token
+        * which creates a |Number| with the negative of the integer value of the digits
+    - an expression followed by a |+| followed by an expression 
+        * which creates an |Add| node containing the value of the expressions
+    - an expression followed by a |-| followed by an expression 
+        * which creates a |Subtract| node containing the value of the expressions
+    - an expression followed by a |*| followed by an expression 
+        * which creates a |Multiply| node containing the value of the expressions
+    - an expression followed by a |/| followed by an expression 
+        * which creates a |Divide| node containing the value of the expressions
+
+Given this lengthy and verbose explanation, I hope you can see the value
+of using a more concise notation!        
+
+Just like other kinds of software, there are many design 
+decisions that must be made in creating a grammar. Some grammars
+work better than others, depending on the situation.
+
+ #### Ambiguity, Precedence and Associativity
+        
+One problem with the straightforward grammar is allows for *ambiguity*. 
+A sentence is ambiguous if there is more than one that it 
+can be derived by a grammar. For example, the expression |1-2-3|
+is ambiguous because it can be parsed in two ways to create
+two different abstract syntax trees [TODO: define "parse"]:
+
+> Subtract (Number 1) (Subtract (Number 2) (Number 3))
+> Subtract (Subtract (Number 1) (Number 2)) (Number 3)
+
+TODO: show the parse trees? define "parse tree"
+
+The same abstract syntax can be generated by parsing |1-(2-3)| and |(1-2)-3|.
+We know from our training that the first one is the "correct" version,
+because subtraction operatations are perfomed left to write.
+The technical term for this is that subtraction is *left associative*.
+(note that this use of the associative is not the same as the 
+mathematical concept of associativity.)
+But the grammar as its written doesn't contain any information
+associativity, so it is ambiguous.
+
+Similarly, the expression |1-2*3| can be parsed in two ways:
+
+> Subtract (Number 1) (Multiply (Number 2) (Number 2))
+> Multiply (Subtract (Number 1) (Number 2)) (Number 2)
+
+The same abstract syntax can be generated by parsing |1-(2*3)| and |(1-2)*3|.
+Again we know that the first version is the correct one, because
+multiplication should be performed before subtraction. Technically,
+we say that multiplication has higher *precedence* than subtraction.
+
+The grammar can be ajusted to express the precedence and associativity
+of the operators. Here is an example:
+
+INCLUDE:SimpleGrammar
+> Term : Term '+' Factor    { Add $1 $3 }
+>      | Term '-' Factor    { Subtract $1 $3 }
+>      | Factor             { $1 }
+> 
+> Factor : Factor '*' Primary    { Multiply $1 $3 }
+>        | Factor '/' Primary    { Divide $1 $3 }
+>        | Primary               { $1 }
+> 
+> Primary : digits         { Number $1 }
+>         | '-' digits     { Number (- $2) }
+>         | '(' Term ')'   { $2 }
+> -- %SimpleGrammar
+
+
+
+ TODO: talk about meta language: language of study versus language of implementation. Better words? %Abst10
+
+ ## Evaluating Arithmetic Expressions
 
 The normal meaning assigned to arithmetic expressions is the evaluation of the
 arithmetic operators to compute a final answer. This evaluation process is
@@ -315,8 +539,8 @@ INCLUDE:Form12
 > evaluate (Multiply (Number 3) (Add (Number 8) (Number 5)))
 >  ==> 39
 > 
-> evaluate (Add (Number 3) (Multiply (Number 8) (Number 2)))
->  ==> 19
+> evaluate (Add (Number 1) (Multiply (Number 8) (Number 2)))
+>  ==> 17
 > 
 > -- %Form12
 
@@ -325,7 +549,7 @@ INCLUDE:Form12
 There are many things that can go wrong when evaluating an expression.
 In our current, very simple language, the only error that can arise
 is attempting to divide by zero. These examples are given in the
-[Simple Examples](http://www.cs.utexas.edu/~wcook/anatomy/code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
+[Simple Examples](./code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
 
 INCLUDE:Erro3
 > testDBZ = evaluate (Divide (Number 8) (Number 0))
@@ -344,7 +568,7 @@ terminate the program when these situations arise,
 but in [Chapter 5](#Monads) we will investigate how to
 manage errors within our evaluator. %Erro6
 
- ## Variables
+ # Variables
 
 Arithmetic expressions often contain variables in addition
 to constants. In grade school the first introduction to variables
@@ -358,7 +582,7 @@ the abstract syntax of expressions to include variables.
 Since the name of a variable "x" can be represented
 as a string of characters, it is easy to represent variables as an additional
 kind of expression. The code for the section is given in
-the [Substitute](http://www.cs.utexas.edu/~wcook/anatomy/code/Substitute.hs.htm) file.
+the [Substitute](./code/Substitute.hs.htm) file.
 The following data definition modifies |Exp| to include
 a |Variable| case. %Vari3
 
@@ -949,7 +1173,7 @@ In addition to arithmetic computations, it is useful for expressions
 to include conditions and also return different kinds of values.
 Until now our expressions have always returned |Int| results, because
 they have only performed arithmetic computations. The code for this section
-is given in the [Int Bool](http://www.cs.utexas.edu/~wcook/anatomy/code/IntBool.hs.htm) file. The type |Value|
+is given in the [Int Bool](./code/IntBool.hs.htm) file. The type |Value|
 is defined to support multiple different kinds of values: %More2
 
 INCLUDE:More3
@@ -1067,7 +1291,7 @@ INCLUDE:More19
 > t1 = Literal (IntV 4)
 > -- -4 - 6
 > t2 = Binary Sub (Literal (IntV (-4))) (Literal (IntV 6))
-> -- 3 - (-2) - (-7)
+> -- 3 - -2 - -7
 > t3 = Binary Sub (Literal (IntV 3))
 >                 (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7))))
 > -- 3*(8 + 5)
@@ -1167,7 +1391,7 @@ very descriptive of the problem that actually took place. %Type1
 
 INCLUDE:Type6run
 > execute (If (Literal (IntV 3)) (Literal (IntV 5)) (Literal (IntV 8)))
->  ==> Exception: Non-exhaustive patterns in function fromBoolV
+>  ==> Exception: Irrefutable pattern failed for pattern IntBool.BoolV test
 > 
 > execute (Binary Add (Literal (IntV 3)) (Literal (BoolV True)))
 >  ==> Exception: Non-exhaustive patterns in function binary
@@ -1215,7 +1439,7 @@ function definitions followed by a main expression. The
 main expression in a C program is an implicit call to a
 function named |main|. Even if a programming language does support more flexible
 definition of functions, top-level functions are quite common. The code
-for this section is given in the [Top Level Functions](http://www.cs.utexas.edu/~wcook/anatomy/code/TopLevelFunctions.hs.htm) file.
+for this section is given in the [Top Level Functions](./code/TopLevelFunctions.hs.htm) file.
 Here is an example of some top-level functions, written in JavaScript: %Top2
 
 ````Java
@@ -1249,6 +1473,7 @@ without return statements: %Top6
 >     1
 >   else
 >     n * power(n, m - 1)
+> -- %Top1
 
 > main =         -- not really a valid Haskell main function
 >   power(3, 4)
@@ -1581,8 +1806,8 @@ later section, but the basic concepts are introduced here. %Lamb8
 Haskell is based directly on the lambda calculus. In
 fact, the example illustrating how to "solve" for the
 function |f| can be written in Haskell. The
-[Examples](http://www.cs.utexas.edu/~wcook/anatomy/code/Examples.hs.htm) file contains the code for the
-simples examples in this section, while the [Function Examples](http://www.cs.utexas.edu/~wcook/anatomy/code/FunExamples.hs.htm)
+[Examples](./code/Examples.hs.htm) file contains the code for the
+simples examples in this section, while the [Function Examples](./code/FunExamples.hs.htm)
 file contains the more complex examples given in the subsections below.
 The following
 definitions are all equivalent in Haskell: %Usin2
@@ -1857,7 +2082,7 @@ takes a function as input or returns a function as an result. The
 function |bindF| takes an |EnvF| as an input and returns a new |EnvF|. %Repr14
 
 INCLUDE:Repr15
-> > bindF :: String -> Value -> EnvF -> EnvF
+> -- bindF :: String -> Value -> EnvF -> EnvF
 > -- %Repr15
 
 Expanding the definition of |EnvF| makes the higher-order nature of |bindF| clear: %Repr16
@@ -2322,7 +2547,7 @@ colored red to remind you that the solution it presents
 is *incorrect*. The correct solution is given in
 the [next section, on closures](#Closures). The code for
 the incorrect soluiton mentioned here is in the
-[Incorrect Functions](http://www.cs.utexas.edu/~wcook/anatomy/code/IncorrectFunctions.hs.htm) file. %A2
+[Incorrect Functions](./code/IncorrectFunctions.hs.htm) file. %A2
 
 To try this approach, function expressions
 are included in the |Value| data type, which
@@ -2563,7 +2788,7 @@ as a part of the program that *creates* a function. The actual
 function value is represented by a closure, which captures the
 current environment at the point when the function expression is
 executed. The code for this section is given in the
-[First-Class Functions](http://www.cs.utexas.edu/~wcook/anatomy/code/FirstClassFunctions.hs.htm) file. %A40
+[First-Class Functions](./code/FirstClassFunctions.hs.htm) file. %A40
 
 To implement this idea, we revise the definition of |Exp|
 and |Value|. First we add function expressions as a new kind
@@ -3367,7 +3592,7 @@ INCLUDE:Fixe45
 > -- %Fixe45
 
 INCLUDE:Fixe46
-> fact = fix g_fact
+> fact'1 = fix g_fact
 > -- %Fixe46
 
 more...  %Fixe47
@@ -3551,7 +3776,7 @@ the expression |a+b| may not cause any errors,
 but if evaluating |a| or |b| can cause an error,
 then the evaluation of |a+b| will have to deal with the
 possibility that |a| or |b| is an error. The full code is
-given in the [Error Checking](http://www.cs.utexas.edu/~wcook/anatomy/code/ErrorChecking.hs.htm) file. %Hand2
+given in the [Error Checking](./code/ErrorChecking.hs.htm) file. %Hand2
 
 Error checking is a notorious problem in programming languages.
 When coding in C, everyone agrees that the return codes of
@@ -3783,7 +4008,7 @@ because we have chosen to write the evaluator in Haskell, a pure functional lang
 The hope is that detailed and explicit analysis of how mutation
 works in programming languages will
 lead to insights about the costs and benefits of using mutation.
-The code for this section is in the [Mutable State](http://www.cs.utexas.edu/~wcook/anatomy/code/Stateful.hs.htm) file. %Muta9
+The code for this section is in the [Mutable State](./code/Stateful.hs.htm) file. %Muta9
 
  ### Addresses
 
@@ -3907,7 +4132,7 @@ Here is an example memory, with two addresses: %Memo5
 This memory has value 120 at address #0 and value 6 at address #1.
 More concisely, this memory can be written as %Memo7
 
-> [120, 6] 
+> [120, 6]
 > -- %Memo8
 
 This memory could be the result of executing the factorial program given above,
@@ -3992,22 +4217,20 @@ For example, the function |mul10| multiplies the contents of a memory address by
 
 INCLUDE:Upda7
 > mul10 addr mem =
->   let n = fromIntV (access addr mem) in
->     update addr (toValue (10 * n)) mem
-> fromIntV (IntV n) = n
-> toValue n = (IntV n)
+>   let IntV n = access addr mem in
+>     update addr (IntV (10 * n)) mem
 > -- %Upda7
 
 Here is an example calling |mul10| on a memory with 4 cells: %Upda8
 
 INCLUDE:Upda9
-> testMul10 = mul10 1 [toValue 3, toValue 4, toValue 5, toValue 6]
+> testMul10 = mul10 1 [IntV 3, IntV 4, IntV 5, IntV 6]
 > -- %Upda9
 
 The result is %Upda10
 
 INCLUDE:Upda11
-> [IntV 3, IntV 4, IntV 50, IntV 6]
+> [IntV 3,IntV 40,IntV 5,IntV 6]
 > -- %Upda11
 
 The fact that |mul10| is a transformation on memory is evident from its type: %Upda12
@@ -4364,11 +4587,11 @@ bind together computations. %Abst26
 
 Using these operators, the *original* code can be written in simpler form: %Abst27
 
-Checked:
+Checked: %Abst37
 
 :    (|evaluate a env|) $\rhd_C$ ($\lambda$|va. (evaluate b env)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|)) %Abst38
 
-Stateful:
+Stateful: %Abst39
 
 :     (|evaluate a env|) $\rhd_S$ ($\lambda$|va. (evaluate b env)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(Binary op av bv, mem)|)) %Abst28
 
@@ -4383,11 +4606,11 @@ a default stateful computation. To see how this works, consider that %Abst29
 
 Using |return|$_S$ the result is: %Abst31
 
-Checked:
+Checked: %Abst40
 
 :    (|evaluate a env|) $\rhd_C$ ($\lambda$|va. (evaluate b env)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|)) %Abst41
 
-Stateful:
+Stateful: %Abst42
 
 :     (|evaluate a env|) $\rhd_S$ ($\lambda$|va. (evaluate b env)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|Binary op av bv|))) %Abst32
 
@@ -4400,11 +4623,11 @@ figured out way to hide the complexity of error checking and mutable memory. Thi
 has been hidden in two new operators, |return| and bind $\rhd$.
 The type of the bind operators is also interesting: %Abst33
 
-Checked:
+Checked: %Abst43
 
 :     $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
 
-Stateful:
+Stateful: %Abst45
 
 :     $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
 
@@ -4490,7 +4713,7 @@ INCLUDE:Monad5
 
 It turns out to be a little more complex to define the stateful monad instance, so this topic
 is delayed until the end of this section. The code for error checking using monads is
-give in the [Checked Monad](http://www.cs.utexas.edu/~wcook/anatomy/code/CheckedMonad.hs.htm) file. %Monad6
+give in the [Checked Monad](./code/CheckedMonad.hs.htm) file. %Monad6
 
  ### Haskell |do| Notation
 
@@ -4602,7 +4825,7 @@ INCLUDE:Mona13
  ### Monadic Mutable State
 
 The full code for the stateful evaluator using monads is
-give in the [Stateful Monad](http://www.cs.utexas.edu/~wcook/anatomy/code/StatefulMonad.hs.htm) file. %Mona15
+give in the [Stateful Monad](./code/StatefulMonad.hs.htm) file. %Mona15
 
 The main complexity in defining a stateful monad is that monads in Haskell
 can only be defined for |data| types, which have explicit constructor labels.

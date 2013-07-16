@@ -13,6 +13,8 @@ TESTS=SimpleTest.hs \
 			StatefulTest.hs
 
 SOURCES=$(TESTS) \
+      Lexer.hs \
+      SimpleParse.hs \
 			CheckedMonad.hs \
 			ErrorChecking.hs \
 			Examples.hs \
@@ -42,7 +44,7 @@ diff: new.lhs
 	diff anatomy.lhs new.lhs
 	
 new.lhs: anatomy.lhs	execute
-	ruby tags.rb | ruby includes.rb "src/*.hs" "output/*.out" ">" > new.lhs
+	ruby tags.rb | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" > new.lhs
 
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
@@ -83,7 +85,7 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 	
 anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
-	ruby includes.rb "src/*.hs" "output/*.out" ">" < anatomy.lhs \
+	ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" < anatomy.lhs \
 	 | sed "/^INCLUDE:/d" \
 	 | sed "s/^ #/#/" \
 	 | sed "s/'[0-9][0-9a-z]*//g" \

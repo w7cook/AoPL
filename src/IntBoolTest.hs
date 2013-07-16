@@ -7,7 +7,7 @@ import Base
 t1 = Literal (IntV 4)
 -- -4 - 6
 t2 = Binary Sub (Literal (IntV (-4))) (Literal (IntV 6))
--- 3 - (-2) - (-7)
+-- 3 - -2 - -7
 t3 = Binary Sub (Literal (IntV 3))
                 (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7))))
 -- 3*(8 + 5)

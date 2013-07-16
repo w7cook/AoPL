@@ -8,14 +8,14 @@ t1 = Number 4
 -- -5 + 6
 t2 = Add (Number (-5)) (Number 6)
 --END:Abst6 BEGIN:Abst15
--- 3 - (-2) - (-7)
+-- 3 - -2 - -7
 t3 = Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
 --END:Abst15 BEGIN:Abst16
 -- 3 * (8 + 5)
 t4 = Multiply (Number 3) (Add (Number 8) (Number 5))
 --END:Abst16 BEGIN:Abst17
--- 3 + 8 * 2
-t5 = Add (Number 3) (Multiply (Number 8) (Number 2))
+-- 1 + 8 * 2
+t5 = Add (Number 1) (Multiply (Number 8) (Number 2))
 --END:Abst17
 
 --BEGIN:Erro3
