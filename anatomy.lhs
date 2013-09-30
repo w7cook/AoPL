@@ -1849,7 +1849,7 @@ A function call in Haskell is represented by placing
 one expression next to another expression. Placing two
 expressions next to each other is sometimes called
 *juxtaposition*. It is useful to think of juxtaposition
-as an operator much like |+| and |*|. The only difference
+as an operator much like |+|. The only difference
 is that juxtaposition is the *invisible* operator.
 In other words, just as |n+m| means addition,
 |f n| means function call. This is not to say that the
