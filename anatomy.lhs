@@ -453,9 +453,6 @@ INCLUDE:SimpleGrammar
 > -- %SimpleGrammar
 
 
-
- TODO: talk about meta language: language of study versus language of implementation. Better words? %Abst10
-
  ## Evaluating Arithmetic Expressions
 
 The normal meaning assigned to arithmetic expressions is the evaluation of the
@@ -543,6 +540,40 @@ INCLUDE:Form12
 >  ==> 17
 > 
 > -- %Form12
+  
+ ## Object Language and Meta-Language
+  
+TODO: talk about meta language: language of study versus language of implementation. Better words? %Abst10
+
+To implement our interpreter we have to deal with two different languages. 
+On the one hand Haskell is the language being used to implement the interpreter, and on the other 
+hand a simple language of arithmetic is being defined and interpreted. 
+The use of two languages can lead to some ambiguity and confusion. 
+For example when referring to an expression |2 + 3|
+do we mean an expression of the implementation language (in this case Haskell), or 
+do we mean an expression of the language being defined (in this case arithmetic)? 
+
+In general it is useful to have different terminology to distinguish
+the roles of the two different languages. We say that Haskell is the
+\emph{meta-language}, whereas the language of arithmetic is the
+\emph{object language} being defined. The term meta-language is used
+to denote the language used for the implementation.  The term object
+language (or just language) is used to denote the language that is the
+object of our study, or in other words the language being defined.
+Using this terminology allows us to eliminate sources of potential
+ambiguity. For example when referring to the meta-language expression
+|2 + 3|, it becomes clear that what is meant is an expression of the
+implementation language.  Similarly when referring to the object
+language expression |2 + 3| what is meant is an expression of the
+language being defined. When there is space for potential confusion we
+will use this terminology to disambiguate meaning.  However, we also
+want to avoid being repetitive and overly explicit, especially when it
+is clear by the context which of the two meanings is intended.  By
+default it is safe to assume that when we are not explicit about which
+of the two languages are we talking about what we mean is the object
+language. In other words, when referring to the expression |2 + 3| the
+default meaning is the object language expression |2 + 3|.
+
 
  ### Errors
 
