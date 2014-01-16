@@ -235,7 +235,7 @@ into abstract syntax. %Abst8
 
 The concrete syntax of a language describes how the abstract
 concepts in the language are represented as text. For example,
-lets consider how to conver the string "3+81*2" into the
+lets consider how to convert the string "3+81\*2" into the
 abstract syntax |Add (Number 3) (Multiply (Number 81) (Number 2))|.
 The first step is to break a text up into *tokens*. %Conc1
 
@@ -246,7 +246,7 @@ words are tokens. But English also uses many symbol tokens, including
 ".", "!", "?", "(" and ")". In the example  "3 + 81 * 2" the tokens
 are 3, "+", 81, "\*", and 2. It is also important to classify tokens
 by their kind. The tokens 3, 81 and 2 are sequences of digits.
-The tokens "+" and "*" are *symbol* tokens. Tokens are typically
+The tokens "+" and "\*" are *symbol* tokens. Tokens are typically
 as simple as possible, and they must be recognizable without considering
 any context. This means that the integer "-23" might not be a good
 token, because it contains the symbol "-", which is also used in
