@@ -2,7 +2,7 @@
 
 .PHONY: verb pretty update clean
 
-PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib 
+PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib
 HSCOLOUR := hscolour -lit
 NEWLINE!=cat foo.txt
 
@@ -13,8 +13,8 @@ TESTS=SimpleTest.hs \
 			StatefulTest.hs
 
 SOURCES=$(TESTS) \
-      Lexer.hs \
-      SimpleParse.hs \
+			Lexer.hs \
+			SimpleParse.hs \
 			CheckedMonad.hs \
 			ErrorChecking.hs \
 			Examples.hs \
@@ -42,7 +42,7 @@ updates: new.lhs
 
 diff: new.lhs
 	diff anatomy.lhs new.lhs
-	
+
 new.lhs: anatomy.lhs	execute
 	ruby tags.rb | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" > new.lhs
 
@@ -52,21 +52,21 @@ fixup: anatomy.lhs new.lhs
 
 code/%.hs : src/%.hs makefile
 	cat $< \
-	| sed "/BEGIN:/d" \
-	| sed "/END:/d" \
-	> $@
+		| sed "/BEGIN:/d" \
+		| sed "/END:/d" \
+		> $@
 	(echo '<pre>'; cat $@; echo '</pre>') \
-	| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
-	| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
-	> $@.htm
+		| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
+		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
+		> $@.htm
 
-code:	$(addprefix code/,$(SOURCES))	
+code:	$(addprefix code/,$(SOURCES))
 
 code/%.hs : code/%.hs makefile
 	(echo '<pre>'; cat $@; echo '</pre>') \
-	| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
-	| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
-	> $@.htm
+		| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
+		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
+		> $@.htm
 
 output/%.out : code/%.hs makefile
 	cd code; runghc $(notdir $<) > ../output/$(addsuffix .out, $(basename $(notdir $<)))
@@ -74,8 +74,8 @@ output/%.out : code/%.hs makefile
 execute: code $(addprefix output/, $(addsuffix .out, $(basename $(notdir $(TESTS)))))
 
 update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
-	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf 
-	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf 
+	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf
+	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf
 	cp anatomy.htm ~/Public/web/anatomy/anatomy.htm
 	mkdir -p	~/Public/web/anatomy/figures
 	mkdir -p	~/Public/web/anatomy/code
@@ -83,35 +83,35 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp code/* ~/Public/web/anatomy/code
 	cp -r cc ~/Public/web/anatomy
 	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
-	
+
 anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
 	ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" < anatomy.lhs \
-	 | sed "/^INCLUDE:/d" \
-	 | sed "s/^ #/#/" \
-	 | sed "s/'[0-9][0-9a-z]*//g" \
-	 | sed "s/^> test[^= ][^= ]* =/>/g" \
-	 | sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
-	 > anatomy.mkd
+		| sed "/^INCLUDE:/d" \
+		| sed "s/^ #/#/" \
+		| sed "s/'[0-9][0-9a-z]*//g" \
+		| sed "s/^> test[^= ][^= ]* =/>/g" \
+		| sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
+		> anatomy.mkd
 
 anatomy.htm: anatomy.mkd
 	cat anatomy.mkd \
-	 | sed "s/||/VERTICAL_BAR/g" \
-	 | perl -pe 's/\|([^ ][^|]*)\|/\`$$1\`/g;' \
-	 | sed "s/VERTICAL_BAR/||/g" \
-	 > foo.mkd 
+		| sed "s/||/VERTICAL_BAR/g" \
+		| perl -pe 's/\|([^ ][^|]*)\|/\`$$1\`/g;' \
+		| sed "s/VERTICAL_BAR/||/g" \
+		> foo.mkd
 	cat foo.mkd \
-	 | $(PANDOC) --mathjax --number-sections --toc -f markdown+lhs -t html --css cc/commentCloud.css --chapters \
-	 | sed "s/\\.eps/.png/" \
-	 > foo2.mkd 
+		| $(PANDOC) --mathjax --number-sections --toc -f markdown+lhs -t html --css cc/commentCloud.css --chapters \
+		| sed "s/\\.eps/.png/" \
+		> foo2.mkd
 	cat foo2.mkd \
-	 | perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)/ <a href='' id='Comment:\$$1' ><\\/a>/g" \
-	 | perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
-	 | sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
-	 | sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
-	 > anatomy.htm
-	 mkdir -p cc
-	 cp ../CommentCloud/*.js cc
-	 cp ../CommentCloud/*.css cc
+		| perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)/ <a href='' id='Comment:\$$1' ><\\/a>/g" \
+		| perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
+		| sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
+		| sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
+		> anatomy.htm
+	mkdir -p cc
+	cp ../CommentCloud/*.js cc
+	cp ../CommentCloud/*.css cc
 
 temp.lhs: anatomy.mkd template.tex
 	cat anatomy.mkd \
@@ -129,28 +129,28 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "/|/s/\\\\_/_/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
-    | sed "s/BAR/||/g" \
-    | sed "s/OPENB/{/g" \
-    | sed "s/CLOSEB/}/g" \
+		| sed "s/BAR/||/g" \
+		| sed "s/OPENB/{/g" \
+		| sed "s/CLOSEB/}/g" \
 		> temp.lhs
-		 
+
 anatomyVerbatim.pdf: temp.lhs
 	lhs2TeX --tt temp.lhs \
-	| sed "s/\\\\char'31/\\\\char45{}\\\\char62{}/g" \
-	| sed "s/\\\\char'10/\\\\char92{}/g" \
-	| sed "s/\\\\char'06/\\\\char60{}\\\\char45{}/g" \
-	| sed "s/\\\\char'36/==/g" \
-	| sed "s/\\\\char'00/./g" \
-	| sed "s/\\\\char'05/not/g" \
-	| sed "s/\\\\char'04/and/g" \
-	| sed "s/\\\\char'37/or/g" \
-	| sed "s/\\\\char'24/forall/g" \
-	> anatomyVerbatim.tex
+		| sed "s/\\\\char'31/\\\\char45{}\\\\char62{}/g" \
+		| sed "s/\\\\char'10/\\\\char92{}/g" \
+		| sed "s/\\\\char'06/\\\\char60{}\\\\char45{}/g" \
+		| sed "s/\\\\char'36/==/g" \
+		| sed "s/\\\\char'00/./g" \
+		| sed "s/\\\\char'05/not/g" \
+		| sed "s/\\\\char'04/and/g" \
+		| sed "s/\\\\char'37/or/g" \
+		| sed "s/\\\\char'24/forall/g" \
+		> anatomyVerbatim.tex
 	pdflatex anatomyVerbatim.tex && pdflatex anatomyVerbatim.tex && pdflatex anatomyVerbatim.tex
 
 anatomyCheck.tex: temp.lhs
 	lhs2TeX --verb temp.lhs > anatomyCheck.tex
-	
+
 anatomy.pdf: temp.lhs
 	lhs2TeX --poly temp.lhs > anatomy.tex
 	pdflatex anatomy.tex && pdflatex anatomy.tex && pdflatex anatomy.tex
@@ -162,4 +162,3 @@ clean:
 		scopes-eps-converted-to.pdf temp.lhs anatomy.pdf anatomy.tex \
 		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb \
 		anatomyCheck.tex anatomy.htm
-	
