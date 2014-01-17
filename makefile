@@ -51,6 +51,7 @@ fixup: anatomy.lhs new.lhs
 	cp new.lhs anatomy.lhs
 
 code/%.hs : src/%.hs makefile
+	@mkdir -p code
 	cat $< \
 		| sed "/BEGIN:/d" \
 		| sed "/END:/d" \
@@ -69,6 +70,7 @@ code/%.hs : code/%.hs makefile
 		> $@.htm
 
 output/%.out : code/%.hs makefile
+	@mkdir -p output
 	cd code; runghc $(notdir $<) > ../output/$(addsuffix .out, $(basename $(notdir $<)))
 
 execute: code $(addprefix output/, $(addsuffix .out, $(basename $(notdir $(TESTS)))))
@@ -161,4 +163,5 @@ clean:
 		anatomyVerbatim.pdf anatomyVerbatim.tex anatomyVerbatim.toc \
 		scopes-eps-converted-to.pdf temp.lhs anatomy.pdf anatomy.tex \
 		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb \
-		anatomyCheck.tex anatomy.htm
+		anatomyCheck.tex anatomy.htm \
+		code output
