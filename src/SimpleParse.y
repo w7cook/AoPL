@@ -8,6 +8,7 @@ import Lexer
 %name parser
 %tokentype { Token }
 
+-- BEGIN:SimpleLexer
 %token 
     digits { Digits $$ }
     '+'    { Symbol "+" }
@@ -16,6 +17,7 @@ import Lexer
     '/'    { Symbol "/" }
     '('    { Symbol "(" }
     ')'    { Symbol ")" }
+-- END:SimpleLexer
 
 %%
 
