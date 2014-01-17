@@ -221,7 +221,8 @@ Each test case is preceded by a comment giving the concise notation for
 the corresponding expression.
 NOTE: It is not legal to write |Add (-4) 6| because |-4| and |6|
 are of type |Int| not |Exp|. Also, Haskell requires parentheses
-around negative numbers, for some reason. %Abst7
+around negative numbers when used with other infix operators to
+prevent parsing ambiguity. %Abst7
 
 Writing abstract syntax directly in Haskell is certainly very ugly.
 There is approximately a 10-fold expansion in the number of characters
