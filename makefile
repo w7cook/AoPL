@@ -14,7 +14,6 @@ TESTS=SimpleTest.hs \
 
 SOURCES=$(TESTS) \
 			Lexer.hs \
-			SimpleParse.hs \
 			CheckedMonad.hs \
 			ErrorChecking.hs \
 			Examples.hs \
@@ -29,8 +28,7 @@ SOURCES=$(TESTS) \
 			StatefulMonad.hs \
 			Simple.hs \
 			Substitute.hs \
-			TopLevelFunctions.hs \
-			Base.hs
+			TopLevelFunctions.hs
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
