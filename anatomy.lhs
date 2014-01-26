@@ -112,9 +112,25 @@ discuss many metaprograms. %Intr7
 
  TODO:introduction to these concepts!! %Expr1
 
+This chapter introduces three fundamental concepts in programming
+languages: *expressions*, *syntax* and *evaluation*. These concepts are
+illustrated by a simple language of arithmetic expressions.
+ 
+An *expression* is a combination of variables, values 
+and operations over these values. For example, the arithmetic expression |2+3| 
+uses two numeric values |2| and |3| and an operation |+| that operates on 
+numeric values. The *syntax* of an expression prescribes how the various 
+components of the expressions can be combined. In general it is not the case that 
+the components of expressions can be combined arbritrarely: they must obey certain 
+rules. For example |2 3| or | + + | are not valid arithmetic expressions.
+Each expression has a meaning (or value), which is defined by the 
+*evaluation* of that expression. Evaluation is a process where expressions 
+composed of various components get simplified until eventually we get a value. 
+For example evaluating |2 + 3| results in |5|. 
+
  ## Simple Language of Arithmetic
 
-A good place to start is analyzing the language of arithmetic, which is
+Lets have a closer look at the language of arithmetic, which is
 familiar to every grade-school child. %Simp2
 
 ````Java
@@ -139,7 +155,7 @@ not $3 - ((-2) - (-7))$ because subtraction operations are performed left to rig
 Part of the problem here is that there is a big difference between our conceptual
 view of what is going on in arithmetic and our conventions for expressing
 arithmetic expressions in written form. In other words, there isn't any confusion about
-what negative number are or what subtraction or exponentiation do, but there is
+what negative numbers are or what subtraction or exponentiation do, but there is
 room for confusion about how to write them down.  %Simp5
 
 The conceptual structure of a given expression can be defined much more
