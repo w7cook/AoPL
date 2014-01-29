@@ -19,10 +19,17 @@ evaluate (Divide a b)    = evaluate a `div` evaluate b
 
 --BEGIN:Form10
 instance Show Exp where
-  show (Number i)      = show i
-  show (Add a b)       = showBinary a "+" b
-  show (Subtract a b)  = showBinary a "-" b
-  show (Multiply a b)  = showBinary a "*" b
-  show (Divide a b)  = showBinary a "/" b
-showBinary a op b = show a ++ op ++ show b
+  show e = showExp 0 e
+
+showExp level (Number i)      = show i
+showExp level (Add a b)       = showBinary level 1 a " + " b
+showExp level (Subtract a b)  = showBinary level 1 a " - " b
+showExp level (Multiply a b)  = showBinary level 2 a "*" b
+showExp level (Divide a b)    = showBinary level 2 a "/" b
+
+showBinary outer inner a op b =
+  if inner < outer then paren result else result
+      where result = showExp inner a ++ op ++ showExp inner b
+      
+paren x = "(" ++ x ++ ")"
 --END:Form10

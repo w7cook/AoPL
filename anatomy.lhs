@@ -178,7 +178,6 @@ INCLUDE:Abst3
 >          | Subtract   Exp Exp
 >          | Multiply   Exp Exp
 >          | Divide     Exp Exp
->   deriving Show
 > -- %Abst3
 
 This data type defines five representational variants, one for numbers,
@@ -189,37 +188,14 @@ components of the data type. Thus a |Number| expression has an integer component
 while the other constructors all have two expression compoents.
 A number that appears in a program is called a *literal*. %Abst4
 
-The five examples given above can be written as values of type |Exp| to
-create five test cases: %Abst5
+As an example of abstract syntax, consider this expression: %Abst5
 
 INCLUDE:Abst1
-> -- 4
-> t1 = Number 4
+> -- 3 - -2 - -7
+> t1 = Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
 > -- %Abst1
 
-INCLUDE:Abst6
-> -- -5 + 6
-> t2 = Add (Number (-5)) (Number 6)
-> -- %Abst6
-
-INCLUDE:Abst15
-> -- 3 - -2 - -7
-> t3 = Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
-> -- %Abst15
-
-INCLUDE:Abst16
-> -- 3 * (8 + 5)
-> t4 = Multiply (Number 3) (Add (Number 8) (Number 5))
-> -- %Abst16
-
-INCLUDE:Abst17
-> -- 1 + 8 * 2
-> t5 = Add (Number 1) (Multiply (Number 8) (Number 2))
-> -- %Abst17
-
-Each test case is preceded by a comment giving the concise notation for
-the corresponding expression.
-NOTE: It is not legal to write |Add (-4) 6| because |-4| and |6|
+NOTE: It is not legal to write |Subtract 3 (-2)| because |3| and |-2|
 are of type |Int| not |Exp|. Also, Haskell requires parentheses
 around negative numbers when used with other infix operators to
 prevent parsing ambiguity. %Abst7
@@ -279,8 +255,8 @@ For example, the tokens from the string "3 + 81 * 2" are: %Toke6
 The [Lexer](./code/Lexer.hs.htm) file contains the code for a simple
 lexer that creates tokens in this form. It defines a function |lexer|
 that transforms a string (i.e. a list of characters) into a list of tokens.
-The |lexer| function takes as input a list of symbols and a list of 
-keywords.
+The |lexer| function takes as input a list of symbols and a list of
+keywords. %Toke8
 
  #### Grammars
 
@@ -291,7 +267,7 @@ to identify and *name* the different parts of the language.
 For example, in English there are many different parts, including
 *verb*, *noun*, *gerund*, *prepositional phrase*,
 *declarative sentence*, etc. Technically, the parts of a
-language are called *syntactic categories*.
+language are called *syntactic categories*. %Gram2
 
 It is certainly possible to
 be a fluent English speaker without any explicit awareness of
@@ -302,13 +278,14 @@ Creating a complete syntax of English is quite difficult,
 and irrelevant to the purpose of this book. But defining a
 grammar for a (very) small fragment of English
 is useful to illustrate how grammars work. %Gram1
-Here is a simple grammar:
+Here is a simple grammar: %Gram3
 
 > Sentence : Noun Verb | Sentence PrepositionalPhase
 > PrepositionalPhase : Prep Noun
 > Noun : 'Dick' | 'Jane' | 'Spot'
 > Verb : 'runs' | 'talks'
 > Preposition : 'to' | 'with'
+> -- %Gram4
 
 The names |Sentence|, |PrepositionalPhase|, |Noun|, |Verb|, and |Preposition| are
 the syntactic categories of this grammar. Each line of
@@ -316,34 +293,36 @@ the grammar is a *rule* that specifies a syntactic category,
 followed by a colon (:) and then sequence of alternative
 forms for that syntactic category. The words in quotes,
 including |Dick|, |Jane|, and |Runs| are the tokens of the
-language.
+language. %Gram6
 
-Here is a translation of the grammar into English:
+Here is a translation of the grammar into English: %Gram7
 
 * a *sentence* is either:
     - a *noun* followed by a *verb*, or
-    - a *sentence* followed by a *prepositional phase*
-* a *prepositional phase* is a *preposition* followed by a *noun*
-* a *noun* is one of "Dick", "Jane", or "Spot"
-* a *verb* is either "tuns" or "talks"
-* a *preposition* is either "to" or "with"
+    - a *sentence* followed by a *prepositional phase* %Gram8
+* a *prepositional phase* is a *preposition* followed by a *noun* %Gram9
+* a *noun* is one of "Dick", "Jane", or "Spot" %Gram10
+* a *verb* is either "tuns" or "talks" %Gram11
+* a *preposition* is either "to" or "with" %Gram12
 
-Some sentences in the language defined by this grammar are:
+Some sentences in the language defined by this grammar are: %Gram13
 
 > Dick talks
 > Jane runs
 > Dick runs with Spot
 > Dick runs to Jane with Spot
 > Spot runs to Jane to Dick to Jane to Dick
+> -- %Gram14
 
-There are also some sentences that don't make much sense:
+There are also some sentences that don't make much sense: %Gram15
 
 > Dick talks with Dick
 > Jane runs to Jane to Jane to Jane to Jane
+> -- %Gram16
 
 These sentences are *syntactically correct* because they
 follow the pattern specified by the grammar, but that doesn't
-ensure that they are meaningful.
+ensure that they are meaningful. %Gram17
 
 Note: computer science literature, 'syntactic categories' are
 often called *nonterminals* while tokens are called *terminals*.
@@ -351,7 +330,7 @@ This comes from the idea that a grammar can be viewed as
 generating sentences by replacing the left side with the right
 side. As long as the resulting sentence still has syntactic
 categories that haven't been replaced by real words, the
-process is not done (not terminated).
+process is not done (not terminated). %Gram18
 
  #### Grammar Actions and Construction of Abstract Syntax
 
@@ -360,7 +339,7 @@ can also specify the meaning of those sentences. Rather than
 try to specify a meaning for English, here is a simple
 grammar for arithmetic expressions, which has been annotated
 to specify the meaning that should be associated with each pattern
-in the grammar:
+in the grammar: %Gram19
 
 > Exp : digits        { Number $1 }
 >     | '-' digits    { Number (- $2) }
@@ -378,30 +357,30 @@ case, the action is some Haskell code with calls to *constructors* to
 create the abstract syntax that corresponds to the concrete syntax of the rule.
 The special syntax |$n| in an action means that the value of the |n|*th* item in the
 grammar rule should be used in the action. For example, in the last rule the
-|$2| refers to the second item in the parenthesis rule, which is |Exp|.
+|$2| refers to the second item in the parenthesis rule, which is |Exp|. %Gram20
 
-Written out explicitly, this grammar means:
+Written out explicitly, this grammar means: %Gram21
 
 * An *expression* Exp is either
-    - a digit token
+    - a digit token %Gram22
         * which creates a |Number| with the integer value of the digits
-    - a minus sign followed by a digits token
+    - a minus sign followed by a digits token %Gram23
         * which creates a |Number| with the negative of the integer value of the digits
-    - an expression followed by a |+| followed by an expression
+    - an expression followed by a |+| followed by an expression %Gram24
         * which creates an |Add| node containing the value of the expressions
-    - an expression followed by a |-| followed by an expression
+    - an expression followed by a |-| followed by an expression %Gram25
         * which creates a |Subtract| node containing the value of the expressions
-    - an expression followed by a |*| followed by an expression
+    - an expression followed by a |*| followed by an expression %Gram26
         * which creates a |Multiply| node containing the value of the expressions
-    - an expression followed by a |/| followed by an expression
-        * which creates a |Divide| node containing the value of the expressions
+    - an expression followed by a |/| followed by an expression %Gram27
+        * which creates a |Divide| node containing the value of the expressions %Gram28
 
 Given this lengthy and verbose explanation, I hope you can see the value
-of using a more concise notation!
+of using a more concise notation! %Gram29
 
 Just like other kinds of software, there are many design
 decisions that must be made in creating a grammar. Some grammars
-work better than others, depending on the situation.
+work better than others, depending on the situation. %Gram30
 
  #### Ambiguity, Precedence and Associativity
 
@@ -409,12 +388,13 @@ One problem with the straightforward grammar is allows for *ambiguity*.
 A sentence is ambiguous if there is more than one that it
 can be derived by a grammar. For example, the expression |1-2-3|
 is ambiguous because it can be parsed in two ways to create
-two different abstract syntax trees [TODO: define "parse"]:
+two different abstract syntax trees [TODO: define "parse"]: %Ambi1
 
 > Subtract (Number 1) (Subtract (Number 2) (Number 3))
 > Subtract (Subtract (Number 1) (Number 2)) (Number 3)
+> -- %Ambi2
 
-TODO: show the parse trees? define "parse tree"
+TODO: show the parse trees? define "parse tree" %Ambi3
 
 The same abstract syntax can be generated by parsing |1-(2-3)| and |(1-2)-3|.
 We know from our training that the second one is the "correct" version,
@@ -423,36 +403,37 @@ The technical term for this is that subtraction is *left associative*.
 (note that this use of the associative is not the same as the
 mathematical concept of associativity.)
 But the grammar as it's written doesn't contain any information
-associativity, so it is ambiguous.
+associativity, so it is ambiguous. %Ambi4
 
-Similarly, the expression |1-2*3| can be parsed in two ways:
+Similarly, the expression |1-2*3| can be parsed in two ways: %Ambi5
 
 > Subtract (Number 1) (Multiply (Number 2) (Number 2))
 > Multiply (Subtract (Number 1) (Number 2)) (Number 2)
+> -- %Ambi6
 
 The same abstract syntax can be generated by parsing |1-(2*3)| and |(1-2)*3|.
 Again we know that the first version is the correct one, because
 multiplication should be performed before subtraction. Technically,
-we say that multiplication has higher *precedence* than subtraction.
+we say that multiplication has higher *precedence* than subtraction. %Ambi7
 
 The grammar can be ajusted to express the precedence and associativity
-of the operators. Here is an example:
+of the operators. Here is an example: %Ambi8
 
 INCLUDE:SimpleGrammar
 > Term : Term '+' Factor    { Add $1 $3 }
 >      | Term '-' Factor    { Subtract $1 $3 }
 >      | Factor             { $1 }
->
+> 
 > Factor : Factor '*' Primary    { Multiply $1 $3 }
 >        | Factor '/' Primary    { Divide $1 $3 }
 >        | Primary               { $1 }
->
+> 
 > Primary : digits         { Number $1 }
 >         | '-' digits     { Number (- $2) }
 >         | '(' Term ')'   { $2 }
 > -- %SimpleGrammar
 
-This unambiguous grammar is now ready to be put into production.
+This unambiguous grammar is now ready to be put into production. %Ambi9
 
 #### Parser Generators
 
@@ -484,23 +465,20 @@ INCLUDE:Eval5
 > main'2 = do
 >   putStrLn "Evaluating the following expression:"
 >   putStr "  "
->   print t3
+>   print t1
 >   putStrLn "Produces the following result:"
 >   putStr "  "
->   print (evaluate t3)
+>   print (evaluate t1)
 > -- %Eval5
 
 The output is %Eval6
 
 INCLUDE:Eval7
 > Evaluating the following expression:
->   Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
+>   3 - -2 - -7
 > Produces the following result:
 >   12
 > -- %Eval7
-
-This looks pretty good, except that that it prints out the
-abstract syntax rather than the more attractive concrete syntax. %Eval8
 
 FOO: Explain Show %Test1
 
@@ -508,11 +486,6 @@ To test many different
 kinds of functions, it is useful to define a generalized test function. %Form5
 
 INCLUDE:Form6
-> test msg fun input = do
->     putStrLn (msg ++ " (" ++ groom input ++ ")")
->     putStr " ==> "
->     putStrLn (groom (fun input)) `catch` showError
->     putStrLn ""
 > -- %Form6
 
 The |test| function takes a function and an input as arguments. It
@@ -522,31 +495,31 @@ five sample expressions defined above: %Form7
 
 INCLUDE:Form8
 > main'3 = do
->   test "evaluate" evaluate t1
->   test "evaluate" evaluate t2
->   test "evaluate" evaluate t3
->   test "evaluate" evaluate t4
->   test "evaluate" evaluate t5
+>   test "evaluate" evaluate (parseExp "4")
+>   test "evaluate" evaluate (parseExp "-5 + 6")
+>   test "evaluate" evaluate (parseExp "3 - -2 - -7")
+>   test "evaluate" evaluate (parseExp "3 * (8 + 5)")
+>   test "evaluate" evaluate (parseExp "1 + 8 * 2")
 > -- %Form8
 
 Running this main program produces the following results: %Form9
 
 INCLUDE:Form12
-> evaluate (Number 4)
+> evaluate 4
 >  ==> 4
->
-> evaluate (Add (Number (-5)) (Number 6))
+> 
+> evaluate (-5) + 6
 >  ==> 1
->
-> evaluate (Subtract (Subtract (Number 3) (Number (-2))) (Number (-7)))
+> 
+> evaluate 3
 >  ==> 12
->
-> evaluate (Multiply (Number 3) (Add (Number 8) (Number 5)))
+> 
+> evaluate 3 * 8 + 5
 >  ==> 39
->
-> evaluate (Add (Number 1) (Multiply (Number 8) (Number 2)))
+> 
+> evaluate 1 + 8 * 2
 >  ==> 17
->
+> 
 > -- %Form12
 
  ## Object Language and Meta-Language
@@ -559,7 +532,7 @@ hand a simple language of arithmetic is being defined and interpreted.
 The use of two languages can lead to some ambiguity and confusion.
 For example when referring to an expression |2 + 3|
 do we mean an expression of the implementation language (in this case Haskell), or
-do we mean an expression of the language being defined (in this case arithmetic)?
+do we mean an expression of the language being defined (in this case arithmetic)? %Obje1
 
 In general it is useful to have different terminology to distinguish
 the roles of the two different languages. We say that Haskell is the
@@ -580,7 +553,7 @@ is clear by the context which of the two meanings is intended.  By
 default it is safe to assume that when we are not explicit about which
 of the two languages are we talking about what we mean is the object
 language. In other words, when referring to the expression |2 + 3| the
-default meaning is the object language expression |2 + 3|.
+default meaning is the object language expression |2 + 3|. %Obje2
 
 
  ### Errors
@@ -591,7 +564,7 @@ is attempting to divide by zero. These examples are given in the
 [Simple Examples](./code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
 
 INCLUDE:Erro3
-> testDBZ = evaluate (Divide (Number 8) (Number 0))
+> testDBZ = evaluate (parseExp "8 / 0")
 > -- %Erro3
 
 In this case, the |div| operator in
@@ -739,19 +712,19 @@ Running these tests produces the following results: %Subs12
 INCLUDE:Subs13
 > substitute ("x", 5) (Add (Variable "x") (Number 2))
 >  ==> Add (Number 5) (Number 2)
->
+> 
 > substitute ("x", 5) (Number 2)
 >  ==> Number 2
->
+> 
 > substitute ("x", 5) (Variable "x")
 >  ==> Number 5
->
+> 
 > substitute ("x", 5) (Add (Multiply (Variable "x") (Variable "x")) (Variable "x"))
 >  ==> Add (Multiply (Number 5) (Number 5)) (Number 5)
->
+> 
 > substitute ("x", 5) (Add (Variable "x") (Variable "y"))
 >  ==> Add (Number 5) (Variable "y")
->
+> 
 > -- %Subs13
 
 It is important to keep in mind that there are now two stages for
@@ -821,21 +794,21 @@ values, but that unknown variables are left intact: %Mult11
 INCLUDE:Mult11
 > substitute e1 (Add (Variable "x") (Variable "y"))
 >  ==> Add (Number 3) (Number (-1))
->
+> 
 > substitute e1 (Number 2)
 >  ==> Number 2
->
+> 
 > substitute e1 (Variable "x")
 >  ==> Number 3
->
+> 
 > substitute e1 (Add (Multiply (Variable "x") (Variable "x")) (Variable "x"))
 >  ==> Add (Multiply (Number 3) (Number 3)) (Number 3)
->
+> 
 > substitute e1 (Add (Variable "x")
 >   (Add (Multiply (Number 2) (Variable "y")) (Variable "z")))
 >  ==> Add (Number 3)
 >   (Add (Multiply (Number 2) (Number (-1))) (Variable "z"))
->
+> 
 > -- %Mult11
 
 Note that it is also possible to substitute multiple variables one at a time: %Mult13
@@ -1259,10 +1232,10 @@ INCLUDE:More99
 > data BinaryOp = Add | Sub | Mul | Div | And | Or
 >               | GT | LT | LE | GE | EQ
 >   deriving (Show, Eq)
->
+> 
 > data UnaryOp = Neg | Not
 >   deriving (Show, Eq)
->
+> 
 > data Exp = Literal   Value
 >          | Unary     UnaryOp Exp
 >          | Binary    BinaryOp Exp Exp
@@ -1277,7 +1250,7 @@ perform the actual computations for binary and unary operations, respectively. %
 
 INCLUDE:More12
 > type Env = [(String, Value)]
->
+> 
 > -- Evaluate an expression in an environment
 > evaluate :: Exp -> Env -> Value
 > evaluate (Literal v) env      = v
@@ -1296,7 +1269,7 @@ INCLUDE:More14
 >   let BoolV test = evaluate a env in
 >     if test then evaluate b env
 >             else evaluate c env
->
+> 
 > execute exp = evaluate exp []
 > -- %More14
 
@@ -1306,7 +1279,7 @@ and the arguments to compute the result of basic operations. %More15
 INCLUDE:More16
 > unary Not (BoolV b) = BoolV (not b)
 > unary Neg (IntV i)  = IntV (-i)
->
+> 
 > binary Add (IntV a)  (IntV b)  = IntV (a + b)
 > binary Sub (IntV a)  (IntV b)  = IntV (a - b)
 > binary Mul (IntV a)  (IntV b)  = IntV (a * b)
@@ -1361,22 +1334,22 @@ Running these test cases with the |test| function defined above yields these res
 INCLUDE:More23
 > execute (Literal (IntV 4))
 >  ==> IntV 4
->
+> 
 > execute (Binary Sub (Literal (IntV (-4))) (Literal (IntV 6)))
 >  ==> IntV (-10)
->
+> 
 > execute (Binary Sub (Literal (IntV 3))
 >   (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7)))))
 >  ==> IntV (-2)
->
+> 
 > execute (Binary Mul (Literal (IntV 3))
 >   (Binary Add (Literal (IntV 8)) (Literal (IntV 5))))
 >  ==> IntV 39
->
+> 
 > execute (Binary Add (Literal (IntV 3))
 >   (Binary Mul (Literal (IntV 8)) (Literal (IntV 2))))
 >  ==> IntV 19
->
+> 
 > execute (If
 >   (Binary GT (Literal (IntV 3))
 >      (Binary Mul (Literal (IntV 3))
@@ -1384,13 +1357,13 @@ INCLUDE:More23
 >   (Literal (IntV 1))
 >   (Literal (IntV 0)))
 >  ==> IntV 0
->
+> 
 > execute (Binary Add (Literal (IntV 2))
 >   (If (Binary LE (Literal (IntV 3)) (Literal (IntV 0)))
 >      (Literal (IntV 9))
 >      (Literal (IntV (-5)))))
 >  ==> IntV (-3)
->
+> 
 > -- %More23
 
  ### Type Errors
@@ -1431,16 +1404,16 @@ very descriptive of the problem that actually took place. %Type1
 INCLUDE:Type6run
 > execute (If (Literal (IntV 3)) (Literal (IntV 5)) (Literal (IntV 8)))
 >  ==> Exception: Irrefutable pattern failed for pattern IntBool.BoolV test
->
+> 
 > execute (Binary Add (Literal (IntV 3)) (Literal (BoolV True)))
 >  ==> Exception: Non-exhaustive patterns in function binary
->
+> 
 > execute (Binary Or (Literal (IntV 3)) (Literal (BoolV True)))
 >  ==> Exception: Non-exhaustive patterns in function binary
->
+> 
 > execute (Unary Neg (Literal (BoolV True)))
 >  ==> Exception: Non-exhaustive patterns in function unary
->
+> 
 > -- %Type6run
 
 We will discuss techniques for preventing type errors later, but for now
@@ -1577,7 +1550,7 @@ INCLUDE:Top22
 >             (Call "power" [Variable  "n",
 >                            Binary  Sub (Variable  "m")
 >                                          (Literal (IntV 1))])))
->
+> 
 > p1 = Program [("power", f1)]
 >              (Call "power" [Literal (IntV 3),
 >                             Literal (IntV 4)])
@@ -1718,26 +1691,26 @@ INCLUDE:Summ12
 >          | Let       String Exp Exp
 >          | Call      String [Exp]
 >   deriving Show
->
+>       
 > evaluate :: Exp -> Env -> FunEnv -> Value
 > evaluate (Literal v) env funEnv      = v
->
-> evaluate (Unary op a) env funEnv     =
+> 
+> evaluate (Unary op a) env funEnv     = 
 >   unary op (evaluate a env funEnv)
->
-> evaluate (Binary op a b) env funEnv  =
+> 
+> evaluate (Binary op a b) env funEnv  = 
 >   binary op (evaluate a env funEnv) (evaluate b env funEnv)
->
-> evaluate (If a b c) env funEnv       =
+> 
+> evaluate (If a b c) env funEnv       = 
 >   let BoolV test = evaluate a env funEnv in
 >     if test then evaluate b env funEnv
 >             else evaluate c env funEnv
->
+> 
 > evaluate (Variable x) env funEnv     = fromJust (lookup x env)
->
+> 
 > evaluate (Let x exp body) env funEnv = evaluate body newEnv funEnv
 >   where newEnv = (x, evaluate exp env funEnv) : env
->
+> 
 > evaluate (Call fun args) env funEnv   = evaluate body newEnv funEnv
 >   where Function xs body = fromJust (lookup fun funEnv)
 >         newEnv = zip xs [evaluate a env funEnv | a <- args]
@@ -2009,7 +1982,7 @@ For example, given the standard Haskell function |negate|
 that inverts the sign of a number, it is easy to quickly negate a list of numbers: %Mapp3
 
 INCLUDE:Mapp4
-> testM1 = map negate [1, 3, -7, 0, 12]
+> testM1 = map negate [1, 3, -7, 0, 12]   
 > -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp4
 
@@ -2027,7 +2000,7 @@ use list comprehensions rather than |map|, because list comprehensions give
 a nice name to the items of the list. Here is an equivalent example using comprehensions: %Mapp8
 
 INCLUDE:Mapp9
-> testM2 = [ negate n | n <- [1, 3, -7, 0, 12] ]
+> testM2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   
 > -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp9
 
@@ -2293,8 +2266,8 @@ For example applying |add| to just one argument returns a new
 function:  %Mult37
 
 INCLUDE:Mult12
-> inc = add 1      -- \b -> b + 1
-> dec = add (-1)   -- \b -> b + (-1)
+> inc = add 1      -- \b. b + 1
+> dec = add (-1)   -- \b. b + (-1)
 > -- %Mult12
 
 These two functions each take a single argument.
@@ -3008,30 +2981,30 @@ INCLUDE:Summ14
 >          | Function  String Exp      -- new
 >          | Call      Exp Exp         -- changed
 >   deriving (Eq, Show)
->
+>   
 > type Env = [(String, Value)]
->
+> 
 > evaluate :: Exp -> Env -> Value
 > evaluate (Literal v) env = v
->
-> evaluate (Unary op a) env =
+> 
+> evaluate (Unary op a) env = 
 >   unary op (evaluate a env)
->
-> evaluate (Binary op a b) env =
+> 
+> evaluate (Binary op a b) env = 
 >   binary op (evaluate a env) (evaluate b env)
->
-> evaluate (If a b c) env =
+> 
+> evaluate (If a b c) env = 
 >   let BoolV test = evaluate a env in
 >     if test then evaluate b env
 >             else evaluate c env
->
+> 
 > evaluate (Variable x) env = fromJust (lookup x env)
->
+> 
 > evaluate (Let x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
->
+> 
 > evaluate (Function x body) env = ClosureV x body env     -- new
->
+> 
 > evaluate (Call fun arg) env = evaluate body newEnv    -- changed
 >   where ClosureV x body closeEnv = evaluate fun env
 >         newEnv = (x, evaluate arg env) : closeEnv
@@ -3674,7 +3647,7 @@ do anything with the argument other than return it. Since it can be
 applied to any value, it can be applied to itself:  %A62
 
 INCLUDE:A63
-> testID = id(id)
+> testID = id(id)   
 > -- returns id
 > -- %A63
 
@@ -3924,7 +3897,7 @@ INCLUDE:Hand17
 > checked_unary Not (BoolV b) = Good (BoolV (not b))
 > checked_unary Neg (IntV i)  = Good (IntV (-i))
 > checked_unary _   _         = Error "Type error"
->
+> 
 > checked_binary :: BinaryOp -> Value -> Value -> Checked Value
 > checked_binary Add (IntV a)  (IntV b)  = Good (IntV (a + b))
 > checked_binary Sub (IntV a)  (IntV b)  = Good (IntV (a - b))
@@ -4443,7 +4416,7 @@ INCLUDE:Summ7
 >          | Access    Exp         -- new
 >          | Assign    Exp Exp   -- new
 >   deriving (Eq, Show)
->
+>   
 > type Env = [(String, Value)]
 > -- %Summ7
 
@@ -4452,30 +4425,30 @@ All the existing cases of the evaluator are modified: %Summ8
 INCLUDE:Summ9
 > evaluate :: Exp -> Env -> Stateful Value
 > evaluate (Literal v) env mem    = (v, mem)
->
+> 
 > evaluate (Unary op a) env mem   =
 >   let (av, mem') = evaluate a env mem in
 >     (unary op av, mem')
->
+> 
 > evaluate (Binary op a b) env mem =
 >   let (av, mem') = evaluate a env mem in
 >     let (bv, mem'') = evaluate b env mem' in
 >       (binary op av bv, mem'')
->
+> 
 > evaluate (If a b c) env mem =
 >   let (BoolV test, mem') = evaluate a env mem in
 >     evaluate (if test then b else c) env mem'
->
+> 
 > evaluate (Variable x) env mem = (fromJust (lookup x env), mem)
->
+> 
 > evaluate (Let x e body) env mem =
 >   let (ev, mem') = evaluate e env mem
 >       newEnv = (x, ev) : env
 >   in
 >     evaluate body newEnv mem'
->
+> 
 > evaluate (Function x body) env mem = (ClosureV x body env, mem)
->
+> 
 > evaluate (Call f a) env mem  =
 >   let (ClosureV x body closeEnv, mem') = evaluate f env mem
 >       (av, mem'') = evaluate a env mem'
@@ -4490,11 +4463,11 @@ INCLUDE:Summ11
 > evaluate (Mutable e) env mem =
 >   let (ev, mem') = evaluate e env mem in
 >     (AddressV (length mem'), mem' ++ [ev])
->
+> 
 > evaluate (Access a) env mem =
 >   let (AddressV i, mem') = evaluate a env mem in
 >       (access i mem', mem')
->
+> 
 > evaluate (Assign a e) env mem =
 >   let (AddressV i, mem') = evaluate a env mem in
 >     let (ev, mem'') = evaluate e env mem' in
@@ -4888,8 +4861,8 @@ a type with a label. %Mona19
 INCLUDE:StatefulMonad2 %Mona20
 > instance Monad Stateful where
 >   return val = ST (\m -> (val, m))
->   (ST c) >>= f =
->     ST (\m ->
+>   (ST c) >>= f = 
+>     ST (\m -> 
 >       let (val, m') = c m
 >           ST f' = f val
 >       in f' m')
@@ -4914,9 +4887,9 @@ INCLUDE:StatefulMonad3 %Mona22
 >   ev <- evaluate e env
 >   let newEnv = (x, ev) : env
 >   evaluate body newEnv
-> evaluate (Variable x) env =
+> evaluate (Variable x) env = 
 >   return (fromJust (lookup x env))
-> evaluate (Function x body) env =
+> evaluate (Function x body) env = 
 >   return (ClosureV  x body env)
 > evaluate (Call fun arg) env = do
 >   ClosureV  x body closeEnv <- evaluate fun env
@@ -4925,7 +4898,7 @@ INCLUDE:StatefulMonad3 %Mona22
 >   evaluate body newEnv
 > evaluate (Mutable e) env = do
 >   ev <- evaluate e env
->   newMemory ev
+>   newMemory ev        
 > evaluate (Access a) env = do
 >   AddressV i <- evaluate a env
 >   readMemory i

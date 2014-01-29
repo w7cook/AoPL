@@ -13,6 +13,7 @@ TESTS=SimpleTest.hs \
 			StatefulTest.hs
 
 SOURCES=$(TESTS) \
+      Base.hs \
 			Lexer.hs \
 			CheckedMonad.hs \
 			ErrorChecking.hs \
@@ -27,6 +28,7 @@ SOURCES=$(TESTS) \
 			Stateful.hs \
 			StatefulMonad.hs \
 			Simple.hs \
+			SimpleParse.hs \
 			Substitute.hs \
 			TopLevelFunctions.hs
 
