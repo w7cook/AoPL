@@ -9,7 +9,7 @@ data Exp = Number     Int
          | Multiply   Exp Exp
          | Divide     Exp Exp
          | Variable   String
-         | Let        String Exp Exp
+         | Declare    String Exp Exp
 --END:Summ3
 
 type Env = [(String, Int)]
@@ -24,6 +24,6 @@ evaluate (Multiply a b) env  = evaluate a env * evaluate b env
 evaluate (Divide a b) env    = evaluate a env `div` evaluate b env
 evaluate (Variable x) env    = fromJust (lookup x env)
 --BEGIN:Impl3
-evaluate (Let x exp body) env = evaluate body newEnv
+evaluate (Declare x exp body) env = evaluate body newEnv
   where newEnv = (x, evaluate exp env) : env
 --END:Eval38 END:Impl3

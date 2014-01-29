@@ -29,6 +29,6 @@ evaluateF (Literal v) env      = v
 evaluateF (Unary op a) env     = unary op (evaluateF a env)
 evaluateF (Binary op a b) env  = binary op (evaluateF a env) (evaluateF b env)
 evaluateF (Variable x) env     = fromJust (env x)        -- changed
-evaluateF (Let x exp body) env = evaluateF body newEnv
+evaluateF (Declare x exp body) env = evaluateF body newEnv
   where newEnv = bindF x (evaluateF exp env) env             -- changed
 --END:Repr34

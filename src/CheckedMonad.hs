@@ -34,7 +34,7 @@ evaluate (If a b c) env = do
   case av of
     (BoolV cond) -> evaluate (if cond then b else c) env
     _ -> Error ("Expected boolean but found " ++ show av)
-evaluate (Let x e body) env = do    -- non-recursive case
+evaluate (Declare x e body) env = do    -- non-recursive case
   ev <- evaluate e env
   let newEnv = (x, ev) : env
   evaluate body newEnv

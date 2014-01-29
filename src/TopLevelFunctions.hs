@@ -2,7 +2,7 @@ module TopLevelFunctions where
 
 import Prelude hiding (LT, GT, EQ)
 import Data.Maybe
-import IntBool hiding (Exp, Literal, Unary, Binary, If, Variable, Let, evaluate)
+import IntBool hiding (Exp, Literal, Unary, Binary, If, Variable, Declare, evaluate)
 
 --BEGIN:Top15
 type FunEnv = [(String, Function)]
@@ -26,7 +26,7 @@ data Exp = Literal   Value
          | Binary    BinaryOp Exp Exp
          | If        Exp Exp Exp
          | Variable  String
-         | Let       String Exp Exp
+         | Declare   String Exp Exp
          | Call      String [Exp]
   deriving Show
       
@@ -48,7 +48,7 @@ evaluate (If a b c) env funEnv       =
 
 evaluate (Variable x) env funEnv     = fromJust (lookup x env)
 
-evaluate (Let x exp body) env funEnv = evaluate body newEnv funEnv
+evaluate (Declare x exp body) env funEnv = evaluate body newEnv funEnv
   where newEnv = (x, evaluate exp env funEnv) : env
 
 --BEGIN:Eval31

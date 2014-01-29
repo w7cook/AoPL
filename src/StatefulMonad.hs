@@ -32,7 +32,7 @@ evaluate (Binary op a b) env = do
 evaluate (If a b c) env = do
   BoolV cond <- evaluate a env
   evaluate (if cond then b else c) env
-evaluate (Let x e body) env = do    -- non-recursive case
+evaluate (Declare x e body) env = do    -- non-recursive case
   ev <- evaluate e env
   let newEnv = (x, ev) : env
   evaluate body newEnv

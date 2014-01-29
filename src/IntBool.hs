@@ -21,7 +21,7 @@ data Exp = Literal   Value
          | Binary    BinaryOp Exp Exp
          | If        Exp Exp Exp
          | Variable  String
-         | Let       String Exp Exp
+         | Declare   String Exp Exp
   deriving (Show, Eq)
 --END:More99
 
@@ -38,7 +38,7 @@ evaluate (Unary op a) env     = unary op (evaluate a env)
 evaluate (Binary op a b) env  = binary op (evaluate a env) (evaluate b env)
 --END:Hand13
 evaluate (Variable x) env     = fromJust (lookup x env)
-evaluate (Let x exp body) env = evaluate body newEnv
+evaluate (Declare x exp body) env = evaluate body newEnv
   where newEnv = (x, evaluate exp env) : env
 --END:More12 BEGIN:More14
 evaluate (If a b c) env =

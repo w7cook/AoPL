@@ -10,7 +10,7 @@ substitute1 (var, val) exp = subst exp where
   subst (Variable name) = if var == name
                           then Number val
                           else Variable name
-  subst (Let x exp body)  = Let x (subst exp) body'
+  subst (Declare x exp body)  = Declare x (subst exp) body'
     where body' = if x == var
                   then body
                   else subst body
@@ -24,6 +24,6 @@ evaluate (Subtract a b)   = evaluate a - evaluate b
 evaluate (Multiply a b)   = evaluate a * evaluate b
 evaluate (Divide a b)     = evaluate a `div` evaluate b
 --BEGIN:Eval28
-evaluate (Let x exp body) = evaluate (substitute1 (x, evaluate exp) body)
+evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
 --END:Eval28
 --END:Summ4

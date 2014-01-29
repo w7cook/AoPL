@@ -30,7 +30,8 @@ SOURCES=$(TESTS) \
 			Simple.hs \
 			SimpleParse.hs \
 			Substitute.hs \
-			TopLevelFunctions.hs
+      SubstituteParse.hs \
+      TopLevelFunctions.hs
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf

@@ -1,4 +1,5 @@
 module Simple where
+import Base
 
 -- BEGIN:Abst3
 data Exp = Number     Int
@@ -30,6 +31,4 @@ showExp level (Divide a b)    = showBinary level 2 a "/" b
 showBinary outer inner a op b =
   if inner < outer then paren result else result
       where result = showExp inner a ++ op ++ showExp inner b
-      
-paren x = "(" ++ x ++ ")"
 --END:Form10

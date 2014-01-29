@@ -10,6 +10,7 @@ data Token = Digits Int
            | TokenKeyword String
            | TokenIdent String
 --END:Token
+           | TokenVar String
    deriving Show
 
 lexer :: [String] -> [String] -> String -> [Token]

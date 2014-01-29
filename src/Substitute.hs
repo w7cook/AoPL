@@ -8,8 +8,24 @@ data Exp = Number   Int
          | Multiply Exp Exp
          | Divide   Exp Exp
          | Variable String        -- added
-   deriving (Show, Eq)
+   deriving (Eq)
 --END:Vari99
+
+--BEGIN:Subst10
+instance Show Exp where
+  show e = showExp 0 e
+
+showExp level (Number i)      = show i
+showExp level (Add a b)       = showBinary level 1 a " + " b
+showExp level (Subtract a b)  = showBinary level 1 a " - " b
+showExp level (Multiply a b)  = showBinary level 2 a "*" b
+showExp level (Divide a b)    = showBinary level 2 a "/" b
+showExp level (Variable x)    = x
+
+showBinary outer inner a op b =
+  if inner < outer then paren result else result
+      where result = showExp inner a ++ op ++ showExp inner b
+--END:Subst10
 
 --BEGIN:Subs9
 substitute1:: (String, Int) -> Exp -> Exp

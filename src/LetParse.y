@@ -9,7 +9,7 @@ import Lexer
 %tokentype { Token }
 
 %token 
-    let   { TokenLet }
+    var   { TokenVar }
     ';'   { TokenSemi }
     int   { TokenInt $$ }
     id    { TokenIdent $$ }
@@ -23,7 +23,7 @@ import Lexer
 
 %%
 
-Exp : var id '=' Exp ';' Exp  { Let $2 $4 $6 }
+Exp : var id '=' Exp ';' Exp  { Declare $2 $4 $6 }
     | Term      { $1 }
 
 Term : Term '+' Factor    { Add $1 $3 }
@@ -40,7 +40,7 @@ Primary : int            { Number $1 }
 
 {
 
-parseExp = parser . lexer [("let", TokenLet)]
+parseExp = parser . lexer [("var", TokenVar)]
 
 parseInput = do
   input <- getContents

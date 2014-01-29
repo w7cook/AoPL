@@ -37,7 +37,7 @@ data Exp = Literal   Value
          | Binary    BinaryOp Exp Exp
          | If        Exp Exp Exp
          | Variable  String
-         | Let       String Exp Exp
+         | Declare   String Exp Exp
          | Function  String Exp
          | Call      Exp Exp
          | Mutable   Exp         -- new
@@ -71,7 +71,7 @@ evaluate (If a b c) env mem =
 
 evaluate (Variable x) env mem = (fromJust (lookup x env), mem)
 
-evaluate (Let x e body) env mem =
+evaluate (Declare x e body) env mem =
   let (ev, mem') = evaluate e env mem
       newEnv = (x, ev) : env
   in

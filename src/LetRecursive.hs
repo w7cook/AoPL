@@ -12,6 +12,6 @@ evaluate (Multiply a b) env  = evaluate a env * evaluate b env
 evaluate (Divide a b) env    = evaluate a env `div` evaluate b env
 evaluate (Variable x) env    = fromJust (lookup x env)
 --BEGIN:Impl5
-evaluate (Let x exp body) env = evaluate body newEnv
+evaluate (Declare x exp body) env = evaluate body newEnv
   where newEnv = (x, evaluate exp newEnv) : env
 --END:Impl5

@@ -1,8 +1,8 @@
 import Stateful hiding (Stateful, evaluate)
 import StatefulMonad 
 
-t0 = Let "x" (Literal (IntV 99)) (Variable "x")
-t1 = Let "x" (Mutable (Literal (IntV 3)))
+t0 = Declare "x" (Literal (IntV 99)) (Variable "x")
+t1 = Declare "x" (Mutable (Literal (IntV 3)))
          (Access (Variable "x"))
          
 main = do

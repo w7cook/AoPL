@@ -114,19 +114,19 @@ discuss many metaprograms. %Intr7
 
 This chapter introduces three fundamental concepts in programming
 languages: *expressions*, *syntax* and *evaluation*. These concepts are
-illustrated by a simple language of arithmetic expressions.
- 
-An *expression* is a combination of variables, values 
-and operations over these values. For example, the arithmetic expression |2+3| 
-uses two numeric values |2| and |3| and an operation |+| that operates on 
-numeric values. The *syntax* of an expression prescribes how the various 
-components of the expressions can be combined. In general it is not the case that 
-the components of expressions can be combined arbritrarely: they must obey certain 
+illustrated by a simple language of arithmetic expressions. %Expr2
+
+An *expression* is a combination of variables, values
+and operations over these values. For example, the arithmetic expression |2+3|
+uses two numeric values |2| and |3| and an operation |+| that operates on
+numeric values. The *syntax* of an expression prescribes how the various
+components of the expressions can be combined. In general it is not the case that
+the components of expressions can be combined arbritrarely: they must obey certain
 rules. For example |2 3| or | + + | are not valid arithmetic expressions.
-Each expression has a meaning (or value), which is defined by the 
-*evaluation* of that expression. Evaluation is a process where expressions 
-composed of various components get simplified until eventually we get a value. 
-For example evaluating |2 + 3| results in |5|. 
+Each expression has a meaning (or value), which is defined by the
+*evaluation* of that expression. Evaluation is a process where expressions
+composed of various components get simplified until eventually we get a value.
+For example evaluating |2 + 3| results in |5|. %Expr3
 
  ## Simple Language of Arithmetic
 
@@ -446,6 +446,7 @@ INCLUDE:SimpleGrammar
 > 
 > Primary : digits         { Number $1 }
 >         | '-' digits     { Number (- $2) }
+>         | id             { Variable $1 }
 >         | '(' Term ')'   { $2 }
 > -- %SimpleGrammar
 
@@ -490,10 +491,6 @@ INCLUDE:Eval5
 The output is %Eval6
 
 INCLUDE:Eval7
-> Evaluating the following expression:
->   3 - -2 - -7
-> Produces the following result:
->   12
 > -- %Eval7
 
 FOO: Explain Show %Test1
@@ -521,21 +518,6 @@ INCLUDE:Form8
 Running this main program produces the following results: %Form9
 
 INCLUDE:Form12
-> evaluate 4
->  ==> 4
-> 
-> evaluate (-5) + 6
->  ==> 1
-> 
-> evaluate 3
->  ==> 12
-> 
-> evaluate 3 * 8 + 5
->  ==> 39
-> 
-> evaluate 1 + 8 * 2
->  ==> 17
-> 
 > -- %Form12
 
  ## Object Language and Meta-Language
@@ -621,7 +603,7 @@ INCLUDE:Vari99
 >          | Multiply Exp Exp
 >          | Divide   Exp Exp
 >          | Variable String        -- added
->    deriving (Show, Eq)
+>    deriving (Eq)
 > -- %Vari99
 
 An association of a variable $x$ with a value $v$ is called a *binding*,
@@ -710,36 +692,25 @@ substitution on binary operators as recursively substituting into the sub-expres
 of the operator. The final case is the only interesting one. It defines
 substitution into a |Variable| expression as a choice: if the variable in the
 expression (|name|) is the *same* as the variable being substituted (|var|)
-then the value is %Subs10
+then the value is the substitution |val|. %Subs10
 
-INCLUDE:Subs11
-> x = Variable "x"
-> y = Variable "y"
-> main'1 = do
->   test "substitute (\"x\", 5)" (substitute1 ("x", 5)) (Add x (Number 2))
->   test "substitute (\"x\", 5)" (substitute1 ("x", 5)) (Number 2)
->   test "substitute (\"x\", 5)" (substitute1 ("x", 5)) x
->   test "substitute (\"x\", 5)" (substitute1 ("x", 5)) (Add (Multiply x x) x)
->   test "substitute (\"x\", 5)" (substitute1 ("x", 5)) (Add x y)
-> -- %Subs11
-
-Running these tests produces the following results: %Subs12
+Running a few tests produces the following results: %Subs12
 
 INCLUDE:Subs13
-> substitute ("x", 5) (Add (Variable "x") (Number 2))
->  ==> Add (Number 5) (Number 2)
+> substitute ("x", 5) x + 2
+>  ==> 5 + 2
 > 
-> substitute ("x", 5) (Number 2)
->  ==> Number 2
+> substitute ("x", 5) 32
+>  ==> 32
 > 
-> substitute ("x", 5) (Variable "x")
->  ==> Number 5
+> substitute ("x", 5) x
+>  ==> 5
 > 
-> substitute ("x", 5) (Add (Multiply (Variable "x") (Variable "x")) (Variable "x"))
->  ==> Add (Multiply (Number 5) (Number 5)) (Number 5)
+> substitute ("x", 5) x*x + x
+>  ==> 5*5 + 5
 > 
-> substitute ("x", 5) (Add (Variable "x") (Variable "y"))
->  ==> Add (Number 5) (Variable "y")
+> substitute ("x", 5) x + 2*y + z
+>  ==> 5 + 2*y + z
 > 
 > -- %Subs13
 
@@ -794,36 +765,24 @@ the corresponding value (|Just val|) or |Nothing| if the variable
 is not found. For the |Nothing| case, the substitute function
 leaves the variable alone. %Mult9
 
-INCLUDE:Mult10
-> z = Variable "z"
-> main'2 = do
->   test "substitute e1" (substitute e1) (Add x y)
->   test "substitute e1" (substitute e1) (Number 2)
->   test "substitute e1" (substitute e1) x
->   test "substitute e1" (substitute e1) (Add (Multiply x x) x)
->   test "substitute e1" (substitute e1) (Add x (Add (Multiply (Number 2) y) z))
-> -- %Mult10
-
-The test results show that multiple variables are substituted with
+The test results below show that multiple variables are substituted with
 values, but that unknown variables are left intact: %Mult11
 
 INCLUDE:Mult11
-> substitute e1 (Add (Variable "x") (Variable "y"))
->  ==> Add (Number 3) (Number (-1))
+> substitute e1 x + 2
+>  ==> 3 + 2
 > 
-> substitute e1 (Number 2)
->  ==> Number 2
+> substitute e1 32
+>  ==> 32
 > 
-> substitute e1 (Variable "x")
->  ==> Number 3
+> substitute e1 x
+>  ==> 3
 > 
-> substitute e1 (Add (Multiply (Variable "x") (Variable "x")) (Variable "x"))
->  ==> Add (Multiply (Number 3) (Number 3)) (Number 3)
+> substitute e1 x*x + x
+>  ==> 3*3 + 3
 > 
-> substitute e1 (Add (Variable "x")
->   (Add (Multiply (Number 2) (Variable "y")) (Variable "z")))
->  ==> Add (Number 3)
->   (Add (Multiply (Number 2) (Number (-1))) (Variable "z"))
+> substitute e1 x + 2*y + z
+>  ==> 3 + 2*-1 + z
 > 
 > -- %Mult11
 
@@ -895,19 +854,19 @@ INCLUDE:Loca17
 > test4 = let x = 3 in (let y = x*2 in x + y)
 > -- %Loca17
 
-In general a |let| expression has the following concrete syntax: %Loca18
+In general a |variable declaration| expression has the following concrete syntax: %Loca18
 
-|let| *variable* |=| *bound-expression* |in| *body* %Loca19
+|var| *variable* |=| *bound-expression* |;| *body* %Loca19
 
-The meaning of a |let| expression is to evaluate the bound expression,
+The meaning of a |variable declaration| expression is to evaluate the bound expression,
 then bind the local variable to the resulting value, and then
 evaluate the body of the expression %Loca20
 
-In Haskell, a |let| expression can be represented by adding
+In Haskell, a |variable declaration| expression can be represented by adding
 another case to the definition of expressions: %Loca21
 
 > data Exp = ...
->          | Let String Exp Exp
+>          | Declare String Exp Exp
 > -- %Loca22
 
 where the string is the variable name, the first Exp is the bound expression
@@ -930,12 +889,12 @@ TODO: talk about *free* versus *bound* variables %Scop5
 
 TODO: talk about renaming %Scop6
 
- ### Substituting into |Let| Expressions {#BasicSubst}
+ ### Substituting into Variable Declarations {#BasicSubst}
 
 When substituting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
 In particular, when substituting for *x* in an expression, if
-the expression is of the form |let| *x* |=| *e* |in| *body* then
+the expression is of the form |var| *x* |=| *e* |;| *body* then
 *x* should be substituted within *e* but not in *body*.
 Because *x* is redefined, the *body* is a hole in the scope of *x*.  %Subs1
 
@@ -947,23 +906,23 @@ Because *x* is redefined, the *body* is a hole in the scope of *x*.  %Subs1
 >                   else subst body
 > -- %Subs17
 
-In the |Let| case for |subst|, the variable is always substituted
+In the |Declare| case for |subst|, the variable is always substituted
 into the bound expression |e|. But the substitution is only performed
 on the body |b| if the variable |var| being substituted is *not* the
 same as the variable |x| defined in the let expression.  %Subs16
 
 TODO: need some test cases here  %Subs18
 
- ### Evaluating |Let| Expressions using Substitution
+ ### Evaluating Variable Declarations using Substitution
 
 The evaluation of a let expression is based on substitution.
-To evaluate |let| *x* |=| *e* |in| *b*,
+To evaluate |var| *x* |=| *e* |;| *b*,
 first evaluate the bound expression *e*, then substitute its value
 for variable *x* in the body *b*. Finally, the result of
 substitution is evaluated.  %Eval1
 
 INCLUDE:Eval28
-> evaluate (Let x exp body) = evaluate (substitute1 (x, evaluate exp) body)
+> evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
 > -- %Eval28
 
  There is no rule for evaluating a variable because all variables
@@ -1017,7 +976,7 @@ INCLUDE:Summ3
 >          | Multiply   Exp Exp
 >          | Divide     Exp Exp
 >          | Variable   String
->          | Let        String Exp Exp
+>          | Declare    String Exp Exp
 > -- %Summ3
 
 INCLUDE:Summ19
@@ -1030,7 +989,7 @@ INCLUDE:Summ19
 >   subst (Variable name) = if var == name
 >                           then Number val
 >                           else Variable name
->   subst (Let x exp body)  = Let x (subst exp) body'
+>   subst (Declare x exp body)  = Declare x (subst exp) body'
 >     where body' = if x == var
 >                   then body
 >                   else subst body
@@ -1043,14 +1002,14 @@ INCLUDE:Summ4
 > evaluate (Subtract a b)   = evaluate a - evaluate b
 > evaluate (Multiply a b)   = evaluate a * evaluate b
 > evaluate (Divide a b)     = evaluate a `div` evaluate b
-> evaluate (Let x exp body) = evaluate (substitute1 (x, evaluate exp) body)
+> evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
 > -- %Summ4
 
  ## Evaluation using Environments {#BasicEvalEnv}
 
 For the basic evaluator substitution and evaluation were
-completely separate, but the evaluation rule for |let|
-expressions involves substitution.  %Eval30
+completely separate, but the evaluation rule for variable 
+declarations involves substitution.  %Eval30
 
 One consequence of this
 rule is that the body of every let expression is copied,
@@ -1071,13 +1030,17 @@ The steps are as follows:  %Eval34
 
 Step                                 Result
 -------------------------            -----------------------------------
-initial expression                   |let x = 2 in|
-                                     \ \ \ \ |let y = x + 1 in|
-                                     \ \ \ \ \ \ \ \ |let z = y + 2 in x * y * z|
+initial expression                   |var x = 2;|
+                                     |var y = x + 1;|
+                                     |var z = y + 2;|
+                                     |x * y * z|
 evaluate bound expression            |2| $\Rightarrow$ |2|
-substitute x $\mapsto$ 2 in body     |let y = 2+1 in (let z = y + 2 in 2 * y * z)|
+substitute x $\mapsto$ 2 in body     |var y = 2 + 1;|
+                                     |var z = y + 2;|
+                                     |2 * y * z|
 evaluate bound expression            |2 + 1| $\Rightarrow$ |3|
-substitute y $\mapsto$ 3 in body     |let z = 3 + 2 in 2 * 3 * z|
+substitute y $\mapsto$ 3 in body     |var z = 3 + 2;|
+                                     |2 * 3 * z|
 evaluate bound expression            |3 + 2| $\Rightarrow$ |5|
 substitute z $\mapsto$ 5 in body     |2 * 3 * 5|
 evaluate body                        |2 * 3 * 5| $\Rightarrow$ |30|  %Eval35
@@ -1085,8 +1048,8 @@ evaluate body                        |2 * 3 * 5| $\Rightarrow$ |30|  %Eval35
 While this is a reasonable approach it is not efficient. We
 have already seen that multiple variables can be substituted
 at the same time. Rather than performing the substitution
-fully for each |let| expression, instead the |let|
-expression can add another binding to the list
+fully for each variable declaration, instead the variable
+declaration can add another binding to the list
 of substitutions being performed.  %Eval36
 
 INCLUDE:Eval38
@@ -1098,15 +1061,15 @@ INCLUDE:Eval38
 > evaluate (Multiply a b) env  = evaluate a env * evaluate b env
 > evaluate (Divide a b) env    = evaluate a env `div` evaluate b env
 > evaluate (Variable x) env    = fromJust (lookup x env)
-> evaluate (Let x exp body) env = evaluate body newEnv
+> evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
 > -- %Eval38
 
 In most cases the environment argument is simply passed unchanged to
 all recursive calls to |evaluate|.
-But in the final case, for |Let|, the environment *does* change. %Eval10
+But in the final case, for |Declare|, the environment *does* change. %Eval10
 
-The case for |Let| first evaluates the bound expression in the
+The case for |Declare| first evaluates the bound expression in the
 current environment |env|, then it creates a new
 environment |newEnv| that binds |x| to the value of
 the bound expressions. It then evaluates the body |b| in the
@@ -1116,23 +1079,27 @@ The steps in evaluation with environments do not copy the expression: %Eval12
 
 Environment                                         Evaluation
 -------------------------------------------         -----------------------------------
-$\emptyset$                                         |let x = 2 in|
-                                                    \ \ \ \ |let y = x + 1 in|
-                                                    \ \ \ \ \ \ \ \ |let z = y + 2 in x * y * z|
+$\emptyset$                                         |var x = 2;|
+                                                    |var y = x + 1;|
+                                                    |var z = y + 2;|
+                                                    |x * y * z|
                                                     { evaluate bound expression |2|}
 $\emptyset$                                         |2| $\Rightarrow$ |2|
-                                                    { add new binding for |x| and evaluate body of let }
-|x| $\mapsto$ 2                                     |let y = x + 1 in (let z = y + 2 in x * y * z)|
+                                                    { add new binding for |x| and evaluate body of variable declaration }
+|x| $\mapsto$ 2                                     |var y = x + 1;|
+                                                    |var z = y + 2;|
+                                                    |x * y * z|
                                                     { evaluate bound expression |x + 1| }
 |x| $\mapsto$ 2                                     |x + 1| $\Rightarrow$ |3|
-                                                    { add new binding for |y| and evaluate body of let }
-|y| $\mapsto$ 3, |x| $\mapsto$ 2                    |let z = y + 2 in x * y * z|
+                                                    { add new binding for |y| and evaluate body of variable declaration }
+|y| $\mapsto$ 3, |x| $\mapsto$ 2                    |var z = y + 2;|
+                                                    |x * y * z|
                                                     { evaluate bound expression |y + 2| }
 |y| $\mapsto$ 3, |x| $\mapsto$ 2                    |y + 2| $\Rightarrow$ |5|
-                                                    { add new binding for |z| and evaluate body of let }
+                                                    { add new binding for |z| and evaluate body of variable declaration }
 |z| $\mapsto$ 5, |y| $\mapsto$ 3, |x| $\mapsto$ 2   |x * y * z| $\Rightarrow$ |70| %Eval13
 
-In the |Let| case of |evaluate|, a new environment |newEnv| is created and used
+In the |Declare| case of |evaluate|, a new environment |newEnv| is created and used
 as the environment for evaluation of the body |b|. %Eval14
 
 The new environments
@@ -1148,14 +1115,14 @@ INCLUDE:Eval16
 
 Environment                                         Evaluation
 -------------------------------------------         -----------------------------------
-$\emptyset$                                         |let x = 9 in (let x = x * x in x + x)|
+$\emptyset$                                         |var x = 9; var x = x * x; x + x)|
                                                     { evaluate bound expression |9| }
 $\emptyset$                                         |9| $\Rightarrow$ |9|
-                                                    { add new binding for |x| and evaluate body of let }
-|x| $\mapsto$ 9                                     |let x = x * x in x + x|
+                                                    { add new binding for |x| and evaluate body of variable declaration }
+|x| $\mapsto$ 9                                     |var x = x * x; x + x|
                                                     { evaluate bound expression |x * x| }
 |x| $\mapsto$ 9                                     |x * x| $\Rightarrow$ |81|
-                                                    { add new binding for |x| and evaluate body of let }
+                                                    { add new binding for |x| and evaluate body of variable declaration }
 |x| $\mapsto$ 81, |x| $\mapsto$ 9                   |x + x| $\Rightarrow$ |162| %Eval17
 
 Note that the environment contains two bindings for |x|, but only the first
@@ -1173,7 +1140,7 @@ INCLUDE:Eval20
 >   (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
 > -- %Eval20
 
-The first |let| expressions creates an environment |x| $\mapsto$ 3 with a
+The first variable declaration creates an environment |x| $\mapsto$ 3 with a
 single binding. The next two let expressions create environments %Eval21
 
 |y| $\mapsto$ 9, |x| $\mapsto$ 3 %Eval22
@@ -1190,10 +1157,10 @@ undefined variable errors arise in this evaluator. %Eval25
 
 TODO: define *exception*? %Eval26
 
- #### Exercise 2.1: Multi-variable |let| expressions
+ #### Exercise 2.1: Multi-variable Variable Declarations
 
-Modify the |let| expression to take a list of bindings, rather than a single one.
-Modify the |evaluate| function to handle evaluation of multi-variable |let| expressions. %Exer2
+Modify the |Declare| expression to take a list of bindings, rather than a single one.
+Modify the |evaluate| function to handle evaluation of multi-variable declarations. %Exer2
 
  ## More Kinds of Data: Booleans and Conditionals
 
@@ -1257,7 +1224,7 @@ INCLUDE:More99
 >          | Binary    BinaryOp Exp Exp
 >          | If        Exp Exp Exp
 >          | Variable  String
->          | Let       String Exp Exp
+>          | Declare   String Exp Exp
 >   deriving (Show, Eq)
 > -- %More99
 
@@ -1273,7 +1240,7 @@ INCLUDE:More12
 > evaluate (Unary op a) env     = unary op (evaluate a env)
 > evaluate (Binary op a b) env  = binary op (evaluate a env) (evaluate b env)
 > evaluate (Variable x) env     = fromJust (lookup x env)
-> evaluate (Let x exp body) env = evaluate body newEnv
+> evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
 > -- %More12
 
@@ -1348,36 +1315,25 @@ INCLUDE:More98
 Running these test cases with the |test| function defined above yields these results: %More22
 
 INCLUDE:More23
-> execute (Literal (IntV 4))
+> execute Literal (IntV 4)
 >  ==> IntV 4
 > 
-> execute (Binary Sub (Literal (IntV (-4))) (Literal (IntV 6)))
+> execute Binary Sub (Literal (IntV (-4))) (Literal (IntV 6))
 >  ==> IntV (-10)
 > 
-> execute (Binary Sub (Literal (IntV 3))
->   (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7)))))
+> execute Binary Sub (Literal (IntV 3)) (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7))))
 >  ==> IntV (-2)
 > 
-> execute (Binary Mul (Literal (IntV 3))
->   (Binary Add (Literal (IntV 8)) (Literal (IntV 5))))
+> execute Binary Mul (Literal (IntV 3)) (Binary Add (Literal (IntV 8)) (Literal (IntV 5)))
 >  ==> IntV 39
 > 
-> execute (Binary Add (Literal (IntV 3))
->   (Binary Mul (Literal (IntV 8)) (Literal (IntV 2))))
+> execute Binary Add (Literal (IntV 3)) (Binary Mul (Literal (IntV 8)) (Literal (IntV 2)))
 >  ==> IntV 19
 > 
-> execute (If
->   (Binary GT (Literal (IntV 3))
->      (Binary Mul (Literal (IntV 3))
->         (Binary Add (Literal (IntV 8)) (Literal (IntV 5)))))
->   (Literal (IntV 1))
->   (Literal (IntV 0)))
+> execute If (Binary GT (Literal (IntV 3)) (Binary Mul (Literal (IntV 3)) (Binary Add (Literal (IntV 8)) (Literal (IntV 5))))) (Literal (IntV 1)) (Literal (IntV 0))
 >  ==> IntV 0
 > 
-> execute (Binary Add (Literal (IntV 2))
->   (If (Binary LE (Literal (IntV 3)) (Literal (IntV 0)))
->      (Literal (IntV 9))
->      (Literal (IntV (-5)))))
+> execute Binary Add (Literal (IntV 2)) (If (Binary LE (Literal (IntV 3)) (Literal (IntV 0))) (Literal (IntV 9)) (Literal (IntV (-5))))
 >  ==> IntV (-3)
 > 
 > -- %More23
@@ -1418,16 +1374,16 @@ Running these tests produce error messages, but the errors are not
 very descriptive of the problem that actually took place. %Type1
 
 INCLUDE:Type6run
-> execute (If (Literal (IntV 3)) (Literal (IntV 5)) (Literal (IntV 8)))
+> execute If (Literal (IntV 3)) (Literal (IntV 5)) (Literal (IntV 8))
 >  ==> Exception: Irrefutable pattern failed for pattern IntBool.BoolV test
 > 
-> execute (Binary Add (Literal (IntV 3)) (Literal (BoolV True)))
+> execute Binary Add (Literal (IntV 3)) (Literal (BoolV True))
 >  ==> Exception: Non-exhaustive patterns in function binary
 > 
-> execute (Binary Or (Literal (IntV 3)) (Literal (BoolV True)))
+> execute Binary Or (Literal (IntV 3)) (Literal (BoolV True))
 >  ==> Exception: Non-exhaustive patterns in function binary
 > 
-> execute (Unary Neg (Literal (BoolV True)))
+> execute Unary Neg (Literal (BoolV True))
 >  ==> Exception: Non-exhaustive patterns in function unary
 > 
 > -- %Type6run
@@ -1704,7 +1660,7 @@ INCLUDE:Summ12
 >          | Binary    BinaryOp Exp Exp
 >          | If        Exp Exp Exp
 >          | Variable  String
->          | Let       String Exp Exp
+>          | Declare   String Exp Exp
 >          | Call      String [Exp]
 >   deriving Show
 >       
@@ -1724,7 +1680,7 @@ INCLUDE:Summ12
 > 
 > evaluate (Variable x) env funEnv     = fromJust (lookup x env)
 > 
-> evaluate (Let x exp body) env funEnv = evaluate body newEnv funEnv
+> evaluate (Declare x exp body) env funEnv = evaluate body newEnv funEnv
 >   where newEnv = (x, evaluate exp env funEnv) : env
 > 
 > evaluate (Call fun args) env funEnv   = evaluate body newEnv funEnv
@@ -1816,7 +1772,7 @@ parameter |x| that computes the result |x * 2| when
 applied to an argument. One benefit of function expressions
 is that we don't need special syntax to name functions,
 which was needed in dealing with [top-level functions](#TopLevel). Instead, we can use the
-existing |let| expression to name functions, because
+existing variable declarations to name functions, because
 functions are just another kind of value. %Lamb7
 
 Lambda notation was invented in 1930s by
@@ -2217,7 +2173,7 @@ INCLUDE:Repr34
 > evaluateF (Unary op a) env     = unary op (evaluateF a env)
 > evaluateF (Binary op a b) env  = binary op (evaluateF a env) (evaluateF b env)
 > evaluateF (Variable x) env     = fromJust (env x)        -- changed
-> evaluateF (Let x exp body) env = evaluateF body newEnv
+> evaluateF (Declare x exp body) env = evaluateF body newEnv
 >   where newEnv = bindF x (evaluateF exp env) env             -- changed
 > -- %Repr34
 
@@ -2523,19 +2479,19 @@ We can use these functions to produce simple arithmetic equations. %Natu24
 
  ### Relationship between Let and Functions
 
-TODO: prove that |let x =| $e$ |in| $b$ is equivalent to
+TODO: prove that |var x =| $e$ |;| $b$ is equivalent to
    ($\lambda$|x.|$b$)$e$ %Rela2
 
-The |let| expression in our language is not necessary, because
-a |let| can be simulated using a function. In particular, any
-expression |let x =| $e$ |in| $b$ is equivalent to ($\lambda$|x.|$b$)$e$. %Rela1
+The variable declaration expression in our language is not necessary, because
+a |var| can be simulated using a function. In particular, any
+expression |var x =| $e$ |;| $b$ is equivalent to ($\lambda$|x.|$b$)$e$. %Rela1
 
-The expression |let x =| $e$ |in| $b$ binds value of $e$ to the variable |x| for use in the body, $b$.
-The creation of bindings in a |let| statement is equivalent to the bindings created
+The expression |var x =| $e$ |;| $b$ binds value of $e$ to the variable |x| for use in the body, $b$.
+The creation of bindings in a |var| statement is equivalent to the bindings created
 from arguments provided to a lambda function. So, if a function was defined as:
 |foo = \x ->| $b$
-Calling |foo| $e$ is equivalent to  |let x =| $e$ |in| $b$
-So, a |let| statement is another rewording of a lambda function that takes a certain
+Calling |foo| $e$ is equivalent to  |var x =| $e$ |;| $b$
+So, a |var| statement is another rewording of a lambda function that takes a certain
 argument binding before interpretting the body. %Rela3
 
  #### Others
@@ -2622,8 +2578,8 @@ first-class functions: %A10
 
 Top-Level Functions (A)             First-Class Functions (B)
 ----------------------------------  ----------------------
-|function f(x) OPENB x * x CLOSEB|  |let f = function(x) OPENB x * x CLOSEB in|
-|f(10)|                             \ \ \ \ |f(10)| %A11
+|function f(x) OPENB x * x CLOSEB|  |var f = function(x) OPENB x * x CLOSEB;|
+|f(10)|                             |f(10)| %A11
 
 The explicit abstract syntax for example (A) is: %A12
 
@@ -2639,9 +2595,9 @@ The explicit abstract syntax for example (B) is: %A14
 
 INCLUDE:A15
 > testP2 =
->  Let "f" (Literal (Function "x"
->                       (Binary Mul (Variable "x")
->                                   (Variable "x"))))
+>  Declare "f" (Literal (Function "x"
+>                         (Binary Mul (Variable "x")
+>                                     (Variable "x"))))
 >    (Call (Variable "f") (Literal (IntV 10)))
 > -- %A15
 
@@ -2722,13 +2678,13 @@ This program is encoded in our language as follows: %Prob4
 
 INCLUDE:Prob5
 > testE2 =
->  Let "add" (Literal (Function "a"
->              (Literal (Function "b"
->                 (Binary Add (Variable "b")
->                             (Variable "a"))))))
->              (Call (Call (Variable "add")
->                              (Literal (IntV 3)))
->                    (Literal (IntV 2)))
+>  Declare"add" (Literal (Function "a"
+>                (Literal (Function "b"
+>                   (Binary Add (Variable "b")
+>                               (Variable "a"))))))
+>                (Call (Call (Variable "add")
+>                                (Literal (IntV 3)))
+>                      (Literal (IntV 2)))
 > -- %Prob5
 
 Rather than work with the ugly constructor syntax in
@@ -2737,7 +2693,7 @@ Haskell, we will continue to use the convention of writing
 
 Here is how evaluation of this sample program proceeds: %Prob7
 
- 1. Evaluate |let add = \a -> (\b -> b + a) in add 3 2| %Prob1
+ 1. Evaluate |var add = \a -> (\b -> b + a); add 3 2| %Prob1
  2. Bind |add| $\mapsto$ |\a -> (\b -> b + a)| %Prob11
  3. Call |(add 3) 2| %Prob12
      a. Call |add 3| %Prob13
@@ -2828,7 +2784,7 @@ of expression:  %A41
 
 As before, the two components of a function expression are
 the *bound variable* |String| and the *body expression* |Exp|.
-Function expressions resemble |let| expressions, so they fit
+Function expressions resemble variable declarations, so they fit
 in well with the other kinds of expressions.  %A43
 
 The next step is to introduce *closures* as a new kind of value.
@@ -2919,7 +2875,7 @@ expression. %Envi3
 
     Set current environment to empty environment $\emptyset$ %Envi5
 
-* Case |Let x e body| %Envi1
+* Case |Declare x e body| %Envi1
     1.  Draw binding box for |x| with unknown value %Envi6
 
         Set parent of new binding to be the current environment %Envi16
@@ -2993,7 +2949,7 @@ INCLUDE:Summ14
 >          | Binary    BinaryOp Exp Exp
 >          | If        Exp Exp Exp
 >          | Variable  String
->          | Let       String Exp Exp
+>          | Declare   String Exp Exp
 >          | Function  String Exp      -- new
 >          | Call      Exp Exp         -- changed
 >   deriving (Eq, Show)
@@ -3016,7 +2972,7 @@ INCLUDE:Summ14
 > 
 > evaluate (Variable x) env = fromJust (lookup x env)
 > 
-> evaluate (Let x exp body) env = evaluate body newEnv
+> evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
 > 
 > evaluate (Function x body) env = ClosureV x body env     -- new
@@ -3028,7 +2984,7 @@ INCLUDE:Summ14
 
  # Recursive Definitions
 
-One consequence of using a simple |let| expression to define functions
+One consequence of using a simple |var| expression to define functions
 is that it is no longer possible to define *recursive functions*, which
 were supported in the [Section on Top-Level Functions](#TopLevel). A recursive
 function is a function that calls itself within its own definition.
@@ -3044,11 +3000,11 @@ The |fact| function is recursive because it calls |fact| within its definition. 
 
 The problem with our existing language implementation is that
 the scope of the variable |fact| is the body of the
-|let| expression, which is |fact(10)|, so while the use of |fact| in
+|var| expression, which is |fact(10)|, so while the use of |fact| in
 |fact(10)| is in scope, the other use in |fact(n-1)| is *not* in scope.
 (TODO: wordy) %Recu5
 
-To solve this problem, we need to change how we understand the |let|
+To solve this problem, we need to change how we understand the |var|
 expression: the scope of the bound variable must be both the body
 of the let, and the bound expression that provides a definition for
 the variable. This means that the variable can be defined in terms of
@@ -3129,7 +3085,7 @@ the steps that might be performed, then the list of steps would be infinite. %Se
  ### Three Analyses of Recursion
 
 In what follows we will explore three ways to understand recursion. The first
-explanation just allows us to define recursive |let| expression by using
+explanation just allows us to define recursive |var| expression by using
 the capabilities for recursion that are built into Haskell. This explanation is
 elegant and concise, but not very satisfying (like pure sugar!). The problem is
 that we have just relied on recursion in Haskell, so we don't really have an
@@ -3290,15 +3246,15 @@ is passed as an argument to the function call itself! %Usin23
 
 TODO: Explain how this works, and give a picture. %Usin24
 
- ### Implementing Recursive |Let| with Haskell
+ ### Implementing Recursive Variable Declarations with Haskell
 
 The powerful techniques for recursive definition illustrated
-in the previous section are sufficient to implement recursive |let|
+in the previous section are sufficient to implement recursive |var|
 expressions. In the Section on [Evaluation using Environments](#BasicEvalEnv),
-|let| was defined as follows: %Impl2
+|var| was defined as follows: %Impl2
 
 INCLUDE:Impl3
-> evaluate (Let x exp body) env = evaluate body newEnv
+> evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
 > -- %Impl3
 
@@ -3309,7 +3265,7 @@ in the new environment. Fortunately this is easy to implement
 in Haskell: %Impl4
 
 INCLUDE:Impl5
-> evaluate (Let x exp body) env = evaluate body newEnv
+> evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp newEnv) : env
 > -- %Impl5
 
@@ -3324,7 +3280,7 @@ In fact, it is too simple: it involved changing 6 characters in the
 code for the non-recursive program. The problem is that we haven't really
 explained recursion in a detailed way, because we have simply
 used Haskell's recursion mechanism to implement recursive
-|let| expressions in our language. The question remains: how
+|var| expressions in our language. The question remains: how
 does recursion work? %Impl7
 
 TODO: come up with a *name* for the little language we are defining
@@ -3335,7 +3291,7 @@ and exploring. PLAI uses names like ArithC and ExprC. %Impl8
 For the case of recursive bindings, the only difference is that the
 order of step 2 and 3 is swapped:  %Recu1
 
-* Case **Recursive** |Let x e body| %Recu13
+* Case **Recursive** |Declare x e body| %Recu13
     1.  Draw binding box for |x| with unknown value %Recu14
 
         Set parent of new binding to be the current environment %Recu16
@@ -3789,7 +3745,7 @@ the actual implementation of languages, including C++ and Java. %Unde9
 
 In previous sections the Exp language was extended with
 specific kinds of expressions and values, for example
-the |let| and |functions|. In addition to augmenting the
+the |var| and |functions|. In addition to augmenting the
 language with new expression types, it is also possible to
 consider extensions that have a general impact on every part of the
 language. Some examples are error handling, tracing of code,
@@ -3964,12 +3920,12 @@ error handling. %Hand35
 
 Extend the evaluator with error checking for the
 remaining expression cases, including
-|if|, non-recursive |let|, and function definition/calls.
+|if|, non-recursive |var|, and function definition/calls.
 Ensure that all errors, including pattern match failures,
 are captured by your code and converted to |Error| values,
 rather than causing Haskell execution errors. %Exer8
 
-As a bonus, implement error checking for recursive |let|
+As a bonus, implement error checking for recursive |var|
 expressions. %Exer5
 
  #### Exercise 5.2: Error Handling (was 5.1.2)
@@ -3981,7 +3937,7 @@ errors to be caught and handled within a program. %Exer6
  #### Exercise 5.3: Multiple Bindings and Arguments
 
 If you really want to experience how messy it is to explicitly program
-error handling, implement error checking where |let| expressions
+error handling, implement error checking where |var| expressions
 can have multiple bindings, and functions can have multiple arguments. %Exer1
 
  ## Mutable State
@@ -4406,8 +4362,8 @@ semicolon operator to the binary operators. In fact, C has such an
 operator: the expression |e1, e2| evaluates |e1| and then evaluates |e2|.
 The result of the expression is the value of |e2|. The value of |e1|
 is discarded.
-Note that |let| can also be used to implement sequences of operations:
-|e1; e2| can be represented as |let dummy = e1 in e2| where |dummy| is a
+Note that |var| can also be used to implement sequences of operations:
+|e1; e2| can be represented as |var dummy = e1; e2| where |dummy| is a
 variable that is not used anywhere in the program. %Muta13
 
  ### Summary of Mutable State
@@ -4425,7 +4381,7 @@ INCLUDE:Summ7
 >          | Binary    BinaryOp Exp Exp
 >          | If        Exp Exp Exp
 >          | Variable  String
->          | Let       String Exp Exp
+>          | Declare   String Exp Exp
 >          | Function  String Exp
 >          | Call      Exp Exp
 >          | Mutable   Exp         -- new
@@ -4457,7 +4413,7 @@ INCLUDE:Summ9
 > 
 > evaluate (Variable x) env mem = (fromJust (lookup x env), mem)
 > 
-> evaluate (Let x e body) env mem =
+> evaluate (Declare x e body) env mem =
 >   let (ev, mem') = evaluate e env mem
 >       newEnv = (x, ev) : env
 >   in
@@ -4835,7 +4791,7 @@ INCLUDE:Mona13
 >   case av of
 >     (BoolV cond) -> evaluate (if cond then b else c) env
 >     _ -> Error ("Expected boolean but found " ++ show av)
-> evaluate (Let x e body) env = do    -- non-recursive case
+> evaluate (Declare x e body) env = do    -- non-recursive case
 >   ev <- evaluate e env
 >   let newEnv = (x, ev) : env
 >   evaluate body newEnv
@@ -4899,7 +4855,7 @@ INCLUDE:StatefulMonad3 %Mona22
 > evaluate (If a b c) env = do
 >   BoolV cond <- evaluate a env
 >   evaluate (if cond then b else c) env
-> evaluate (Let x e body) env = do    -- non-recursive case
+> evaluate (Declare x e body) env = do    -- non-recursive case
 >   ev <- evaluate e env
 >   let newEnv = (x, ev) : env
 >   evaluate body newEnv
