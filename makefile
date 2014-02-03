@@ -45,7 +45,10 @@ diff: new.lhs
 	diff anatomy.lhs new.lhs
 
 new.lhs: anatomy.lhs	execute
-	ruby tags.rb | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" > new.lhs
+	ruby tags.rb \
+  | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
+  > sed -E 's/ +$//' \
+  > new.lhs
 
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs

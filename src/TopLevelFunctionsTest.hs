@@ -1,9 +1,10 @@
 import Base
 import Prelude hiding (LT, GT, EQ)
-import IntBool hiding (Exp, Literal, Unary, Binary, If, Variable, Let, evaluate, execute)
+import IntBool hiding (Exp, Literal, Unary, Binary, If, Variable, evaluate, execute)
 import TopLevelFunctions
 
 --BEGIN:Top22
+-- parseExp "function(n, m) if m == 0 then 1 else n*power(n, m-1)"
 f1 = Function ["n", "m"]
       (If (Binary EQ (Variable "m") (Literal (IntV 0)))
           (Literal (IntV 1))
