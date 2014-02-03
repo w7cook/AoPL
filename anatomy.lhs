@@ -829,7 +829,17 @@ INCLUDE:Loca10
 > test2 = 2 * (let x = 3 in x + 5)
 > -- %Loca10
 
-TODO: note that |where| in Haskell is similar to |let|. %Loca11
+Haskell's |where| allows a declarative style (vs |let|'s expressive style) that
+states an algorithm in a manner that that assumes equations shall be eventually
+satisfied. There are nuanced performance and binding differences between the
+two, but most uses are relatively straightforward: %Loca11
+
+> isOdd n = if predicate then t else f
+>   where
+>     predicate = odd n
+>     t = True
+>     f = False
+> -- %Loca24
 
 It is also possible to define multiple local variables in Java or C: %Loca12
 
