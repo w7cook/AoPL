@@ -854,6 +854,7 @@ INCLUDE:Loca17
 > test4 = let x = 3 in (let y = x*2 in x + y)
 > -- %Loca17
 
+Since the language we are defining is a subset of JavaScript, we will use its syntax.
 In general a |variable declaration| expression has the following concrete syntax: %Loca18
 
 |var| *variable* |=| *bound-expression* |;| *body* %Loca19
@@ -938,8 +939,8 @@ containing a variable that does not have a value. For example, these
 expressions all contain undefined variables: %Unde2
 
 > x + 3
-> let x = 2 in x * y
-> (let x = 3 in x) * x
+> var x = 2; x * y
+> (var x = 3; x) * x
 > -- %Unde5
 
 What will happen when these expressions are evaluated? The definition of
@@ -1019,12 +1020,10 @@ the body of the inner let expression is copied multiple times.
 In the following example, the expression |x * y * z| is copied
 three times:  %Eval32
 
-INCLUDE:Eval33
-> test5 = let x = 2 in
->   let y = x+1 in
->     let z = y+2 in
->       x*y*z
-> -- %Eval33
+> var x = 2;
+> var y = x+1;
+> var z = y+2;
+> x*y*z
 
 The steps are as follows:  %Eval34
 
@@ -1109,13 +1108,13 @@ find the most recent enclosing binding for a variable, and ignore any
 additional bindings. For example, consider the evaluation of this
 expression: %Eval15
 
-INCLUDE:Eval16
-> test6 = let x = 9 in (let x = x*x in x+x)
-> -- %Eval16
+> var x = 9;
+> var x = x*x;
+> x+x
 
 Environment                                         Evaluation
 -------------------------------------------         -----------------------------------
-$\emptyset$                                         |var x = 9; var x = x * x; x + x)|
+$\emptyset$                                         |var x = 9; var x = x * x; x + x|
                                                     { evaluate bound expression |9| }
 $\emptyset$                                         |9| $\Rightarrow$ |9|
                                                     { add new binding for |x| and evaluate body of variable declaration }
@@ -1135,10 +1134,8 @@ is not changed, so there is no need to reset or restore the previous
 environment. For example, evaluating the following expression
 creates to extensions of the base environment %Eval19
 
-INCLUDE:Eval20
-> test7 = let x = 3 in
->   (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
-> -- %Eval20
+> var x = 3;
+> (var y = 3*x; 2+y) + (var z = 7*x; 1+z)
 
 The first variable declaration creates an environment |x| $\mapsto$ 3 with a
 single binding. The next two let expressions create environments %Eval21

@@ -19,23 +19,6 @@ test3 = let x = 3 in let y = x*2 in x + y
 test4 = let x = 3 in (let y = x*2 in x + y)
 --END:Loca17
 
---BEGIN:Eval33
-test5 = let x = 2 in
-  let y = x+1 in
-    let z = y+2 in
-      x*y*z
---END:Eval33
-
---BEGIN:Eval16
-test6 = let x = 9 in (let x = x*x in x+x)
---END:Eval16
-
---BEGIN:Eval20
-test7 = let x = 3 in
-  (let y = 3*x in 2+y) + (let z = 7*x in 1+z)
---END:Eval20
-
-
 --BEGIN:Usin3
 f'1(x) = x * 2
 f'2 x  = x * 2
