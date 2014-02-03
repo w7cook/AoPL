@@ -110,8 +110,6 @@ discuss many metaprograms. %Intr7
 
  # Expressions, Syntax, and Evaluation {#Chapter1}
 
- TODO:introduction to these concepts!! %Expr1
-
 This chapter introduces three fundamental concepts in programming
 languages: *expressions*, *syntax* and *evaluation*. These concepts are
 illustrated by a simple language of arithmetic expressions. %Expr2
@@ -439,11 +437,11 @@ INCLUDE:SimpleGrammar
 > Term : Term '+' Factor    { Add $1 $3 }
 >      | Term '-' Factor    { Subtract $1 $3 }
 >      | Factor             { $1 }
-> 
+>
 > Factor : Factor '*' Primary    { Multiply $1 $3 }
 >        | Factor '/' Primary    { Divide $1 $3 }
 >        | Primary               { $1 }
-> 
+>
 > Primary : digits         { Number $1 }
 >         | '-' digits     { Number (- $2) }
 >         | id             { Variable $1 }
@@ -699,19 +697,19 @@ Running a few tests produces the following results: %Subs12
 INCLUDE:Subs13
 > substitute ("x", 5) x + 2
 >  ==> 5 + 2
-> 
+>
 > substitute ("x", 5) 32
 >  ==> 32
-> 
+>
 > substitute ("x", 5) x
 >  ==> 5
-> 
+>
 > substitute ("x", 5) x*x + x
 >  ==> 5*5 + 5
-> 
+>
 > substitute ("x", 5) x + 2*y + z
 >  ==> 5 + 2*y + z
-> 
+>
 > -- %Subs13
 
 It is important to keep in mind that there are now two stages for
@@ -771,19 +769,19 @@ values, but that unknown variables are left intact: %Mult11
 INCLUDE:Mult11
 > substitute e1 x + 2
 >  ==> 3 + 2
-> 
+>
 > substitute e1 32
 >  ==> 32
-> 
+>
 > substitute e1 x
 >  ==> 3
-> 
+>
 > substitute e1 x*x + x
 >  ==> 3*3 + 3
-> 
+>
 > substitute e1 x + 2*y + z
 >  ==> 3 + 2*-1 + z
-> 
+>
 > -- %Mult11
 
 Note that it is also possible to substitute multiple variables one at a time: %Mult13
@@ -831,7 +829,17 @@ INCLUDE:Loca10
 > test2 = 2 * (let x = 3 in x + 5)
 > -- %Loca10
 
-TODO: note that |where| in Haskell is similar to |let|. %Loca11
+Haskell's |where| allows a declarative style (vs |let|'s expressive style) that
+states an algorithm in a manner that that assumes equations shall be eventually
+satisfied. There are nuanced performance and binding differences between the
+two, but most uses are relatively straightforward: %Loca11
+
+> isOdd n = if predicate then t else f
+>   where
+>     predicate = odd n
+>     t = True
+>     f = False
+> -- %Loca24
 
 It is also possible to define multiple local variables in Java or C: %Loca12
 
@@ -1009,7 +1017,7 @@ INCLUDE:Summ4
  ## Evaluation using Environments {#BasicEvalEnv}
 
 For the basic evaluator substitution and evaluation were
-completely separate, but the evaluation rule for variable 
+completely separate, but the evaluation rule for variable
 declarations involves substitution.  %Eval30
 
 One consequence of this
@@ -1212,10 +1220,10 @@ INCLUDE:More99
 > data BinaryOp = Add | Sub | Mul | Div | And | Or
 >               | GT | LT | LE | GE | EQ
 >   deriving (Show, Eq)
-> 
+>
 > data UnaryOp = Neg | Not
 >   deriving (Show, Eq)
-> 
+>
 > data Exp = Literal   Value
 >          | Unary     UnaryOp Exp
 >          | Binary    BinaryOp Exp Exp
@@ -1230,7 +1238,7 @@ perform the actual computations for binary and unary operations, respectively. %
 
 INCLUDE:More12
 > type Env = [(String, Value)]
-> 
+>
 > -- Evaluate an expression in an environment
 > evaluate :: Exp -> Env -> Value
 > evaluate (Literal v) env      = v
@@ -1249,7 +1257,7 @@ INCLUDE:More14
 >   let BoolV test = evaluate a env in
 >     if test then evaluate b env
 >             else evaluate c env
-> 
+>
 > execute exp = evaluate exp []
 > -- %More14
 
@@ -1259,7 +1267,7 @@ and the arguments to compute the result of basic operations. %More15
 INCLUDE:More16
 > unary Not (BoolV b) = BoolV (not b)
 > unary Neg (IntV i)  = IntV (-i)
-> 
+>
 > binary Add (IntV a)  (IntV b)  = IntV (a + b)
 > binary Sub (IntV a)  (IntV b)  = IntV (a - b)
 > binary Mul (IntV a)  (IntV b)  = IntV (a * b)
@@ -1314,25 +1322,25 @@ Running these test cases with the |test| function defined above yields these res
 INCLUDE:More23
 > execute Literal (IntV 4)
 >  ==> IntV 4
-> 
+>
 > execute Binary Sub (Literal (IntV (-4))) (Literal (IntV 6))
 >  ==> IntV (-10)
-> 
+>
 > execute Binary Sub (Literal (IntV 3)) (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7))))
 >  ==> IntV (-2)
-> 
+>
 > execute Binary Mul (Literal (IntV 3)) (Binary Add (Literal (IntV 8)) (Literal (IntV 5)))
 >  ==> IntV 39
-> 
+>
 > execute Binary Add (Literal (IntV 3)) (Binary Mul (Literal (IntV 8)) (Literal (IntV 2)))
 >  ==> IntV 19
-> 
+>
 > execute If (Binary GT (Literal (IntV 3)) (Binary Mul (Literal (IntV 3)) (Binary Add (Literal (IntV 8)) (Literal (IntV 5))))) (Literal (IntV 1)) (Literal (IntV 0))
 >  ==> IntV 0
-> 
+>
 > execute Binary Add (Literal (IntV 2)) (If (Binary LE (Literal (IntV 3)) (Literal (IntV 0))) (Literal (IntV 9)) (Literal (IntV (-5))))
 >  ==> IntV (-3)
-> 
+>
 > -- %More23
 
  ### Type Errors
@@ -1373,16 +1381,16 @@ very descriptive of the problem that actually took place. %Type1
 INCLUDE:Type6run
 > execute If (Literal (IntV 3)) (Literal (IntV 5)) (Literal (IntV 8))
 >  ==> Exception: Irrefutable pattern failed for pattern IntBool.BoolV test
-> 
+>
 > execute Binary Add (Literal (IntV 3)) (Literal (BoolV True))
 >  ==> Exception: Non-exhaustive patterns in function binary
-> 
+>
 > execute Binary Or (Literal (IntV 3)) (Literal (BoolV True))
 >  ==> Exception: Non-exhaustive patterns in function binary
-> 
+>
 > execute Unary Neg (Literal (BoolV True))
 >  ==> Exception: Non-exhaustive patterns in function unary
-> 
+>
 > -- %Type6run
 
 We will discuss techniques for preventing type errors later, but for now
@@ -1519,7 +1527,7 @@ INCLUDE:Top22
 >             (Call "power" [Variable  "n",
 >                            Binary  Sub (Variable  "m")
 >                                          (Literal (IntV 1))])))
-> 
+>
 > p1 = Program [("power", f1)]
 >              (Call "power" [Literal (IntV 3),
 >                             Literal (IntV 4)])
@@ -1660,26 +1668,26 @@ INCLUDE:Summ12
 >          | Declare   String Exp Exp
 >          | Call      String [Exp]
 >   deriving Show
->       
+>
 > evaluate :: Exp -> Env -> FunEnv -> Value
 > evaluate (Literal v) env funEnv      = v
-> 
-> evaluate (Unary op a) env funEnv     = 
+>
+> evaluate (Unary op a) env funEnv     =
 >   unary op (evaluate a env funEnv)
-> 
-> evaluate (Binary op a b) env funEnv  = 
+>
+> evaluate (Binary op a b) env funEnv  =
 >   binary op (evaluate a env funEnv) (evaluate b env funEnv)
-> 
-> evaluate (If a b c) env funEnv       = 
+>
+> evaluate (If a b c) env funEnv       =
 >   let BoolV test = evaluate a env funEnv in
 >     if test then evaluate b env funEnv
 >             else evaluate c env funEnv
-> 
+>
 > evaluate (Variable x) env funEnv     = fromJust (lookup x env)
-> 
+>
 > evaluate (Declare x exp body) env funEnv = evaluate body newEnv funEnv
 >   where newEnv = (x, evaluate exp env funEnv) : env
-> 
+>
 > evaluate (Call fun args) env funEnv   = evaluate body newEnv funEnv
 >   where Function xs body = fromJust (lookup fun funEnv)
 >         newEnv = zip xs [evaluate a env funEnv | a <- args]
@@ -1951,7 +1959,7 @@ For example, given the standard Haskell function |negate|
 that inverts the sign of a number, it is easy to quickly negate a list of numbers: %Mapp3
 
 INCLUDE:Mapp4
-> testM1 = map negate [1, 3, -7, 0, 12]   
+> testM1 = map negate [1, 3, -7, 0, 12]
 > -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp4
 
@@ -1969,7 +1977,7 @@ use list comprehensions rather than |map|, because list comprehensions give
 a nice name to the items of the list. Here is an equivalent example using comprehensions: %Mapp8
 
 INCLUDE:Mapp9
-> testM2 = [ negate n | n <- [1, 3, -7, 0, 12] ]   
+> testM2 = [ negate n | n <- [1, 3, -7, 0, 12] ]
 > -- returns [-1, -3, 7, 0, -12]
 > -- %Mapp9
 
@@ -2950,30 +2958,30 @@ INCLUDE:Summ14
 >          | Function  String Exp      -- new
 >          | Call      Exp Exp         -- changed
 >   deriving (Eq, Show)
->   
+>
 > type Env = [(String, Value)]
-> 
+>
 > evaluate :: Exp -> Env -> Value
 > evaluate (Literal v) env = v
-> 
-> evaluate (Unary op a) env = 
+>
+> evaluate (Unary op a) env =
 >   unary op (evaluate a env)
-> 
-> evaluate (Binary op a b) env = 
+>
+> evaluate (Binary op a b) env =
 >   binary op (evaluate a env) (evaluate b env)
-> 
-> evaluate (If a b c) env = 
+>
+> evaluate (If a b c) env =
 >   let BoolV test = evaluate a env in
 >     if test then evaluate b env
 >             else evaluate c env
-> 
+>
 > evaluate (Variable x) env = fromJust (lookup x env)
-> 
+>
 > evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
-> 
+>
 > evaluate (Function x body) env = ClosureV x body env     -- new
-> 
+>
 > evaluate (Call fun arg) env = evaluate body newEnv    -- changed
 >   where ClosureV x body closeEnv = evaluate fun env
 >         newEnv = (x, evaluate arg env) : closeEnv
@@ -3616,7 +3624,7 @@ do anything with the argument other than return it. Since it can be
 applied to any value, it can be applied to itself:  %A62
 
 INCLUDE:A63
-> testID = id(id)   
+> testID = id(id)
 > -- returns id
 > -- %A63
 
@@ -3866,7 +3874,7 @@ INCLUDE:Hand17
 > checked_unary Not (BoolV b) = Good (BoolV (not b))
 > checked_unary Neg (IntV i)  = Good (IntV (-i))
 > checked_unary _   _         = Error "Type error"
-> 
+>
 > checked_binary :: BinaryOp -> Value -> Value -> Checked Value
 > checked_binary Add (IntV a)  (IntV b)  = Good (IntV (a + b))
 > checked_binary Sub (IntV a)  (IntV b)  = Good (IntV (a - b))
@@ -4385,7 +4393,7 @@ INCLUDE:Summ7
 >          | Access    Exp         -- new
 >          | Assign    Exp Exp   -- new
 >   deriving (Eq, Show)
->   
+>
 > type Env = [(String, Value)]
 > -- %Summ7
 
@@ -4394,30 +4402,30 @@ All the existing cases of the evaluator are modified: %Summ8
 INCLUDE:Summ9
 > evaluate :: Exp -> Env -> Stateful Value
 > evaluate (Literal v) env mem    = (v, mem)
-> 
+>
 > evaluate (Unary op a) env mem   =
 >   let (av, mem') = evaluate a env mem in
 >     (unary op av, mem')
-> 
+>
 > evaluate (Binary op a b) env mem =
 >   let (av, mem') = evaluate a env mem in
 >     let (bv, mem'') = evaluate b env mem' in
 >       (binary op av bv, mem'')
-> 
+>
 > evaluate (If a b c) env mem =
 >   let (BoolV test, mem') = evaluate a env mem in
 >     evaluate (if test then b else c) env mem'
-> 
+>
 > evaluate (Variable x) env mem = (fromJust (lookup x env), mem)
-> 
+>
 > evaluate (Declare x e body) env mem =
 >   let (ev, mem') = evaluate e env mem
 >       newEnv = (x, ev) : env
 >   in
 >     evaluate body newEnv mem'
-> 
+>
 > evaluate (Function x body) env mem = (ClosureV x body env, mem)
-> 
+>
 > evaluate (Call f a) env mem  =
 >   let (ClosureV x body closeEnv, mem') = evaluate f env mem
 >       (av, mem'') = evaluate a env mem'
@@ -4432,11 +4440,11 @@ INCLUDE:Summ11
 > evaluate (Mutable e) env mem =
 >   let (ev, mem') = evaluate e env mem in
 >     (AddressV (length mem'), mem' ++ [ev])
-> 
+>
 > evaluate (Access a) env mem =
 >   let (AddressV i, mem') = evaluate a env mem in
 >       (access i mem', mem')
-> 
+>
 > evaluate (Assign a e) env mem =
 >   let (AddressV i, mem') = evaluate a env mem in
 >     let (ev, mem'') = evaluate e env mem' in
@@ -4830,8 +4838,8 @@ a type with a label. %Mona19
 INCLUDE:StatefulMonad2 %Mona20
 > instance Monad Stateful where
 >   return val = ST (\m -> (val, m))
->   (ST c) >>= f = 
->     ST (\m -> 
+>   (ST c) >>= f =
+>     ST (\m ->
 >       let (val, m') = c m
 >           ST f' = f val
 >       in f' m')
@@ -4856,9 +4864,9 @@ INCLUDE:StatefulMonad3 %Mona22
 >   ev <- evaluate e env
 >   let newEnv = (x, ev) : env
 >   evaluate body newEnv
-> evaluate (Variable x) env = 
+> evaluate (Variable x) env =
 >   return (fromJust (lookup x env))
-> evaluate (Function x body) env = 
+> evaluate (Function x body) env =
 >   return (ClosureV  x body env)
 > evaluate (Call fun arg) env = do
 >   ClosureV  x body closeEnv <- evaluate fun env
@@ -4867,7 +4875,7 @@ INCLUDE:StatefulMonad3 %Mona22
 >   evaluate body newEnv
 > evaluate (Mutable e) env = do
 >   ev <- evaluate e env
->   newMemory ev        
+>   newMemory ev
 > evaluate (Access a) env = do
 >   AddressV i <- evaluate a env
 >   readMemory i
