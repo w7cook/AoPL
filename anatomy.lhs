@@ -1990,8 +1990,6 @@ The comprehensions used earlier in this document could be replace by invocations
 
 |[evaluate a env BAR a <- args]|   \ \ \ \  $\equiv$  \ \ \ \  |map (\a-> evaluate a env) args| %Mapp12
 
-TODO: make a comment about point-free style? %Mapp13
-
 TODO: is a function that returns a function also called higher order? %Mapp14
 
  ### Representing Environments as Functions {#EnvAsFun}
