@@ -251,7 +251,7 @@ some words are *verbs* and other words are *nouns*. %Toke3
 
 The following data structure is useful for representing basic tokens. %Toke4
 
-INCLUDE:BasicToken %BasicToken
+INCLUDE:BasicToken
 > data Token = Digits Int
 >            | Symbol String
 > -- %BasicToken
@@ -495,10 +495,6 @@ FOO: Explain Show %Test1
 
 To test many different
 kinds of functions, it is useful to define a generalized test function. %Form5
-
-INCLUDE:Form6
-> -- %Form6
-
 The |test| function takes a function and an input as arguments. It
 prints the input and then prints the result of applying the function to the input.
 The following main program invokes |test| to evaluate each of the
@@ -532,8 +528,8 @@ do we mean an expression of the language being defined (in this case arithmetic)
 
 In general it is useful to have different terminology to distinguish
 the roles of the two different languages. We say that Haskell is the
-\emph{meta-language}, whereas the language of arithmetic is the
-\emph{object language} being defined. The term meta-language is used
+*meta-language*, whereas the language of arithmetic is the
+*object language* being defined. The term meta-language is used
 to denote the language used for the implementation.  The term object
 language (or just language) is used to denote the language that is the
 object of our study, or in other words the language being defined.
@@ -764,7 +760,10 @@ is not found. For the |Nothing| case, the substitute function
 leaves the variable alone. %Mult9
 
 The test results below show that multiple variables are substituted with
-values, but that unknown variables are left intact: %Mult11
+values, but that unknown variables are left intact: %Mult99
+
+INCLUDE:Mult4
+>
 
 INCLUDE:Mult11
 > substitute e1 x + 2
@@ -2392,11 +2391,11 @@ function that chooses one of two alternatives. %Bool17
  #### Natural Numbers
 
 Natural numbers can also be represented functionally. The Church encoding
-of natural numbers is known as \emph{Church Numerals}. The idea behind
+of natural numbers is known as *Church Numerals*. The idea behind
 Church Numerals is related to the Peano axioms of arithmetic. The Peano
-axioms define a constant $0$ as the \emph{first} natural number and a
-\emph{successor} function, $succ$. $succ$ takes a natural number and returns
-the \emph{next} natural number. For example, %Natu2
+axioms define a constant $0$ as the *first* natural number and a
+*successor* function, $succ$. $succ$ takes a natural number and returns
+the *next* natural number. For example, %Natu2
 
 $1 = succ(0)$ %Natu3
 

@@ -44,10 +44,10 @@ updates: new.lhs
 diff: new.lhs
 	diff anatomy.lhs new.lhs
 
-new.lhs: anatomy.lhs	execute
+new.lhs: anatomy.lhs	
 	ruby tags.rb \
   | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
-  > sed -E 's/ +$//' \
+  | sed "s/ +$$//" \
   > new.lhs
 
 fixup: anatomy.lhs new.lhs

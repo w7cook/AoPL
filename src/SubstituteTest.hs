@@ -24,14 +24,12 @@ main'1 = do
 e1 = [ ("x", 3), ("y", -1) ]
 --END:Mult4
 
---BEGIN:Mult10
 main'2 = do
   test "substitute e1" (substitute e1) t1
   test "substitute e1" (substitute e1) t2
   test "substitute e1" (substitute e1) t3
   test "substitute e1" (substitute e1) t4
   test "substitute e1" (substitute e1) t5
---END:Mult10
 
 main = do
   tagged "Subs13" main'1

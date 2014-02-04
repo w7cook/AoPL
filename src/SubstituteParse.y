@@ -8,7 +8,7 @@ import Lexer
 %name parser
 %tokentype { Token }
 
--- BEGIN:SimpleLexer
+-- BEGIN:SubstLexer
 %token 
     id     { TokenIdent $$ }
     digits { Digits $$ }
@@ -18,11 +18,11 @@ import Lexer
     '/'    { Symbol "/" }
     '('    { Symbol "(" }
     ')'    { Symbol ")" }
--- END:SimpleLexer
+-- END:SubstLexer
 
 %%
 
--- BEGIN:SimpleGrammar
+-- BEGIN:SubstGrammar
 Term : Term '+' Factor    { Add $1 $3 }
      | Term '-' Factor    { Subtract $1 $3 }
      | Factor             { $1 }
@@ -35,7 +35,7 @@ Primary : digits         { Number $1 }
         | '-' digits     { Number (- $2) }
         | id             { Variable $1 }
         | '(' Term ')'   { $2 }
--- END:SimpleGrammar
+-- END:SubstGrammar
 
 {
 
