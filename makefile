@@ -7,31 +7,31 @@ HSCOLOUR := hscolour -lit
 NEWLINE!=cat foo.txt
 
 TESTS=SimpleTest.hs \
-			SubstituteTest.hs \
-			IntBoolTest.hs \
-			TopLevelFunctionsTest.hs \
-			StatefulTest.hs
+	SubstituteTest.hs \
+	IntBoolTest.hs \
+	TopLevelFunctionsTest.hs \
+	StatefulTest.hs
 
 SOURCES=$(TESTS) \
-      Base.hs \
-			Lexer.hs \
-			CheckedMonad.hs \
-			ErrorChecking.hs \
-			Examples.hs \
-			FirstClassFunctions.hs \
-			FunExamples.hs \
-			FunctionalEnvironment.hs \
-			IncorrectFunctions.hs \
-			IntBool.hs \
-			Let.hs \
-			LetSubstitute.hs \
-			Stateful.hs \
-			StatefulMonad.hs \
-			Simple.hs \
-			SimpleParse.hs \
-			Substitute.hs \
-      SubstituteParse.hs \
-      TopLevelFunctions.hs
+	Base.hs \
+	Lexer.hs \
+	CheckedMonad.hs \
+	ErrorChecking.hs \
+	Examples.hs \
+	FirstClassFunctions.hs \
+	FunExamples.hs \
+	FunctionalEnvironment.hs \
+	IncorrectFunctions.hs \
+	IntBool.hs \
+	Let.hs \
+	LetSubstitute.hs \
+	Stateful.hs \
+	StatefulMonad.hs \
+	Simple.hs \
+	SimpleParse.hs \
+	Substitute.hs \
+	SubstituteParse.hs \
+	TopLevelFunctions.hs
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
@@ -44,17 +44,17 @@ updates: new.lhs
 diff: new.lhs
 	diff anatomy.lhs new.lhs
 
-new.lhs: anatomy.lhs	execute
+new.lhs: anatomy.lhs execute
 	ruby tags.rb \
-  | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
-  > sed -E 's/ +$//' \
-  > new.lhs
+		| ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
+		> sed -E 's/ +$//' \
+		> new.lhs
 
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
 	cp new.lhs anatomy.lhs
 
-code/%.hs : src/%.hs makefile
+code/%.hs: src/%.hs makefile
 	@mkdir -p code
 	cat $< \
 		| sed "/BEGIN:/d" \
@@ -65,15 +65,15 @@ code/%.hs : src/%.hs makefile
 		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
 		> $@.htm
 
-code:	$(addprefix code/,$(SOURCES))
+code: $(addprefix code/,$(SOURCES))
 
-code/%.hs : code/%.hs makefile
+code/%.hs: code/%.hs makefile
 	(echo '<pre>'; cat $@; echo '</pre>') \
 		| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
 		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
 		> $@.htm
 
-output/%.out : code/%.hs makefile
+output/%.out: code/%.hs makefile
 	@mkdir -p output
 	cd code; runghc $(notdir $<) > ../output/$(addsuffix .out, $(basename $(notdir $<)))
 
