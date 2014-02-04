@@ -2070,8 +2070,7 @@ write a *higher-order* function. A higher-order function is one that
 takes a function as input or returns a function as an result. The
 function |bindF| takes an |EnvF| as an input and returns a new |EnvF|. %Repr14
 
-INCLUDE:Repr15
-> -- bindF :: String -> Value -> EnvF -> EnvF
+> bindF :: String -> Value -> EnvF -> EnvF
 > -- %Repr15
 
 Expanding the definition of |EnvF| makes the higher-order nature of |bindF| clear: %Repr16
