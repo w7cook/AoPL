@@ -1244,7 +1244,7 @@ booleans. Some examples are $4 < 10$ and $3 * 10 = 7$. Once booleans are include
 in the language, it is possible to define a *conditional* expression, with the following
 concrete syntax: %More6
 
-|if| *test* |then| *true-part* |else| *false-part* %More7
+|if (|*test*|)| *true-part*|; else| *false-part* %More7
 
 A conditional expression allows selection of one of two different values
 based on whether a boolean is true or false. Note that a conditional *expression* is
