@@ -15,15 +15,15 @@ TESTS=SimpleTest.hs \
 			FunExamples.hs
 
 PARSERS=\
-      SimpleParse.y \
-      SubstituteParse.y \
-      IntBoolParse.y \
-      DeclareParse.y \
-      TopLevelFunctionsParse.y
+			SimpleParse.y \
+			SubstituteParse.y \
+			IntBoolParse.y \
+			DeclareParse.y \
+			TopLevelFunctionsParse.y
 
 SOURCES=$(TESTS) \
-      $(addsuffix .hs, $(basename $(PARSERS))) \
-      Base.hs \
+			$(addsuffix .hs, $(basename $(PARSERS))) \
+			Base.hs \
 			Lexer.hs \
 			CheckedMonad.hs \
 			ErrorChecking.hs \
@@ -38,8 +38,8 @@ SOURCES=$(TESTS) \
 			StatefulMonad.hs \
 			Simple.hs \
 			Substitute.hs \
-      TopLevelFunctions.hs \
-      Value.hs
+			TopLevelFunctions.hs \
+			Value.hs
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
@@ -54,9 +54,9 @@ diff: new.lhs
 
 new.lhs: anatomy.lhs	
 	ruby tags.rb \
-  | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
-  | perl -pe "s/ +$$//" \
-  > new.lhs
+	| ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
+	| perl -pe "s/ +$$//" \
+	> new.lhs
 
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
