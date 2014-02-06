@@ -199,7 +199,7 @@ and four for the the binary operators of addition, subtraction, multiplication,
 and division. The symbols |Number|, |Add|, |Subtract| etc are the *constructors*
 of the data type. The types that follow the constructors are the
 components of the data type. Thus a |Number| expression has an integer component,
-while the other constructors all have two expression compoents.
+while the other constructors all have two expression components.
 A number that appears in a program is called a *literal*. %Abst4
 
 As an example of abstract syntax, consider this expression: %Abst5
@@ -444,7 +444,6 @@ INCLUDE:SimpleGrammar
 >
 > Primary : digits         { Number $1 }
 >         | '-' digits     { Number (- $2) }
->         | id             { Variable $1 }
 >         | '(' Term ')'   { $2 }
 > -- %SimpleGrammar
 
@@ -489,6 +488,10 @@ INCLUDE:Eval5
 The output is %Eval6
 
 INCLUDE:Eval7
+> Evaluating the following expression:
+>   [3 - -2 - -7]
+> Produces the following result:
+>   12
 > -- %Eval7
 
 FOO: Explain Show %Test1
@@ -512,6 +515,21 @@ INCLUDE:Form8
 Running this main program produces the following results: %Form9
 
 INCLUDE:Form12
+> evaluate [4]
+>  ==> 4
+>
+> evaluate [-5 + 6]
+>  ==> 1
+>
+> evaluate [3 - -2 - -7]
+>  ==> 12
+>
+> evaluate [3*(8 + 5)]
+>  ==> 39
+>
+> evaluate [1 + 8*2]
+>  ==> 17
+>
 > -- %Form12
 
  ## Object Language and Meta-Language
@@ -691,20 +709,20 @@ then the value is the substitution |val|. %Subs10
 Running a few tests produces the following results: %Subs12
 
 INCLUDE:Subs13
-> substitute ("x", 5) x + 2
->  ==> 5 + 2
+> substitute ("x", 5) [x + 2]
+>  ==> [5 + 2]
 >
-> substitute ("x", 5) 32
->  ==> 32
+> substitute ("x", 5) [32]
+>  ==> [32]
 >
-> substitute ("x", 5) x
->  ==> 5
+> substitute ("x", 5) [x]
+>  ==> [5]
 >
-> substitute ("x", 5) x*x + x
->  ==> 5*5 + 5
+> substitute ("x", 5) [x*x + x]
+>  ==> [5*5 + 5]
 >
-> substitute ("x", 5) x + 2*y + z
->  ==> 5 + 2*y + z
+> substitute ("x", 5) [x + 2*y + z]
+>  ==> [5 + 2*y + z]
 >
 > -- %Subs13
 
@@ -763,23 +781,24 @@ The test results below show that multiple variables are substituted with
 values, but that unknown variables are left intact: %Mult99
 
 INCLUDE:Mult4
->
+> e1 = [ ("x", 3), ("y", -1) ]
+> -- %Mult4
 
 INCLUDE:Mult11
-> substitute e1 x + 2
->  ==> 3 + 2
+> substitute e1 [x + 2]
+>  ==> [3 + 2]
 >
-> substitute e1 32
->  ==> 32
+> substitute e1 [32]
+>  ==> [32]
 >
-> substitute e1 x
->  ==> 3
+> substitute e1 [x]
+>  ==> [3]
 >
-> substitute e1 x*x + x
->  ==> 3*3 + 3
+> substitute e1 [x*x + x]
+>  ==> [3*3 + 3]
 >
-> substitute e1 x + 2*y + z
->  ==> 3 + 2*-1 + z
+> substitute e1 [x + 2*y + z]
+>  ==> [3 + 2*-1 + z]
 >
 > -- %Mult11
 
@@ -864,7 +883,7 @@ INCLUDE:Loca17
 Since the language we are defining is a subset of JavaScript, we will use its syntax.
 In general a |variable declaration| expression has the following concrete syntax: %Loca18
 
-|var| *variable* |=| *bound-expression* |;| *body* %Loca19
+|var| *variable* |=| *bound-expression*|;| *body* %Loca19
 
 The meaning of a |variable declaration| expression is to evaluate the bound expression,
 then bind the local variable to the resulting value, and then
@@ -902,13 +921,13 @@ TODO: talk about renaming %Scop6
 When substituting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
 In particular, when substituting for *x* in an expression, if
-the expression is of the form |var| *x* |=| *e* |;| *body* then
+the expression is of the form |var| *x* |=| *e*|;| *body* then
 *x* should be substituted within *e* but not in *body*.
 Because *x* is redefined, the *body* is a hole in the scope of *x*.  %Subs1
 
 > substitute1 (var, val) exp = subst exp
 >   ...
->   subst (Let x exp body)  = Let x (subst exp) body'
+>   subst (Declare x exp body)  = Declare x (subst exp) body'
 >     where body' = if x == var
 >                   then body
 >                   else subst body
@@ -924,7 +943,7 @@ TODO: need some test cases here  %Subs18
  ### Evaluating Variable Declarations using Substitution
 
 The evaluation of a let expression is based on substitution.
-To evaluate |var| *x* |=| *e* |;| *b*,
+To evaluate |var| *x* |=| *e*|;| *b*,
 first evaluate the bound expression *e*, then substitute its value
 for variable *x* in the body *b*. Finally, the result of
 substitution is evaluated.  %Eval1
@@ -1017,8 +1036,7 @@ INCLUDE:Summ4
 
 For the basic evaluator substitution and evaluation were
 completely separate, but the evaluation rule for variable
-declarations involves substitution.  %Eval30
-
+declarations involves substitution.
 One consequence of this
 rule is that the body of every let expression is copied,
 because substitution creates a copy of the expression with
@@ -1031,6 +1049,7 @@ three times:  %Eval32
 > var y = x+1;
 > var z = y+2;
 > x*y*z
+> -- %Eval8
 
 The steps are as follows:  %Eval34
 
@@ -1081,6 +1100,12 @@ environment |newEnv| that binds |x| to the value of
 the bound expressions. It then evaluates the body |b| in the
 new environment |newEnv|. %Eval11
 
+The Haskell function |fromJust| raises an exception if its
+argument is |Nothing|, which occurs when the variable named
+by |x| is not found in the environment |env|. This is where
+undefined variable errors arise in this evaluator. %Eval25
+TODO: define *exception*? %Eval26
+
 The steps in evaluation with environments do not copy the expression: %Eval12
 
 Environment                                         Evaluation
@@ -1118,6 +1143,7 @@ expression: %Eval15
 > var x = 9;
 > var x = x*x;
 > x+x
+> -- %Eval16
 
 Environment                                         Evaluation
 -------------------------------------------         -----------------------------------
@@ -1143,6 +1169,7 @@ creates to extensions of the base environment %Eval19
 
 > var x = 3;
 > (var y = 3*x; 2+y) + (var z = 7*x; 1+z)
+> -- %Eval20
 
 The first variable declaration creates an environment |x| $\mapsto$ 3 with a
 single binding. The next two let expressions create environments %Eval21
@@ -1154,31 +1181,56 @@ single binding. The next two let expressions create environments %Eval21
 Internally Haskell allows these two environments to share the definition
 of the original environment |x| $\mapsto$ 3. %Eval24
 
-The Haskell function |fromJust| raises an exception if its
-argument is |Nothing|, which occurs when the variable named
-by |x| is not found in the environment |env|. This is where
-undefined variable errors arise in this evaluator. %Eval25
+Here are some test cases for evaluating expressions with declarations: %Eval33
 
-TODO: define *exception*? %Eval26
+INCLUDE:DeclTest1
+> execute [4]
+>  ==> 4
+>
+> execute [-4 - 6]
+>  ==> -10
+>
+> execute [var x = 3;
+> x]
+>  ==> 3
+>
+> execute [var x = 3;
+> var y = x*x;
+> x]
+>  ==> 3
+>
+> execute [var x = 3;
+> var x = x*x;
+> x]
+>  ==> 9
+>
+> execute [var x = 3;
+> var y = x*x;
+> y]
+>  ==> 9
+>
+> execute [2 + (var x = 2; x)]
+>  ==> 4
+>
+> -- %DeclTest1
 
- #### Exercise 2.1: Multi-variable Variable Declarations
+The code for this section
+is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)
+and  [Declare Test](./code/DeclareTest.hs.htm) files. %Eval30
 
-Modify the |Declare| expression to take a list of bindings, rather than a single one.
-Modify the |evaluate| function to handle evaluation of multi-variable declarations. %Exer2
-
- ## More Kinds of Data: Booleans and Conditionals
+ ## More Kinds of Data: Booleans and Conditionals {#MoreData}
 
 In addition to arithmetic computations, it is useful for expressions
 to include conditions and also return different kinds of values.
 Until now our expressions have always returned |Int| results, because
 they have only performed arithmetic computations. The code for this section
-is given in the [Int Bool](./code/IntBool.hs.htm) file. The type |Value|
+is given in the [Int Bool](./code/IntBool.hs.htm) and [Int Bool Parser](./code/IntBoolParse.y.htm) files. The type |Value|
 is defined to support multiple different kinds of values: %More2
 
 INCLUDE:More3
 > data Value = IntV  Int
 >            | BoolV Bool
->  deriving (Eq, Show)
+>  deriving (Eq)
 > -- %More3
 
 Some example values are |BoolV True| and
@@ -1229,7 +1281,6 @@ INCLUDE:More99
 >          | If        Exp Exp Exp
 >          | Variable  String
 >          | Declare   String Exp Exp
->   deriving (Show, Eq)
 > -- %More99
 
 Evaluation is then defined by cases as before. Two helper functions, |binary| and |unary| (defined below),
@@ -1286,59 +1337,47 @@ Using the new format, here are the expressions for the test
 cases given above: %More18
 
 INCLUDE:More19
-> -- 4
-> t1 = Literal (IntV 4)
-> -- -4 - 6
-> t2 = Binary Sub (Literal (IntV (-4))) (Literal (IntV 6))
-> -- 3 - -2 - -7
-> t3 = Binary Sub (Literal (IntV 3))
->                 (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7))))
-> -- 3*(8 + 5)
-> t4 = Binary Mul (Literal (IntV 3))
->                 (Binary Add (Literal (IntV 8)) (Literal (IntV 5)))
-> -- 3 + 8 * 2
-> t5 = Binary Add (Literal (IntV 3))
->                 (Binary Mul (Literal (IntV 8)) (Literal (IntV 2)))
+> t1 = "4"
+> t2 = "-4 - 6"
+> t3 = "if (3==6) -2; else -7"
+> t4 = "3*(8 + 5)"
+> t5 = "3 + 8 * 2"
 > -- %More19
 
 In addition, new expressions can be defined to represent conditional expressions: %More20
 
 INCLUDE:More98
-> -- if 3 > 3*(8 + 5) then 1 else 0
-> t6 = If (Binary GT (Literal (IntV 3)) t4)
->         (Literal (IntV 1))
->         (Literal (IntV 0))
-> -- 2 + (if 3 <= 0 then 9 else -5)
-> t7 = Binary Add (Literal (IntV 2))
->                 (If (Binary LE (Literal (IntV 3))
->                                         (Literal (IntV 0)))
->                     (Literal (IntV 9))
->                     (Literal (IntV (-5))))
+> t6 = "if (3 > 3*(8 + 5)) 1; else 0"
+> t7 = "2 + (if (3 <= 0) 9; else -5)"
 > -- %More98
 
 Running these test cases with the |test| function defined above yields these results: %More22
 
 INCLUDE:More23
-> execute Literal (IntV 4)
->  ==> IntV 4
+> execute [4]
+>  ==> 4
 >
-> execute Binary Sub (Literal (IntV (-4))) (Literal (IntV 6))
->  ==> IntV (-10)
+> execute [-4 - 6]
+>  ==> -10
 >
-> execute Binary Sub (Literal (IntV 3)) (Binary Sub (Literal (IntV (-2))) (Literal (IntV (-7))))
->  ==> IntV (-2)
+> execute [if (3 == 6)
+> -2;
+> else -7]
+>  ==> -7
 >
-> execute Binary Mul (Literal (IntV 3)) (Binary Add (Literal (IntV 8)) (Literal (IntV 5)))
->  ==> IntV 39
+> execute [3 * (8 + 5)]
+>  ==> 39
 >
-> execute Binary Add (Literal (IntV 3)) (Binary Mul (Literal (IntV 8)) (Literal (IntV 2)))
->  ==> IntV 19
+> execute [3 + 8 * 2]
+>  ==> 19
 >
-> execute If (Binary GT (Literal (IntV 3)) (Binary Mul (Literal (IntV 3)) (Binary Add (Literal (IntV 8)) (Literal (IntV 5))))) (Literal (IntV 1)) (Literal (IntV 0))
->  ==> IntV 0
+> execute [if (3 > 3 * (8 + 5))
+> 1;
+> else 0]
+>  ==> 0
 >
-> execute Binary Add (Literal (IntV 2)) (If (Binary LE (Literal (IntV 3)) (Literal (IntV 0))) (Literal (IntV 9)) (Literal (IntV (-5))))
->  ==> IntV (-3)
+> execute [2 + (if (3 >= 0) 9; else -5)]
+>  ==> 11
 >
 > -- %More23
 
@@ -1358,36 +1397,34 @@ undefined.  Attempting to evaluate |3 + True| results in a call to
 handled by the |binary| function. As a result, Haskell generates a
 *Non-exhaustive pattern* error: %Type3
 
-    Main> evaluate [] (Binary Add (Literal (IntV 3)) (Literal (BoolV True)))
+    Main> evaluate [] (parseExp "3 + true")
     *** Exception: Non-exhaustive patterns in function binary %Type4
 
 Here are some examples of expression that generate type errors: %Type5
 
 INCLUDE:Type6
-> -- if 3 then 5 else 8
-> err1 = If (Literal (IntV 3)) (Literal (IntV 5)) (Literal (IntV 8))
-> -- 3 + True
-> err2 = Binary Add (Literal (IntV 3)) (Literal (BoolV True))
-> -- 3 || True
-> err3 = Binary Or (Literal (IntV 3)) (Literal (BoolV True))
-> -- -True
-> err4 = Unary Neg (Literal (BoolV True))
+> err1 = "if (3) 5; else 8"
+> err2 = "3 + true"
+> err3 = "3 || true"
+> err4 = "-true"
 > -- %Type6
 
 Running these tests produce error messages, but the errors are not
 very descriptive of the problem that actually took place. %Type1
 
 INCLUDE:Type6run
-> execute If (Literal (IntV 3)) (Literal (IntV 5)) (Literal (IntV 8))
+> execute [if (3)
+> 5;
+> else 8]
 >  ==> Exception: Irrefutable pattern failed for pattern IntBool.BoolV test
 >
-> execute Binary Add (Literal (IntV 3)) (Literal (BoolV True))
+> execute [3 + true]
 >  ==> Exception: Non-exhaustive patterns in function binary
 >
-> execute Binary Or (Literal (IntV 3)) (Literal (BoolV True))
+> execute [3 || true]
 >  ==> Exception: Non-exhaustive patterns in function binary
 >
-> execute Unary Neg (Literal (BoolV True))
+> execute [-true]
 >  ==> Exception: Non-exhaustive patterns in function unary
 >
 > -- %Type6run
@@ -1418,7 +1455,7 @@ first we will implement the ability to evaluate a restricted subset of functions
 in our developing language. Then, to help you actually answer the question of what a function is, we will
 explore the idea of functions as first-class values in a programming language. %Func4
 
- ## Top-Level Function Definitions
+ ## Top-Level Function Definitions {#TopLevel}
 
 Some programming languages, including C and ACL2, allow functions to be defined only
 at the top level of the program. The "top level" means outside of
@@ -1518,6 +1555,7 @@ of actual argument expressions: %Top19
 As an example, here is an encoding of the example program: %Top21
 
 INCLUDE:Top22
+> -- parseExp "function(n, m) if m == 0 then 1 else n*power(n, m-1)"
 > f1 = Function ["n", "m"]
 >       (If (Binary EQ (Variable "m") (Literal (IntV 0)))
 >           (Literal (IntV 1))
@@ -2481,20 +2519,20 @@ We can use these functions to produce simple arithmetic equations. %Natu24
 > a = plus x (mul y z) -- is equivalent to church 20
 > -- %Natu25
 
- ### Relationship between Let and Functions
+ ### Relationship between Declarations and Functions
 
-TODO: prove that |var x =| $e$ |;| $b$ is equivalent to
+TODO: prove that |var x =| $e$|;| $b$ is equivalent to
    ($\lambda$|x.|$b$)$e$ %Rela2
 
 The variable declaration expression in our language is not necessary, because
 a |var| can be simulated using a function. In particular, any
-expression |var x =| $e$ |;| $b$ is equivalent to ($\lambda$|x.|$b$)$e$. %Rela1
+expression |var x =| $e$|;| $b$ is equivalent to ($\lambda$|x.|$b$)$e$. %Rela1
 
-The expression |var x =| $e$ |;| $b$ binds value of $e$ to the variable |x| for use in the body, $b$.
+The expression |var x =| $e$|;| $b$ binds value of $e$ to the variable |x| for use in the body, $b$.
 The creation of bindings in a |var| statement is equivalent to the bindings created
 from arguments provided to a lambda function. So, if a function was defined as:
 |foo = \x ->| $b$
-Calling |foo| $e$ is equivalent to  |var x =| $e$ |;| $b$
+Calling |foo| $e$ is equivalent to  |var x =| $e$|;| $b$
 So, a |var| statement is another rewording of a lambda function that takes a certain
 argument binding before interpretting the body. %Rela3
 
@@ -4954,5 +4992,51 @@ INCLUDE:StatefulHelper3 %Mona26
  ## State machines (???)
 
 --------------------END-HIDE-------------------------
+
+ # Assignments
+
+ ## Basic Interpreter
+
+Extend the *parser* and *interpreter* of [Section on Evaluating Using Environments](#BasicEvalEnv)
+to allow multiple bindings in a variable binding
+expression. For example, %Basi1
+
+> var x = 3, y = 9;
+> x * y
+> -- %Basi2
+
+The abstract syntax of the Exp language with multiple bindings can be expressed
+by changing the |Decalre| rule to support a list of pairs of strings and expressions: %Basi3
+
+> data Exp = ...
+> 					| Declare [(String, Exp)] Exp
+> -- %Basi4
+
+If a |Declare| expression has duplicate identifiers, your program must signal an error.
+It is legal for a nested |Declare| to reuse the same name. Two examples: %Basi5
+
+> var x = 3, x = x + 2; x*2       -- illegal
+> var x = 3; var x = x + 2; x*2   -- legal
+> -- %Basi6
+
+Note that a multiple declare is not the same as multiple nested declares. For examle, %Basi7
+
+> var a = 3; var b = 8; var a = b, b = a; a + b       -- evaluates to 11
+> var a = 3; var b = 8; var a = b; var b = a; a + b   -- evaluates to 16
+> -- %Basi8
+
+You must write and include test cases that amply exercise all of the code you've written. %Basi9
+
+You can assume that the inputs are valid programs and that your program may
+raise arbitrary errors when given invalid input. %Basi10
+
+Here is an example test case: %Basi11
+
+> var a = 2, b = 7; (var m = 5 * a, n = m + 1; if (n > b) a; else 0) + a
+> -- %Basi12
+
+The code that you must modify
+is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)
+and  [Declare Test](./code/DeclareTest.hs.htm) files. %Basi13
 
  # References

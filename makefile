@@ -8,11 +8,19 @@ NEWLINE!=cat foo.txt
 
 TESTS=SimpleTest.hs \
 			SubstituteTest.hs \
+			DeclareTest.hs \
 			IntBoolTest.hs \
 			TopLevelFunctionsTest.hs \
 			StatefulTest.hs
 
+PARSERS=\
+      SimpleParse.y \
+      SubstituteParse.y \
+      IntBoolParse.y \
+      DeclareParse.y
+
 SOURCES=$(TESTS) \
+      $(addsuffix .hs, $(basename $(PARSERS))) \
       Base.hs \
 			Lexer.hs \
 			CheckedMonad.hs \
@@ -23,14 +31,12 @@ SOURCES=$(TESTS) \
 			FunctionalEnvironment.hs \
 			IncorrectFunctions.hs \
 			IntBool.hs \
-			Let.hs \
-			LetSubstitute.hs \
+			Declare.hs \
+			DeclareSubstitute.hs \
 			Stateful.hs \
 			StatefulMonad.hs \
 			Simple.hs \
-			SimpleParse.hs \
 			Substitute.hs \
-      SubstituteParse.hs \
       TopLevelFunctions.hs
 
 verb: anatomyVerbatim.pdf
@@ -47,14 +53,18 @@ diff: new.lhs
 new.lhs: anatomy.lhs	
 	ruby tags.rb \
   | ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
-  | sed "s/ +$$//" \
+  | perl -pe "s/ +$$//" \
   > new.lhs
 
 fixup: anatomy.lhs new.lhs
 	cp anatomy.lhs backup/archive`date "+%m%d%H%M%Y%S"`.lhs
 	cp new.lhs anatomy.lhs
 
-code/%.hs : src/%.hs makefile
+src/%.hs : src/%.y makefile 
+	cd src
+	happy $<
+
+code/%.hs : src/%.hs makefile $(addprefix src/,$(SOURCES))
 	@mkdir -p code
 	cat $< \
 		| sed "/BEGIN:/d" \
@@ -65,15 +75,20 @@ code/%.hs : src/%.hs makefile
 		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
 		> $@.htm
 
-code:	$(addprefix code/,$(SOURCES))
-
-code/%.hs : code/%.hs makefile
+code/%.y : src/%.y makefile $(addprefix src/,$(SOURCES))
+	@mkdir -p code
+	cat $< \
+		| sed "/BEGIN:/d" \
+		| sed "/END:/d" \
+		> $@
 	(echo '<pre>'; cat $@; echo '</pre>') \
 		| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
 		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
 		> $@.htm
 
-output/%.out : code/%.hs makefile
+code:	$(addprefix code/,$(SOURCES)) $(addprefix code/,$(PARSERS))
+
+output/%.out : code/%.hs makefile $(addprefix code/,$(SOURCES))
 	@mkdir -p output
 	cd code; runghc $(notdir $<) > ../output/$(addsuffix .out, $(basename $(notdir $<)))
 

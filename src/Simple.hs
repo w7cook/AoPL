@@ -20,7 +20,7 @@ evaluate (Divide a b)    = evaluate a `div` evaluate b
 
 --BEGIN:Form10
 instance Show Exp where
-  show e = showExp 0 e
+  show e = "[" ++ showExp 0 e ++ "]"
 
 showExp level (Number i)      = show i
 showExp level (Add a b)       = showBinary level 1 a " + " b
