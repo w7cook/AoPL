@@ -11,25 +11,6 @@ data Exp = Number     Int
          | Variable   String
          | Declare    String Exp Exp
 --END:Summ3
-
-instance Show Exp where
-  show e = "[" ++ showExp 0 e ++ "]"
-
-showExp level (Number i)      = show i
-showExp level (Variable x)    = x
-showExp level (Declare x a b) = 
-	if level > 0 then
-  	paren ("var " ++ x ++ " = " ++ showExp 0 a ++ "; " ++ showExp 0 b)
-  else
-    "var " ++ x ++ " = " ++ showExp 0 a ++ ";\n" ++ showExp 0 b
-showExp level (Add a b)       = showBinary level 1 a " + " b
-showExp level (Subtract a b)  = showBinary level 1 a " - " b
-showExp level (Multiply a b)  = showBinary level 2 a "*" b
-showExp level (Divide a b)    = showBinary level 2 a "/" b
-
-showBinary outer inner a op b =
-  if inner < outer then paren result else result
-      where result = showExp inner a ++ op ++ showExp inner b
       
 type Env = [(String, Int)]
 
@@ -48,3 +29,21 @@ evaluate (Declare x exp body) env = evaluate body newEnv
 --END:Eval38 END:Impl3
 
 execute e = evaluate e []
+
+
+instance Show Exp where
+  show e = "[" ++ showExp 0 e ++ "]"
+
+showExp level (Number i)      = show i
+showExp level (Variable x)    = x
+showExp level (Declare x a b) = 
+	if level > 0 then paren result else result
+  	where result = "var " ++ x ++ " = " ++ showExp 0 a ++ "; " ++ showExp 0 b
+showExp level (Add a b)       = showBinary level 1 a " + " b
+showExp level (Subtract a b)  = showBinary level 1 a " - " b
+showExp level (Multiply a b)  = showBinary level 2 a "*" b
+showExp level (Divide a b)    = showBinary level 2 a "/" b
+
+showBinary outer inner a op b =
+  if inner < outer then paren result else result
+      where result = showExp inner a ++ op ++ showExp inner b

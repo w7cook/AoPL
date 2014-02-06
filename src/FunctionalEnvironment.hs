@@ -1,5 +1,6 @@
 module FunctionalEnvironment where
 import Data.Maybe
+import Value
 import IntBool
 
 --BEGIN:Repr31

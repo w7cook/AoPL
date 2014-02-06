@@ -1,24 +1,23 @@
 module TopLevelFunctions where
 
-import Prelude hiding (LT, GT, EQ)
+import Prelude hiding (LT, GT, EQ, showList)
 import Data.Maybe
-import IntBool hiding (Exp, Literal, Unary, Binary, If, Variable, Declare, evaluate)
+import Value
 
 --BEGIN:Top15
 type FunEnv = [(String, Function)]
 data Function = Function [String] Exp
-  deriving Show
 --END:Top15
 
 --BEGIN:Top18
 data Program = Program FunEnv Exp
-  deriving Show
 --END:Top18
 
 --BEGIN:Eval41
 execute :: Program -> Value
 execute (Program funEnv main) = evaluate main [] funEnv
 --END:Eval41
+
 
 --BEGIN:Summ12
 data Exp = Literal   Value
@@ -28,8 +27,8 @@ data Exp = Literal   Value
          | Variable  String
          | Declare   String Exp Exp
          | Call      String [Exp]
-  deriving Show
-      
+
+            
 --BEGIN:Eval59
 evaluate :: Exp -> Env -> FunEnv -> Value
 --END:Eval59
@@ -58,4 +57,37 @@ evaluate (Call fun args) env funEnv   = evaluate body newEnv funEnv
 --END:Summ12 END:Eval31
 
 
-   
+paren x = "(" ++ x ++ ")"
+
+instance Show Program where
+	show (Program fenv exp) = (showList "\n" (map showFun fenv)) ++ "\n" ++ showExp 0 exp
+
+showFun (name, Function args body) = "function " ++ name ++ "(" ++ showList ", " args ++ ") {\n  " ++ showExp 0 body ++ "\n}"
+
+instance Show Exp where
+  show e = "[" ++ showExp 0 e ++ "]"
+
+showExp level (Literal i)      = show i
+showExp level (Variable x)    = x
+showExp level (Declare x a b) = 
+	if level > 0 then paren result else result
+  	where result = "var " ++ x ++ " = " ++ showExp 0 a ++ "; " ++ showExp 0 b
+showExp level (If a b c)    = 
+	if level > 0 then paren result else result
+	  where result = "if (" ++ showExp 0 a ++ ") " ++ showExp 0 b ++ "; else " ++ showExp 0 c
+showExp level (Unary Neg a)    = "-" ++ showExp 99 a
+showExp level (Unary Not a)    = "!" ++ showExp 99 a
+showExp level (Binary op a b)  = showBinary level (fromJust (lookup op levels)) a (fromJust (lookup op names)) b
+  where levels = [(Or, 1), (And, 2), (GT, 3), (LT, 3), (LE, 3), (GE, 3), (EQ, 3), 
+  							  (Add, 4), (Sub, 4), (Mul, 5), (Div, 5)] 
+        names = [(Or, "||"), (And, "&&"), (GT, ">"), (LT, "<"), (LE, "<="), (GE, ">="), (EQ, "=="), 
+  							  (Add, "+"), (Sub, "-"), (Mul, "*"), (Div, "/")] 
+showExp level (Call f args)    = f ++ "(" ++ showList ", " (map (showExp 0) args) ++ ")"
+
+showList sep [] = ""
+showList sep [e] = e
+showList sep (e:es) = e ++ sep ++ showList sep es
+
+showBinary outer inner a op b =
+  if inner < outer then paren result else result
+      where result = showExp inner a ++ " " ++ op ++ " " ++ showExp inner b

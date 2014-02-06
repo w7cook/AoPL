@@ -1,33 +1,10 @@
 import Base
 import Prelude hiding (LT, GT, EQ)
-import IntBool hiding (Exp, Literal, Unary, Binary, If, Variable, evaluate, execute)
 import TopLevelFunctions
+import TopLevelFunctionsParse
 
---BEGIN:Top22
--- parseExp "function(n, m) if m == 0 then 1 else n*power(n, m-1)"
-f1 = Function ["n", "m"]
-      (If (Binary EQ (Variable "m") (Literal (IntV 0)))
-          (Literal (IntV 1))
-          (Binary Mul
-            (Variable "n")
-            (Call "power" [Variable  "n",
-                           Binary  Sub (Variable  "m")
-                                         (Literal (IntV 1))])))
-
-p1 = Program [("power", f1)]
-             (Call "power" [Literal (IntV 3),
-                            Literal (IntV 4)])
---END:Top22
-
---BEGIN:A13
-testP1 = Program
-  [("f", Function ["x"]
-           (Binary Mul (Variable "x")
-                       (Variable "x")))]
-  (Call "f" [Literal (IntV 10)])
---END:A13
+p1 = parseExp "function power(n, m) { if (m == 0) 1; else n*power(n, m-1) } power(3, 4)"
 
 main = do
-  tagged "TLF1" (test "execute" execute testP1)
-  tagged "TLF2" (test "execute" execute p1)
+  tagged "Top22" (test "execute" execute p1)
   

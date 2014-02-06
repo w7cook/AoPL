@@ -11,13 +11,15 @@ TESTS=SimpleTest.hs \
 			DeclareTest.hs \
 			IntBoolTest.hs \
 			TopLevelFunctionsTest.hs \
-			StatefulTest.hs
+			StatefulTest.hs \
+			FunExamples.hs
 
 PARSERS=\
       SimpleParse.y \
       SubstituteParse.y \
       IntBoolParse.y \
-      DeclareParse.y
+      DeclareParse.y \
+      TopLevelFunctionsParse.y
 
 SOURCES=$(TESTS) \
       $(addsuffix .hs, $(basename $(PARSERS))) \
@@ -27,7 +29,6 @@ SOURCES=$(TESTS) \
 			ErrorChecking.hs \
 			Examples.hs \
 			FirstClassFunctions.hs \
-			FunExamples.hs \
 			FunctionalEnvironment.hs \
 			IncorrectFunctions.hs \
 			IntBool.hs \
@@ -37,7 +38,8 @@ SOURCES=$(TESTS) \
 			StatefulMonad.hs \
 			Simple.hs \
 			Substitute.hs \
-      TopLevelFunctions.hs
+      TopLevelFunctions.hs \
+      Value.hs
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf

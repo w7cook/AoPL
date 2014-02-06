@@ -1190,23 +1190,16 @@ INCLUDE:DeclTest1
 > execute [-4 - 6]
 >  ==> -10
 >
-> execute [var x = 3;
-> x]
+> execute [var x = 3; x]
 >  ==> 3
 >
-> execute [var x = 3;
-> var y = x*x;
-> x]
+> execute [var x = 3; var y = x*x; x]
 >  ==> 3
 >
-> execute [var x = 3;
-> var x = x*x;
-> x]
+> execute [var x = 3; var x = x*x; x]
 >  ==> 9
 >
-> execute [var x = 3;
-> var y = x*x;
-> y]
+> execute [var x = 3; var y = x*x; y]
 >  ==> 9
 >
 > execute [2 + (var x = 2; x)]
@@ -1240,18 +1233,18 @@ the *labels* for data variants, while |Int| and |Bool| uses are *types* that spe
 data are associated with that data variant. %More5
 
 The abstract syntax of expressions can now be expanded to include operations involving
-booleans. Some examples are $4 < 10$ and $3 * 10 = 7$. Once booleans are included
+booleans. Some examples are |4 < 10| and |3 * 10 = 7|. Once booleans are included
 in the language, it is possible to define a *conditional* expression, with the following
 concrete syntax: %More6
 
-|if (|*test*|)| *true-part*|; else| *false-part* %More7
+|if (|*test*|)| *true-exp*|; else| *false-exp* %More7
 
 A conditional expression allows selection of one of two different values
 based on whether a boolean is true or false. Note that a conditional *expression* is
 expected to produce a value. This is different from the conditional *statement*
 found in many languages (most notably C and Java), which executes one of two blocks but
 does not produce a value. In these languages, conditional expressions are written
-*test* |?| *true-part* |:| *false-part*. Haskell, however, only has
+*test* |?| *true-exp* |:| *false-exp*. Haskell, however, only has
 conditional expressions of the kind discussed here. %More8
 
 Given a full set of arithmetic operators, some comparison operators
@@ -1267,14 +1260,16 @@ is fairly special, it is included directly as |If| expression.
 These changes are implemented in the
 following definition for the abstract syntax |Exp|: %More9
 
-INCLUDE:More99
+INCLUDE:UnBinOps
 > data BinaryOp = Add | Sub | Mul | Div | And | Or
 >               | GT | LT | LE | GE | EQ
 >   deriving (Show, Eq)
 >
 > data UnaryOp = Neg | Not
 >   deriving (Show, Eq)
->
+> -- %UnBinOps
+
+INCLUDE:More99
 > data Exp = Literal   Value
 >          | Unary     UnaryOp Exp
 >          | Binary    BinaryOp Exp Exp
@@ -1286,9 +1281,11 @@ INCLUDE:More99
 Evaluation is then defined by cases as before. Two helper functions, |binary| and |unary| (defined below),
 perform the actual computations for binary and unary operations, respectively. %More11
 
-INCLUDE:More12
+INCLUDE:EnvDef
 > type Env = [(String, Value)]
->
+> -- %EnvDef
+
+INCLUDE:More12
 > -- Evaluate an expression in an environment
 > evaluate :: Exp -> Env -> Value
 > evaluate (Literal v) env      = v
@@ -1360,9 +1357,7 @@ INCLUDE:More23
 > execute [-4 - 6]
 >  ==> -10
 >
-> execute [if (3 == 6)
-> -2;
-> else -7]
+> execute [if (3 == 6) -2; else -7]
 >  ==> -7
 >
 > execute [3 * (8 + 5)]
@@ -1371,9 +1366,7 @@ INCLUDE:More23
 > execute [3 + 8 * 2]
 >  ==> 19
 >
-> execute [if (3 > 3 * (8 + 5))
-> 1;
-> else 0]
+> execute [if (3 > 3 * (8 + 5)) 1; else 0]
 >  ==> 0
 >
 > execute [2 + (if (3 >= 0) 9; else -5)]
@@ -1413,10 +1406,8 @@ Running these tests produce error messages, but the errors are not
 very descriptive of the problem that actually took place. %Type1
 
 INCLUDE:Type6run
-> execute [if (3)
-> 5;
-> else 8]
->  ==> Exception: Irrefutable pattern failed for pattern IntBool.BoolV test
+> execute [if (3) 5; else 8]
+>  ==> Exception: Irrefutable pattern failed for pattern Value.BoolV test
 >
 > execute [3 + true]
 >  ==> Exception: Non-exhaustive patterns in function binary
@@ -1500,13 +1491,13 @@ without return statements: %Top6
 >     n * power(n, m - 1)
 > -- %Top1
 
-> main =         -- not really a valid Haskell main function
->   power(3, 4)
+> main =
+>   print (power(3, 4))
 > -- %Top8
 
 These examples provides an outline for the basic concrete syntax of a function: %Top9
 
-|function| *function-name* |(| *parameter-name*, ..., *parameter-name* |)| *body-expression* %Top10
+|function| *function-name* |(| *parameter-name*, ..., *parameter-name* |)| { *body-expression* } %Top10
 
 The exact syntax varies from language to language. Some languages
 begin with a keyword |function| or |def|. Other languages require brackets
@@ -1529,7 +1520,6 @@ provide a means to represent such programs: %Top14
 INCLUDE:Top15
 > type FunEnv = [(String, Function)]
 > data Function = Function [String] Exp
->   deriving Show
 > -- %Top15
 
 A list of function definitions is a *function environment*.
@@ -1541,7 +1531,6 @@ main expression: %Top17
 
 INCLUDE:Top18
 > data Program = Program FunEnv Exp
->   deriving Show
 > -- %Top18
 
 Any of the expressions can contain calls to the top-level
@@ -1555,19 +1544,12 @@ of actual argument expressions: %Top19
 As an example, here is an encoding of the example program: %Top21
 
 INCLUDE:Top22
-> -- parseExp "function(n, m) if m == 0 then 1 else n*power(n, m-1)"
-> f1 = Function ["n", "m"]
->       (If (Binary EQ (Variable "m") (Literal (IntV 0)))
->           (Literal (IntV 1))
->           (Binary Mul
->             (Variable "n")
->             (Call "power" [Variable  "n",
->                            Binary  Sub (Variable  "m")
->                                          (Literal (IntV 1))])))
+> execute function power(n, m) {
+>   if (m == 0) 1; else n * power(n, m - 1)
+> }
+> power(3, 4)
+>  ==> 81
 >
-> p1 = Program [("power", f1)]
->              (Call "power" [Literal (IntV 3),
->                             Literal (IntV 4)])
 > -- %Top22
 
  ### Evaluating Top-Level Functions {#EvalTopLevel}
@@ -1638,9 +1620,10 @@ in the following (silly) example:  %Eval52
     function pow(pow)
       if pow <= 0 then
         2
-      else
-        let pow = pow(pow - 1) in
-          pow * pow(pow - 2)
+      else (
+        var pow = pow(pow - 1);
+        pow * pow(pow - 2)
+      )
 %Eval40
 ````
 
@@ -1651,9 +1634,10 @@ are renamed to be less confusing:  %Eval53
     function pow(a)
       if a <= 0 then
         2
-      else
-        let b = pow(a - 1) in
-          b * pow(b - 2)
+      else (
+        var b = pow(a - 1);
+        b * pow(b - 2)
+      )
 %Eval42
 ````
 
@@ -1694,7 +1678,8 @@ first-class functions %Stac2
  ### Summary
 
 Here is the full code for the evaluator supporting
-top-level functions definitions.  %Summ1
+top-level functions definitions, taken from the
+[Top Level Functions](./code/TopLevelFuncdtions.hs.htm) file.  %Summ1
 
 INCLUDE:Summ12
 > data Exp = Literal   Value
@@ -1704,7 +1689,7 @@ INCLUDE:Summ12
 >          | Variable  String
 >          | Declare   String Exp Exp
 >          | Call      String [Exp]
->   deriving Show
+>
 >
 > evaluate :: Exp -> Env -> FunEnv -> Value
 > evaluate (Literal v) env funEnv      = v
@@ -2620,32 +2605,20 @@ Top-Level Functions (A)             First-Class Functions (B)
 |function f(x) OPENB x * x CLOSEB|  |var f = function(x) OPENB x * x CLOSEB;|
 |f(10)|                             |f(10)| %A11
 
-The explicit abstract syntax for example (A) is: %A12
+The explicit abstract syntax for the call in example (A) is: %A12
 
-INCLUDE:A13
-> testP1 = Program
->   [("f", Function ["x"]
->            (Binary Mul (Variable "x")
->                        (Variable "x")))]
->   (Call "f" [Literal (IntV 10)])
-> -- %A13
+>  Call "f" (Literal (IntV 10))
 
-The explicit abstract syntax for example (B) is: %A14
+The explicit abstract syntax for the call in example (B) is: %A14
 
-INCLUDE:A15
-> testP2 =
->  Declare "f" (Literal (Function "x"
->                         (Binary Mul (Variable "x")
->                                     (Variable "x"))))
->    (Call (Variable "f") (Literal (IntV 10)))
-> -- %A15
+>  Call (Variable "f") (Literal (IntV 10))
 
 Note that the function in the |Call| is string |"f"|
 in the first version, but is an expression |Variable "f"|
 in the second version. %A16
 
 In many cases the
-first expression (the function) will be *variable* that
+first expression (the function) will be a *variable* that
 names the function to be called. Since there is no longer any
 special function environment, the names of functions are looked
 up in the normal variable environment. (TODO: should this come
@@ -2980,7 +2953,8 @@ INCLUDE:Exam7
 
  ## Summary of First-Class Functions
 
-Here is the full code for first-class functions with non-recursive definitions:  %Summ13
+Here is the full code for first-class functions with non-recursive definitions,
+taken from the [First Class Functions](./code/FirstClassFuncdtions.hs.htm) file:  %Summ13
 
 INCLUDE:Summ14
 > data Exp = Literal   Value

@@ -1,4 +1,5 @@
 {-# OPTIONS -XRankNTypes #-}
+import Value
 import IntBool
 import FunctionalEnvironment
 
