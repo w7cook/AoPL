@@ -8,9 +8,6 @@ emptyEnvF = \var -> Nothing
 --END:Repr31
 
 bindF :: String -> a -> (String -> Maybe a) -> (String -> Maybe a)
---BEGIN:Repr15
--- bindF :: String -> Value -> EnvF -> EnvF
---END:Repr15
 
 --BEGIN:Repr19
 bindF var val env = \testVar -> if testVar == var

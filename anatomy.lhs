@@ -2027,8 +2027,6 @@ The comprehensions used earlier in this document could be replace by invocations
 
 |[evaluate a env BAR a <- args]|   \ \ \ \  $\equiv$  \ \ \ \  |map (\a-> evaluate a env) args| %Mapp12
 
-TODO: make a comment about point-free style? %Mapp13
-
 TODO: is a function that returns a function also called higher order? %Mapp14
 
  ### Representing Environments as Functions {#EnvAsFun}
@@ -2107,8 +2105,7 @@ write a *higher-order* function. A higher-order function is one that
 takes a function as input or returns a function as an result. The
 function |bindF| takes an |EnvF| as an input and returns a new |EnvF|. %Repr14
 
-INCLUDE:Repr15
-> -- bindF :: String -> Value -> EnvF -> EnvF
+> bindF :: String -> Value -> EnvF -> EnvF
 > -- %Repr15
 
 Expanding the definition of |EnvF| makes the higher-order nature of |bindF| clear: %Repr16
