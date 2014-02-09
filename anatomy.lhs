@@ -17,9 +17,9 @@ I'm writing these notes because I want to teach the theory of programming
 languages with a practical focus, but I don't want to use Scheme (or ML) as the
 host language.
 Thus many excellent books do not fit my needs, including
-[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs) [@sk],
+[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/\~sk/Publications/Books/ProgLangs) [@sk],
 [*Essentials of Programming Languages*](http://www.cs.indiana.edu/eopl) [@Friedman:2008:EPL:1378240]
-or [*Concepts in Programming Languages*](http://theory.stanford.edu/~jcm/books.html) [@Mitchell:2001:CPL:580408]. %Why2
+or [*Concepts in Programming Languages*](http://theory.stanford.edu/\~jcm/books.html) [@Mitchell:2001:CPL:580408]. %Why2
 
 This book uses Haskell, a pure functional language.
 Phil Wadler [@Wadler:1987:CAS:24697.24706] gives some good reasons why to prefer Haskell
@@ -1679,7 +1679,7 @@ first-class functions %Stac2
 
 Here is the full code for the evaluator supporting
 top-level functions definitions, taken from the
-[Top Level Functions](./code/TopLevelFuncdtions.hs.htm) file.  %Summ1
+[Top Level Functions](./code/TopLevelFunctions.hs.htm) file.  %Summ1
 
 INCLUDE:Summ12
 > data Exp = Literal   Value
