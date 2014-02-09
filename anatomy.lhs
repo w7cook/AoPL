@@ -295,7 +295,7 @@ is useful to illustrate how grammars work. %Gram1
 Here is a simple grammar: %Gram3
 
 > Sentence : Noun Verb | Sentence PrepositionalPhase
-> PrepositionalPhase : Prep Noun
+> PrepositionalPhase : Preposition Noun
 > Noun : 'Dick' | 'Jane' | 'Spot'
 > Verb : 'runs' | 'talks'
 > Preposition : 'to' | 'with'
