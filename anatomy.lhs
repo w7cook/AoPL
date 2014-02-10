@@ -5003,7 +5003,7 @@ raise arbitrary errors when given invalid input. %Basi10
 
 Here is an example test case: %Basi11
 
-> var a = 2, b = 7; (var m = 5 * a, n = m + 1; if (n > b) a; else 0) + a
+> var a = 2, b = 7; (var m = 5 * a, n = m - 1; a * n + b / m) + a
 > -- %Basi12
 
 The code that you must modify
