@@ -36,14 +36,21 @@ evaluate (If a b c) env =
             else evaluate c env
 evaluate (Declare x exp body) env = evaluate body newEnv
   where newEnv = bindF x (evaluate exp env) env
-evaluate (Variable x) env     = fromJust (env x)
+evaluate (Variable x) env     =
+  case env x of
+    Nothing -> error ("Variable " ++ x ++ " undefined")
+    Just v  -> v
 --BEGIN:A35
 evaluate (Call fun arg) env = evaluate body newEnv
   where Function x body = evaluate fun env
         newEnv = bindF x (evaluate arg env) env
 --END:A35
 
+emptyEnv = \x->Nothing
+
 -- Same as IntBool
+execute exp = evaluate exp emptyEnv
+
 data BinaryOp = Add | Sub | Mul | Div | And | Or
               | GT | LT | LE | GE | EQ
   deriving (Eq, Show)

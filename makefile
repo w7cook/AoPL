@@ -11,15 +11,18 @@ TESTS=SimpleTest.hs \
 			DeclareTest.hs \
 			IntBoolTest.hs \
 			TopLevelFunctionsTest.hs \
+			IncorrectFunctionsTest.hs \
 			StatefulTest.hs \
-			FunExamples.hs
+			FunExamples.hs \
+			ErrorCheckingTest.hs 
 
 PARSERS=\
 			SimpleParse.y \
 			SubstituteParse.y \
 			IntBoolParse.y \
 			DeclareParse.y \
-			TopLevelFunctionsParse.y
+			TopLevelFunctionsParse.y \
+			FirstClassFunctionsParse.y
 
 SOURCES=$(TESTS) \
 			$(addsuffix .hs, $(basename $(PARSERS))) \
@@ -105,7 +108,7 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp figures/*.png ~/Public/web/anatomy/figures
 	cp code/* ~/Public/web/anatomy/code
 	cp -r cc ~/Public/web/anatomy
-	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
+	scp -r ~/Public/web/anatomy lust.cs.utexas.edu:public_html
 
 anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
 	ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" < anatomy.lhs \

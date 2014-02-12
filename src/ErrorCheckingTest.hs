@@ -1,15 +1,17 @@
 
-import FirstClassFunctions hiding (evaluate)
+import Base
+import FirstClassFunctions hiding (evaluate, execute)
+import FirstClassFunctionsParse
 import ErrorChecking
 
 --BEGIN:Hand28
-testUBV = evaluate (Variable "x") []
+testUBV = execute (parseExp "x")
 --END:Hand28
 
 --BEGIN:Hand32
-testDBZ2 = evaluate (Binary Div (Literal (IntV 3)) (Literal (IntV 0)) ) []
+testDBZ2 = execute (parseExp "3 / 0")
 --END:Hand32
 
 main = do
-  print testUBV
-  print testDBZ2
+  tagged "testUBV" (print testUBV)
+  tagged "testDBZ2" (print testDBZ2)

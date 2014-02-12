@@ -17,6 +17,10 @@ evaluate (Variable x) env =
     Nothing -> Error ("Variable " ++ x ++ " undefined")
     Just v  -> Good v
 --END:Hand11 BEGIN:Hand15
+evaluate (Unary op a) env =
+  case evaluate a env of
+    Error msg -> Error msg
+    Good av ->   checked_unary op av
 evaluate (Binary op a b) env =
   case evaluate a env of
     Error msg -> Error msg
@@ -26,6 +30,8 @@ evaluate (Binary op a b) env =
         Good bv ->
           checked_binary op av bv
 --END:Hand15
+
+execute exp = evaluate exp []
 
 --BEGIN:Hand17
 checked_unary :: UnaryOp -> Value -> Checked Value
