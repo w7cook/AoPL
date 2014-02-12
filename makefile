@@ -108,7 +108,7 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp figures/*.png ~/Public/web/anatomy/figures
 	cp code/* ~/Public/web/anatomy/code
 	cp -r cc ~/Public/web/anatomy
-	scp -r ~/Public/web/anatomy lust.cs.utexas.edu:public_html
+	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
 
 anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
 	ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" < anatomy.lhs \

@@ -5007,8 +5007,8 @@ expression. For example, %Basi1
 > x * y
 > -- %Basi2
 
-The abstract syntax of the Exp language with multiple bindings can be expressed
-by changing the |Decalre| rule to support a list of pairs of strings and expressions: %Basi3
+The abstract syntax of the |Exp| language with multiple bindings can be expressed
+by changing the |Declare| rule to support a list of pairs of strings and expressions: %Basi3
 
 > data Exp = ...
 > 					| Declare [(String, Exp)] Exp
