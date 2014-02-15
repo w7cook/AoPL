@@ -11,15 +11,18 @@ TESTS=SimpleTest.hs \
 			DeclareTest.hs \
 			IntBoolTest.hs \
 			TopLevelFunctionsTest.hs \
+			IncorrectFunctionsTest.hs \
 			StatefulTest.hs \
-			FunExamples.hs
+			FunExamples.hs \
+			ErrorCheckingTest.hs 
 
 PARSERS=\
 			SimpleParse.y \
 			SubstituteParse.y \
 			IntBoolParse.y \
 			DeclareParse.y \
-			TopLevelFunctionsParse.y
+			TopLevelFunctionsParse.y \
+			FirstClassFunctionsParse.y
 
 SOURCES=$(TESTS) \
 			$(addsuffix .hs, $(basename $(PARSERS))) \

@@ -17,9 +17,9 @@ I'm writing these notes because I want to teach the theory of programming
 languages with a practical focus, but I don't want to use Scheme (or ML) as the
 host language.
 Thus many excellent books do not fit my needs, including
-[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/~sk/Publications/Books/ProgLangs) [@sk],
+[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/\~sk/Publications/Books/ProgLangs) [@sk],
 [*Essentials of Programming Languages*](http://www.cs.indiana.edu/eopl) [@Friedman:2008:EPL:1378240]
-or [*Concepts in Programming Languages*](http://theory.stanford.edu/~jcm/books.html) [@Mitchell:2001:CPL:580408]. %Why2
+or [*Concepts in Programming Languages*](http://theory.stanford.edu/\~jcm/books.html) [@Mitchell:2001:CPL:580408]. %Why2
 
 This book uses Haskell, a pure functional language.
 Phil Wadler [@Wadler:1987:CAS:24697.24706] gives some good reasons why to prefer Haskell
@@ -1181,6 +1181,12 @@ single binding. The next two let expressions create environments %Eval21
 Internally Haskell allows these two environments to share the definition
 of the original environment |x| $\mapsto$ 3. %Eval24
 
+It is useful to define an |execute| function that supplies the default, empty, environment: %Eval62
+
+INCLUDE:DeclExec %Eval63
+> execute e = evaluate e []
+> -- %DeclExec
+
 Here are some test cases for evaluating expressions with declarations: %Eval33
 
 INCLUDE:DeclTest1
@@ -1679,7 +1685,7 @@ first-class functions %Stac2
 
 Here is the full code for the evaluator supporting
 top-level functions definitions, taken from the
-[Top Level Functions](./code/TopLevelFuncdtions.hs.htm) file.  %Summ1
+[Top Level Functions](./code/TopLevelFunctions.hs.htm) file.  %Summ1
 
 INCLUDE:Summ12
 > data Exp = Literal   Value
@@ -2608,10 +2614,12 @@ Top-Level Functions (A)             First-Class Functions (B)
 The explicit abstract syntax for the call in example (A) is: %A12
 
 >  Call "f" (Literal (IntV 10))
+> -- %A13
 
 The explicit abstract syntax for the call in example (B) is: %A14
 
 >  Call (Variable "f") (Literal (IntV 10))
+> -- %A15
 
 Note that the function in the |Call| is string |"f"|
 in the first version, but is an expression |Variable "f"|
@@ -2690,7 +2698,7 @@ This program is encoded in our language as follows: %Prob4
 
 INCLUDE:Prob5
 > testE2 =
->  Declare"add" (Literal (Function "a"
+>  Declare "add" (Literal (Function "a"
 >                (Literal (Function "b"
 >                   (Binary Add (Variable "b")
 >                               (Variable "a"))))))
@@ -3764,7 +3772,7 @@ consider extensions that have a general impact on every part of the
 language. Some examples are error handling, tracing of code,
 and mutable state. %Comp2
 
- ## Error Checking
+ ## Error Checking {#ErrorCheckingMonMonadic}
 
 Errors are an important aspect of computation. They
 are typically a pervasive feature of a language, beause they affect
@@ -3847,6 +3855,10 @@ three places where errors can arise: in |evaluate a env|, in |evaluate b env|, o
 This definition for |evaluate| of a binary operator handles the first two situations: %Hand14
 
 INCLUDE:Hand15
+> evaluate (Unary op a) env =
+>   case evaluate a env of
+>     Error msg -> Error msg
+>     Good av ->   checked_unary op av
 > evaluate (Binary op a b) env =
 >   case evaluate a env of
 >     Error msg -> Error msg
@@ -3907,22 +3919,26 @@ calls |binary| and then tags the resulting value as |Good|. %Hand18
 Evaluating an expression may now return an error for unbound variables: %Hand27
 
 INCLUDE:Hand28
-> testUBV = evaluate (Variable "x") []
+> testUBV = execute (parseExp "x")
 > -- %Hand28
 
 The result of evaluation is: %Hand29
 
-    Error "Variable x undefined" %Hand30
+INCLUDE:testUBV
+> Error "Variable x undefined"
+> -- %testUBV
 
 Or for divide by zero: %Hand31
 
 INCLUDE:Hand32
-> testDBZ2 = evaluate (Binary Div (Literal (IntV 3)) (Literal (IntV 0)) ) []
+> testDBZ2 = execute (parseExp "3 / 0")
 > -- %Hand32
 
 The result of evaluation is: %Hand33
 
-    Error "Divide by zero" %Hand34
+INCLUDE:testDBZ2
+> Error "Divide by zero"
+> -- %testDBZ2
 
 Your take-away from this section should be that checking error everywhere
 is messy and tedious. The code for binary operators has to deal with
@@ -4099,7 +4115,7 @@ The current value of all mutable cells used in a program is called
 addresses to values. The same techniques used for environments could
 be used for memories, as a list of pairs or a function.
 Memory can also be represented as a function mapping integers
-to values, similar to the [representation of environments as functions](#EnvAsFun). %Memo2
+to values, similar to the [representation of environments as functions](#EnvAsFun).
 Note that a memory is also sometimes called a *store*, based on the idea
 that is provides a form of *storage*. %Memo12
 
@@ -4201,7 +4217,7 @@ INCLUDE:Upda4
 
 The |update| function works by splitting the memory into the part
 before the address and the part starting with the address |addr|. The pattern
-$_:after$ binds $after$ to be the memory after the address. The |update|
+|_:after| binds |after| to be the memory after the address. The |update|
 function then recreates a new memory containing the before part,
 the updated memory cell, and the after part. The function
 is inefficient because it has to copy all the memory cells it has scanned up to that
@@ -4267,7 +4283,7 @@ This final type is the type of a *stateful* computation. Since it is
 useful to talk about, we will give it a name: %Stat7
 
 INCLUDE:Stat8
-> type Stateful t = Memory -> (Value, Memory)
+> type Stateful t = Memory -> (t, Memory)
 > -- %Stat8
 
 This is a *generic* type for a memory-based computation which returns
@@ -4379,7 +4395,7 @@ Note that |var| can also be used to implement sequences of operations:
 |e1; e2| can be represented as |var dummy = e1; e2| where |dummy| is a
 variable that is not used anywhere in the program. %Muta13
 
- ### Summary of Mutable State
+ ### Summary of Mutable State {#NonMonadicMutableState}
 
 Again, the take-away should be that mutation is messy when
 programmed in this way. Mutation affects every part of the
@@ -4492,7 +4508,7 @@ expressed in a uniform format. %Mona1
  ### Abstracting Simple Computations
 
 The first step is to examine how the two evaluators deal with
-simple computations that return values. Here are the cases for
+simple computations that return values.
 Consider the way that the |Literal| expression is evaluated for
 both the Checked and the Stateful evaluators. %Abst13
 
@@ -4522,7 +4538,7 @@ with the checked or stateful values are hidden in the |return| helper functions.
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |evaluate :: Exp -> Env -> Checked Value|                     |evaluate :: Exp -> Env -> Stateful Value|
-|evaluate (Literal v) env = return|$_C$ |v|                   |evaluate (Literal v) = return|$_S$ |v| %Abst21
+|evaluate (Literal v) env = return|$_C$ |v|                   |evaluate (Literal v) env = return|$_S$ |v| %Abst21
 
  ### Abstracting Computation Composition
 
@@ -4593,7 +4609,7 @@ Stateful: %Abst39
 :     (|evaluate a env|) $\rhd_S$ ($\lambda$|va. (evaluate b env)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(Binary op av bv, mem)|)) %Abst28
 
 All mention of |Error| and |Good| have been removed from the Checked version!
-The error `plumbing' has been hidden. Most of the memory plumbing has been removed
+The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
 from the Stateful version, but there is still a little at the end. But the pattern
 that has emerged is the same one that was identified in the previous section, where
 the |return|$_S$ function converts a value (the result of |Binary op av bv|) into
@@ -4788,10 +4804,6 @@ Here is a version of error checking using the |Checked| monad defined above: %Mo
 INCLUDE:Mona13
 > evaluate :: Exp -> Env -> Checked Value
 > evaluate (Literal v) env     = return v
-> evaluate (Variable x) env    =
->   case lookup x env of
->     Nothing -> Error ("Variable " ++ x ++ " undefined")
->     Just v  -> return v
 > evaluate (Unary op a) env = do
 >   av <- evaluate a env
 >   checked_unary op av
@@ -4804,10 +4816,16 @@ INCLUDE:Mona13
 >   case av of
 >     (BoolV cond) -> evaluate (if cond then b else c) env
 >     _ -> Error ("Expected boolean but found " ++ show av)
+> -- variables and declarations
+> evaluate (Variable x) env    =
+>   case lookup x env of
+>     Nothing -> Error ("Variable " ++ x ++ " undefined")
+>     Just v  -> return v
 > evaluate (Declare x e body) env = do    -- non-recursive case
 >   ev <- evaluate e env
 >   let newEnv = (x, ev) : env
 >   evaluate body newEnv
+> -- function definitions and function calls
 > evaluate (Function x body) env = return (ClosureV x body env)
 > evaluate (Call fun arg) env = do
 >   funv <- evaluate fun env
@@ -4818,6 +4836,11 @@ INCLUDE:Mona13
 >       evaluate body newEnv
 >     _ -> Error ("Expected function but found " ++ show funv)
 > -- %Mona13
+
+Note that code involving errors only occurs where an error is actually raised.
+Other parts of the code, for example the case for |Binary| and |Declare| do not
+explicitly mention errors. This is very different from the code given in
+the [Section on Error Checking](#ErrorCheckingMonMonadic). %Mona17
 
  ### Monadic Mutable State
 
@@ -4831,7 +4854,7 @@ given in the [Section on Stateful Computations](#Stateful), since it is
 a pure function type: %Mona16
 
 INCLUDE:Stat8
-> type Stateful t = Memory -> (Value, Memory)
+> type Stateful t = Memory -> (t, Memory)
 > -- %Stat8
 
 To define a monad, Haskell requires a *data* type that labels the function: %Mona18
@@ -4894,6 +4917,9 @@ INCLUDE:StatefulMonad3 %Mona22
 >   return ev
 > -- %StatefulMonad3
 
+Note that the expression forms that don't involve memory, including unary and binary operations,
+function calls and function definitions, don't explicitly mention any memory operations,
+as they did in the code given in the [Section on Mutable State](#NonMonadicMutableState).
 The evaluate function depends on three helper functions that
 provide basic stateful computations to create memory cells, read memory,
 and udpate memory. %Mona23
@@ -4911,8 +4937,13 @@ INCLUDE:StatefulHelper3 %Mona26
 > -- %StatefulHelper3
 
  # More Chapters on the way...
- ## Abstract Interpretation and Types
  ## Data Abstraction: Objects and Abstract Data Types
+
+
+
+
+ ## Abstract Interpretation and Types
+
  ## Algebra and Coalgebra
  ## Partial Evaluation
  ## Memory Management
@@ -4976,8 +5007,8 @@ expression. For example, %Basi1
 > x * y
 > -- %Basi2
 
-The abstract syntax of the Exp language with multiple bindings can be expressed
-by changing the |Decalre| rule to support a list of pairs of strings and expressions: %Basi3
+The abstract syntax of the |Exp| language with multiple bindings can be expressed
+by changing the |Declare| rule to support a list of pairs of strings and expressions: %Basi3
 
 > data Exp = ...
 > 					| Declare [(String, Exp)] Exp
@@ -4989,6 +5020,12 @@ It is legal for a nested |Declare| to reuse the same name. Two examples: %Basi5
 > var x = 3, x = x + 2; x*2       -- illegal
 > var x = 3; var x = x + 2; x*2   -- legal
 > -- %Basi6
+
+**The meaning of a var declaration is that all of the expressions associated with variables
+are evaluated first, in the environment before the var is entered. Then all the variables are
+bound to the values that result from those evaluations. Then these bindings are added to the
+outer environment, creating a new environment that is used to evaluate the body of the var declaration.
+This means that the *scope* of all variables is the body of the var in which they are defined.** %Basi14
 
 Note that a multiple declare is not the same as multiple nested declares. For examle, %Basi7
 
@@ -5003,8 +5040,13 @@ raise arbitrary errors when given invalid input. %Basi10
 
 Here is an example test case: %Basi11
 
-> var a = 2, b = 7; (var m = 5 * a, n = m + 1; if (n > b) a; else 0) + a
+> var a = 2, b = 7; (var m = 5 * a, n = b - 1; a * n + b / m) + a
 > -- %Basi12
+
+The previous version of this example contained an unbound use of the variable |m|: %Basi15
+
+> var a = 2, b = 7; (var m = 5 * a, n = m - 1; a * n + b / m) + a
+> -- %Basi17
 
 The code that you must modify
 is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)

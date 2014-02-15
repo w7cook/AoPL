@@ -1,4 +1,4 @@
-
+import Base
 import IncorrectFunctions
 
 --BEGIN:Prob3
@@ -7,7 +7,7 @@ teste1 = let add = \a -> (\b -> b + a) in add 3 2
 
 --BEGIN:Prob5
 testE2 =
- Declare"add" (Literal (Function "a"
+ Declare "add" (Literal (Function "a"
                (Literal (Function "b"
                   (Binary Add (Variable "b")
                               (Variable "a"))))))
@@ -24,9 +24,9 @@ testP2 =
    (Call (Variable "f") (Literal (IntV 10)))
 --END:A15
 
-emptyEnv = \x->Nothing
-
 main = do
-  print (evaluate testE2 emptyEnv)
-  print (evaluate testP2 emptyEnv)
+  (test "execute" execute testE2)
+  (test "execute" execute testP2)
+  --tagged "InFunOut1" (test "execute" execute testE2)
+  --tagged "InFunOut2" (test "execute" execute testP2)
   

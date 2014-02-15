@@ -28,7 +28,7 @@ update addr val mem =
 --END:Upda4
 
 --BEGIN:Stat8
-type Stateful t = Memory -> (Value, Memory)
+type Stateful t = Memory -> (t, Memory)
 --END:Stat8
 
 --BEGIN:Summ7

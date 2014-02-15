@@ -16,10 +16,6 @@ instance Monad Checked where
 --BEGIN:Mona13
 evaluate :: Exp -> Env -> Checked Value
 evaluate (Literal v) env     = return v
-evaluate (Variable x) env    =
-  case lookup x env of
-    Nothing -> Error ("Variable " ++ x ++ " undefined")
-    Just v  -> return v
 evaluate (Unary op a) env = do
   av <- evaluate a env
   checked_unary op av
@@ -34,10 +30,16 @@ evaluate (If a b c) env = do
   case av of
     (BoolV cond) -> evaluate (if cond then b else c) env
     _ -> Error ("Expected boolean but found " ++ show av)
+-- variables and declarations
+evaluate (Variable x) env    =
+  case lookup x env of
+    Nothing -> Error ("Variable " ++ x ++ " undefined")
+    Just v  -> return v
 evaluate (Declare x e body) env = do    -- non-recursive case
   ev <- evaluate e env
   let newEnv = (x, ev) : env
   evaluate body newEnv
+-- function definitions and function calls
 evaluate (Function x body) env = return (ClosureV x body env)
 evaluate (Call fun arg) env = do
   funv <- evaluate fun env
