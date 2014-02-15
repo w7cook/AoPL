@@ -709,19 +709,19 @@ then the value is the substitution |val|. %Subs10
 Running a few tests produces the following results: %Subs12
 
 INCLUDE:Subs13
-> substitute ("x", 5) [x + 2]
+> substitute1 ("x", 5) [x + 2]
 >  ==> [5 + 2]
 >
-> substitute ("x", 5) [32]
+> substitute1 ("x", 5) [32]
 >  ==> [32]
 >
-> substitute ("x", 5) [x]
+> substitute1 ("x", 5) [x]
 >  ==> [5]
 >
-> substitute ("x", 5) [x*x + x]
+> substitute1 ("x", 5) [x*x + x]
 >  ==> [5*5 + 5]
 >
-> substitute ("x", 5) [x + 2*y + z]
+> substitute1 ("x", 5) [x + 2*y + z]
 >  ==> [5 + 2*y + z]
 >
 > -- %Subs13
