@@ -16,7 +16,6 @@ import Lexer
     '{'    { Symbol "{" }
     '}'    { Symbol "}" }
     if     { TokenKeyword "if" }
-    then   { TokenKeyword "then" }
     else   { TokenKeyword "else" }
     true   { TokenKeyword "true" }
     false  { TokenKeyword "false" }
@@ -45,31 +44,31 @@ import Lexer
 Program : Functions Exp      { Program $1 $2 }
 
 Functions : Functions Function   { $1 ++ [$2] }
-		      | 						         { [] }
+          |                      { [] }
 
-Function : fun id '(' ids ')' '{' Exp '}'			 { ($2, Function $4 $7) }
+Function : fun id '(' ids ')' '{' Exp '}'       { ($2, Function $4 $7) }
  
-ids : ids ',' id 		{ $1 ++ [$3] }
-		| id 					  { [$1] }
-		| 							{ [] }
-		
+ids : ids ',' id     { $1 ++ [$3] }
+    | id               { [$1] }
+    |               { [] }
+    
  -- all the rest is the same as IntBool.y
  
 Exp : var id '=' Exp ';' Exp           { Declare $2 $4 $6 }
     | if '(' Exp ')' Exp ';' else Exp  { If $3 $5 $8 }
-    | Or        							         { $1 }
+    | Or                               { $1 }
 
-Or	 : Or '||' And        { Binary Or $1 $3 }
-     | And								{ $1 }
+Or   : Or '||' And        { Binary Or $1 $3 }
+     | And                { $1 }
 
-And	 : And '&&' Comp      { Binary And $1 $3 }
-     | Comp								{ $1 }
+And   : And '&&' Comp      { Binary And $1 $3 }
+     | Comp                { $1 }
 
 Comp : Comp '==' Term     { Binary EQ $1 $3 }
      | Comp '<' Term      { Binary LT $1 $3 }
      | Comp '>' Term      { Binary GT $1 $3 }
      | Comp '<=' Term     { Binary LE $1 $3 }
-     | Comp '<=' Term     { Binary GE $1 $3 }
+     | Comp '>=' Term     { Binary GE $1 $3 }
      | Term               { $1 }
 
 Term : Term '+' Factor    { Binary Add $1 $3 }
