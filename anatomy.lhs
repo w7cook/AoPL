@@ -609,12 +609,12 @@ The following data definition modifies |Exp| to include
 a |Variable| case. %Vari3
 
 INCLUDE:Vari99
-> data Exp = Number   Int
->          | Add      Exp Exp
->          | Subtract Exp Exp
->          | Multiply Exp Exp
->          | Divide   Exp Exp
->          | Variable String        -- added
+> data Exp = Number    Int
+>          | Add       Exp Exp
+>          | Subtract  Exp Exp
+>          | Multiply  Exp Exp
+>          | Divide    Exp Exp
+>          | Variable  String        
 >    deriving (Eq)
 > -- %Vari99
 
@@ -709,27 +709,41 @@ then the value is the substitution |val|. %Subs10
 Running a few tests produces the following results: %Subs12
 
 INCLUDE:Subs13
-> substitute ("x", 5) [x + 2]
+> substitute1 ("x", 5) [x + 2] 
 >  ==> [5 + 2]
 >
-> substitute ("x", 5) [32]
+> substitute1 ("x", 5) [32]
 >  ==> [32]
 >
-> substitute ("x", 5) [x]
+> substitute1 ("x", 5) [x]
 >  ==> [5]
 >
-> substitute ("x", 5) [x*x + x]
+> substitute1 ("x", 5) [x*x + x]
 >  ==> [5*5 + 5]
 >
-> substitute ("x", 5) [x + 2*y + z]
+> substitute1 ("x", 5) [x + 2*y + z]
 >  ==> [5 + 2*y + z]
 >
 > -- %Subs13
+
+Note that here we use are using pseudo-Haskell code in the second argument 
+of |substitute1|. The code |[x + 2]| does not work. Instead it is supposed 
+to represent the more longwinded abstract syntax representation of the 
+expression |x+2|: |Add (Variable "x") (Number 2)|. So the first expression 
+corresponds to the following piece of real Haskell code:
+
+> substitute1 ("x", 5) (Add (Variable "x") (Number 2))
+>  ==> [5 + 2]
+
+However it will be useful to us to use the pseudo-code |[x+2]| instead, since it 
+can be quite difficult to read abstract syntax directly. 
 
 It is important to keep in mind that there are now two stages for
 evaluating an expression containing a variable. The first stage
 is to *substitute* the variable for its value, then the second
 stage is to *evaluate* the resulting arithmetic expression. %Subs14
+
+INCLUDE:Subs12
 
 TODO: talk about *renaming* variables, or substituting one variable for another %Subs15
 
@@ -752,6 +766,44 @@ The corresponding type is %Mult5
 INCLUDE:Mult6
 > type Env = [(String, Int)]
 > -- %Mult6
+
+An important operation on environments is *variable lookup*. Variable lookup 
+is an operation that given a variable name and an environment looks up that 
+variable in the environment. For example:
+
+* lookup $x$ in $e1$                       $\longrightarrow$ $3$ 
+* lookup $y$ in $e1$                       $\longrightarrow$ $-1$
+
+In each case the corresponding value of the variable being looked up in the environment 
+is returned. However what happens when a variable that is not in the environment is looked up? 
+
+* lookup $z$ in $e1$                       $\longrightarrow$ $???$ 
+
+In this case variable lookup fails, and it is necessary to deal with this 
+possibility by signaling an error or triggering an exception.
+
+Haskell already provides a function, called |lookup|, that implements 
+the functionality that is needed for variable lookup. The type of |lookup|
+is as follows:
+
+> lookup :: Eq a => a -> [(a, b)] -> Maybe b
+
+This type is more general than what we need for variable lookup, but we can see 
+that if |a| is instantiated to |String| and |b| is instantiated to |Int|, 
+then the type is almost what we expect: |String -> Env -> Maybe Int|. The return 
+type of lookup (|Maybe b|) deserves a little bit more of explanation. The type |Maybe|
+is part of the Haskell libraries and it is widely used. The definition is as follows:
+
+> data Maybe a = Nothing | Just a
+
+The basic intuition is that |Maybe| is a container that may either 
+contain a value of type |a| (|Just a|) or no value at all (|Nothing|). 
+This is exactly what we need for |lookup|: when |lookup| succeeds at finding 
+a variable in the environment it can return the looked-up value v using |Just v|; 
+otherwise if variable lookup fails |lookup| returns |Nothing|. The |Maybe| datatype
+provides us with a way to deal with lookup-up errors gracefully and later to detect 
+such errors using pattern-matching to check whether the result was |Just v|
+or |Nothing|.
 
 The substitution function is easily modified to work with
 environments rather than single bindings: %Mult7

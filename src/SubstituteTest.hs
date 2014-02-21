@@ -13,11 +13,11 @@ t5 = parseExp "x+2*y+z"
 
 --BEGIN:Subs11
 main'1 = do
-  test "substitute (\"x\", 5)" (substitute1 ("x", 5)) t1
-  test "substitute (\"x\", 5)" (substitute1 ("x", 5)) t2
-  test "substitute (\"x\", 5)" (substitute1 ("x", 5)) t3
-  test "substitute (\"x\", 5)" (substitute1 ("x", 5)) t4
-  test "substitute (\"x\", 5)" (substitute1 ("x", 5)) t5
+  test "substitute1 (\"x\", 5)" (substitute1 ("x", 5)) t1
+  test "substitute1 (\"x\", 5)" (substitute1 ("x", 5)) t2
+  test "substitute1 (\"x\", 5)" (substitute1 ("x", 5)) t3
+  test "substitute1 (\"x\", 5)" (substitute1 ("x", 5)) t4
+  test "substitute1 (\"x\", 5)" (substitute1 ("x", 5)) t5
 --END:Subs11
 
 --BEGIN:Mult4

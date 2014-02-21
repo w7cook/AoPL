@@ -2,13 +2,13 @@ module Substitute where
 import Base
 
 --BEGIN:Vari99
-data Exp = Number   Int
-         | Add      Exp Exp
-         | Subtract Exp Exp
-         | Multiply Exp Exp
-         | Divide   Exp Exp
-         | Variable String        -- added
-   deriving (Eq)
+data Exp  = Number    Int
+          | Add       Exp Exp
+          | Subtract  Exp Exp
+          | Multiply  Exp Exp
+          | Divide    Exp Exp
+          | Variable  String        -- added
+          deriving (Eq)
 --END:Vari99
 
 --BEGIN:Subs9
@@ -23,6 +23,19 @@ substitute1 (var, val) exp = subst exp where
                           then Number val
                           else Variable name
 --END:Subs9
+
+--BEGIN:Subs12
+rename1:: (String, String) -> Exp -> Exp
+rename1 (var, newvar) exp = rename exp where
+  rename (Number i)       = Number i
+  rename (Add a b)        = Add (rename a) (rename b)
+  rename (Subtract a b)   = Subtract (rename a) (rename b)
+  rename (Multiply a b)   = Multiply (rename a) (rename b)
+  rename (Divide a b)     = Divide (rename a) (rename b)
+  rename (Variable name)  = if var == name
+                            then Variable newvar
+                            else Variable name
+--END:Subs12
 
 --BEGIN:Mult6
 type Env = [(String, Int)]
