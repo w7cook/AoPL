@@ -1279,8 +1279,8 @@ is given in the [Int Bool](./code/IntBool.hs.htm) and [Int Bool Parser](./code/I
 is defined to support multiple different kinds of values: %More2
 
 INCLUDE:More3
-> data Value = IntV  Int
->            | BoolV Bool
+> data Value  = IntV  Int
+>             | BoolV Bool
 >  deriving (Eq)
 > -- %More3
 
@@ -4988,14 +4988,148 @@ INCLUDE:StatefulHelper3 %Mona26
 > updateMemory val i = ST (\mem-> ((), update i val mem))
 > -- %StatefulHelper3
 
+ # Abstract Interpretation and Types
+
+So far we have been focused on writing interpreters for small
+languages. An interpreter is a meta-program that evaluates a program in a
+written in the interpreted language. When evaluating an expression 
+such as:
+
+evaluate (3+5) ==> 8
+
+we cannot be more precise about the result of this particular program:
+the expression 3+5 evaluates only to the (concrete) number 8. The
+evaluate function implements what is called a *concrete interpreter*.
+
+However it is possible to write interpreters that return *abstract
+values*. Those interpreters, called abstract interpreters, return some
+abstraction of the result of executing a program.
+
+The most common and familiar example of abstract interpretation is
+*type-checking* or *type-inference*. A type-checker analyses a program in
+a language, checks whether the types of all sub-expressions are
+compatible and returns the corresponding type of the program. For
+example:
+
+tcheck (3+5) ==> Int
+
+A type-checker works in a similar way to a concrete interpreter. The
+difference is that instead of returning a (concrete) value, it returns
+a type. A type is an abstraction of values. When the type
+of an expression is Int, it is not known exactly which concrete number
+will that expression evaluate to. However it is known that that expression 
+will evaluate to an integer value and not to a boolean value.
+
+Type-checking is not the only example of abstract interpretation. In
+fact abstract interpretation is a huge area of research in programming
+languages because various forms of abstract interpretation are useful
+to prove certain properties about programs.[TODO: more references]
+
+ ## Languages with a Single Type of Values 
+
+In a language with a single type of data type-checking 
+is trivial. For example, in the language of arithmetic, which 
+only allows integer values, type-checking would be defined as follows:
+
+> data Type = TInt
+>
+> check :: Exp -> Type
+> check e = TInt
+
+In other words, all expressions have type |TInt| and type-checking
+cannot fail, since there are no type-errors. Therefore, type-checking
+only really makes sense in a language with at least two types of data.
+
+ ## A Language with Integers and Booleans
+
+In this tutorial we are going to write a type-checker for a language
+with Integers and Booleans.  The language with integer and booleans
+that we are going to use is:
+
+> data BinaryOp = Add | Sub | Mul | Div | And | Or
+>               | GT | LT | LE | GE | EQ
+> 
+> data UnaryOp = Neg | Not
+>
+> data Exp = Literal   Value
+>          | Unary     UnaryOp Exp
+>          | Binary    BinaryOp Exp Exp
+>          | If        Exp Exp Exp
+>          | Variable  String
+>          | Declare   String Exp Exp
+
+
+(NOTE: The language in the tutorial files includes an additional constructor Call. For this question you can ignore that constructor and there is no need to have a case for Call in the type-checker function.)
+
+For this language types are represented as:
+
+> data Type = TInt | TBool deriving (Eq,Show)
+
+This datatype accounts for the two possible types in the language. 
+
+Type-checking can fail when the types of subexpressions are incompatible. For example, the expression:
+
+3 + true 
+
+should fail to type-check because addition (+) is an operation that expects two integer values. However in this case, the second argument is not an integer, but a boolean. 
+
+Type environments In a language with variables a type-checker needs to track the types of variables. To do this we can use what is called a type environment.
+
+type TEnv = [(String,Type)]
+
+ A type environment plays a similar role to the environment in a regular interpreter: it is used to track the types of variables during the type-checking process of an expression.
+
+Type of the type-checker We are going to use the following type for the type-checker:
+
+tcheck :: Exp -> TEnv -> Maybe Type
+
+Note how similar this type is to the type of an environment-based interpreter except for two differences:
+	
+	1) Where in the concrete interpreter we used Value, we now use Type.
+	2) The return type is now “Maybe Type”
+
+Difference 1) is because if we look at tcheck as an abstract interpreter, then types play the role of abstract values. Difference 2) is for convenience. It is not necessary to use a Maybe type, but using the Maybe type makes the code more robust when tracking for type-checking errors.
+
+Typing rules for expressions Most expressions in the language it are fairly obvious to type-check. For example, to type-check an expression of the form:
+
+	e1 + e2
+
+we proceed as follows:
+
+	1) check whether the type of e1 is TInt
+	2) check whether the type of e2 is TInt
+	3) If both types are TInt return TInt as the result type (Just TInt); otherwise fail to type-check (Nothing)
+
+Typing Declare Expressions To type a declare expression of the form
+
+var x = e; body
+
+we proceed as follows:
+
+	1) type-check the expression e
+	2)if e has a valid type then type-check the body expression with an type-environment extended with x |-> typeof e; otherwise fail with a type-error.
+
+For expressions with unbound variables: for example:
+
+var x = y; x
+
+you should return Nothing (or an error). In other words the type-checker works only for valid programs. 
+
+Typing If Expressions The only slightly tricky expression to type-check is an if expression. The type-checking rule for an if expressions of the form:
+	
+	if e1 e2; else e3
+
+is 
+
+	1) check whether the type of e1 is Bool
+	2) compute the type of e2 
+	3) compute the type of e3
+	4) check whether the types of e2 and e3 are the same. If they are the same return that type; otherwise fail.
+
+Note that if type-checking any subexpressions fails with a type-error (Nothing) then the type-checking of the if expression will also fail.
+
  # More Chapters on the way...
  ## Data Abstraction: Objects and Abstract Data Types
-
-
-
-
- ## Abstract Interpretation and Types
-
  ## Algebra and Coalgebra
  ## Partial Evaluation
  ## Memory Management
