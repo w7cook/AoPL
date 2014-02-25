@@ -40,13 +40,13 @@ import Lexer
 
 Exp : var id '=' Exp ';' Exp           { Declare $2 $4 $6 }
     | if '(' Exp ')' Exp ';' else Exp  { If $3 $5 $8 }
-    | Or        							         { $1 }
+    | Or                               { $1 }
 
-Or	 : Or '||' And        { Binary Or $1 $3 }
-     | And								{ $1 }
+Or   : Or '||' And        { Binary Or $1 $3 }
+     | And                { $1 }
 
-And	 : And '&&' Comp      { Binary And $1 $3 }
-     | Comp								{ $1 }
+And   : And '&&' Comp      { Binary And $1 $3 }
+     | Comp                { $1 }
 
 Comp : Comp '==' Term     { Binary EQ $1 $3 }
      | Comp '<' Term      { Binary LT $1 $3 }

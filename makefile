@@ -12,6 +12,7 @@ TESTS=SimpleTest.hs \
 			IntBoolTest.hs \
 			TopLevelFunctionsTest.hs \
 			IncorrectFunctionsTest.hs \
+			FirstClassFunctionsTest.hs \
 			StatefulTest.hs \
 			FunExamples.hs \
 			ErrorCheckingTest.hs 
@@ -22,7 +23,8 @@ PARSERS=\
 			IntBoolParse.y \
 			DeclareParse.y \
 			TopLevelFunctionsParse.y \
-			FirstClassFunctionsParse.y
+			FirstClassFunctionsParse.y \
+			LambdaParse.y
 
 SOURCES=$(TESTS) \
 			$(addsuffix .hs, $(basename $(PARSERS))) \
@@ -42,7 +44,8 @@ SOURCES=$(TESTS) \
 			Simple.hs \
 			Substitute.hs \
 			TopLevelFunctions.hs \
-			Value.hs
+			Value.hs \
+			Lambda.hs
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
@@ -130,6 +133,7 @@ anatomy.htm: anatomy.mkd
 		| sed "s/\\.eps/.png/" \
 		> foo2.mkd
 	cat foo2.mkd \
+		| sed "s/BAR/|/g" \
 		| perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)/ <a href='' id='Comment:\$$1' ><\\/a>/g" \
 		| perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
 		| sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \

@@ -39,6 +39,6 @@ data UnaryOp = Neg | Not
 
 
 instance Show Value where
-	show (IntV n) = show n
-	show (BoolV True) = "true"
-	show (BoolV False) = "false"
+  show (IntV n) = show n
+  show (BoolV True) = "true"
+  show (BoolV False) = "false"

@@ -36,7 +36,7 @@ Factor : Factor '*' Primary    { Multiply $1 $3 }
 
 Primary : digits            { Number $1 }
         | '-' digits        { Number (- $2) }
-        | id								{ Variable $1 }
+        | id                { Variable $1 }
         | '(' Exp ')'       { $2 }
 
 {

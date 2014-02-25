@@ -20,10 +20,10 @@ test msg fun input = do
     
 showError :: SomeException -> IO ()
 showError ex = putStr ("Exception: " ++ trimError (show ex))  where
-	trimError e = trim e where
-	  trim (':' : ' ' : msg) = msg
-	  trim (c:cs) = trim cs
-	  trim [] = e
+  trimError e = trim e where
+    trim (':' : ' ' : msg) = msg
+    trim (c:cs) = trim cs
+    trim [] = e
       
 paren x = "(" ++ x ++ ")"
 

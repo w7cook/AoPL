@@ -449,7 +449,7 @@ INCLUDE:SimpleGrammar
 
 This unambiguous grammar is now ready to be put into production. %Ambi9
 
-#### Parser Generators
+ #### Parser Generators
 
 
  how to create simple grammars using the
@@ -2029,7 +2029,7 @@ INCLUDE:Func24
 > areaD = compose areaR (\x -> x / 2)
 > -- %Func24
 
- ### Mapping {#Map}
+ ### Mapping and List Comprehensions {#Map}
 
 One of the earliest and widely cited examples of first class functions
 is in the definition of a |map| function, which applies a function to
@@ -3011,10 +3011,20 @@ INCLUDE:Exam7
 
 ![Environment Diagram 3](figures/env3.png) %Exam4
 
- ## Summary of First-Class Functions
+ ## Summary of First-Class Functions  {#FirstClassFunctions}
 
-Here is the full code for first-class functions with non-recursive definitions,
-taken from the [First Class Functions](./code/FirstClassFuncdtions.hs.htm) file:  %Summ13
+Here is the full code for first-class functions with non-recursive definitions.
+The grammar changes are as follows, taken from 
+the [First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm) file: %Summ13
+
+INCLUDE:FCFGrammar1
+> Exp : function '(' id ')' '{' Exp '}'  { Function $3 $6 }
+INCLUDE:FCFGrammar2
+> Primary : Primary '(' Primary ')' { Call $1 $3 }
+> -- %FCFGrammar2
+
+Here is the definition of the abstract syntax and the evaluator,
+taken from the [First Class Functions](./code/FirstClassFunctions.hs.htm) file:   %Summ16
 
 INCLUDE:Summ14
 > data Exp = Literal   Value
@@ -3054,6 +3064,8 @@ INCLUDE:Summ14
 >   where ClosureV x body closeEnv = evaluate fun env
 >         newEnv = (x, evaluate arg env) : closeEnv
 > -- %Summ14
+
+A test case can be found in the [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm) file 
 
  # Recursive Definitions
 
@@ -5183,7 +5195,7 @@ Note that if type-checking any subexpressions fails with a type-error (Nothing) 
 
  # Assignments
 
- ## Basic Interpreter
+ ## Assignment 1: Basic Interpreter {#assign1}
 
 Extend the *parser* and *interpreter* of [Section on Evaluating Using Environments](#BasicEvalEnv)
 to allow multiple bindings in a variable binding
@@ -5197,7 +5209,7 @@ The abstract syntax of the |Exp| language with multiple bindings can be expresse
 by changing the |Declare| rule to support a list of pairs of strings and expressions: %Basi3
 
 > data Exp = ...
-> 					| Declare [(String, Exp)] Exp
+>          | Declare [(String, Exp)] Exp
 > -- %Basi4
 
 If a |Declare| expression has duplicate identifiers, your program must signal an error.
@@ -5238,4 +5250,57 @@ The code that you must modify
 is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)
 and  [Declare Test](./code/DeclareTest.hs.htm) files. %Basi13
 
+ ## Assignment 2: First-Class Functions {#assign2}
+
+Extend the *parser* and *interpreter* of [Section on First-Class Functions](#FirstClassFunctions)
+to allow passing multiple parameters, by adding a *tuple* data type and allowing *patterns* to
+be used in function and variable definitions.  For example: %FCF1
+
+Here are two example test cases: %Assi1
+
+> var f = function (a, b) { a + 2 * b };
+> f(3, 4) - f(5, 2)
+> -- %Assi2
+
+> var z = 10;
+> var (x, y) = (3, z*2);
+> y / z
+> -- %Assi3
+
+You must change the parser to allow creation of tuples, patterns
+in function and variable definitions, and functions called with a tuple.
+Here are suggested changes to your abstract syntax: %Assi4
+
+> data Exp = ...
+>          | Function Pattern Exp         -- functions have patterns
+>          | Tuple [Exp]                  -- tuple expression
+> -- %Assi5
+
+> data Pattern = VarP String              -- variable patterns
+>              | TupleP [Pattern]         -- tuple patterns
+> -- %Assi6
+
+> data Value = ...
+>            | ClosureV Pattern Exp Env   -- functions have patterns
+>            | TupleV [Value]             -- tuple value
+>   deriving (Eq, Show)
+> -- %Assi7
+
+You must write and include test cases that amply exercise all of the code you've written.
+You can assume that the inputs are valid programs and that your program may raise arbitrary
+errors when given invalid input (except as mentioned above). %Assi8
+
+The files you need are 
+[First Class Functions](./code/FirstClassFunctions.hs.htm), 
+[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm), 
+and
+[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm).
+And the files that they link to (including [Lexer](./code/Lexer.hs.htm)).
+
+ ## Files on Lambda Calculus {#LambdaExp}
+ 
+Here two files that can be used to represent and parse lambda-expressions:
+[Lambda Abstract Syntax](./code/Lambda.hs.htm) and 
+[Lambda Parser](./code/LambdaParse.y.htm) 
+ 
  # References
