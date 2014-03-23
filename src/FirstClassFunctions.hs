@@ -2,6 +2,7 @@ module FirstClassFunctions where
 
 import Prelude hiding (LT, GT, EQ, id)
 import Data.Maybe
+import Data.List
 
 --BEGIN:A42
 data Value = IntV  Int
@@ -19,7 +20,7 @@ data Exp = Literal   Value
          | Declare   String Exp Exp
          | Function  String Exp      -- new
          | Call      Exp Exp         -- changed
-  deriving (Eq, Show)
+  deriving (Eq)
   
 type Env = [(String, Value)]
 
@@ -54,6 +55,36 @@ evaluate (Call fun arg) env = evaluate body newEnv    -- changed
 
 execute exp = evaluate exp []
 
+-- Code to display expressions
+
+instance Show Exp where
+  show e = "[" ++ showExp 0 e ++ "]"
+
+showExp level (Literal i)      = show i
+showExp level (Variable x)    = x
+showExp level (Declare x a b) = 
+  if level > 0 then paren result else result
+    where result = "var " ++ x ++ " = " ++ showExp 0 a ++ "; " ++ showExp 0 b
+showExp level (If a b c)    = 
+  if level > 0 then paren result else result
+    where result = "if (" ++ showExp 0 a ++ ") " ++ showExp 0 b ++ "; else " ++ showExp 0 c
+showExp level (Unary Neg a)    = "-" ++ showExp 99 a
+showExp level (Unary Not a)    = "!" ++ showExp 99 a
+showExp level (Binary op a b)  = showBinary level (fromJust (lookup op levels)) a (fromJust (lookup op names)) b
+  where levels = [(Or, 1), (And, 2), (GT, 3), (LT, 3), (LE, 3), (GE, 3), (EQ, 3), 
+                  (Add, 4), (Sub, 4), (Mul, 5), (Div, 5)] 
+        names = [(Or, "||"), (And, "&&"), (GT, ">"), (LT, "<"), (LE, "<="), (GE, ">="), (EQ, "=="), 
+                  (Add, "+"), (Sub, "-"), (Mul, "*"), (Div, "/")] 
+showExp level (Function x body)    = "function(" ++ x ++ ") {" ++ showExp 0 body ++ "}"
+showExp level (Call fun arg)    = showExp 6 fun ++ "(" ++ showExp 0 arg ++ ")"
+
+showBinary outer inner a op b =
+  if inner < outer then paren result else result
+      where result = showExp inner a ++ " " ++ op ++ " " ++ showExp inner b
+      
+paren x = "(" ++ x ++ ")"
+
+ 
 -- same as in IntBool.hs
 data BinaryOp = Add | Sub | Mul | Div | And | Or
               | GT | LT | LE | GE | EQ

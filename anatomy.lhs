@@ -26,7 +26,7 @@ Phil Wadler [@Wadler:1987:CAS:24697.24706] gives some good reasons why to prefer
 over Scheme in his review of Structure and Interpretation of
 Computer Programs [@Abelson:1996:SIC:547755]. I agree with most but not
 all of his points. For example, I do not care much for the fact that Haskell is
-lazy. None of the examples in this book rely upon this feature. %Why3
+lazy. Only small portions of this book rely upon this feature. %Why3
 
 I believe Haskell is particularly well suited to writing interpreters.
 But one must be careful to read Haskell code as one would read poetry, not
@@ -119,7 +119,7 @@ and operations over these values. For example, the arithmetic expression |2+3|
 uses two numeric values |2| and |3| and an operation |+| that operates on
 numeric values. The *syntax* of an expression prescribes how the various
 components of the expressions can be combined. In general it is not the case that
-the components of expressions can be combined arbritrarely: they must obey certain
+the components of expressions can be combined arbitrarily: they must obey certain
 rules. For example |2 3| or | + + | are not valid arithmetic expressions.
 Each expression has a meaning (or value), which is defined by the
 *evaluation* of that expression. Evaluation is a process where expressions
@@ -226,7 +226,7 @@ into abstract syntax. %Abst8
 
 The concrete syntax of a language describes how the abstract
 concepts in the language are represented as text. For example,
-lets consider how to convert the string "3+81\*2" into the
+lets consider how to convert the string |"3+81\*2"| into the
 abstract syntax |Add (Number 3) (Multiply (Number 81) (Number 2))|.
 The first step is to break a text up into *tokens*. %Conc1
 
@@ -234,18 +234,18 @@ The first step is to break a text up into *tokens*. %Conc1
 
 Tokens are the basic units of a language. In English, for example,
 words are tokens. But English also uses many symbol tokens, including
-".", "!", "?", "(" and ")". In the example  "3 + 81 * 2" the tokens
-are 3, "+", 81, "\*", and 2. It is also important to classify tokens
-by their kind. The tokens 3, 81 and 2 are sequences of digits.
-The tokens "+" and "\*" are *symbol* tokens. Tokens are typically
+".", "!", "?", "(" and ")". In the example  |"3 + 81 * 2"| the tokens
+are |3|, |"+"|, |81|, |"\*"|, and |2|. It is also important to classify tokens
+by their kind. The tokens |3|, |81| and |2| are sequences of digits.
+The tokens |"+"| and |"\*"| are *symbol* tokens. Tokens are typically
 as simple as possible, and they must be recognizable without considering
-any context. This means that the integer "-23" might not be a good
-token, because it contains the symbol "-", which is also used in
+any context. This means that the integer |"-23"| might not be a good
+token, because it contains the symbol |"-"|, which is also used in
 other contexts. %Toke2
 
 More complex languages may
 have other kinds of tokens (other common kinds of token are *keyword*
-and *identifer* tokens, which are discussed later in the book). %Toke1
+and *identifier* tokens, which are discussed later in the book). %Toke1
 Token kinds are similar to the kinds of words in English, where
 some words are *verbs* and other words are *nouns*. %Toke3
 
@@ -257,7 +257,7 @@ INCLUDE:BasicToken
 > -- %BasicToken
 
 A |Token| is either an integer token or a symbol token with a string.
-For example, the tokens from the string "3 + 81 * 2" are: %Toke6
+For example, the tokens from the string |"3 + 81 * 2"| are: %Toke6
 
 > Digits 3
 > Symbol "+"
@@ -365,7 +365,7 @@ in the grammar: %Gram19
 > -- %Gram5
 
 This grammar is similar to the one given above for English, but each
-rule includes an *action* enclosed in curly braces |{...}|. The
+rule includes an *action* enclosed in curly braces |OPENB ... CLOSEB|. The
 action says what should happen when that rule is recognized.  In this
 case, the action is some Haskell code with calls to *constructors* to
 create the abstract syntax that corresponds to the concrete syntax of the rule.
@@ -430,7 +430,7 @@ Again we know that the first version is the correct one, because
 multiplication should be performed before subtraction. Technically,
 we say that multiplication has higher *precedence* than subtraction. %Ambi7
 
-The grammar can be ajusted to express the precedence and associativity
+The grammar can be adjusted to express the precedence and associativity
 of the operators. Here is an example: %Ambi8
 
 INCLUDE:SimpleGrammar
@@ -726,9 +726,9 @@ INCLUDE:Subs13
 >
 > -- %Subs13
 
-Note that here we use are using pseudo-Haskell code in the second argument 
-of |substitute1|. The code |[x + 2]| does not work. Instead it is supposed 
-to represent the more longwinded abstract syntax representation of the 
+Note that the test case prints the concrete syntax of the expression in square brackets, 
+as |[x + 2]|. The print format   
+represents the more longwinded abstract syntax representation of the 
 expression |x+2|: |Add (Variable "x") (Number 2)|. So the first expression 
 corresponds to the following piece of real Haskell code:
 
@@ -933,29 +933,29 @@ INCLUDE:Loca17
 > -- %Loca17
 
 Since the language we are defining is a subset of JavaScript, we will use its syntax.
-In general a |variable declaration| expression has the following concrete syntax: %Loca18
+In general a *variable declaration* expression has the following concrete syntax: %Loca18
 
 |var| *variable* |=| *bound-expression*|;| *body* %Loca19
 
-The meaning of a |variable declaration| expression is to evaluate the bound expression,
+The meaning of a *variable declaration* expression is to evaluate the bound expression,
 then bind the local variable to the resulting value, and then
 evaluate the body of the expression %Loca20
 
-In Haskell, a |variable declaration| expression can be represented by adding
+In our Haskell code, a *variable declaration* expression can be represented by adding
 another case to the definition of expressions: %Loca21
 
 > data Exp = ...
 >          | Declare String Exp Exp
 > -- %Loca22
 
-where the string is the variable name, the first Exp is the bound expression
-and the second expression is the body. %Loca23
+where the string is the variable name, the first |Exp| is the *bound expression*
+and the second |Exp| is the *body*. %Loca23
 
  ### Scope
 
 The *scope* of a variable is the portion of the text of a program
 in which a variable is defined. Normally the scope of a local
-variable is all of the body of the let in which the variable is defined.
+variable is all of the body of the declaration in which the variable is defined.
 However, it is possible for a variable to be redefined, which creates
 a hole in the scope of the outer variable: %Scop2
 
@@ -988,13 +988,13 @@ Because *x* is redefined, the *body* is a hole in the scope of *x*.  %Subs1
 In the |Declare| case for |subst|, the variable is always substituted
 into the bound expression |e|. But the substitution is only performed
 on the body |b| if the variable |var| being substituted is *not* the
-same as the variable |x| defined in the let expression.  %Subs16
+same as the variable |x| defined in the variable declaration.  %Subs16
 
 TODO: need some test cases here  %Subs18
 
  ### Evaluating Variable Declarations using Substitution
 
-The evaluation of a let expression is based on substitution.
+The evaluation of a variable declaration is based on substitution.
 To evaluate |var| *x* |=| *e*|;| *b*,
 first evaluate the bound expression *e*, then substitute its value
 for variable *x* in the body *b*. Finally, the result of
@@ -1090,10 +1090,10 @@ For the basic evaluator substitution and evaluation were
 completely separate, but the evaluation rule for variable
 declarations involves substitution.
 One consequence of this
-rule is that the body of every let expression is copied,
+rule is that the body of every variable declaration is copied,
 because substitution creates a copy of the expression with
-variables substituted. When let expressions are *nested*,
-the body of the inner let expression is copied multiple times.
+variables substituted. When variable declarations are *nested*,
+the body of the inner variable declaration is copied multiple times.
 In the following example, the expression |x * y * z| is copied
 three times:  %Eval32
 
@@ -1224,7 +1224,7 @@ creates to extensions of the base environment %Eval19
 > -- %Eval20
 
 The first variable declaration creates an environment |x| $\mapsto$ 3 with a
-single binding. The next two let expressions create environments %Eval21
+single binding. The next two variable declarations create environments %Eval21
 
 |y| $\mapsto$ 9, |x| $\mapsto$ 3 %Eval22
 
@@ -2320,8 +2320,8 @@ For example applying |add| to just one argument returns a new
 function:  %Mult37
 
 INCLUDE:Mult12
-> inc = add 1      -- \b. b + 1
-> dec = add (-1)   -- \b. b + (-1)
+> inc = add 1      -- \\ b. b + 1
+> dec = add (-1)   -- \\ b. b + (-1)
 > -- %Mult12
 
 These two functions each take a single argument.
@@ -2439,7 +2439,7 @@ INCLUDE:Bool9
 
 The behavior of "or" is to return true if |a| is true, and return |b|
 if |a| is false. It works by calling |a| as a function, passing
-true and |b| as arguments. %Bool10
+|true| and |b| as arguments. %Bool10
 
 INCLUDE:Bool11
 > andF :: BooleanF -> BooleanF -> BooleanF
@@ -2498,10 +2498,13 @@ value like |0| or |1|. The Church numeral |0| applies |f| zero times to
 
 INCLUDE:Natu11
 > zero = \f -> \x -> x
-> one = \f -> \x -> f x
-> two = \f -> \x -> f (f x)
+> one  = \f -> \x -> f x
+> two  = \f -> \x -> f (f x)
 > three = \f -> \x -> f (f (f x))
 > -- %Natu11
+
+INCLUDE:NatuSucc
+>
 
 Note that |f| and |x| have no restrictions. To demonstrate Church numerals, let
 us evaluate |three| by setting |f| to the successor function |(+1)| and |x|
@@ -2566,13 +2569,13 @@ TODO: prove that |var x =| $e$|;| $b$ is equivalent to
 
 The variable declaration expression in our language is not necessary, because
 a |var| can be simulated using a function. In particular, any
-expression |var x =| $e$|;| $b$ is equivalent to ($\lambda$|x.|$b$)$e$. %Rela1
+expression |var x =| $e$|;| $b$ is equivalent to |(function(x) {| $b$ |})|$e$. %Rela1
 
 The expression |var x =| $e$|;| $b$ binds value of $e$ to the variable |x| for use in the body, $b$.
 The creation of bindings in a |var| statement is equivalent to the bindings created
-from arguments provided to a lambda function. So, if a function was defined as:
-|foo = \x ->| $b$
-Calling |foo| $e$ is equivalent to  |var x =| $e$|;| $b$
+from arguments provided to a function. So, if a function was defined as:
+|foo = function(x) {| $b$ |}|
+Calling |foo(|$e$|)| is equivalent to  |var x =| $e$|;| $b$.
 So, a |var| statement is another rewording of a lambda function that takes a certain
 argument binding before interpretting the body. %Rela3
 
@@ -2586,7 +2589,7 @@ callbacks, event handlers, thunks, continuations, etc. %Othe2
 Its now time to define the syntax and semantics of a
 language with first-class functions. Based on the examples
 in the [previous section](#FirstClassExamples), some features are no longer needed.
-For example, `let` expressions are not needed because they
+For example, variable declaration expressions are not needed because they
 can be expressed using functions. Functions only need one
 argument, because multi-argument functions can be expressed
 by returning functions from functions.  %Eval58
@@ -2658,10 +2661,10 @@ To clarify the effect of this change, consider these two versions
 of a simple program, written using top-level functions or
 first-class functions: %A10
 
-Top-Level Functions (A)             First-Class Functions (B)
-----------------------------------  ----------------------
-|function f(x) OPENB x * x CLOSEB|  |var f = function(x) OPENB x * x CLOSEB;|
-|f(10)|                             |f(10)| %A11
+Top-Level Functions (A)            \ \ \  First-Class Functions (B)
+---------------------------------- ------ ----------------------
+|function f(x) OPENB x * x CLOSEB|        |var f = function(x) OPENB x * x CLOSEB;|
+|f(10)|                                   |f(10)| %A11
 
 The explicit abstract syntax for the call in example (A) is: %A12
 
@@ -2687,7 +2690,7 @@ TODO: example where function to be called is not a variable. %A17
 
 The first few cases for evaluation are exactly the same
 as before. In particular, evaluating a literal value is
-the same, although now the literal value might be a function. %A18
+the same, except that now the literal value might be a function. %A18
 
 INCLUDE:A34
 > evaluate :: Exp -> Env -> Value
@@ -2740,13 +2743,18 @@ Let's look at the problem of returning functions as values first.
 The section on [Multiple Arguments](#Curry) showed how a two-argument
 function could be implemented by writing a function that takes
 one argument, but then returns a function that takes the second
-argument. Here is a small program that illustrates this technique: %Prob2
+argument. Here is a small Haskell program that illustrates this technique: %Prob2
 
 INCLUDE:Prob3
 > teste1 = let add = \a -> (\b -> b + a) in add 3 2
 > -- %Prob3
 
 This program is encoded in our language as follows: %Prob4
+
+> var add = function(a) { function(b) { b + a } };
+> add(3)(2)
+
+Here is the abstract syntax for this program:
 
 INCLUDE:Prob5
 > testE2 =
@@ -2765,25 +2773,25 @@ Haskell, we will continue to use the convention of writing
 
 Here is how evaluation of this sample program proceeds: %Prob7
 
- 1. Evaluate |var add = \a -> (\b -> b + a); add 3 2| %Prob1
- 2. Bind |add| $\mapsto$ |\a -> (\b -> b + a)| %Prob11
+ 1. Evaluate |var add = function(a) { function(b) { b + a }}; add 3 2| %Prob1
+ 2. Bind |add| $\mapsto$ |function(a) { function(b) { b + a }}| %Prob11
  3. Call |(add 3) 2| %Prob12
      a. Call |add 3| %Prob13
      b. Evaluate the variable |add|, which looks it up in the
-        environment to get |\a -> (\b -> b + a)| %Prob14
+        environment to get |function(a) { function(b) { b + a }}| %Prob14
      c. Bind |a| $\mapsto$ |3| %Prob15
-     d. Return |\b -> b + a| as result of |add 3| %Prob16
- 4. Call |\b -> b + a| on argument |2| %Prob17
+     d. Return |function(b) { b + a }| as result of |add 3| %Prob16
+ 4. Call |function(b) { b + a }| on argument |2| %Prob17
      a. Bind |b| $\mapsto$ |2| %Prob18
      b. Evaluate |b + a| %Prob19
      c. Look up |b| to get |2| %Prob20
      d. Look up |a| to get... **unbound variable!** %Prob8
 
 To put this more concisely, the problem arises because the call to |add 3|
-returns |\b -> b + a|. But this function expression is not well defined because
+returns |function(b) { b + a }|. But this function expression is not well defined because
 it has a free variable |a|. What happened to the binding for |a|? It had
 a value in Steps 12 through 14 of the explanation above. But this
-binding is lost when returning the literal |\b -> b + a|. The problem doesn't
+binding is lost when returning the literal |function(b) { b + a }|. The problem doesn't
 exhibit itself until the function is called. %Prob9
 
 The problems with returning literal function expressions as values is that
@@ -4009,7 +4017,7 @@ is messy and tedious. The code for binary operators has to deal with
 errors, even though most binary operators don't have anything to do with
 error handling. %Hand35
 
- #### Exercise 5.1: Complete Error Checking (was 5.1.1)
+ #### Exercise 6.1: Complete Error Checking
 
 Extend the evaluator with error checking for the
 remaining expression cases, including
@@ -4021,13 +4029,13 @@ rather than causing Haskell execution errors. %Exer8
 As a bonus, implement error checking for recursive |var|
 expressions. %Exer5
 
- #### Exercise 5.2: Error Handling (was 5.1.2)
+ #### Exercise 6.2: Error Handling
 
 In the code given above, all errors cause the program to terminate execution.
 Extend the language with a |try|/|catch| expression that allows
 errors to be caught and handled within a program. %Exer6
 
- #### Exercise 5.3: Multiple Bindings and Arguments
+ #### Exercise 6.3: Multiple Bindings and Arguments
 
 If you really want to experience how messy it is to explicitly program
 error handling, implement error checking where |var| expressions
@@ -4549,7 +4557,7 @@ INCLUDE:Summ11
 At first glance it does not seem there is anything that can be
 done about the messy coding involved in implementing errors
 and mutable state. These features are *aspects* of the evaluation
-process, because they effect all the code of the evaluator, not
+process, because they affect all the code of the evaluator, not
 just the part that directly involves the new feature. %Abst11
 
 What is worse is that combining the code for errors and mutable
@@ -4579,7 +4587,7 @@ both the Checked and the Stateful evaluators. %Abst13
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |evaluate :: Exp -> Env -> Checked Value|                     |evaluate :: Exp -> Env -> Stateful Value|
-|evaluate (Literal v) env = Good v|                           |evaluate (Literal v) env m = (v, m)| %Abst14
+|evaluate (Literal v) env = Good v|                           |evaluate (Literal v) env mem = (v, mem)| %Abst14
 
 One important point is that literal values never cause errors
 and they do not modify memory. They represent the simple good
@@ -4593,7 +4601,7 @@ stateful value. %Abst18
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |return|$_C$ |:: Value -> Checked Value|                      |return|$_S$ |:: Value -> Stateful Value|
-|return|$_C$ |v = Good v|                                     |return|$_S$ |v =| $\lambda$ |m.(v, m)| %Abst19
+|return|$_C$ |v = Good v|                                     |return|$_S$ |v =| $\lambda$ |mem.(v, mem)| %Abst19
 
 Using these return functions, the original |evaluate| code can be written
 so that the two cases are nearly identical. The details of how to deal
@@ -4664,13 +4672,11 @@ bind together computations. %Abst26
 
 Using these operators, the *original* code can be written in simpler form: %Abst27
 
-Checked: %Abst37
-
-:    (|evaluate a env|) $\rhd_C$ ($\lambda$|va. (evaluate b env)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|)) %Abst38
-
-Stateful: %Abst39
-
-:     (|evaluate a env|) $\rhd_S$ ($\lambda$|va. (evaluate b env)| $\rhd_S$ ($\lambda$|vb.| $\lambda$|mem.(Binary op av bv, mem)|)) %Abst28
+Checked                                          \ \ \ \ \ \  Stateful
+------------------------------------------------ ------------ ----------------------
+(|evaluate a env|) $\rhd_C$ ($\lambda$|va.| 								(|evaluate a env|) $\rhd_S$ ($\lambda$|va.|
+\ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|vb.|               \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|vb.|
+\ \ \ \ |checked_binary op av bv|))                          \ \ \ \ $\lambda$|mem.(Binary op av bv, mem)|))
 
 All mention of |Error| and |Good| have been removed from the Checked version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
@@ -4683,13 +4689,11 @@ a default stateful computation. To see how this works, consider that %Abst29
 
 Using |return|$_S$ the result is: %Abst31
 
-Checked: %Abst40
-
-:    (|evaluate a env|) $\rhd_C$ ($\lambda$|va. (evaluate b env)| $\rhd_C$ ($\lambda$|vb. checked_binary op av bv|)) %Abst41
-
-Stateful: %Abst42
-
-:     (|evaluate a env|) $\rhd_S$ ($\lambda$|va. (evaluate b env)| $\rhd_S$ ($\lambda$|vb. return|$_S$ (|Binary op av bv|))) %Abst32
+Checked                                          \ \ \ \ \ \  Stateful
+------------------------------------------------ ------------ ----------------------
+(|evaluate a env|) $\rhd_C$ ($\lambda$|va.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|va.|
+\ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|vb.|               \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|vb.|
+\ \ \ \ |checked_binary op av bv|))														\ \ \ \ |return|$_S$ (|Binary op av bv|)))
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
 rules for |Mutable|, assignment, and access there will be explicit references to memory.
@@ -4837,7 +4841,7 @@ where |m| is a data type declared as an instance of |Monad|,
 then the variable |x| will be assigned a value of type $t_1$.
 Then |e2| must have type |m| $t_2$ for some type $t_2$.
 Note that the |<-| symbol must be understood differently
-from |=|. What is means is that |x| is bound to the simple value produced
+from |=|. What it means is that |x| is bound to the simple value produced
 by the computation |e1|. The |<-| is there to remind you that |x| is not bound directly to
 the monadic computation produced by |e1|, but is bound to the value that the computation
 generates. %Hask10
@@ -4932,12 +4936,12 @@ a type with a label. %Mona19
 
 INCLUDE:StatefulMonad2 %Mona20
 > instance Monad Stateful where
->   return val = ST (\m -> (val, m))
+>   return val = ST (\mem -> (val, mem))
 >   (ST c) >>= f =
->     ST (\m ->
->       let (val, m') = c m
+>     ST (\mem ->
+>       let (val, mem') = c mem
 >           ST f' = f val
->       in f' m')
+>       in f' mem')
 > -- %StatefulMonad2
 
 Here is a version of evaluator using the |Stateful| monad defined above: %Mona21
@@ -5124,7 +5128,7 @@ be used in function and variable definitions.  For example: %FCF1
 
 Here are two example test cases: %Assi1
 
-> var f = function (a, b) { a + 2 * b };
+> var f = function(a, b) { a + 2 * b };
 > f(3, 4) - f(5, 2)
 > -- %Assi2
 
@@ -5138,6 +5142,7 @@ in function and variable definitions, and functions called with a tuple.
 Here are suggested changes to your abstract syntax: %Assi4
 
 > data Exp = ...
+>          | Declare Pattern Exp Exp      -- declarations bind using patterns
 >          | Function Pattern Exp         -- functions have patterns
 >          | Tuple [Exp]                  -- tuple expression
 > -- %Assi5

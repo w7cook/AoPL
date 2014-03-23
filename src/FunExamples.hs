@@ -183,6 +183,11 @@ two = \f -> \x -> f (f x)
 three = \f -> \x -> f (f (f x))
 --END:Natu11
 
+--BEEGIN:NatuSucc
+succ = \n -> (\f -> \x -> f (n f x))
+--END:NatuSucc
+
+
 --BEGIN:Natu17
 type ChurchN = forall a. (a -> a) -> a -> a
 --END:Natu17

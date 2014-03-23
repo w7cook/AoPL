@@ -40,6 +40,7 @@ data Exp = Literal   Value
          | Declare   String Exp Exp
          | Function  String Exp
          | Call      Exp Exp
+         | Seq       Exp Exp
          | Mutable   Exp         -- new
          | Access    Exp         -- new
          | Assign    Exp Exp   -- new
@@ -105,6 +106,9 @@ evaluate (Assign a e) env mem =
 --END:Sema25
 --END:Summ11
 
+execute exp = v
+  where (v, _) = evaluate exp [] []
+  
 -- same as in IntBool.hs
 data BinaryOp = Add | Sub | Mul | Div | And | Or
               | GT | LT | LE | GE | EQ
