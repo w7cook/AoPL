@@ -6,7 +6,7 @@ import Value
 import IntBool
 import Lexer
 
--- parser produced by Happy Version 1.18.10
+-- parser produced by Happy Version 1.18.9
 
 data HappyAbsSyn t4 t5 t6 t7 t8 t9 t10
 	= HappyTerminal (Token)
