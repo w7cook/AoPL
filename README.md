@@ -10,6 +10,24 @@ This document is a series of notes about programming languages, originally
 written for students of the [undergraduate programming languages][cs345] course
 at the [University of Texas at Austin][ut].
 
+## Install
+
+Install "cabal"
+Install lhs2TeX by using "cabal install lhs2tex"
+Install Pandoc by using "cabal install pandoc"
+Install pandoc-citeproc by using "cabal install pandoc-citeproc"
+Use "make" to build. Here are some things you can build:
+  pretty - builds anatomy.pdf and opens it
+  verb - builds anatomyVerbatim.pdf and opens it
+  anatomy.pdf - builds the pretty version
+  anatomyVerbatim.pdf - builds the text-based version
+  anatomy.htm - builds the HTML version (with source code) and comments
+  clean - clean the builds
+  update - upload a new copy of the book to the public server
+    (requires server access)
+  execute - run all the code and build the tests
+  fixup - modify the core anatomy.lhs file to have updated paragraph marks and code
+
 ## Why?
 
 I’m writing these notes because I want to teach the theory of programming
