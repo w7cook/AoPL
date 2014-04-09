@@ -265,7 +265,7 @@ For example, the tokens from the string |"3 + 81 * 2"| are: %Toke6
 > Digits 2
 > -- %Toke7
 
-Program souce code is not broken up into tokens straight out of the box, instead it is merely a text file, which is to say, it is a string of characters.  A program that transforms a list of characters into a list of tokens is called a |lexer|.  
+Program souce code is not broken up into tokens straight out of the box, instead it is merely a text file, which is to say, it is a string of characters.  A program that transforms a list of characters into a list of tokens is called a *lexer*.  
 
 The [Lexer](./code/Lexer.hs.htm) file contains the code for a simple
 lexer that creates tokens in the form we speciied above. The |lexer| function takes as input a list of symbols and a list of keywords. %Toke8
@@ -400,7 +400,7 @@ work better than others, depending on the situation. %Gram30
 
  #### Ambiguity, Precedence and Associativity
 
-One problem with grammars is that sometimes they allow for |ambiguity|.  A grammar is ambiguous if there exists a sentence that can be correctly parsed by the grammar into more than one syntax tree.  For example, the expression "1-2-3" is ambiguous because it can be parsed in two ways to create the following two distinct abstract syntax trees:
+One problem with grammars is that sometimes they allow for *ambiguity*.  A grammar is ambiguous if there exists a sentence that can be correctly parsed by the grammar into more than one syntax tree.  For example, the expression |1-2-3| is ambiguous because it can be parsed in two ways to create the following two distinct abstract syntax trees:
 
 > Subtract (Number 1) (Subtract (Number 2) (Number 3))
 > Subtract (Subtract (Number 1) (Number 2)) (Number 3)
@@ -408,7 +408,7 @@ One problem with grammars is that sometimes they allow for |ambiguity|.  A gramm
 
 TODO: show the parse trees? define "parse tree" %Ambi3
 
-The same original sentence (1-2-3) generates two different parse trees with our currently used grammar, the first by parsing it as 1-(2-3), and the second by parsing it as (1-2)-3.
+The same original sentence |1-2-3| generates two different parse trees with our currently used grammar, the first by parsing it as |1-(2-3)|, and the second by parsing it as |(1-2)-3|.
 We know from our training in arithmetic that the second one is the "correct" version,
 because subtraction operations are performed left to right.
 The technical term for this is that subtraction is *left associative*.
