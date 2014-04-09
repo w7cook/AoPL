@@ -4026,6 +4026,16 @@ Ensure that all errors, including pattern match failures,
 are captured by your code and converted to |Error| values,
 rather than causing Haskell execution errors. %Exer8
 
+Start with the files for First Class Functions and Error Checking and
+combine them and complete the error cases. 
+The files you need are 
+[Error Checking](./code/ErrorChecking.hs.htm), 
+[First Class Functions](./code/FirstClassFunctions.hs.htm), 
+[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm), 
+[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm), and
+[Error Checking Test](./code/ErrorCheckingTest.hs.htm).
+And the files that they link to (including [Lexer](./code/Lexer.hs.htm)).
+
 As a bonus, implement error checking for recursive |var|
 expressions. %Exer5
 
@@ -4033,7 +4043,10 @@ expressions. %Exer5
 
 In the code given above, all errors cause the program to terminate execution.
 Extend the language with a |try|/|catch| expression that allows
-errors to be caught and handled within a program. %Exer6
+errors to be caught and handled within a program. The syntax is
+|try { Exp } catch { Exp }|, and the meaning is to evaluate the first Exp and
+return its value if it is |Good|, otherwise evaluate the second
+expression and return its value (or an Error). %Exer6
 
  #### Exercise 6.3: Multiple Bindings and Arguments
 
@@ -4637,7 +4650,7 @@ evaluate one expression (checking errors and updating memory) and then
 evaluating the second expression (checking errors and updating memory as
 appropriate). They both have a similar pattern of code for dealing with
 the evaluation of |a| and |b|. Factoring out the common
-parts as |A| and |F|, the core of the pattern is: %Abst23
+parts as *first-part* and *next-part*, the core of the pattern is: %Abst23
 
 Checked                                 \ \ \ \ \ \  Stateful
 --------------------------------------- ------------ ----------------------
@@ -4646,7 +4659,7 @@ Checked                                 \ \ \ \ \ \  Stateful
 \ \ |Good v ->| *next-part* |v|
 
 This *first-part* corresponds to |evaluate a env| or |evaluate b env| in both the original
-versions. The *second-part* represents the remainder... just everything that
+versions. The *second-part* represents the remainder of the computation. It is just everything that
 appears after the main pattern, but with all the free variables made explicit.
 For the Checked case, the only variable needed in the *second-part* is the
 variable |v| that comes form the |Good| case. For the Stateful case,
@@ -4865,7 +4878,7 @@ TODO: mention |let| in |do|, and the case where no variable is used. %Hask12
 The messy evaluators for error checking and mutable state can be rewritten much more
 cleanly using monads. %Usin25
 
- ### Monadic Error Checking
+ ### Monadic Error Checking {#MonadicErrors}
 
 Here is a version of error checking using the |Checked| monad defined above: %Mona14
 
@@ -4910,7 +4923,7 @@ Other parts of the code, for example the case for |Binary| and |Declare| do not
 explicitly mention errors. This is very different from the code given in
 the [Section on Error Checking](#ErrorCheckingMonMonadic). %Mona17
 
- ### Monadic Mutable State
+ ### Monadic Mutable State {#MonadicState}
 
 The full code for the stateful evaluator using monads is
 give in the [Stateful Monad](./code/StatefulMonad.hs.htm) file. %Mona15
@@ -5017,17 +5030,6 @@ INCLUDE:StatefulHelper3 %Mona26
  ## Memory Management
 
 --------------------BEGIN-HIDE-------------------------
- # Pervasive Computational Strategies {#Monads}
- ## Strategies
- ### Failure
- ### Mutable State
- ### Identifying a Common Pattern
- ## Defining Computational Strategies as Monads
- ### The Monad Pattern
- ### Maybe Monad
- ### State Monad
- ### List Monad
- ## Monad case study: Parsing
 
  ### Special Kinds of States: Readers and Writers
  ## Order of Evaluation
@@ -5168,6 +5170,17 @@ and
 [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm).
 And the files that they link to (including [Lexer](./code/Lexer.hs.htm)).
 
+ ## Assignment 3: Defining a Monad for State and Error handling  {#assign3}
+ 
+ Combine the monads and interpreters for [Error Checking](#MonadicErrors) and 
+ [Mutable State](#MonadicState) into a single monad that perfroms both error checking 
+ and mutable state. You must also combine the evaluation functions.
+ 
+ The type of your monad must combine Checked and Stateful. There are several 
+ ways to do this, but then one needed for this assignment is:
+ 
+> data CheckedStateful t = CST (Memory -> (Checked t, Memory))
+ 
  ## Files on Lambda Calculus {#LambdaExp}
  
 Here two files that can be used to represent and parse lambda-expressions:
