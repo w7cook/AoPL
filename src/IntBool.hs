@@ -5,12 +5,12 @@ import Value
 import Data.Maybe
 
 --BEGIN:More99
-data Exp = Literal   Value
-         | Unary     UnaryOp Exp
-         | Binary    BinaryOp Exp Exp
-         | If        Exp Exp Exp
-         | Variable  String
-         | Declare   String Exp Exp
+data Exp  = Literal   Value
+          | Unary     UnaryOp Exp
+          | Binary    BinaryOp Exp Exp
+          | If        Exp Exp Exp
+          | Variable  String
+          | Declare   String Exp Exp
 --END:More99
 
 --BEGIN:More12

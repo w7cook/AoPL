@@ -2,8 +2,8 @@ module Value where
 import Prelude hiding (LT, GT, EQ, id)
 
 --BEGIN:More3
-data Value = IntV  Int
-           | BoolV Bool
+data Value  =  IntV  Int
+            |  BoolV Bool
  deriving (Eq)
 --END:More3
 
