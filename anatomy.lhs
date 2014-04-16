@@ -609,13 +609,13 @@ The following data definition modifies |Exp| to include
 a |Variable| case. %Vari3
 
 INCLUDE:Vari99
-> data Exp = Number    Int
->          | Add       Exp Exp
->          | Subtract  Exp Exp
->          | Multiply  Exp Exp
->          | Divide    Exp Exp
->          | Variable  String        
->    deriving (Eq)
+> data Exp  = Number    Int
+>           | Add       Exp Exp
+>           | Subtract  Exp Exp
+>           | Multiply  Exp Exp
+>           | Divide    Exp Exp
+>           | Variable  String        -- added
+>           deriving (Eq)
 > -- %Vari99
 
 An association of a variable $x$ with a value $v$ is called a *binding*,
@@ -709,7 +709,7 @@ then the value is the substitution |val|. %Subs10
 Running a few tests produces the following results: %Subs12
 
 INCLUDE:Subs13
-> substitute1 ("x", 5) [x + 2] 
+> substitute1 ("x", 5) [x + 2]
 >  ==> [5 + 2]
 >
 > substitute1 ("x", 5) [32]
@@ -726,24 +726,36 @@ INCLUDE:Subs13
 >
 > -- %Subs13
 
-Note that the test case prints the concrete syntax of the expression in square brackets, 
-as |[x + 2]|. The print format   
-represents the more longwinded abstract syntax representation of the 
-expression |x+2|: |Add (Variable "x") (Number 2)|. So the first expression 
-corresponds to the following piece of real Haskell code:
+Note that the test case prints the concrete syntax of the expression in square brackets,
+as |[x + 2]|. The print format
+represents the more longwinded abstract syntax representation of the
+expression |x+2|: |Add (Variable "x") (Number 2)|. So the first expression
+corresponds to the following piece of real Haskell code: %Subs11
 
 > substitute1 ("x", 5) (Add (Variable "x") (Number 2))
 >  ==> [5 + 2]
+> -- %Subs20
 
-However it will be useful to us to use the pseudo-code |[x+2]| instead, since it 
-can be quite difficult to read abstract syntax directly. 
+However it will be useful to us to use the pseudo-code |[x+2]| instead, since it
+can be quite difficult to read abstract syntax directly. %Subs21
 
 It is important to keep in mind that there are now two stages for
 evaluating an expression containing a variable. The first stage
 is to *substitute* the variable for its value, then the second
 stage is to *evaluate* the resulting arithmetic expression. %Subs14
 
-INCLUDE:Subs12
+INCLUDE:Subs12 %Subs22
+> rename1:: (String, String) -> Exp -> Exp
+> rename1 (var, newvar) exp = rename exp where
+>   rename (Number i)       = Number i
+>   rename (Add a b)        = Add (rename a) (rename b)
+>   rename (Subtract a b)   = Subtract (rename a) (rename b)
+>   rename (Multiply a b)   = Multiply (rename a) (rename b)
+>   rename (Divide a b)     = Divide (rename a) (rename b)
+>   rename (Variable name)  = if var == name
+>                             then Variable newvar
+>                             else Variable name
+> -- %Subs12
 
 TODO: talk about *renaming* variables, or substituting one variable for another %Subs15
 
@@ -767,43 +779,45 @@ INCLUDE:Mult6
 > type Env = [(String, Int)]
 > -- %Mult6
 
-An important operation on environments is *variable lookup*. Variable lookup 
-is an operation that given a variable name and an environment looks up that 
-variable in the environment. For example:
+An important operation on environments is *variable lookup*. Variable lookup
+is an operation that given a variable name and an environment looks up that
+variable in the environment. For example: %Mult10
 
-* lookup $x$ in $e1$                       $\longrightarrow$ $3$ 
-* lookup $y$ in $e1$                       $\longrightarrow$ $-1$
+* lookup $x$ in $e1$                       $\longrightarrow$ $3$ %Mult16
+* lookup $y$ in $e1$                       $\longrightarrow$ $-1$ %Mult28
 
-In each case the corresponding value of the variable being looked up in the environment 
-is returned. However what happens when a variable that is not in the environment is looked up? 
+In each case the corresponding value of the variable being looked up in the environment
+is returned. However what happens when a variable that is not in the environment is looked up? %Mult42
 
-* lookup $z$ in $e1$                       $\longrightarrow$ $???$ 
+* lookup $z$ in $e1$                       $\longrightarrow$ $???$ %Mult43
 
-In this case variable lookup fails, and it is necessary to deal with this 
-possibility by signaling an error or triggering an exception.
+In this case variable lookup fails, and it is necessary to deal with this
+possibility by signaling an error or triggering an exception. %Mult44
 
-Haskell already provides a function, called |lookup|, that implements 
+Haskell already provides a function, called |lookup|, that implements
 the functionality that is needed for variable lookup. The type of |lookup|
-is as follows:
+is as follows: %Mult45
 
 > lookup :: Eq a => a -> [(a, b)] -> Maybe b
+> -- %Mult46
 
-This type is more general than what we need for variable lookup, but we can see 
-that if |a| is instantiated to |String| and |b| is instantiated to |Int|, 
-then the type is almost what we expect: |String -> Env -> Maybe Int|. The return 
+This type is more general than what we need for variable lookup, but we can see
+that if |a| is instantiated to |String| and |b| is instantiated to |Int|,
+then the type is almost what we expect: |String -> Env -> Maybe Int|. The return
 type of lookup (|Maybe b|) deserves a little bit more of explanation. The type |Maybe|
-is part of the Haskell libraries and it is widely used. The definition is as follows:
+is part of the Haskell libraries and it is widely used. The definition is as follows: %Mult47
 
 > data Maybe a = Nothing | Just a
+> -- %Mult48
 
-The basic intuition is that |Maybe| is a container that may either 
-contain a value of type |a| (|Just a|) or no value at all (|Nothing|). 
-This is exactly what we need for |lookup|: when |lookup| succeeds at finding 
-a variable in the environment it can return the looked-up value v using |Just v|; 
+The basic intuition is that |Maybe| is a container that may either
+contain a value of type |a| (|Just a|) or no value at all (|Nothing|).
+This is exactly what we need for |lookup|: when |lookup| succeeds at finding
+a variable in the environment it can return the looked-up value v using |Just v|;
 otherwise if variable lookup fails |lookup| returns |Nothing|. The |Maybe| datatype
-provides us with a way to deal with lookup-up errors gracefully and later to detect 
+provides us with a way to deal with lookup-up errors gracefully and later to detect
 such errors using pattern-matching to check whether the result was |Just v|
-or |Nothing|.
+or |Nothing|. %Mult49
 
 The substitution function is easily modified to work with
 environments rather than single bindings: %Mult7
@@ -1279,8 +1293,8 @@ is given in the [Int Bool](./code/IntBool.hs.htm) and [Int Bool Parser](./code/I
 is defined to support multiple different kinds of values: %More2
 
 INCLUDE:More3
-> data Value  = IntV  Int
->             | BoolV Bool
+> data Value  =  IntV  Int
+>             |  BoolV Bool
 >  deriving (Eq)
 > -- %More3
 
@@ -1328,12 +1342,12 @@ INCLUDE:UnBinOps
 > -- %UnBinOps
 
 INCLUDE:More99
-> data Exp = Literal   Value
->          | Unary     UnaryOp Exp
->          | Binary    BinaryOp Exp Exp
->          | If        Exp Exp Exp
->          | Variable  String
->          | Declare   String Exp Exp
+> data Exp  = Literal   Value
+>           | Unary     UnaryOp Exp
+>           | Binary    BinaryOp Exp Exp
+>           | If        Exp Exp Exp
+>           | Variable  String
+>           | Declare   String Exp Exp
 > -- %More99
 
 Evaluation is then defined by cases as before. Two helper functions, |binary| and |unary| (defined below),
@@ -2320,8 +2334,8 @@ For example applying |add| to just one argument returns a new
 function:  %Mult37
 
 INCLUDE:Mult12
-> inc = add 1      -- \\ b. b + 1
-> dec = add (-1)   -- \\ b. b + (-1)
+> inc = add 1      -- \b. b + 1
+> dec = add (-1)   -- \b. b + (-1)
 > -- %Mult12
 
 These two functions each take a single argument.
@@ -2498,13 +2512,13 @@ value like |0| or |1|. The Church numeral |0| applies |f| zero times to
 
 INCLUDE:Natu11
 > zero = \f -> \x -> x
-> one  = \f -> \x -> f x
-> two  = \f -> \x -> f (f x)
+> one = \f -> \x -> f x
+> two = \f -> \x -> f (f x)
 > three = \f -> \x -> f (f (f x))
 > -- %Natu11
 
 INCLUDE:NatuSucc
->
+> -- %NatuSucc
 
 Note that |f| and |x| have no restrictions. To demonstrate Church numerals, let
 us evaluate |three| by setting |f| to the successor function |(+1)| and |x|
@@ -2753,18 +2767,13 @@ This program is encoded in our language as follows: %Prob4
 
 > var add = function(a) { function(b) { b + a } };
 > add(3)(2)
+> -- %Prob32
 
-Here is the abstract syntax for this program:
+Here is the abstract syntax for this program: %Prob33
 
 INCLUDE:Prob5
-> testE2 =
->  Declare "add" (Literal (Function "a"
->                (Literal (Function "b"
->                   (Binary Add (Variable "b")
->                               (Variable "a"))))))
->                (Call (Call (Variable "add")
->                                (Literal (IntV 3)))
->                      (Literal (IntV 2)))
+> testE2 = parseExp ("var add = function(a) { function(b) { a + b } };"++
+>                    "    add(3)(2)")
 > -- %Prob5
 
 Rather than work with the ugly constructor syntax in
@@ -3022,13 +3031,13 @@ INCLUDE:Exam7
  ## Summary of First-Class Functions  {#FirstClassFunctions}
 
 Here is the full code for first-class functions with non-recursive definitions.
-The grammar changes are as follows, taken from 
+The grammar changes are as follows, taken from
 the [First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm) file: %Summ13
 
 INCLUDE:FCFGrammar1
 > Exp : function '(' id ')' '{' Exp '}'  { Function $3 $6 }
 INCLUDE:FCFGrammar2
-> Primary : Primary '(' Primary ')' { Call $1 $3 }
+> Primary : Primary '(' Exp ')' { Call $1 $3 }
 > -- %FCFGrammar2
 
 Here is the definition of the abstract syntax and the evaluator,
@@ -3043,7 +3052,7 @@ INCLUDE:Summ14
 >          | Declare   String Exp Exp
 >          | Function  String Exp      -- new
 >          | Call      Exp Exp         -- changed
->   deriving (Eq, Show)
+>   deriving (Eq)
 >
 > type Env = [(String, Value)]
 >
@@ -3073,7 +3082,7 @@ INCLUDE:Summ14
 >         newEnv = (x, evaluate arg env) : closeEnv
 > -- %Summ14
 
-A test case can be found in the [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm) file 
+A test case can be found in the [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm) file %Summ15
 
  # Recursive Definitions
 
@@ -4027,14 +4036,14 @@ are captured by your code and converted to |Error| values,
 rather than causing Haskell execution errors. %Exer8
 
 Start with the files for First Class Functions and Error Checking and
-combine them and complete the error cases. 
-The files you need are 
-[Error Checking](./code/ErrorChecking.hs.htm), 
-[First Class Functions](./code/FirstClassFunctions.hs.htm), 
-[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm), 
+combine them and complete the error cases.
+The files you need are
+[Error Checking](./code/ErrorChecking.hs.htm),
+[First Class Functions](./code/FirstClassFunctions.hs.htm),
+[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm),
 [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm), and
 [Error Checking Test](./code/ErrorCheckingTest.hs.htm).
-And the files that they link to (including [Lexer](./code/Lexer.hs.htm)).
+And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Exer2
 
 As a bonus, implement error checking for recursive |var|
 expressions. %Exer5
@@ -4498,6 +4507,7 @@ INCLUDE:Summ7
 >          | Declare   String Exp Exp
 >          | Function  String Exp
 >          | Call      Exp Exp
+>          | Seq       Exp Exp
 >          | Mutable   Exp         -- new
 >          | Access    Exp         -- new
 >          | Assign    Exp Exp   -- new
@@ -4949,12 +4959,12 @@ a type with a label. %Mona19
 
 INCLUDE:StatefulMonad2 %Mona20
 > instance Monad Stateful where
->   return val = ST (\mem -> (val, mem))
+>   return val = ST (\m -> (val, m))
 >   (ST c) >>= f =
->     ST (\mem ->
->       let (val, mem') = c mem
+>     ST (\m ->
+>       let (val, m') = c m
 >           ST f' = f val
->       in f' mem')
+>       in f' m')
 > -- %StatefulMonad2
 
 Here is a version of evaluator using the |Stateful| monad defined above: %Mona21
@@ -5021,63 +5031,67 @@ INCLUDE:StatefulHelper3 %Mona26
 
 So far we have been focused on writing interpreters for small
 languages. An interpreter is a meta-program that evaluates a program in a
-written in the interpreted language. When evaluating an expression 
-such as:
+written in the interpreted language. When evaluating an expression
+such as: %Abst6
 
-evaluate (3+5) ==> 8
+> evaluate (3+5) ==> 8
+> -- %Abst9
 
 we cannot be more precise about the result of this particular program:
 the expression 3+5 evaluates only to the (concrete) number 8. The
-evaluate function implements what is called a *concrete interpreter*.
+evaluate function implements what is called a *concrete interpreter*. %Abst15
 
 However it is possible to write interpreters that return *abstract
 values*. Those interpreters, called abstract interpreters, return some
-abstraction of the result of executing a program.
+abstraction of the result of executing a program. %Abst16
 
 The most common and familiar example of abstract interpretation is
 *type-checking* or *type-inference*. A type-checker analyses a program in
 a language, checks whether the types of all sub-expressions are
 compatible and returns the corresponding type of the program. For
-example:
+example: %Abst17
 
-tcheck (3+5) ==> Int
+> typeCheck (3+5) ==> Int
+> -- %Abst28
 
 A type-checker works in a similar way to a concrete interpreter. The
 difference is that instead of returning a (concrete) value, it returns
 a type. A type is an abstraction of values. When the type
-of an expression is Int, it is not known exactly which concrete number
-will that expression evaluate to. However it is known that that expression 
-will evaluate to an integer value and not to a boolean value.
+of an expression is |Int|, it is not known exactly which concrete number
+will that expression evaluate to. However it is known that that expression
+will evaluate to an integer value and not to a boolean value. %Abst32
 
 Type-checking is not the only example of abstract interpretation. In
 fact abstract interpretation is a huge area of research in programming
 languages because various forms of abstract interpretation are useful
-to prove certain properties about programs.[TODO: more references]
+to prove certain properties about programs.[TODO: more references] %Abst37
 
- ## Languages with a Single Type of Values 
+ ## Languages with a Single Type of Values
 
-In a language with a single type of data type-checking 
-is trivial. For example, in the language of arithmetic, which 
-only allows integer values, type-checking would be defined as follows:
+In a language with a single type of data type-checking
+is trivial. For example, in the language of arithmetic, which
+only allows integer values, type-checking would be defined as follows: %Lang1
 
 > data Type = TInt
 >
 > check :: Exp -> Type
 > check e = TInt
+> -- %Lang2
 
 In other words, all expressions have type |TInt| and type-checking
 cannot fail, since there are no type-errors. Therefore, type-checking
-only really makes sense in a language with at least two types of data.
+only really makes sense in a language with at least two types of data. %Lang3
 
  ## A Language with Integers and Booleans
 
 In this tutorial we are going to write a type-checker for a language
 with Integers and Booleans.  The language with integer and booleans
-that we are going to use is:
+that we are going to use is the same one from
+the [Section on More Kinds of Data](#MoreData): %A29
 
 > data BinaryOp = Add | Sub | Mul | Div | And | Or
 >               | GT | LT | LE | GE | EQ
-> 
+>
 > data UnaryOp = Neg | Not
 >
 > data Exp = Literal   Value
@@ -5086,76 +5100,110 @@ that we are going to use is:
 >          | If        Exp Exp Exp
 >          | Variable  String
 >          | Declare   String Exp Exp
+> -- %A33
 
 
-(NOTE: The language in the tutorial files includes an additional constructor Call. For this question you can ignore that constructor and there is no need to have a case for Call in the type-checker function.)
+(NOTE: The language in the tutorial files includes an additional constructor Call. For this question you can ignore that constructor and there is no need to have a case for Call in the type-checker function.) %A81
 
-For this language types are represented as:
+For this language types are represented as: %A82
 
-> data Type = TInt | TBool deriving (Eq,Show)
+> data Type = TInt | TBool
+>    deriving (Eq, Show)
+> -- %A83
 
-This datatype accounts for the two possible types in the language. 
+This datatype accounts for the two possible types in the language. %A84
 
-Type-checking can fail when the types of subexpressions are incompatible. For example, the expression:
+Type-checking can fail when the types of subexpressions are incompatible. For example, the expression: %A85
 
-3 + true 
+> 3 + true
+> -- %A86
 
-should fail to type-check because addition (+) is an operation that expects two integer values. However in this case, the second argument is not an integer, but a boolean. 
+should fail to type-check because addition (+) is an operation that expects two integer values. However in this case, the second argument is not an integer, but a boolean. %A87
 
-Type environments In a language with variables a type-checker needs to track the types of variables. To do this we can use what is called a type environment.
+Type environments In a language with variables a type-checker needs to track the types of variables. To do this we can use what is called a type environment. %A88
 
-type TEnv = [(String,Type)]
+> type TEnv = [(String,Type)]
+> -- %A89
 
- A type environment plays a similar role to the environment in a regular interpreter: it is used to track the types of variables during the type-checking process of an expression.
+A type environment plays a similar role to the environment in a regular interpreter: it is used to track the types of variables during the type-checking process of an expression. %A90
 
-Type of the type-checker We are going to use the following type for the type-checker:
+Type of the type-checker We are going to use the following type for the type-checker: %A91
 
-tcheck :: Exp -> TEnv -> Maybe Type
+> typeCheck :: Exp -> TEnv -> Maybe Type
+> -- %A92
 
-Note how similar this type is to the type of an environment-based interpreter except for two differences:
-	
-	1) Where in the concrete interpreter we used Value, we now use Type.
-	2) The return type is now “Maybe Type”
+Note how similar this type is to the type of an environment-based interpreter except for two differences: %A93
 
-Difference 1) is because if we look at tcheck as an abstract interpreter, then types play the role of abstract values. Difference 2) is for convenience. It is not necessary to use a Maybe type, but using the Maybe type makes the code more robust when tracking for type-checking errors.
+1) Where in the concrete interpreter we used |Value|, we now use |Type|.
+2) The return type is now |Maybe Type| %A94
 
-Typing rules for expressions Most expressions in the language it are fairly obvious to type-check. For example, to type-check an expression of the form:
+Difference 1) is because if we look at tcheck as an abstract interpreter, then types play the role of abstract values. Difference 2) is for convenience. It is not necessary to use a Maybe type, but using the Maybe type makes the code more robust when tracking for type-checking errors. %A95
 
-	e1 + e2
+Typing rules for expressions Most expressions in the language it are fairly obvious to type-check. For example, to type-check an expression of the form: %A96
 
-we proceed as follows:
+> e1 + e2
+> -- %A97
 
-	1) check whether the type of e1 is TInt
-	2) check whether the type of e2 is TInt
-	3) If both types are TInt return TInt as the result type (Just TInt); otherwise fail to type-check (Nothing)
+we proceed as follows: %A98
 
-Typing Declare Expressions To type a declare expression of the form
+1) check whether the type of |e1| is |TInt|
+2) check whether the type of |e2| is |TInt|
+3) If both types are |TInt|, return |TInt| as the result type (|Just TInt|); otherwise fail to type-check (|Nothing|) %A99
 
-var x = e; body
+Typing Declare Expressions To type a declare expression of the form %A100
 
-we proceed as follows:
+> var x = e; body
+> -- %A101
 
-	1) type-check the expression e
-	2)if e has a valid type then type-check the body expression with an type-environment extended with x |-> typeof e; otherwise fail with a type-error.
+we proceed as follows: %A102
 
-For expressions with unbound variables: for example:
+1) type-check the expression |e|
+2) if |e| has a valid type then type-check the body expression with an type-environment extended with x |-> typeof e;
+		otherwise fail with a type-error. %A103
 
-var x = y; x
+For expressions with unbound variables: for example: %A104
 
-you should return Nothing (or an error). In other words the type-checker works only for valid programs. 
+> var x = y; x
+> -- %A105
 
-Typing If Expressions The only slightly tricky expression to type-check is an if expression. The type-checking rule for an if expressions of the form:
-	
-	if e1 e2; else e3
+you should return |Nothing| (or an error). In other words the type-checker works only for valid programs. %A106
 
-is 
+Typing |If| Expressions. The only slightly tricky expression to type-check is an if expression.
+ The type-checking rule for an if expressions of the form: %A107
 
-	1) check whether the type of e1 is Bool
-	2) compute the type of e2 
-	3) compute the type of e3
-	4) check whether the types of e2 and e3 are the same. If they are the same return that type; otherwise fail.
+> if (e1) e2; else e3
+> -- %A108
 
-Note that if type-checking any subexpressions fails with a type-error (Nothing) then the type-checking of the if expression will also fail.
+is %A109
+
+1) check whether the type of |e1| is |TBool|
+2) compute the type of |e2|
+3) compute the type of |e3|
+4) check whether the types of |e2| and |e3| are the same. If they are the same return that type; otherwise fail. %A110
+
+The code for the |typeCheck| function is as follows: %A111
+
+INCLUDE:Type12 %A112
+> -- Type-check an expression in a typing environment
+> typeCheck :: Exp -> TypeEnv -> Type
+> typeCheck (Literal (IntV _)) env  = TInt
+> typeCheck (Literal (BoolV _)) env = TBool
+> typeCheck (Unary op a) env     = checkUnary op (typeCheck a env)
+> typeCheck (Binary op a b) env  = checkBinary op (typeCheck a env) (typeCheck b env)
+> typeCheck (Variable x) env     = fromJust (lookup x env)
+> typeCheck (Declare x exp body) env = typeCheck body newEnv
+>   where newEnv = (x, typeCheck exp env) : env
+> typeCheck (If a b c) env =
+>   if TBool == typeCheck a env then
+>     if typeCheck b env == typeCheck c env then
+>       typeCheck b env
+>     else
+>       error ("Result types are not the same in " ++ show b ++ ", " ++ show c)
+>   else
+>     error ("Conditional must return a boolean: " ++ show a)
+> -- %Type12
+
+Note that if type-checking any subexpressions fails with a type-error (|Nothing|) then the type-checking of the if expression will also fail. %A113
 
  # More Chapters on the way...
  ## Data Abstraction: Objects and Abstract Data Types
@@ -5163,7 +5211,7 @@ Note that if type-checking any subexpressions fails with a type-error (Nothing) 
  ## Partial Evaluation
  ## Memory Management
 
---------------------BEGIN-HIDE-------------------------
+--------------------BEGIN-HIDE------------------------- %Memo2
 
  ### Special Kinds of States: Readers and Writers
  ## Order of Evaluation
@@ -5297,28 +5345,29 @@ You must write and include test cases that amply exercise all of the code you've
 You can assume that the inputs are valid programs and that your program may raise arbitrary
 errors when given invalid input (except as mentioned above). %Assi8
 
-The files you need are 
-[First Class Functions](./code/FirstClassFunctions.hs.htm), 
-[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm), 
+The files you need are
+[First Class Functions](./code/FirstClassFunctions.hs.htm),
+[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm),
 and
 [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm).
-And the files that they link to (including [Lexer](./code/Lexer.hs.htm)).
+And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Assi9
 
  ## Assignment 3: Defining a Monad for State and Error handling  {#assign3}
- 
- Combine the monads and interpreters for [Error Checking](#MonadicErrors) and 
- [Mutable State](#MonadicState) into a single monad that perfroms both error checking 
- and mutable state. You must also combine the evaluation functions.
- 
- The type of your monad must combine Checked and Stateful. There are several 
- ways to do this, but then one needed for this assignment is:
- 
+
+ Combine the monads and interpreters for [Error Checking](#MonadicErrors) and
+ [Mutable State](#MonadicState) into a single monad that perfroms both error checking
+ and mutable state. You must also combine the evaluation functions. %Assi10
+
+ The type of your monad must combine Checked and Stateful. There are several
+ ways to do this, but then one needed for this assignment is: %Assi11
+
 > data CheckedStateful t = CST (Memory -> (Checked t, Memory))
- 
+> -- %Assi12
+
  ## Files on Lambda Calculus {#LambdaExp}
- 
+
 Here two files that can be used to represent and parse lambda-expressions:
-[Lambda Abstract Syntax](./code/Lambda.hs.htm) and 
-[Lambda Parser](./code/LambdaParse.y.htm) 
- 
+[Lambda Abstract Syntax](./code/Lambda.hs.htm) and
+[Lambda Parser](./code/LambdaParse.y.htm) %File1
+
  # References

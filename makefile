@@ -46,7 +46,8 @@ SOURCES=$(TESTS) \
 			Substitute.hs \
 			TopLevelFunctions.hs \
 			Value.hs \
-			Lambda.hs
+			Lambda.hs \
+			IntBoolTyping.hs 
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf

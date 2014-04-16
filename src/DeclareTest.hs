@@ -3,18 +3,18 @@ import Declare
 import DeclareParse
 import Base
 
---BEGIN:More19
+--BEGIN:Decl19
 t1 = "4"
 t2 = "-4 - 6"
 t3 = "var x = 3; x"
 t4 = "var x = 3; var y = x*x; x"
 t5 = "var x = 3; var x = x*x; x"
---END:More19
+--END:Decl19
 
---BEGIN:More98
+--BEGIN:Decl98
 t6 = "var x = 3; var y = x*x; y"
 t7 = "2 + (var x =2; x)"
---END:More98
+--END:Decl98
 
 test1 = do
   test "execute" execute (parseExp t1)
