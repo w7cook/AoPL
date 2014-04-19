@@ -18,8 +18,13 @@ mul10 :: Int -> Memory -> Memory
 
 t1 = parseExp ("var x = mutable 3;"++
      "var y = mutable true;"++
-     "if (@y) (x = @x + 1); else x;"++
+     "if (@y) { x = @x + 1 } else { x };"++
      "@x")
+
+t2 = parseExp ("var x = mutable 3;"++
+     "var y = mutable 7;"++
+     "x = @x + @y;"++
+     "@x * @y")
 
 main'2 = do
   print testMul10
@@ -27,5 +32,4 @@ main'2 = do
 main = do
   tagged "Upda11" main'2
   test "evaluate" execute t1
-  
-  
+  test "evaluate" execute t2

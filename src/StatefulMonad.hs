@@ -21,6 +21,7 @@ instance Monad Stateful where
         
 --BEGIN:StatefulMonad3
 evaluate :: Exp -> Env -> Stateful Value
+-- basic operations
 evaluate (Literal v) env = return v
 evaluate (Unary op a) env = do
   av <- evaluate a env
@@ -32,12 +33,16 @@ evaluate (Binary op a b) env = do
 evaluate (If a b c) env = do
   BoolV cond <- evaluate a env
   evaluate (if cond then b else c) env
+
+-- variables and declarations
 evaluate (Declare x e body) env = do    -- non-recursive case
   ev <- evaluate e env
   let newEnv = (x, ev) : env
   evaluate body newEnv
 evaluate (Variable x) env = 
   return (fromJust (lookup x env))
+
+-- first-class functions
 evaluate (Function x body) env = 
   return (ClosureV  x body env)
 evaluate (Call fun arg) env = do
@@ -45,6 +50,11 @@ evaluate (Call fun arg) env = do
   argv <- evaluate arg env
   let newEnv = (x, argv) : closeEnv
   evaluate body newEnv
+
+-- mutation operations
+evaluate (Seq a b) env = do
+  evaluate a env
+  evaluate b env
 evaluate (Mutable e) env = do
   ev <- evaluate e env
   newMemory ev        

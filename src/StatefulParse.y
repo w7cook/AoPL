@@ -41,22 +41,20 @@ import Lexer
 
 %%
 
--- BEGIN:FCFGrammar1
 Exp : function '(' id ')' '{' Exp '}'  { Function $3 $6 }
--- END:FCFGrammar1
     | var id '=' Exp ';' Exp           { Declare $2 $4 $6 }
-    | if '(' Exp ')' Exp ';' else Exp  { If $3 $5 $8 }
-    | Exp ';' Exp 										 { Seq $1 $3 }
-    | Assign													 { $1 }
-    | Or                               { $1 }
+    | if '(' Exp ')' '{' Exp '}' else '{' Exp '}'  { If $3 $6 $10 }
+    | Exp ';' Exp                      { Seq $1 $3 }
+    | Assign                           { $1 }
 
-Assign : Exp '=' Exp 		  { Assign $1 $3 }
+Assign : Or '=' Assign    { Assign $1 $3 }
+       | Or               { $1 }
 
 Or   : Or '||' And        { Binary Or $1 $3 }
      | And                { $1 }
 
-And   : And '&&' Comp      { Binary And $1 $3 }
-     | Comp                { $1 }
+And  : And '&&' Comp      { Binary And $1 $3 }
+     | Comp               { $1 }
 
 Comp : Comp '==' Term     { Binary EQ $1 $3 }
      | Comp '<' Term      { Binary LT $1 $3 }
@@ -73,9 +71,7 @@ Factor : Factor '*' Primary    { Binary Mul $1 $3 }
        | Factor '/' Primary    { Binary Div $1 $3 }
        | Primary               { $1 }
 
--- BEGIN:FCFGrammar2
 Primary : Primary '(' Exp ')' { Call $1 $3 }
--- END:FCFGrammar2
         | digits         { Literal (IntV $1) }
         | true           { Literal (BoolV True) }
         | false          { Literal (BoolV False) }

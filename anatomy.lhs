@@ -183,7 +183,8 @@ converts from the concrete written form to the abstract syntax. %Simp9
  ### Abstract Syntax in Haskell
 
 This section describes how to represent abstract syntax using Haskell. The code
-for this section is found in the [Simple](./code/Simple.hs.htm) file.
+for this section is found in the [Simple](./code/Simple.hs.htm) and 
+[SimpleParse](./code/SimpleParse.y.htm) files.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
 INCLUDE:Abst3
@@ -1906,7 +1907,7 @@ Because $\lambda$ is not a standard character on most
 keyboards (and it is not part of ASCII), Haskell uses
 an *ASCII art* rendition of $\lambda$ as a backslash |\\|.
 The dot used in a traditional lambda expression is replaced
-by ASCII art |->| for an arrow. The idea is that the function
+by ASCII art | -> | for an arrow. The idea is that the function
 maps from |x| to its result, so an arrow makes some sense. %Usin4
 
 The concept illustrated above is an important general rule,
@@ -4148,17 +4149,17 @@ The following table gives the concrete syntax of these operations. %Addr4
 
 Operation        Meaning
 ---------------- -----------------------
-|Mutable(e)|     Creates a mutable cell with initial value given by |e|
+|mutable(e)|     Creates a mutable cell with initial value given by |e|
 |@a|             Accesses the contents stored at address |a|
-|a := e|         Updates the contents at address |a| to be value of expression |e| %Addr5
+|a = e|         Updates the contents at address |a| to be value of expression |e| %Addr5
 
 Using these operations, the factorial program given above can be expressed
 as follows, using mutable cells: %Addr6
 
 ````Java
-x = Mutable(1);
-for (i = Mutable(2); @i <= 5; i := @i + 1) {
-  x := @x * @i;
+x = mutable(1);
+for (i = mutable(2); @i <= 5; i = @i + 1) {
+  x = @x * @i;
 }
 %Addr7
 ````
@@ -4254,8 +4255,8 @@ are 10 different memory configurations that are created: %Memo11
 Step                    Memory
 -------------------     ------------------------------------------
 *start*                 $[]$
-|x = Mutable(1);|       $[1]$
-|i = Mutable(2);|       $[1, 2]$
+|x = mutable(1);|       $[1]$
+|i = mutable(2);|       $[1, 2]$
 |x = @x * @i;|          $[2, 2]$
 |i = @i + 1;|           $[2, 3]$
 |x = @x * @i;|          $[6, 3]$
@@ -4404,20 +4405,20 @@ table defines the abstract syntax: %Sema15
 
 Operation        Abstract Syntax    Meaning
 ---------------- ------------------ -----------------------
-|Mutable(e)|     |Mutable e|        Allocate memory
+|mutable(e)|     |Mutable e|        Allocate memory
 |@a|             |Access a|         Accesses memory
-|a := e|         |Assign a e|       Updates memory %Sema16
+|a = e|          |Assign a e|       Updates memory %Sema16
 
 The abstract syntax is added to the data type representing expressions in
 our language: %Sema17
 
 > data Exp = ...
->          | Mutable   Exp         -- new
->          | Access    Exp         -- new
->          | Assign    Exp Exp   -- new
+>          | Mutable   Exp        -- mutable(e)
+>          | Access    Exp        -- @a
+>          | Assign    Exp Exp    -- a = e
 > -- %Sema18
 
-The |Mutable(e)| expression creates a new memory cell and returns its
+The |mutable(e)| expression creates a new memory cell and returns its
 address. First the expression |e| is evaluated to get the initial value
 of the new memory cell. Evaluating |e| may modify memory, so care must
 be taken to allocate the new cell in the new memory. The address of
@@ -4441,7 +4442,7 @@ INCLUDE:Sema23
 >       (access i mem', mem')
 > -- %Sema23
 
-An assignment statement |a := e| first evaluates the target expression |a|
+An assignment statement |a = e| first evaluates the target expression |a|
 to get an address. It is an error if |a| does not evaluate to an address.
 Then the source expression |e| is evaluated.
 Evaluating |a| and |e| may update the memory, so %Sema21
@@ -5158,7 +5159,7 @@ Typing Declare Expressions To type a declare expression of the form %A100
 we proceed as follows: %A102
 
 1) type-check the expression |e|
-2) if |e| has a valid type then type-check the body expression with an type-environment extended with x |-> typeof e;
+2) if |e| has a valid type then type-check the body expression with an type-environment extended with |x --> typeof e|;
 		otherwise fail with a type-error. %A103
 
 For expressions with unbound variables: for example: %A104
@@ -5166,7 +5167,7 @@ For expressions with unbound variables: for example: %A104
 > var x = y; x
 > -- %A105
 
-you should return |Nothing| (or an error). In other words the type-checker works only for valid programs. %A106
+you should throw an error. In other words the type-checker works only for valid programs. %A106
 
 Typing |If| Expressions. The only slightly tricky expression to type-check is an if expression.
  The type-checking rule for an if expressions of the form: %A107
@@ -5203,7 +5204,11 @@ INCLUDE:Type12 %A112
 >     error ("Conditional must return a boolean: " ++ show a)
 > -- %Type12
 
-Note that if type-checking any subexpressions fails with a type-error (|Nothing|) then the type-checking of the if expression will also fail. %A113
+Here are the two helper functions, which are the abstract versions of binary and unary:
+
+INCLUDE:Type16
+
+Note that if type-checking any subexpressions fails with a type-error then the type-checking of the if expression will also fail. %A113
 
  # More Chapters on the way...
  ## Data Abstraction: Objects and Abstract Data Types
@@ -5354,12 +5359,12 @@ And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Assi9
 
  ## Assignment 3: Defining a Monad for State and Error handling  {#assign3}
 
- Combine the monads and interpreters for [Error Checking](#MonadicErrors) and
- [Mutable State](#MonadicState) into a single monad that perfroms both error checking
- and mutable state. You must also combine the evaluation functions. %Assi10
+Combine the monads and interpreters for [Error Checking](#MonadicErrors) and
+[Mutable State](#MonadicState) into a single monad that perfroms both error checking
+and mutable state. You must also combine the evaluation functions. %Assi10
 
- The type of your monad must combine Checked and Stateful. There are several
- ways to do this, but then one needed for this assignment is: %Assi11
+The type of your monad must combine Checked and Stateful. There are several
+ways to do this, but then one needed for this assignment is: %Assi11
 
 > data CheckedStateful t = CST (Memory -> (Checked t, Memory))
 > -- %Assi12

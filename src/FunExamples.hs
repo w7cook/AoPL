@@ -183,7 +183,7 @@ two = \f -> \x -> f (f x)
 three = \f -> \x -> f (f (f x))
 --END:Natu11
 
---BEEGIN:NatuSucc
+--BEGIN:NatuSucc
 succ = \n -> (\f -> \x -> f (n f x))
 --END:NatuSucc
 

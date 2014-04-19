@@ -53,9 +53,9 @@ type Env = [(String, Value)]
 --BEGIN:Stat11
 evaluate :: Exp -> Env -> Stateful Value
 --END:Stat11
-evaluate (Literal v) env mem    = (v, mem)
+evaluate (Literal v) env mem  = (v, mem)
 
-evaluate (Unary op a) env mem   =
+evaluate (Unary op a) env mem =
   let (av, mem') = evaluate a env mem in
     (unary op av, mem')
 
@@ -85,7 +85,12 @@ evaluate (Call f a) env mem  =
       (av, mem'') = evaluate a env mem'
       newEnv = (x, av) : closeEnv
   in
-      evaluate body newEnv mem''
+    evaluate body newEnv mem''
+
+evaluate (Seq a b) env mem  =
+  let (_, mem') = evaluate a env mem in
+    evaluate b env mem'
+
 --END:Summ9 BEGIN:Summ11 BEGIN:Sema20
 evaluate (Mutable e) env mem =
   let (ev, mem') = evaluate e env mem in
@@ -95,7 +100,7 @@ evaluate (Mutable e) env mem =
 --BEGIN:Sema23
 evaluate (Access a) env mem =
   let (AddressV i, mem') = evaluate a env mem in
-      (access i mem', mem')
+    (access i mem', mem')
 --END:Sema23
 
 --BEGIN:Sema25
@@ -131,3 +136,4 @@ binary LE  (IntV a)  (IntV b)  = BoolV (a <= b)
 binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
 binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
 binary EQ  a         b         = BoolV (a == b)
+binary op  a         b         = error ("Invalid binary " ++ show op ++ " operation: " ++ show a ++ ", " ++ show b) 

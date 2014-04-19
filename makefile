@@ -13,6 +13,7 @@ TESTS=SimpleTest.hs \
 			IncorrectFunctionsTest.hs \
 			FirstClassFunctionsTest.hs \
 			StatefulTest.hs \
+			StatefulMonadTest.hs \
 			FunExamples.hs \
 			ErrorCheckingTest.hs 
 

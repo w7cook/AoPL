@@ -1,11 +1,18 @@
 import Stateful hiding (Stateful, evaluate)
+import Base
 import StatefulMonad 
+import StatefulParse
 
-t0 = Declare "x" (Literal (IntV 99)) (Variable "x")
-t1 = Declare "x" (Mutable (Literal (IntV 3)))
-         (Access (Variable "x"))
-         
+t1 = parseExp ("var x = mutable 3;"++
+     "var y = mutable true;"++
+     "if (@y) { x = @x + 1 } else { x };"++
+     "@x")
+
+t2 = parseExp ("var x = mutable 3;"++
+     "var y = mutable 7;"++
+     "x = @x + @y;"++
+     "y = @y * @x")
+
 main = do
-  print (runStateful (evaluate (Literal (IntV 6)) []))
-  print (runStateful (evaluate t0 []))
-  print (runStateful (evaluate t1 []))
+  test "evaluate" execute t1
+  test "evaluate" execute t2
