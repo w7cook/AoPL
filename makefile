@@ -130,7 +130,7 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
 		| sed "/^INCLUDE:/d" \
 		| sed "s/^ #/#/" \
 		| sed "s/'[0-9][0-9a-z]*//g" \
-		| sed "s/^> test[^= ][^= ]* =/>/g" \
+		| sed "s/^> test[^= ][^= ]* =/> /g" \
 		| sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
 		> anatomy.mkd
 
@@ -169,6 +169,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		| sed "/^%[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		| sed "s/%[a-zA-Z0-9][a-zA-Z0-9]*//g" \
+		| sed "s/@/ATSIGN/g" \
 		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex --chapters \
 		| sed "s/{verbatim}/{spec}/g" \
 		| sed "s/@/@@/g" \
@@ -183,6 +184,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/BAR/||/g" \
 		| sed "s/OPENB/{/g" \
 		| sed "s/CLOSEB/}/g" \
+		| sed "s/ATSIGN/@@/g" \
 		> temp.lhs
 
 # convert temp.lhs into Verbatim PDF, coverting various character sequences

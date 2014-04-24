@@ -183,7 +183,7 @@ converts from the concrete written form to the abstract syntax. %Simp9
  ### Abstract Syntax in Haskell
 
 This section describes how to represent abstract syntax using Haskell. The code
-for this section is found in the [Simple](./code/Simple.hs.htm) and 
+for this section is found in the [Simple](./code/Simple.hs.htm) and
 [SimpleParse](./code/SimpleParse.y.htm) files.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
@@ -2519,6 +2519,7 @@ INCLUDE:Natu11
 > -- %Natu11
 
 INCLUDE:NatuSucc
+> succ = \n -> (\f -> \x -> f (n f x))
 > -- %NatuSucc
 
 Note that |f| and |x| have no restrictions. To demonstrate Church numerals, let
@@ -3975,13 +3976,14 @@ INCLUDE:Hand17
 > checked_unary :: UnaryOp -> Value -> Checked Value
 > checked_unary Not (BoolV b) = Good (BoolV (not b))
 > checked_unary Neg (IntV i)  = Good (IntV (-i))
-> checked_unary _   _         = Error "Type error"
+> checked_unary op   v         =
+>     Error ("Unary " ++ show op ++ " called with invalid argument " ++ show v)
 >
 > checked_binary :: BinaryOp -> Value -> Value -> Checked Value
 > checked_binary Add (IntV a)  (IntV b)  = Good (IntV (a + b))
 > checked_binary Sub (IntV a)  (IntV b)  = Good (IntV (a - b))
 > checked_binary Mul (IntV a)  (IntV b)  = Good (IntV (a * b))
-> checked_binary Div (IntV a)  (IntV 0)  = Error "Divide by zero"
+> checked_binary Div _         (IntV 0)  = Error "Divide by zero"
 > checked_binary Div (IntV a)  (IntV b)  = Good (IntV (a `div` b))
 > checked_binary And (BoolV a) (BoolV b) = Good (BoolV (a && b))
 > checked_binary Or  (BoolV a) (BoolV b) = Good (BoolV (a || b))
@@ -3990,7 +3992,9 @@ INCLUDE:Hand17
 > checked_binary GE  (IntV a)  (IntV b)  = Good (BoolV (a >= b))
 > checked_binary GT  (IntV a)  (IntV b)  = Good (BoolV (a > b))
 > checked_binary EQ  a         b         = Good (BoolV (a == b))
-> checked_binary _   _         _         = Error "Type error"
+> checked_binary op  a         b         =
+>     Error ("Binary " ++ show op ++
+>            " called with invalid arguments " ++ show a ++ ", " ++ show b)
 > -- %Hand17
 
 All the other cases are the same as before, so |checked_binary|
@@ -4149,16 +4153,16 @@ The following table gives the concrete syntax of these operations. %Addr4
 
 Operation        Meaning
 ---------------- -----------------------
-|mutable(e)|     Creates a mutable cell with initial value given by |e|
+|mutable e|      Creates a mutable cell with initial value given by |e|
 |@a|             Accesses the contents stored at address |a|
-|a = e|         Updates the contents at address |a| to be value of expression |e| %Addr5
+|a = e|          Updates the contents at address |a| to be value of expression |e| %Addr5
 
 Using these operations, the factorial program given above can be expressed
 as follows, using mutable cells: %Addr6
 
 ````Java
-x = mutable(1);
-for (i = mutable(2); @i <= 5; i = @i + 1) {
+x = mutable 1;
+for (i = mutable 2; @i <= 5; i = @i + 1) {
   x = @x * @i;
 }
 %Addr7
@@ -4255,8 +4259,8 @@ are 10 different memory configurations that are created: %Memo11
 Step                    Memory
 -------------------     ------------------------------------------
 *start*                 $[]$
-|x = mutable(1);|       $[1]$
-|i = mutable(2);|       $[1, 2]$
+|x = mutable 1;|        $[1]$
+|i = mutable 2;|        $[1, 2]$
 |x = @x * @i;|          $[2, 2]$
 |i = @i + 1;|           $[2, 3]$
 |x = @x * @i;|          $[6, 3]$
@@ -4405,7 +4409,7 @@ table defines the abstract syntax: %Sema15
 
 Operation        Abstract Syntax    Meaning
 ---------------- ------------------ -----------------------
-|mutable(e)|     |Mutable e|        Allocate memory
+|mutable e|      |Mutable e|        Allocate memory
 |@a|             |Access a|         Accesses memory
 |a = e|          |Assign a e|       Updates memory %Sema16
 
@@ -4413,12 +4417,12 @@ The abstract syntax is added to the data type representing expressions in
 our language: %Sema17
 
 > data Exp = ...
->          | Mutable   Exp        -- mutable(e)
+>          | Mutable   Exp        -- mutable e
 >          | Access    Exp        -- @a
 >          | Assign    Exp Exp    -- a = e
 > -- %Sema18
 
-The |mutable(e)| expression creates a new memory cell and returns its
+The |mutable e| expression creates a new memory cell and returns its
 address. First the expression |e| is evaluated to get the initial value
 of the new memory cell. Evaluating |e| may modify memory, so care must
 be taken to allocate the new cell in the new memory. The address of
@@ -4439,7 +4443,7 @@ section, could be used. %Sema19
 INCLUDE:Sema23
 > evaluate (Access a) env mem =
 >   let (AddressV i, mem') = evaluate a env mem in
->       (access i mem', mem')
+>     (access i mem', mem')
 > -- %Sema23
 
 An assignment statement |a = e| first evaluates the target expression |a|
@@ -4521,9 +4525,9 @@ All the existing cases of the evaluator are modified: %Summ8
 
 INCLUDE:Summ9
 > evaluate :: Exp -> Env -> Stateful Value
-> evaluate (Literal v) env mem    = (v, mem)
+> evaluate (Literal v) env mem  = (v, mem)
 >
-> evaluate (Unary op a) env mem   =
+> evaluate (Unary op a) env mem =
 >   let (av, mem') = evaluate a env mem in
 >     (unary op av, mem')
 >
@@ -4551,7 +4555,12 @@ INCLUDE:Summ9
 >       (av, mem'') = evaluate a env mem'
 >       newEnv = (x, av) : closeEnv
 >   in
->       evaluate body newEnv mem''
+>     evaluate body newEnv mem''
+>
+> evaluate (Seq a b) env mem  =
+>   let (_, mem') = evaluate a env mem in
+>     evaluate b env mem'
+>
 > -- %Summ9
 
 Here are the mutation-specific parts of the evaluator: %Summ10
@@ -4563,18 +4572,13 @@ INCLUDE:Summ11
 >
 > evaluate (Access a) env mem =
 >   let (AddressV i, mem') = evaluate a env mem in
->       (access i mem', mem')
+>     (access i mem', mem')
 >
 > evaluate (Assign a e) env mem =
 >   let (AddressV i, mem') = evaluate a env mem in
 >     let (ev, mem'') = evaluate e env mem' in
 >       (ev, update i ev mem'')
 > -- %Summ11
-
- #### Exercise 5.6: Errors and Mutable State
-
- Write a version of |evaluate| that supports both error checking
- and mutable state. %Exer7
 
  ## Monads: Abstract Computational Strategies
 
@@ -4963,15 +4967,17 @@ INCLUDE:StatefulMonad2 %Mona20
 >   return val = ST (\m -> (val, m))
 >   (ST c) >>= f =
 >     ST (\m ->
->       let (val, m') = c m
->           ST f' = f val
->       in f' m')
+>       let (val, m') = c m in
+>         let ST f' = f val in
+>           f' m'
+>       )
 > -- %StatefulMonad2
 
 Here is a version of evaluator using the |Stateful| monad defined above: %Mona21
 
 INCLUDE:StatefulMonad3 %Mona22
 > evaluate :: Exp -> Env -> Stateful Value
+> -- basic operations
 > evaluate (Literal v) env = return v
 > evaluate (Unary op a) env = do
 >   av <- evaluate a env
@@ -4983,12 +4989,16 @@ INCLUDE:StatefulMonad3 %Mona22
 > evaluate (If a b c) env = do
 >   BoolV cond <- evaluate a env
 >   evaluate (if cond then b else c) env
+>
+> -- variables and declarations
 > evaluate (Declare x e body) env = do    -- non-recursive case
 >   ev <- evaluate e env
 >   let newEnv = (x, ev) : env
 >   evaluate body newEnv
 > evaluate (Variable x) env =
 >   return (fromJust (lookup x env))
+>
+> -- first-class functions
 > evaluate (Function x body) env =
 >   return (ClosureV  x body env)
 > evaluate (Call fun arg) env = do
@@ -4996,6 +5006,11 @@ INCLUDE:StatefulMonad3 %Mona22
 >   argv <- evaluate arg env
 >   let newEnv = (x, argv) : closeEnv
 >   evaluate body newEnv
+>
+> -- mutation operations
+> evaluate (Seq a b) env = do
+>   evaluate a env
+>   evaluate b env
 > evaluate (Mutable e) env = do
 >   ev <- evaluate e env
 >   newMemory ev
@@ -5006,7 +5021,6 @@ INCLUDE:StatefulMonad3 %Mona22
 >   AddressV i <- evaluate a env
 >   ev <- evaluate e env
 >   updateMemory ev i
->   return ev
 > -- %StatefulMonad3
 
 Note that the expression forms that don't involve memory, including unary and binary operations,
@@ -5025,7 +5039,7 @@ INCLUDE:StatefulHelper2 %Mona25
 > -- %StatefulHelper2
 
 INCLUDE:StatefulHelper3 %Mona26
-> updateMemory val i = ST (\mem-> ((), update i val mem))
+> updateMemory val i = ST (\mem-> (val, update i val mem))
 > -- %StatefulHelper3
 
  # Abstract Interpretation and Types
@@ -5204,9 +5218,30 @@ INCLUDE:Type12 %A112
 >     error ("Conditional must return a boolean: " ++ show a)
 > -- %Type12
 
-Here are the two helper functions, which are the abstract versions of binary and unary:
+Here are the two helper functions, which are the abstract versions of binary and unary: %A114
 
-INCLUDE:Type16
+INCLUDE:Type16 %A115
+> checkUnary Not TBool = TBool
+> checkUnary Neg TInt  = TInt
+> checkUnary op  a     = error ("Mismatched argument for " ++
+>                               show op ++ " " ++ show a)
+>
+> checkBinary Add TInt  TInt  = TInt
+> checkBinary Sub TInt  TInt  = TInt
+> checkBinary Mul TInt  TInt  = TInt
+> checkBinary Div TInt  TInt  = TInt
+> checkBinary And TBool TBool = TBool
+> checkBinary Or  TBool TBool = TBool
+> checkBinary LT  TInt  TInt  = TBool
+> checkBinary LE  TInt  TInt  = TBool
+> checkBinary GE  TInt  TInt  = TBool
+> checkBinary GT  TInt  TInt  = TBool
+> checkBinary EQ  a     b     | a == b = TBool
+> checkBinary op  a     b      =
+>   error ("Mismatched binary types for " ++
+>          show a ++ " " ++ show op ++ " " ++ show b)
+>
+> -- %Type16
 
 Note that if type-checking any subexpressions fails with a type-error then the type-checking of the if expression will also fail. %A113
 
@@ -5252,9 +5287,9 @@ Note that if type-checking any subexpressions fails with a type-error then the t
 
 --------------------END-HIDE-------------------------
 
- # Assignments
+ # Appendix A: Assignments {-}
 
- ## Assignment 1: Basic Interpreter {#assign1}
+ ## Assignment 1: Basic Interpreter {#assign1 -}
 
 Extend the *parser* and *interpreter* of [Section on Evaluating Using Environments](#BasicEvalEnv)
 to allow multiple bindings in a variable binding
@@ -5309,7 +5344,7 @@ The code that you must modify
 is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)
 and  [Declare Test](./code/DeclareTest.hs.htm) files. %Basi13
 
- ## Assignment 2: First-Class Functions {#assign2}
+ ## Assignment 2: First-Class Functions {#assign2 -}
 
 Extend the *parser* and *interpreter* of [Section on First-Class Functions](#FirstClassFunctions)
 to allow passing multiple parameters, by adding a *tuple* data type and allowing *patterns* to
@@ -5357,19 +5392,19 @@ and
 [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm).
 And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Assi9
 
- ## Assignment 3: Defining a Monad for State and Error handling  {#assign3}
+ ## Assignment 3: Defining a Monad for State and Error handling  {#assign3 -}
 
 Combine the monads and interpreters for [Error Checking](#MonadicErrors) and
-[Mutable State](#MonadicState) into a single monad that perfroms both error checking
+[Mutable State](#MonadicState) into a single monad that performs both error checking
 and mutable state. You must also combine the evaluation functions. %Assi10
 
-The type of your monad must combine Checked and Stateful. There are several
+The type of your monad must combine |Checked| and |Stateful|. There are several
 ways to do this, but then one needed for this assignment is: %Assi11
 
 > data CheckedStateful t = CST (Memory -> (Checked t, Memory))
 > -- %Assi12
 
- ## Files on Lambda Calculus {#LambdaExp}
+ ## Files on Lambda Calculus {#LambdaExp -}
 
 Here two files that can be used to represent and parse lambda-expressions:
 [Lambda Abstract Syntax](./code/Lambda.hs.htm) and

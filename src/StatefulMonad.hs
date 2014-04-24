@@ -14,9 +14,10 @@ instance Monad Stateful where
   return val = ST (\m -> (val, m))
   (ST c) >>= f = 
     ST (\m -> 
-      let (val, m') = c m
-          ST f' = f val
-      in f' m')
+      let (val, m') = c m in
+        let ST f' = f val in
+          f' m'
+      )
 --END:StatefulMonad2
         
 --BEGIN:StatefulMonad3
@@ -65,7 +66,6 @@ evaluate (Assign a e) env = do
   AddressV i <- evaluate a env
   ev <- evaluate e env
   updateMemory ev i
-  return ev
 --END:StatefulMonad3
 
 --BEGIN:StatefulHelper1
@@ -77,11 +77,13 @@ readMemory i = ST (\mem-> (access i mem, mem))
 --END:StatefulHelper2
 
 --BEGIN:StatefulHelper3
-updateMemory val i = ST (\mem-> ((), update i val mem))
+updateMemory val i = ST (\mem-> (val, update i val mem))
 --END:StatefulHelper3
 
 runStateful (ST c) = 
    let (val, mem) = c [] in val
+
+execute exp = runStateful (evaluate exp [])
 
 
   

@@ -1,4 +1,4 @@
-import Stateful hiding (Stateful, evaluate)
+import Stateful hiding (Stateful, evaluate, execute)
 import Base
 import StatefulMonad 
 import StatefulParse

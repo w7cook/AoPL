@@ -33,7 +33,8 @@ typeCheck (If a b c) env =
 --BEGIN:Type16
 checkUnary Not TBool = TBool
 checkUnary Neg TInt  = TInt
-checkUnary op  a     = error ("Mismatched argument for " ++ " " ++ show op ++ " " ++ show a)
+checkUnary op  a     = error ("Mismatched argument for " ++ 
+                              show op ++ " " ++ show a)
 
 checkBinary Add TInt  TInt  = TInt
 checkBinary Sub TInt  TInt  = TInt
@@ -46,6 +47,8 @@ checkBinary LE  TInt  TInt  = TBool
 checkBinary GE  TInt  TInt  = TBool
 checkBinary GT  TInt  TInt  = TBool
 checkBinary EQ  a     b     | a == b = TBool
-checkBinary op  a     b      = error ("Mismatched binary types for " ++ show a ++ " " ++ show op ++ " " ++ show b)
+checkBinary op  a     b      = 
+  error ("Mismatched binary types for " ++ 
+         show a ++ " " ++ show op ++ " " ++ show b)
 
 --END:Type16
