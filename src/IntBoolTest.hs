@@ -7,14 +7,14 @@ import IntBoolTyping
 --BEGIN:More19
 t1 = "4"
 t2 = "-4 - 6"
-t3 = "if (3==6) -2; else -7"
+t3 = "if (3==6) -2 else -7"
 t4 = "3*(8 + 5)"
 t5 = "3 + 8 * 2"
 --END:More19
 
 --BEGIN:More98
-t6 = "if (3 > 3*(8 + 5)) 1; else 0"
-t7 = "2 + (if (3 <= 0) 9; else -5)"
+t6 = "if (3 > 3*(8 + 5)) 1 else 0"
+t7 = "2 + (if (3 <= 0) 9 else -5)"
 --END:More98
 
 test1 msg fun = do
@@ -27,7 +27,7 @@ test1 msg fun = do
   test msg fun (parseExp t7)
 
 --BEGIN:Type6
-err1 = "if (3) 5; else 8"
+err1 = "if (3) 5 else 8"
 err2 = "3 + true"
 err3 = "3 || true"
 err4 = "-true"

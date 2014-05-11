@@ -22,6 +22,8 @@ import Lexer
 %%
 
 -- BEGIN:SimpleGrammar
+Exp  : Term							  { $1 } 
+
 Term : Term '+' Factor    { Add $1 $3 }
      | Term '-' Factor    { Subtract $1 $3 }
      | Factor             { $1 }
@@ -32,7 +34,7 @@ Factor : Factor '*' Primary    { Multiply $1 $3 }
 
 Primary : digits         { Number $1 }
         | '-' digits     { Number (- $2) }
-        | '(' Term ')'   { $2 }
+        | '(' Exp ')'   { $2 }
 -- END:SimpleGrammar
 
 {

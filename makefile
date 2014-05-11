@@ -145,10 +145,11 @@ anatomy.htm: anatomy.mkd
 		| sed "s/VERTICAL_BAR/||/g" \
 		> foo.mkd
 	cat foo.mkd \
-		| $(PANDOC) --mathjax --number-sections --toc -f markdown+lhs -t html --css cc/commentCloud.css --chapters \
+		| $(PANDOC) --mathjax --number-sections --toc -f markdown+lhs -t html --css anatomy.css --css cc/commentCloud.css --chapters \
 		| sed "s/\\.eps/.png/" \
 		> foo2.mkd
 	cat foo2.mkd \
+		| sed "s/@@/@/g" \
 		| sed "s/BAR/|/g" \
 		| sed "s/OPENB/{/g" \
 		| sed "s/CLOSEB/}/g" \
@@ -169,7 +170,10 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		| sed "/^%[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		| sed "s/%[a-zA-Z0-9][a-zA-Z0-9]*//g" \
+		| sed "s/@@/AtX/g" \
 		| sed "s/@/ATSIGN/g" \
+		> foo.lhs
+	cat foo.lhs \
 		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex --chapters \
 		| sed "s/{verbatim}/{spec}/g" \
 		| sed "s/@/@@/g" \
@@ -184,6 +188,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/BAR/||/g" \
 		| sed "s/OPENB/{/g" \
 		| sed "s/CLOSEB/}/g" \
+		| sed "s/AtX/@/g" \
 		| sed "s/ATSIGN/@@/g" \
 		> temp.lhs
 

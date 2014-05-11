@@ -70,7 +70,7 @@ testE6 = let add = \a -> (\b -> b + a) in (add 3) 2
 --BEGIN:Exam7
 testE7 = let m = 2 in
   let proc = \n -> m + n
-      part = \(g,n) -> \m -> n * g(m)
+      part = \(g, n) -> \m -> n * g(m)
   in let inc = part(proc, 3) in
       inc 7
 --END:Exam7

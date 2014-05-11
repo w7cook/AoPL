@@ -23,6 +23,7 @@
 
 \usepackage{booktabs}
 
+
 % Paragraph format:
 % Pandoc prefers unindented paragraphs in the European style:
 \setlength{\parindent}{0pt}
@@ -95,9 +96,19 @@ $endif$
 % The commented out line below is in the default pandoc  latex.template.
 % Some unpleasantness with table formatting must be corrected.
 
-\usepackage{color}
-\usepackage[usenames,dvipsnames]{xcolor}
 
+\usepackage{color}
+
+\usepackage[framemethod=tikz]{mdframed}
+\definecolor{usethiscolorhere}{rgb}{0.86666,0.78431,0.78431}
+
+\surroundwithmdframed[backgroundcolor=usethiscolorhere,
+          roundcorner=10pt,
+          linecolor=blue,
+          ]{description}
+%\usepackage[usenames,dvipsnames]{xcolor}
+
+\definecolor{Mahogany}{rgb}{0.75, 0.25, 0.0}
 \newcommand{\StartIncorrect}{\color{Mahogany}}
 \newcommand{\EndIncorrect}{\color{black}}
 

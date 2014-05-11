@@ -67,7 +67,12 @@ text for some sections. %Ackn2
  ## Introduction
 
 In order to understand programming languages, it is useful to spend some time thinking
-about *languages* in general. Usually we treat language like the air we breathe:
+about *languages* in general. %Intr1
+
+language
+  ~ A *language* is a means to communicate information. %Intr3
+
+Usually we treat language like the air we breathe:
 it is everywhere but it is invisible. I say that language is invisible because we are
 usually more focused on the message, or the content, that is being conveyed than
 on the structure and mechanisms of the language itself. Even when we focus on
@@ -91,9 +96,14 @@ convey meaning? A user of a language has an implicit understanding of answers to
 these questions. But to really study language we must create an explicit description
 of the answers to these questions. %Intr4
 
-The concepts of structure and meaning have technical names. The structure of
-a language is called its *syntax*. The rules that defined the meaning of a language
-are called *semantics*. Syntax is a particular way to structure information, while
+The concepts of structure and meaning have technical names. %Intr8
+
+syntax
+  ~ The structure of a language is called its *syntax*.
+semantics
+  ~ The rules that defined the meaning of a language are called *semantics*. %Intr9
+
+Syntax is a particular way to structure information, while
 semantics can be viewed as a mapping from syntax to its meaning, or interpretation.
 The meaning of a program is usually some form of behavior, because programs
 *do* things.
@@ -103,10 +113,430 @@ This is what data structures and functions/procedures are for. %Intr6
 
 Thus the primary technique in these notes is to use programming to study programming
 languages. In other words, we will write programs to represent and manipulate programs.
-One general term for this activity is *metaprogramming*. A metaprogram is
-any program whose input or output is a program. Familiar examples of metaprograms
+One general term for this activity is *metaprogramming*. %Intr10
+
+metaprogram
+  ~ A *metaprogram* is any program whose input or output is a program. %Intr11
+
+Familiar examples of metaprograms
 include compilers, interpreters, virtual machines. In this course we will read, write and
 discuss many metaprograms. %Intr7
+
+ ## Introduction to Haskell Programming
+
+The goal of this tutorial is to get the students familiar with Haskell Programming.
+Students are encouraged to bring their own laptops to go through the installation
+process of Haskell and corresponding editors, especially if they haven't tried to
+install Haskell before or if they had problems with the installation. In any case
+the lab machines will have Haskell installed and students can also use these
+machines for the tutorial. %Intr12
+
+ ### Installing Haskell and related tools
+
+If you have your laptop and have not installed Haskell yet, you can try to install it now.
+If you have problems we can try to help you. %Inst1
+
+The Haskell platform is the easiest way to [install Haskell in Windows or Mac OS](http://www.haskell.org/platform). %Inst2
+
+In Ubuntu Linux you can use: %Inst3
+
+> sudo apt-get install haskell-platform
+> -- %Inst4
+
+ ### Installing Emacs
+
+We recommend using emacs as the editor for Haskell, since it is quite simple to use
+and it has a nice Haskell mode. In Ubuntu you can do they following to install
+emacs and the corresponding Haskell mode: %Inst5
+
+> sudo apt-get install emacs
+> sudo apt-get install haskell-mode
+> -- %Inst6
+
+In Mac OS you can try to use [Aquamacs](http://aquamacs.org).
+Look here for a [version of emacs for Windows](http://ftp.gnu.org/gnu/emacs/windows/). %Inst7
+
+However students are welcome to use whatever editor they prefer.
+If students are more comfortable using Vim, for example, they are
+welcome to. The choice of the editor is not important. %Inst8
+
+ ### Basic steps in Haskell
+
+In this tutorial we are going to implement our first Haskell code.
+To begin with, Haskell has normal data as in other programming languages.
+When writing Haskell code, lines that begin |Prelude>| are input to the
+Haskell interpreter, |ghci|, and the next line is the output. %Basi16
+
+> Prelude> 3 + 8 * 8
+> 67
+> Prelude> True && False
+> False
+> Prelude> "this is a " ++ "test"
+> "this is a test"
+> -- %Basi18
+
+As illustrated above, Haskell has standard functions for manipulating
+numbers, booleans, and strings. Haskell also supports tuples and lists,
+as illustrated below: %Basi19
+
+> Prelude> (3 * 8, "test" ++ "1", not True)
+> (24, "test1", False)
+> Prelude> ()
+> ()
+> Prelude> [1, 1+1, 1+1+1]
+> [1, 2, 3]
+> Prelude> 1 : [2, 3]
+> [1, 2, 3]
+> Prelude> 1 : 2 : 3 : []
+> [1, 2, 3]
+> Prelude> length [1, 2, 3]
+> 3
+> -- %Basi20
+
+Tuples are fixed length but can contain different types of values.
+Lists are variable length but must contain only one type of value.
+The colon function |:| adds a new item to the front of a list. %Basi21
+
+ #### Functions
+
+First, create a file called "Tutorial1.hs".
+After the creation of the file define the module header as follows: %Func25
+
+> module Tutorial1 where
+> -- %Func26
+
+It is possible to define simple functions in Haskell
+For example, consider a function that computes the absolute value of a number: %Func27
+
+> absolute :: Int -> Int
+> absolute x = if x < 0 then -x else x
+> -- %Func28
+
+This first line declares a function |absolute| with type |Int -> Int|, which means that it takes
+a single integer as an input, and produces a single integer result.
+The second line defines |absolute| by naming the input value |x| and then providing an expression
+to compute the result.
+Everything is an expression in Haskell. This means that everything, including |if| expressions,
+have a value. Generally speaking Haskell definitions have the following basic form: %Func29
+
+|name arg|$_1$ $\ ...\ $ |arg|$_n$ |= expression| %Func30
+
+Note that in the right side of |=| (the body of the definition) is an expression.
+This is different from a conventional imperative language, where the body of a definition is
+usually a *statement*, which does not have a value. %Func31
+
+expression
+  ~ An *expression* is a syntactic category for syntax produces a value, and possibly has other side effects.
+statement
+  ~ A *statement* is a syntactic category for syntax that has a side effect rather than producing a value.
+side effect
+  ~ A *side effect* is a effect on the program state. Examples of side effects include allocating memory,
+    assigning to memory, input/output, or exceptions. %Func32
+
+In Haskell there are no statements, only expressions. As mentioned above, the |if|
+construct is also an expression. %Func33
+
+Question 1: Are both of the following Haskell programs valid? %Func34
+
+> nested_if1 x = if ( absolute x <= 10)
+>                then x
+>                else error "Only numbers between [-10, 10] allowed"
+> -- %Func35
+
+> nested_if2 x = if ( (if x < 0 then -x else x) <= 10)
+>                then x
+>                else error "Only numbers between [-10, 10] allowed"
+> -- %Func36
+
+Once you have thought about it you can try these definitions on your Haskell file and see if they are accepted or not. %Func37
+
+Question 2: Can you have nested |if| statements in Java, C or C++? For example, would this be valid in Java? %Func38
+
+````Java
+int m(int x) {
+    if ((if (x < 0) -x else x) > 10)
+      return x;
+    else
+      return 0;
+}
+%Func39
+````
+
+ #### Data Types
+
+Data types in Haskell are defined by variants and components. In other words, a data type
+has a set of variants each with their own constructor, or tag, and each variant has
+a set of components or fields. For example, here is a data type for simple geometry: %Data1
+
+> data Geometry = Point     Int Int          -- x and y
+>               | Circle    Int Int Int      -- x, y, and radius
+>               | Rectangle Int Int Int Int  -- top, left, right, bottom
+> -- %Data2
+
+A data type definition always begins with |data| and is followed by the name of the data type,
+in this case |Geometry|. There then follows a list of variants with unique tag names, in this
+case |Point|, |Circle|, and |Rectangle|, which are separated by vertical bar| BAR|. Following
+each constructor tag is a list of data types specifying the types of components of that variant.
+A |Point| has two components, both integers. A |Circle| has three components, and a rectangle
+has 4 integer components. One issue with this notation is that it is not clear what the components
+*mean*. The meaning of each component is specified in a comment. %Data3
+
+The tags are called *constructors* because they are defined to construct values of the data type.
+For example, here are that construct three geometric objects: %Data4
+
+> Point 3 10
+> Circle 10 10 10
+> Rectangle 0 0 100 10
+> -- %Data5
+
+Data types can also be recursive, allowing the definition of complex data types. %Data6
+
+INCLUDE:GEOM1
+> data Geometry = Point     Float Float              -- x and y
+>               | Circle    Float Float Float        -- x, y, and radius
+>               | Rectangle Float Float Float Float  -- top, left, right, bottom
+>               | Composite [Geometry]               -- list of geometry objects
+> -- %GEOM1
+
+Here is a composite geometric value: %Data8
+
+> Composite [Point 3 10, Circle 10 10 10, Rectangle 0 0 100 10]
+> -- %Data9
+
+Two special cases of data types are *enumerations*, which only have variants and no components,
+and *structures* which only have a single variant, with multiple components. An example
+enumeration is the data type of days of the week: %Data10
+
+> data Days = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday
+> -- %Data11
+
+In this case the tags are constants. One well known enumeration is the data type |Boolean|: %Data12
+
+> data Boolean = True | False
+> -- %Data13
+
+An example of a structure is a person data type: %Data14
+
+> data Person = Person String Int Int  -- name, age, shoe size
+> -- %Data15
+
+Note that the data type and the constructor tag are the same. This is common for
+structures, and doesn't cause any confusion because data types and constructor functions
+are always distinguished syntactically in Haskell. Here is an example person: %Data16
+
+> Person "William" 42 10
+> -- %Data17
+
+A Haskell program almost always includes more than one data type definition. %Data18
+
+ #### Pattern Matching Data Types
+
+Functions are defined over data types by *pattern matching*. For example, to
+compute the area of a geometric figure, one would define: %Patt1
+
+INCLUDE:GEOM2
+> area :: Geometry -> Float
+> area (Point x y)         = 0
+> area (Circle x y r)      = pi * r ^ 2
+> area (Rectangle t l r b) = (b - t) * (r - l)
+> area (Composite cs)      = sum [ area c | c <- cs ]
+> -- %GEOM2
+
+
+
+ #### Parametric Polymorphism and Type-Inference
+
+We have seen that Haskell supports definitions with a type-signature or without.
+When a definition does not have a signature, Haskell infers one and it is still
+able to check whether some type-errors exist or not. For example, for the definition %Para1
+
+> newline s = s ++ "\n"
+> -- %Para2
+
+Haskell is able to infer the type: |String -> String|. %Para3
+
+In Haskell strings are represented as lists of characters, whose type is written |[Char]|.
+The operator |++| is a built-in function in Haskell that allows concatenating two lists.
+However for certain definitions it appears as if there is not enough information
+to infer a type. For example, consider the definition: %Para4
+
+> identity x = x
+> -- %Para5
+
+This is the definition of the identity function: the function that given some argument
+returns that argument unmodified. This is a perfectly valid definition, but what type should it have?
+The answer is: %Para6
+
+> identity :: a -> a
+> -- %Para7
+
+The function ||identity|| is a (parametrically) polymorphic function. Polymorphism means that
+the definition works for multiple types; and this type of polymorphism is called parametric
+because it results from abstracting/parametrizing over a type. In the type signature the a
+is a type variable (or parameter). In other words it is a variable that can be replaced by
+some valid type (for example |Int|, |Char| or |String|). Indeed the |identity| function can be applied
+to any type of values. Try the following in |ghci|, and see what is the resulting type: %Para8
+
+> identity 3
+> identity 'c'
+> identity identity   --- you may try instead :t identity identity
+> -- %Para9
+
+Question 3: Have you seen this form of polymorphism in other languages? Perhaps under a different name? %Para10
+
+ #### Pattern matching
+
+One feature that many functional languages support is pattern matching. Pattern matching plays a
+role similar to conditional expressions, allowing us to create definitions depending on whether
+the input matches a certain pattern. For example, the function |hd| (to be read as "head") given
+a list returns the first element of the list: %Patt3
+
+> hd :: [a] -> a
+> hd []        = error "cannot take the head of an empty list!"
+> hd (x:xs)    = x
+> -- %Patt4
+
+In this definition, the pattern |[]| denotes the empty list, whereas the pattern |(x:xs)| denotes
+a list where the first element (or the head) is |x| and the remainder of the list is |xs|.
+Note that instead of a single clause in the definition there are now two clauses for each case. %Patt5
+
+Question 4: Define a |tl| function that given a list, drops the first element and returns
+the remainder of the list. That is, the function should behave as follows for the sample inputs: %Patt6
+
+> Prelude> tl [1, 2, 3]
+> [2, 3]
+> -- %Patt7
+
+> Prelude> tl ['a', 'b']
+> ['b']
+> -- %Patt8
+
+More Pattern Matching: Pattern matching can be used with different types. For example,
+here are two definitions with pattern matching on tuples and integers: %Patt9
+
+> first :: (a, b) -> a
+> first (x, y) = x
+> -- %Patt10
+
+> isZero :: Int -> Bool
+> isZero 0 = True
+> isZero n = False
+> -- %Patt11
+
+ #### Recursion
+
+In functional languages mutable state is generally avoided and in the case of Haskell
+(which is purely functional) it is actually forbidden. So how can we write many of the
+programs we are used to? In particular how can we write programs that in a language
+like C would normally be written with some mutable state and some type of loop? For example: %Recu11
+
+````Java
+int sum_array(int a[], int num_elements) {
+   int i, sum = 0;
+   for (i = 0; i < num_elements; i++) {
+     sum = sum + a[i];
+   }
+   return sum;
+}
+%Recu22
+````
+
+The answer is to use recursive functions. For example here is how to write a function that sums a list of integers: %Recu23
+
+> sumList :: [Int] -> Int
+> sumList []     = 0
+> sumList (x:xs) = x + sumList xs
+> -- %Recu24
+
+Question 5: The factorial function can be defined mathematically as follows: %Recu25
+
+$n! = \left\{ \begin{array}{ll} 1          & \mathrm{if\ } n = 0 \\
+                                n * (n-1)! & \mathrm{if\ } n > 0 \end{array} \right.$ %Recu26
+
+
+Translate this definition into Haskell using recursion and pattern matching. %Recu27
+
+Question 6: The Fibonacci sequence is: %Recu28
+
+> 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+> -- %Recu29
+
+write a function: %Recu30
+
+> fib :: Int -> Int
+> -- %Recu31
+
+that given a number returns the corresponding number in the sequence.
+(If you don't know Fibonacci numbers you may enjoy finding the recurrence pattern;
+alternatively you can look it up in Wikipedia). %Recu32
+
+Question 7: Write a function: %Recu33
+
+> mapList :: (a -> b) -> [a] -> [b]
+> -- %Recu34
+
+that applies the function of type |a->b| to every element of a list. For example: %Recu35
+
+> Prelude> mapList absolute [4, -5, 9, -7]
+> [4, 5, 9, 7]
+> -- %Recu36
+
+Question 7: Write a function that given a list of characters returns a list with
+the corresponding ASCII number of the character. Note that in Haskell, the function |ord|: %Recu37
+
+> ord :: Char -> Int
+> -- %Recu38
+
+gives you the ASCII number of a character. To use it add the following just after the module declaration: %Recu39
+
+> import Data.Char
+> -- %Recu40
+
+to import the character handling library. %Recu41
+
+Question 8: Write a function |filterList| that given a predicate and a list returns another list
+with only the elements that satisfy the predicate. %Recu42
+
+> filterList :: (a -> Bool) -> [a] -> [a]
+> -- %Recu43
+
+For example, the following filters all the even numbers in a list (even is a built-in Haskell function): %Recu44
+
+> Prelude> filterList even [1, 2, 3, 4, 5]
+> [2, 4]
+> -- %Recu45
+
+Question 9: Haskell has a function |zip|: %Recu46
+
+> zip :: [a] -> [b] -> [(a, b)]
+> -- %Recu47
+
+that given two lists pairs together the elements in the same positions. For example: %Recu48
+
+> Prelude> zip [1, 2, 3] ['a', 'b', 'c']
+> [(1, 'a'), (2, 'b'), (3, 'c')]
+> -- %Recu49
+
+For lists of different lengths it truncates the larger list: %Recu50
+
+> Prelude> zip [1, 2, 3] ['a', 'b', 'c', 'd']
+> [(1, 'a'), (2, 'b'), (3, 'c')]
+> -- %Recu51
+
+Write a definition |zipList| that implements the |zip| function. %Recu52
+
+Question 10: Define a function |zipSum|: %Recu53
+
+> zipSum :: [Int] -> [Int] -> [Int]
+> -- %Recu54
+
+that sums the elements of two lists at the same positions.
+Suggestion: You can define this function recursively, but a simpler solution can be found by
+combining some of the previous functions. %Recu55
+
+
+Assignment 1 (Optional and not graded):
+Your first assignment is to try to complete as many questions in the tutorial as you can. %Recu56
 
  # Expressions, Syntax, and Evaluation {#Chapter1}
 
@@ -114,17 +544,21 @@ This chapter introduces three fundamental concepts in programming
 languages: *expressions*, *syntax* and *evaluation*. These concepts are
 illustrated by a simple language of arithmetic expressions. %Expr2
 
-An *expression* is a combination of variables, values
-and operations over these values. For example, the arithmetic expression |2+3|
-uses two numeric values |2| and |3| and an operation |+| that operates on
-numeric values. The *syntax* of an expression prescribes how the various
-components of the expressions can be combined. In general it is not the case that
-the components of expressions can be combined arbitrarily: they must obey certain
-rules. For example |2 3| or | + + | are not valid arithmetic expressions.
-Each expression has a meaning (or value), which is defined by the
-*evaluation* of that expression. Evaluation is a process where expressions
-composed of various components get simplified until eventually we get a value.
-For example evaluating |2 + 3| results in |5|. %Expr3
+expression
+  ~ An *expression* is a combination of variables, values
+		and operations over these values. For example, the arithmetic expression |2+3|
+		uses two numeric values |2| and |3| and an operation |+| that operates on
+		numeric values.
+syntax
+  ~ The *syntax* of an expression prescribes how the various
+		components of the expressions can be combined. In general it is not the case that
+		the components of expressions can be combined arbitrarily: they must obey certain
+		rules. For example |2 3| or |+ +| are not valid arithmetic expressions.
+evaluation
+  ~ Each expression has a meaning (or value), which is defined by the
+		*evaluation* of that expression. Evaluation is a process where expressions
+		composed of various components get simplified until eventually we get a value.
+		For example evaluating |2 + 3| results in |5|. %Expr3
 
  ## Simple Language of Arithmetic
 
@@ -172,13 +606,23 @@ structure is explicit. %Simp8
 
  ## Syntax
 
-The conceptual structure (illustrated by the pictures) is called the *abstract
-syntax* of the language. The particular details and rules for writing expressions
-as strings of characters is called the *concrete syntax*. The abstract
-syntax for arithmetic expressions is very simple, while the concrete syntax
+Syntax comes in two forms: abstract and concrete. %Synt1
+
+abstract syntax
+  ~ The conceptual structure (illustrated by the pictures) is called the *abstract
+		syntax* of the language.
+concrete syntax
+  ~ The particular details and rules for writing expressions
+		as strings of characters is called the *concrete syntax*. %Synt2
+
+The abstract syntax for arithmetic expressions is very simple, while the concrete syntax
 is quite complex. To make these concepts more precise, we show how to
 represent abstract syntax as a data structure, and how to define a *parser*, which
 converts from the concrete written form to the abstract syntax. %Simp9
+
+parser
+  ~ A parser is a program that converts concrete syntax into abstract syntax.
+    A parser typically inputs text and outputs the abstract syntax structure. %Synt3
 
  ### Abstract Syntax in Haskell
 
@@ -202,6 +646,10 @@ of the data type. The types that follow the constructors are the
 components of the data type. Thus a |Number| expression has an integer component,
 while the other constructors all have two expression components.
 A number that appears in a program is called a *literal*. %Abst4
+
+literal
+  ~ A *literal* is a constant value that appears in a program. A literal can be a
+    number, string, boolean, or other constant. %Abst38
 
 As an example of abstract syntax, consider this expression: %Abst5
 
@@ -227,7 +675,7 @@ into abstract syntax. %Abst8
 
 The concrete syntax of a language describes how the abstract
 concepts in the language are represented as text. For example,
-lets consider how to convert the string |"3+81\*2"| into the
+lets consider how to convert the string |"3+81*2"| into the
 abstract syntax |Add (Number 3) (Multiply (Number 81) (Number 2))|.
 The first step is to break a text up into *tokens*. %Conc1
 
@@ -236,9 +684,21 @@ The first step is to break a text up into *tokens*. %Conc1
 Tokens are the basic units of a language. In English, for example,
 words are tokens. But English also uses many symbol tokens, including
 ".", "!", "?", "(" and ")". In the example  |"3 + 81 * 2"| the tokens
-are |3|, |"+"|, |81|, |"\*"|, and |2|. It is also important to classify tokens
+are |3|, |"+"|, |81|, |"*"|, and |2|. It is also important to classify tokens
 by their kind. The tokens |3|, |81| and |2| are sequences of digits.
-The tokens |"+"| and |"\*"| are *symbol* tokens. Tokens are typically
+The tokens |"+"| and |"*"| are *symbol* tokens. %Toke5
+
+token
+  ~ A token is the basic syntactic unit of a language. Tokens can be
+    individual characters, or groups of characters. Token are often
+    classified into kinds, for example *integers*, *strings*, *identifiers*.
+identifier
+  ~ An identifier is a string of characters that represents a name. Identifiers usually
+    begin with a alphabetic character, then continue with one or more
+    numeric digits or special symbols. Special symbols that may be used
+    inlucde underscore "_" and "$", but others may be included. %Toke9
+
+Tokens are typically
 as simple as possible, and they must be recognizable without considering
 any context. This means that the integer |"-23"| might not be a good
 token, because it contains the symbol |"-"|, which is also used in
@@ -275,14 +735,23 @@ keywords. %Toke8
 
  #### Grammars
 
-A *grammar* is a set of rules that specify how tokens can be placed together to
-form valid expressions of a language.
+Grammars are familiar from studying natural languages, but they are
+especialy important when studying computer languages. %Gram31
+
+grammar
+  ~ A *grammar* is a set of rules that specify how tokens can be placed together to
+    form valid expressions of a language. %Gram32
+
 To create a grammar, it is essential
-to identify and *name* the different parts of the language.
-For example, in English there are many different parts, including
-*verb*, *noun*, *gerund*, *prepositional phrase*,
-*declarative sentence*, etc. Technically, the parts of a
-language are called *syntactic categories*. %Gram2
+to identify and *name* the different parts of the language. %Gram33
+
+syntactic category
+  ~ The parts of a language are called *syntactic categories*. %Gram2
+		For example, in English there are many different parts, including
+		*verb*, *noun*, *gerund*, *prepositional phrase*,
+		*declarative sentence*, etc. In software langauges, example syntactic
+		categories include *expressions*, *terms, *functions*, *types*,
+		or *classes*. %Gram34
 
 It is certainly possible to
 be a fluent English speaker without any explicit awareness of
@@ -303,8 +772,8 @@ Here is a simple grammar: %Gram3
 > -- %Gram4
 
 The names |Sentence|, |PrepositionalPhase|, |Noun|, |Verb|, and |Preposition| are
-the syntactic categories of this grammar. Each line of
-the grammar is a *rule* that specifies a syntactic category,
+the syntactic categories of this grammar.
+Each line of the grammar is a *rule* that specifies a syntactic category,
 followed by a colon (:) and then sequence of alternative
 forms for that syntactic category. The words in quotes,
 including |Dick|, |Jane|, and |Runs| are the tokens of the
@@ -339,12 +808,22 @@ These sentences are *syntactically correct* because they
 follow the pattern specified by the grammar, but that doesn't
 ensure that they are meaningful. %Gram17
 
-Note: computer science literature, 'syntactic categories' are
-often called *nonterminals* while tokens are called *terminals*.
-This comes from the idea that a grammar can be viewed as
-generating sentences by replacing the left side with the right
-side. As long as the resulting sentence still has syntactic
-categories that haven't been replaced by real words, the
+To summarize, here is a formal description of grammars. %Gram35
+
+production rule
+  ~ A *production rule* defines how a non-terminal
+    can be translated into a sequence of tokens and other syntactic categories.
+terminal
+  ~ A *terminal* is a token used in a grammar rule.
+non-terminal
+  ~ The *non-terminals* are the names of syntactic categories used in a grammar. %Gram36
+
+The intuition behind the use of the terms *non-terminal* and *terminal* is
+that the grammar rules *produce* sequences of tokens. Starting with a start symbol,
+a grammar can be viewed as
+generating sequences of non-terminal/terminals by replacing the left side with the right
+side. As long as the resulting sentence still has non-terminals
+that haven't been replaced by real words, the
 process is not done (not terminated). %Gram18
 
  #### Grammar Actions and Construction of Abstract Syntax
@@ -399,9 +878,13 @@ work better than others, depending on the situation. %Gram30
 
  #### Ambiguity, Precedence and Associativity
 
-One problem with the straightforward grammar is allows for *ambiguity*.
-A sentence is ambiguous if there is more than one that it
-can be derived by a grammar. For example, the expression |1-2-3|
+One problem with the straightforward grammar is allows for *ambiguity*. %Ambi10
+
+ambiguity
+  ~ A sentence is ambiguous if there is more than one way that it
+    can be derived by a grammar. %Ambi11
+
+For example, the expression |1-2-3|
 is ambiguous because it can be parsed in two ways to create
 two different abstract syntax trees [TODO: define "parse"]: %Ambi1
 
@@ -431,10 +914,20 @@ Again we know that the first version is the correct one, because
 multiplication should be performed before subtraction. Technically,
 we say that multiplication has higher *precedence* than subtraction. %Ambi7
 
+precedence
+  ~ *Precedence* is an order on grammar rules that defines which rule should
+    apply first in cases of ambiguity. Precedence rules are applied before
+    associativity rules.
+associativity
+  ~ Associativity specifies whether binary operators are grouped from the
+    *left* or the *right* in order to resolve ambiguity. %Ambi12
+
 The grammar can be adjusted to express the precedence and associativity
 of the operators. Here is an example: %Ambi8
 
 INCLUDE:SimpleGrammar
+> Exp  : Term							  { $1 }
+>
 > Term : Term '+' Factor    { Add $1 $3 }
 >      | Term '-' Factor    { Subtract $1 $3 }
 >      | Factor             { $1 }
@@ -448,10 +941,19 @@ INCLUDE:SimpleGrammar
 >         | '(' Term ')'   { $2 }
 > -- %SimpleGrammar
 
-This unambiguous grammar is now ready to be put into production. %Ambi9
+This grammar works by splitting the |Exp| non-terminal of the original
+grammar into multiple non-terminals, each of which represents a precedence level. %Ambi13
+The low-precedence operators |+| and |-| are grouped into a |Term| non-terminal,
+which allows addition and subtraction of factors. A |Factor| non-terminal
+allows multiplication and division, but does not allow addition. A |Primary|
+non-terminal allows primitive constructs, including a parenthesized expression,
+which allows addition and subtraction to be used under multiplication.
+%Ambi9
 
  #### Parser Generators
 
+The grammar notation used above is also a language. It is a language
+of grammars.
 
  how to create simple grammars using the
 [Happy Parser Generator](http://www.haskell.org/happy/). %Pars1
@@ -547,7 +1049,7 @@ do we mean an expression of the language being defined (in this case arithmetic)
 
 In general it is useful to have different terminology to distinguish
 the roles of the two different languages. We say that Haskell is the
-*meta-language*, whereas the language of arithmetic is the
+*meta language*, whereas the language of arithmetic is the
 *object language* being defined. The term meta-language is used
 to denote the language used for the implementation.  The term object
 language (or just language) is used to denote the language that is the
@@ -621,6 +1123,10 @@ INCLUDE:Vari99
 
 An association of a variable $x$ with a value $v$ is called a *binding*,
 which can be written $x \mapsto v$.
+
+binding
+  ~ A *binding* is an association of a variable with its value.
+  
 Bindings can be represented in Haskell as a pair. For example, the
 binding of $x \mapsto 5$ can be represented as |("x", 5)|. %Vari5
 
@@ -645,6 +1151,11 @@ This interplay between being constant and being variable can be quite confusing,
 especially since variables in most programming languages *can change*
 over time. The process of actually changing a variable's value over time, within a
 single context, is called *mutation*.
+
+mutation
+  ~ Mutation refers to the ability of a variable or data structure to change
+    over time.
+
 This seems to be a major difference between programming language
 variables and mathematical variables. However, if you think about things
 in a slightly different way then it is possible to unify these two
@@ -766,6 +1277,9 @@ There can be multiple variables in a single expression. For example,
 evaluating $2 * x + y$ where $x=3$ and $y=-2$. A collection of bindings
 is called an *environment*. %Mult2
 
+environment
+  ~ An *environment* is a mapping from variables to values.
+
 Since a binding is represented as a pair, an environment can be
 represented as a list of pairs. The environment mentioned above
 would be %Mult3
@@ -794,6 +1308,10 @@ is returned. However what happens when a variable that is not in the environment
 
 In this case variable lookup fails, and it is necessary to deal with this
 possibility by signaling an error or triggering an exception. %Mult44
+
+unbound variable
+  ~ An *unbound variable* is a variable that does not have a binding.
+    Unbound variables are a common form of errors in programs.
 
 Haskell already provides a function, called |lookup|, that implements
 the functionality that is needed for variable lookup. The type of |lookup|
@@ -968,8 +1486,13 @@ and the second |Exp| is the *body*. %Loca23
 
  ### Scope
 
-The *scope* of a variable is the portion of the text of a program
-in which a variable is defined. Normally the scope of a local
+Variables have a range of text in which they are defined.
+
+scope
+  ~ The *scope* of a variable is the portion of the text of a program
+    in which a variable is defined. 
+    
+Normally the scope of a local
 variable is all of the body of the declaration in which the variable is defined.
 However, it is possible for a variable to be redefined, which creates
 a hole in the scope of the outer variable: %Scop2
@@ -1048,10 +1571,18 @@ error message: %Unde4
 
 The fact that a variable is undefined is a *static* property of the
 program: whether a variable is undefined depends only on the text of the program,
-not upon the particular data that the program is manipulating. (TODO: accurate example
-of static versus dynamic?) This is different
+not upon the particular data that the program is manipulating. 
+This is different
 from the divide by zero error, which depends upon the particular data that the program is manipulating.
-As a result, divide by zero is a *dynamic* error. Of course, it might be possible to identify, just from
+As a result, divide by zero is a *dynamic* error. 
+
+static
+  ~ A *static* property of a program can be determined by examining the text 
+    of the program but without executing or evaluating it.
+dynamic
+  ~ A *dynamic* property of a program can only be determined by evaluating the program.    
+
+Of course, it might be possible to identify, just from
 examining the text of a program, that it will always divide by zero. Alternatively,
 it may be the case that the code containing an undefined variable is never
 executed at runtime. Thus the boundary between static and dynamic errors is not
@@ -1302,7 +1833,7 @@ INCLUDE:More3
 Some example values are |BoolV True| and
 |IntV 3|. We will define additional kinds of values, including functions and lists, later.
 The names |IntV| and |BoolV| in this type definition are
-the *labels* for data variants, while |Int| and |Bool| uses are *types* that specify what kind of
+the *tags* for data variants, while |Int| and |Bool| uses are *types* that specify what kind of
 data are associated with that data variant. %More5
 
 The abstract syntax of expressions can now be expanded to include operations involving
@@ -1310,7 +1841,7 @@ booleans. Some examples are |4 < 10| and |3 * 10 = 7|. Once booleans are include
 in the language, it is possible to define a *conditional* expression, with the following
 concrete syntax: %More6
 
-|if (|*test*|)| *true-exp*|; else| *false-exp* %More7
+|if (|*test*|)| *true-exp*| else| *false-exp* %More7
 
 A conditional expression allows selection of one of two different values
 based on whether a boolean is true or false. Note that a conditional *expression* is
@@ -1409,7 +1940,7 @@ cases given above: %More18
 INCLUDE:More19
 > t1 = "4"
 > t2 = "-4 - 6"
-> t3 = "if (3==6) -2; else -7"
+> t3 = "if (3==6) -2 else -7"
 > t4 = "3*(8 + 5)"
 > t5 = "3 + 8 * 2"
 > -- %More19
@@ -1417,8 +1948,8 @@ INCLUDE:More19
 In addition, new expressions can be defined to represent conditional expressions: %More20
 
 INCLUDE:More98
-> t6 = "if (3 > 3*(8 + 5)) 1; else 0"
-> t7 = "2 + (if (3 <= 0) 9; else -5)"
+> t6 = "if (3 > 3*(8 + 5)) 1 else 0"
+> t7 = "2 + (if (3 <= 0) 9 else -5)"
 > -- %More98
 
 Running these test cases with the |test| function defined above yields these results: %More22
@@ -1430,7 +1961,7 @@ INCLUDE:More23
 > execute [-4 - 6]
 >  ==> -10
 >
-> execute [if (3 == 6) -2; else -7]
+> execute [if (3 == 6) -2 else -7]
 >  ==> -7
 >
 > execute [3 * (8 + 5)]
@@ -1439,10 +1970,10 @@ INCLUDE:More23
 > execute [3 + 8 * 2]
 >  ==> 19
 >
-> execute [if (3 > 3 * (8 + 5)) 1; else 0]
+> execute [if (3 > 3 * (8 + 5)) 1 else 0]
 >  ==> 0
 >
-> execute [2 + (if (3 >= 0) 9; else -5)]
+> execute [2 + (if (3 >= 0) 9 else -5)]
 >  ==> 11
 >
 > -- %More23
@@ -1469,7 +2000,7 @@ handled by the |binary| function. As a result, Haskell generates a
 Here are some examples of expression that generate type errors: %Type5
 
 INCLUDE:Type6
-> err1 = "if (3) 5; else 8"
+> err1 = "if (3) 5 else 8"
 > err2 = "3 + true"
 > err3 = "3 || true"
 > err4 = "-true"
@@ -1479,7 +2010,7 @@ Running these tests produce error messages, but the errors are not
 very descriptive of the problem that actually took place. %Type1
 
 INCLUDE:Type6run
-> execute [if (3) 5; else 8]
+> execute [if (3) 5 else 8]
 >  ==> Exception: Irrefutable pattern failed for pattern Value.BoolV test
 >
 > execute [3 + true]
@@ -1562,8 +2093,7 @@ without return statements: %Top6
 >     1
 >   else
 >     n * power(n, m - 1)
-> -- %Top1
-
+>
 > main =
 >   print (power(3, 4))
 > -- %Top8
@@ -1618,7 +2148,7 @@ As an example, here is an encoding of the example program: %Top21
 
 INCLUDE:Top22
 > execute function power(n, m) {
->   if (m == 0) 1; else n * power(n, m - 1)
+>   if (m == 0) 1 else n * power(n, m - 1)
 > }
 > power(3, 4)
 >  ==> 81
@@ -1810,6 +2340,12 @@ and operate on functions. In this section we rework the
 concept of functions presented above to integrate them into
 the language, so that functions are *first-class* values. %Firs2
 
+first-class values
+  ~ A *first-class value* is a value that can be used 
+    like any other value. A value is first class if it can be
+    passed to functions, returned from functions, and stored
+    in a variable binding.
+    
 Consider the following function definition: %Firs3
 
 INCLUDE:Firs4
@@ -1855,10 +2391,13 @@ Here is a solution for |f| using a lambda: %Lamb2
 
 The symbol $\lambda$ is the greek letter *lambda*. Just like
 the symbol $\sqrt{x}$, $\lambda$ has no inherent meaning, but
-is assigned a meaning for our purposes. The general form of a
-function expression is: %Lamb4
+is assigned a meaning for our purposes. 
 
-$\lambda$*var*. *body* %Lamb5
+lambda or function expression
+  ~ A *lambda expression* is an expression that creates a function.
+    The general form of a function expression is: %Lamb4
+
+    $\lambda$*var*. *body* %Lamb5
 
 This represents a function with parameter *var* that computes a
 result defined by the *body* expression. The *var* may of course
@@ -1905,9 +2444,9 @@ INCLUDE:Usin3
 The last example uses Haskell's notation for writing a lambda expression.
 Because $\lambda$ is not a standard character on most
 keyboards (and it is not part of ASCII), Haskell uses
-an *ASCII art* rendition of $\lambda$ as a backslash |\\|.
+an *ASCII art* rendition of $\lambda$ as a backslash |\ |.
 The dot used in a traditional lambda expression is replaced
-by ASCII art | -> | for an arrow. The idea is that the function
+by ASCII art |->| for an arrow. The idea is that the function
 maps from |x| to its result, so an arrow makes some sense. %Usin4
 
 The concept illustrated above is an important general rule,
@@ -2080,7 +2619,7 @@ A function that takes another function as an input is called a *higher-order fun
 Higher-order functions are quite useful, but what I find even more interesting
 are functions that *return* functions as results. %Mapp10
 
-The comprehensions used earlier in this document could be replace by invocations of
+The comprehensions used earlier in this document could be replaced by invocations of
 |map|: %Mapp11
 
 |[evaluate a env BAR a <- args]|   \ \ \ \  $\equiv$  \ \ \ \  |map (\a-> evaluate a env) args| %Mapp12
@@ -2089,7 +2628,7 @@ TODO: is a function that returns a function also called higher order? %Mapp14
 
  ### Representing Environments as Functions {#EnvAsFun}
 
-In [Chapter 1](#Chapter1), an environment was defined as a list of bindings.
+In [Chapter 1](#Chapter1), an environment was represented as a list of bindings.
 However, it is often useful to consider the *behavior* of a concept
 rather than its concrete *representation*. The purpose of a
 environment is to map variable names to values. A map is just
@@ -2281,7 +2820,7 @@ fundamental nature of environments as maps from names to values.
 It is still OK to think of environments as 'data', because
 functions are data and this function is being used to represent
 an environment. In this case it is a functional representation of data.
-In the end, the line between data and behavior and data is quite
+In the end, the line between data and behavior is quite
 blurry. %Repr35
 
 TODO: define "shadow" and use it in the right places. %Repr36
@@ -2401,7 +2940,61 @@ for Haskell that is not found in most other languages: *place arguments
 that change most frequently at the end of the argument list*. Conversely,
 arguments that change rarely should be placed early in the argument list. %Mult26
 
-TODO: talk about pairs and define curry/uncurry %Mult27
+It is also possible to convert between functions that take multiple arguments
+and chains of functions taking one argument. The standard way to represent multiple
+arguments in Haskell is with a *tuple*, or a collection of values. One simple
+case of a tuple is a *pair*. For example, here are two pairs:
+
+> (3, 5)
+> ("test", 99)
+
+A Haskell function that takes a tuple as an argument resembles functions in most 
+other programming languages:
+
+> max(a, b) = if a > b then a else b
+
+But in Haskell this is really just a function taking one argument, which is pattern
+matched to be a tuple, in this case a pair that binds |a| to the first component and |b|
+to the second component. This function performs that same computation as the standard
+|max| function, which is a function that takes a single argument and returns a function
+that takes the second argument,
+
+> max a b = if a > b then a else b
+
+which is equivalent to
+
+> max = \a-> \b-> if a > b then a else b
+
+Note that multiple functions can be represented in a lambda expression as well:
+
+> max = \a b-> if a > b then a else b   -- equivalent to above definition
+
+currying
+  ~ The process of converting from a function taking a tuple to a chain of functions
+    that take one argument at a time is called *currying*.
+
+A curry function is a higher-order function that performs this operation:
+ 
+> curry2 f = \a b-> f(a, b)
+
+The function |curry2| converts a function |f| that takes a pair to a new function that
+takes one argument and returns a function that takes the second argument. %Mult27
+A function that takes a 3-tuple and converts it to curryied form can also be defined:
+
+> curry3 f = \a b c-> f(a, b, c)
+
+In Haskell it is not possible to take a arbitrary length tuple and curry it.
+It is possible to write |uncurry| functions that perform that opposite transformation,
+from a function with multiple arguments to a function with a single tuple argument:
+
+> uncurry2 f = \(a, b)   -> f a b
+> uncurry3 f = \(a, b, c)-> f a b c
+
+uncurrying
+  ~ The process of converting from a chain of functions
+    that take one argument at a time into a function that takes a single tuple argument
+    is called *uncurrying*.
+
 
 
  ### Church Encodings
@@ -2481,6 +3074,11 @@ This code is not necessarily more readable, but it is concise.
 In effect a Church boolean *is* an |if| expression: it is a
 function that chooses one of two alternatives. %Bool17
 
+Church Boolean
+  ~ A *Church Boolean* is a encoding of a boolean value as a function of two
+    arguments, which returns the first argument for true, and the second 
+    argument for false.
+  
  #### Natural Numbers
 
 Natural numbers can also be represented functionally. The Church encoding
@@ -2612,8 +3210,12 @@ by returning functions from functions.  %Eval58
 
 Evaluation of first-class functions (lambdas) is
 complicated by the need to properly enforce *lexical scoping*
-rules. Lexical scope means that a variable refers to the
-closest enclosing definition of that variable.
+rules. 
+
+lexical scope 
+  ~ *Lexical scope* means that a variable refers to the
+     closest enclosing definition of that variable.
+
 TODO: move this discussion earlier!   %Eval9
 
 \StartIncorrect
@@ -2856,9 +3458,12 @@ function expression as a value is that the bindings of the free variables
 in the function expression are either lost or may be overwritten.
 The solution is to *preserve the bindings that existed at the
 point when the function was defined*. The mechanism for doing
-this is called a *closure*. A closure is a combination of a
-function expression and an environment. Rather than think of
-a function expression as a function value, instead think of it
+this is called a *closure*. 
+
+closure
+  ~ A closure is a combination of a function expression and an environment. 
+  
+Rather than think of a function expression as a function value, instead think of it
 as a part of the program that *creates* a function. The actual
 function value is represented by a closure, which captures the
 current environment at the point when the function expression is
@@ -3023,7 +3628,7 @@ INCLUDE:Exam6
 INCLUDE:Exam7
 > testE7 = let m = 2 in
 >   let proc = \n -> m + n
->       part = \(g,n) -> \m -> n * g(m)
+>       part = \(g, n) -> \m -> n * g(m)
 >   in let inc = part(proc, 3) in
 >       inc 7
 > -- %Exam7
@@ -3090,8 +3695,11 @@ A test case can be found in the [First Class Functions Test](./code/FirstClassFu
 
 One consequence of using a simple |var| expression to define functions
 is that it is no longer possible to define *recursive functions*, which
-were supported in the [Section on Top-Level Functions](#TopLevel). A recursive
-function is a function that calls itself within its own definition.
+were supported in the [Section on Top-Level Functions](#TopLevel). 
+
+recursive function
+  ~ A recursive function is a function that calls itself within its own definition.
+
 For example, consider this definition of the factorial function: %Recu2
 
 INCLUDE:Recu3
@@ -3169,8 +3777,13 @@ and subtract conditionals, to get both occurrences of |fact| onto the same
 side of the equation. We are going to have to take another approach. %Sema12
 
 The first thing to notice is that |fact| is a function, and like most functions
-it is an *infinite* structure. This
-makes sense in several ways. It is infinite in the sense that it defines
+it is an *infinite* structure. 
+
+infinite structure
+  ~ An *infinite structure* is a structure that is conceptually infinite,
+    but cannot be represented explicitly in its entirety.
+
+This makes sense in several ways. It is infinite in the sense that it defines
 the factorial for every natural number, and there is an infinity of natural numbers.
 If you consider the grade-school definition of
 a function as a set of pairs, then the set of pairs in the factorial function is
@@ -3414,8 +4027,12 @@ TODO: examples here  %Recu21
  ## Understanding Recursion with Fixed Points
 
 Another way to explain recursion is by using the mathematical
-concept of a fixed point. A *fixed point* of a function $f$
-if a value $x$ where $x = f(x)$. If you think of a function as
+concept of a fixed point. 
+
+fixed point
+  ~ A *fixed point* of a function $f$ is a value $x$ where $x = f(x)$. 
+
+If you think of a function as
 a transformation on values, then fixed points are values that
 are unchanged by the function. For example, if the function
 represents a rotation (imagine simple rotation of a book on a table)
@@ -3471,6 +4088,11 @@ $g(x) = 10 - x$ %Fixe8
 
 Functions created in this way are called *generators* for
 recursive equations.
+
+generator
+  ~ A function that is passed as an argument to the fixed-point function,
+    with the intent of creating an infinite value.
+
 Given the generator $g$, the original equation can be rewritten as: %Fixe9
 
 $x = g(x)$ %Fixe10
@@ -3598,13 +4220,13 @@ INCLUDE:Fixe30
 The function |g_twos| is a non-recursive function that adds a 2 to the front
 of a list. Here are some test cases for applying |g_twos| to various lists:  %Fixe31
 
-input                   output            input = output
-------------------      ------------      ----------------
-|[]|                    |[2]|             no
-|[1]|                   |[2,1]|           no
-|[3,4,5]|               |[2,3,4,5]|       no
-|[2,2,2,2,2]|           |[2,2,2,2,2,2]|   no
-|[2,2,2,...]|           |[2,2,2,...]|     *yes*  %Fixe32
+input                   output                input = output
+------------------      ------------          ----------------
+|[]|                    |[2]|                 no
+|[1]|                   |[2, 1]|              no
+|[3, 4, 5]|             |[2, 3, 4, 5]|        no
+|[2, 2, 2, 2, 2]|       |[2, 2, 2, 2, 2, 2]|  no
+|[2, 2, 2, ...]|        |[2, 2, 2, ...]|      *yes*  %Fixe32
 
 The function |g_twos| can be applied to any list. If it is applied to
 any finite list, then the input and output lists cannot be the same
@@ -3614,7 +4236,7 @@ an infinite list is still an infinite list. Adding a 2 onto the front
 of an infinite list of 2s will return an infinite list of 2s. Thus
 an infinite list of 2s is a fixed point of |g_twos|.  %Fixe34
 
-> fix(g_twos)  ==>  [2,2,2,...]
+> fix(g_twos)  ==>  [2, 2, 2, ...]
 > -- %Fixe23
 
 Functions used in this way are called generators because they
@@ -3624,7 +4246,7 @@ structure, and then the |fix| function repeats that step over
 and over until the full infinite structure is created. Consider
 what happens when the output of the function is applied to the
 input of the previous iteration. The results are
-|[]|, |[2]|, |[2,2]|, |[2,2,2]|, |[2,2,2,2]|, ...
+|[]|, |[2]|, |[2, 2]|, |[2, 2, 2]|, |[2, 2, 2, 2]|, ...
 At each step the result is a better approximation of the final
 solution.  %Fixe35
 
@@ -3640,31 +4262,31 @@ list and then puts a |0| on the front of the list.  %Fixe38
 
 Here are the result when applied to the same test cases listed above:  %Fixe39
 
-input                   output            input = output
-------------------      ------------      ----------------
-|[]|                    |[0]|             no
-|[1]|                   |[0,2]|           no
-|[3,4,5]|               |[0,4,5,6]|       no
-|[2,2,2,2,2]|           |[0,3,3,3,3,3]|   no
-|[2,2,2,...]|           |[0,3,3,3,...]|   no  %Fixe40
+input                   output                input = output
+------------------      ------------          ----------------
+|[]|                    |[0]|                 no
+|[1]|                   |[0, 2]|              no
+|[3, 4, 5]|             |[0, 4, 5, 6]|        no
+|[2, 2, 2, 2, 2]|       |[0, 3, 3, 3, 3, 3]|  no
+|[2, 2, 2, ...]|        |[0, 3, 3, 3, ...]|   no  %Fixe40
 
 A more interesting set of test cases involves starting with the empty
-list, then using each function result as the next test case:  %Fixe41
+list,  then using each function result as the next test case:  %Fixe41
 
-input                   output                 input = output
-------------------      ------------           ----------------
-|[]|                    |[0]|                  no
-|[0]|                   |[0,1]|                no
-|[0,1]|                 |[0,1,2]|              no
-|[0,1,2]|               |[0,1,2,3]|            no
-|[0,1,2,3]|             |[0,1,2,3,4]|          no
-|[0,1,2,3,4]|           |[0,1,2,3,4,5]|        no
-|[0,1,2,3,4,5,...]|     |[0,1,2,3,4,5,6,...]|  *yes*  %Fixe42
+input                     output                         input = output
+------------------        ------------                   ----------------
+|[]|                      |[0]|                          no
+|[0]|                     |[0, 1]|                       no
+|[0, 1]|                  |[0, 1, 2]|                    no
+|[0, 1, 2]|               |[0, 1, 2, 3]|                 no
+|[0, 1, 2, 3]|            |[0, 1, 2, 3, 4]|              no
+|[0, 1, 2, 3, 4]|         |[0, 1, 2, 3, 4, 5]|           no
+|[0, 1, 2, 3, 4, 5, ...]| |[0, 1, 2, 3, 4, 5, 6, ...]|   *yes*  %Fixe42
 
 The only list that is unchanged after applying |g_numbers|
 is the list of natural numbers:  %Fixe43
 
-> fix(g_numbers)  ==>  [0,1,2,3,4,5,...]
+> fix(g_numbers)  ==>  [0, 1, 2, 3, 4, 5, ...]
 > -- %Fixe33
 
 By staring with the empty list and then applying |g_numbers| repeatedly,
@@ -3709,7 +4331,10 @@ use its argument.  %A59
  ### A Non-Recursive Definition of |fix|
 
 It is also possible to define |fix| non-recursively, by using *self application*.
-Self application is when a function is applied to itself.
+
+self application
+  ~ Self application is when a function is applied to itself.
+
 This works because functions are values, so a function can be
 passed as an argument to itself. For example, consider the identity
 function, which simply returns its argument:  %A60
@@ -3793,7 +4418,12 @@ the definition of |stamp| expanded.  %A77
 
 A second problem with this definition of |fix| is that it
 *diverges*, or creates an infinite loop, when executed
-in non-lazy languages. Thus it cannot be used in Haskell
+in non-lazy languages. 
+
+diverge
+  ~ A function diverges if it doesn't return a value
+
+Thus it cannot be used in Haskell
 because of self-application, and it cannot be used in
 most other languages because of strict evaluation. A
 non-strict version can be defined:  %A78
@@ -4071,10 +4701,14 @@ can have multiple bindings, and functions can have multiple arguments. %Exer1
  ## Mutable State
 
 A second common pervasive computational strategy, besides
-error handling, is the use of *mutable state*. Mutable state
-means means that the state of a program changes or mutates:
-that a variable can be assigned a new value or a part of a
-data structure can be modified. Mutable state is a pervasive
+error handling, is the use of *mutable state*. 
+
+mutable state
+  ~ Mutable state means means that the state of a program changes or mutates:
+    that a variable can be assigned a new value or a part of a
+    data structure can be modified. 
+    
+Mutable state is a pervasive
 feature because it is something that happens in addition to
 the normal computation of a value or result from a function. %Muta2
 
@@ -4137,10 +4771,14 @@ To rectify this situation, at the cost of being somewhat unconventional,
 this book takes a different approach to mutable state, where mutability must
 be explicitly declared. Variables are not mutable by default. Instead
 a new kind of value, an *address*, is introduced to support mutation.
-An address identifies a mutable container that stores a single value,
-but whose contents can change over time. The storage identified by an
+
+address
+  ~ An address identifies a mutable container that stores a single value,
+    but whose contents can change over time. Addresses are sometimes called *locations*.
+
+The storage identified by an
 address is sometimes called a *cell*. You can think of it as a *box*
-that contains a value.  Addresses are sometimes called *locations*.
+that contains a value.  
 (Note that the concept of an address of a mutable container is also used in
 ML and BLISS for mutable values, where they are known as |ref| values. This is
 also closely related to the concept of an address of a memory cell, as it appears
@@ -4154,7 +4792,7 @@ The following table gives the concrete syntax of these operations. %Addr4
 Operation        Meaning
 ---------------- -----------------------
 |mutable e|      Creates a mutable cell with initial value given by |e|
-|@a|             Accesses the contents stored at address |a|
+|@@a|             Accesses the contents stored at address |a|
 |a = e|          Updates the contents at address |a| to be value of expression |e| %Addr5
 
 Using these operations, the factorial program given above can be expressed
@@ -4170,7 +4808,13 @@ for (i = mutable 2; @i <= 5; i = @i + 1) {
 
 In this model a variable always denotes the address to which it is bound.
 If the variable |x| appears on the right side of an assignment, it must be *dereferenced*
-as |@x|. If the variable appears on the left side of an assignment, it
+as |@@x|. 
+
+dereferencing
+  ~ A address is *dereferenced* when the contents of the box associated with 
+    the address is looked up and returned.
+
+If the variable appears on the left side of an assignment, it
 denotes an address that is updated. %Addr8
 
 It should be clear that the *variables* don't actually change in this model.
@@ -4210,8 +4854,12 @@ are expressed. %Addr13
  #### Memory
 
 The current value of all mutable cells used in a program is called
-*memory*. Logically, a memory is a map or association of
-addresses to values. The same techniques used for environments could
+*memory*. 
+
+memory
+  ~ memory is a map or association of addresses to values. 
+  
+The same techniques used for environments could
 be used for memories, as a list of pairs or a function.
 Memory can also be represented as a function mapping integers
 to values, similar to the [representation of environments as functions](#EnvAsFun).
@@ -4261,14 +4909,14 @@ Step                    Memory
 *start*                 $[]$
 |x = mutable 1;|        $[1]$
 |i = mutable 2;|        $[1, 2]$
-|x = @x * @i;|          $[2, 2]$
-|i = @i + 1;|           $[2, 3]$
-|x = @x * @i;|          $[6, 3]$
-|i = @i + 1;|           $[6, 4]$
-|x = @x * @i;|          $[24, 4]$
-|i = @i + 1;|           $[24, 5]$
-|x = @x * @i;|          $[120, 5]$
-|i = @i + 1;|           $[120, 6]$ %Memo1
+|x = @@x * @@i;|          $[2, 2]$
+|i = @@i + 1;|           $[2, 3]$
+|x = @@x * @@i;|          $[6, 3]$
+|i = @@i + 1;|           $[6, 4]$
+|x = @@x * @@i;|          $[24, 4]$
+|i = @@i + 1;|           $[24, 5]$
+|x = @@x * @@i;|          $[120, 5]$
+|i = @@i + 1;|           $[120, 6]$ %Memo1
 
  ### Pure Functional Operations on Memory
 
@@ -4386,7 +5034,13 @@ INCLUDE:Stat8
 > -- %Stat8
 
 This is a *generic* type for a memory-based computation which returns
-a value of type |t|. Just as in the case of errors, it is useful to
+a value of type |t|. 
+
+stateful computation
+  ~ A stateful computation is represented functionally as a function
+    that takes an initial state and returns a value and an updated state.
+    
+Just as in the case of errors, it is useful to
 give a visual form to the shape of a stateful computation: %Stat9
 
 ![Shape of a stateful computation.](figures/StatefulShape.eps) %Err11
@@ -4410,7 +5064,7 @@ table defines the abstract syntax: %Sema15
 Operation        Abstract Syntax    Meaning
 ---------------- ------------------ -----------------------
 |mutable e|      |Mutable e|        Allocate memory
-|@a|             |Access a|         Accesses memory
+|@@a|             |Access a|         Accesses memory
 |a = e|          |Assign a e|       Updates memory %Sema16
 
 The abstract syntax is added to the data type representing expressions in
@@ -4434,7 +5088,7 @@ INCLUDE:Sema20
 >     (AddressV (length mem'), mem' ++ [ev])
 > -- %Sema20
 
-The access expression |@a| expression evaluates the address
+The access expression |@@a| evaluates the address
 expression |a| to get an address, then returns the contents of
 the memory at that address. Note that if the |Address i| pattern fails, Haskell
 raises an error. This is another case where error handling, as in the previous
@@ -4702,9 +5356,9 @@ Using these operators, the *original* code can be written in simpler form: %Abst
 
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ ----------------------
-(|evaluate a env|) $\rhd_C$ ($\lambda$|va.| 								(|evaluate a env|) $\rhd_S$ ($\lambda$|va.|
+(|evaluate a env|) $\rhd_C$ ($\lambda$|va.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|va.|
 \ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|vb.|               \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|vb.|
-\ \ \ \ |checked_binary op av bv|))                          \ \ \ \ $\lambda$|mem.(Binary op av bv, mem)|))
+\ \ \ \ |checked_binary op av bv|))                           \ \ \ \ $\lambda$|mem.(Binary op av bv, mem)|))
 
 All mention of |Error| and |Good| have been removed from the Checked version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
@@ -4713,7 +5367,7 @@ that has emerged is the same one that was identified in the previous section, wh
 the |return|$_S$ function converts a value (the result of |Binary op av bv|) into
 a default stateful computation. To see how this works, consider that %Abst29
 
-|return|$_S$ (|Binary op av bv|)\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|mem. (Binary op av bv, mem)| %Abst30
+|return|$_S$ x\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|mem. (x, mem)| %Abst30
 
 Using |return|$_S$ the result is: %Abst31
 
@@ -4721,7 +5375,7 @@ Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ ----------------------
 (|evaluate a env|) $\rhd_C$ ($\lambda$|va.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|va.|
 \ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|vb.|               \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|vb.|
-\ \ \ \ |checked_binary op av bv|))														\ \ \ \ |return|$_S$ (|Binary op av bv|)))
+\ \ \ \ |checked_binary op av bv|))                            \ \ \ \ |return|$_S$ (|Binary op av bv|)))
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
 rules for |Mutable|, assignment, and access there will be explicit references to memory.
@@ -4733,12 +5387,9 @@ has been hidden in two new operators, |return| and bind $\rhd$.
 The type of the bind operators is also interesting: %Abst33
 
 Checked: %Abst43
-
-:     $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
-
+  ~ $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
 Stateful: %Abst45
-
-:     $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
+  ~ $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
 
 It should be clear that an consistent pattern has emerged. This is a *very* abstract
 pattern, which has to do with the structure of the underlying computation: is it a
@@ -4746,12 +5397,13 @@ checked computation or a stateful computation? Other forms of computation are al
 possible. %Abst35
 
  ### Monads Defined
+monad
 
-A *monad* $m$ is a computational structure that involves three parts: %Mona3
+:   A *monad* $m$ is a computational structure that involves three parts: %Mona3
 
-* A generic data type $m$ %Mona4
-* A *return* function |return|$_m :: t \rightarrow m\ t$ %Mona5
-* A *bind* function $\rhd_m :: m\ t \rightarrow (t \rightarrow m\ s) \rightarrow m\ s$ %Mona6
+    * A generic data type $m$ %Mona4
+    * A *return* function |return|$_m :: t \rightarrow m\ t$ %Mona5
+    * A *bind* function $\rhd_m :: m\ t \rightarrow (t \rightarrow m\ s) \rightarrow m\ s$ %Mona6
 
 The symbol $m$ gives the name of the monad and also defines the *shape* of the computation.
 A program that uses the monad $m$ is called an $m$-computation.
@@ -4764,14 +5416,18 @@ implies that it might produce an error rather than an integer. As another exampl
 The fact that it is a "stateful computation" implies that there is a memory which is required
 as input to the computation, and that it produces an updated memory in addition to the string result. %Mona7
 
-The |return|$_m$ function specifies how values are converted into $m$-computations. The
-|return|$_m$ function has type $t \rightarrow m\ t$ for any type $t$. What this means is that it
+return
+  ~ The |return|$_m$ function specifies how values are converted into $m$-computations. 
+
+The |return|$_m$ function has type $t \rightarrow m\ t$ for any type $t$. What this means is that it
 converts a value of type $t$ into an $m$-computation that just returns the value. It is
 important that the computation *just* returns the value, so, for example, it is not legal for
 the stateful return function to modify memory. Examples of return were given in the previous section. %Mona8
 
-The *bind* function $\rhd_m$ specifies how $m$-computations are combined together. In general
-the behavior of $A \rhd_m F$ is to perform the $m$-computation $A$ and then pass the value
+bind
+  ~ The *bind* function $\rhd_m$ specifies how $m$-computations are combined together. 
+
+In general the behavior of $A \rhd_m F$ is to perform the $m$-computation $A$ and then pass the value
 it produces to the function $F$ to create a second $m$-computation, which is returned as the
 result of the bind operation.
 Note that the $A$ may not produce a value, in which case $F$ is not
@@ -4796,8 +5452,12 @@ that makes them easy to use. %Mona12
 
  ### The Monad Type Class
 
-Haskell allow monads to be defined very cleanly using *type classes*. The |Monad| class
-has the following definition: %Monad1
+Haskell allow monads to be defined very cleanly using *type classes*. 
+
+type class
+  ~ A type class is a Haskell mechanism for overloading functios based on their type.
+  
+The |Monad| class has the following definition: %Monad1
 
 > class Monad m where
 >   (>>=) :: m t -> (t -> m s) -> m s
@@ -4861,7 +5521,7 @@ Here is the basic pattern for |do| notation: %Hask6
 
 This is equivalent to this form, using bind: %Hask8
 
-|e1 >>= |($\lambda$|x.e2)| %Hask9
+|e1 >>= | ($\lambda$|x.e2)| %Hask9
 
 The expressions |e1| and |e2| must be expressions that produce
 values in the same monad |m|. To be precise, if |e1| has type |m| $t_1$
@@ -5055,10 +5715,21 @@ such as: %Abst6
 we cannot be more precise about the result of this particular program:
 the expression 3+5 evaluates only to the (concrete) number 8. The
 evaluate function implements what is called a *concrete interpreter*. %Abst15
-
 However it is possible to write interpreters that return *abstract
 values*. Those interpreters, called abstract interpreters, return some
 abstraction of the result of executing a program. %Abst16
+
+abstract value
+  ~ An abstract value is a value that represents a collection of concrete values.
+concrete interpreter
+  ~ A *concrete interpreter* is a normal interpreter that evaluates
+    with normal values.
+abstract interpreter
+  ~ A *abstract interpreter* is an interpreter that operates over
+    abstact values using abstract operations. 
+validity
+  ~ An abstract interpreter is *valid* if the concrete value result is a member
+    of the set of values of the abstact value evaluation result, for all evaluations. 
 
 The most common and familiar example of abstract interpretation is
 *type-checking* or *type-inference*. A type-checker analyses a program in
@@ -5137,7 +5808,7 @@ should fail to type-check because addition (+) is an operation that expects two 
 
 Type environments In a language with variables a type-checker needs to track the types of variables. To do this we can use what is called a type environment. %A88
 
-> type TEnv = [(String,Type)]
+> type TEnv = [(String, Type)]
 > -- %A89
 
 A type environment plays a similar role to the environment in a regular interpreter: it is used to track the types of variables during the type-checking process of an expression. %A90
@@ -5174,7 +5845,7 @@ we proceed as follows: %A102
 
 1) type-check the expression |e|
 2) if |e| has a valid type then type-check the body expression with an type-environment extended with |x --> typeof e|;
-		otherwise fail with a type-error. %A103
+    otherwise fail with a type-error. %A103
 
 For expressions with unbound variables: for example: %A104
 
@@ -5186,7 +5857,7 @@ you should throw an error. In other words the type-checker works only for valid 
 Typing |If| Expressions. The only slightly tricky expression to type-check is an if expression.
  The type-checking rule for an if expressions of the form: %A107
 
-> if (e1) e2; else e3
+> if (e1) e2 else e3
 > -- %A108
 
 is %A109

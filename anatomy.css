@@ -1,0 +1,8 @@
+
+dl {
+	border-left: 10px blue solid;
+	padding-left: 5px;
+}
+
+dt { font-weight: bold }
+dd { }

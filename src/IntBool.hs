@@ -48,7 +48,7 @@ showExp level (Declare x a b) =
     where result = "var " ++ x ++ " = " ++ showExp 0 a ++ "; " ++ showExp 0 b
 showExp level (If a b c)    = 
   if level > 0 then paren result else result
-    where result = "if (" ++ showExp 0 a ++ ") " ++ showExp 0 b ++ "; else " ++ showExp 0 c
+    where result = "if (" ++ showExp 0 a ++ ") " ++ showExp 0 b ++ " else " ++ showExp 0 c
 showExp level (Unary Neg a)    = "-" ++ showExp 99 a
 showExp level (Unary Not a)    = "!" ++ showExp 99 a
 showExp level (Binary op a b)  = showBinary level (fromJust (lookup op levels)) a (fromJust (lookup op names)) b

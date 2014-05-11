@@ -55,7 +55,7 @@ ids : ids ',' id     { $1 ++ [$3] }
  -- all the rest is the same as IntBool.y
  
 Exp : var id '=' Exp ';' Exp           { Declare $2 $4 $6 }
-    | if '(' Exp ')' Exp ';' else Exp  { If $3 $5 $8 }
+    | if '(' Exp ')' Exp else Exp  { If $3 $5 $7 }
     | Or                               { $1 }
 
 Or   : Or '||' And        { Binary Or $1 $3 }
