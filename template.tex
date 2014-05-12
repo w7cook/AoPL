@@ -102,9 +102,14 @@ $endif$
 \usepackage[framemethod=tikz]{mdframed}
 \definecolor{usethiscolorhere}{rgb}{0.86666,0.78431,0.78431}
 
-\surroundwithmdframed[backgroundcolor=usethiscolorhere,
-          roundcorner=10pt,
+\mdfsetup{skipabove=0,skipbelow=0}
+\surroundwithmdframed[
           linecolor=blue,
+          middlelinewidth=1em,
+          topline=false,
+          bottomline=false,
+          rightline=false,
+          innertopmargin=0
           ]{description}
 %\usepackage[usenames,dvipsnames]{xcolor}
 

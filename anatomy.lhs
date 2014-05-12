@@ -1164,9 +1164,8 @@ the idea of variables having a fixed binding, but introduce the concept
 of a *mutable container* that can change over time. The
 variable will then be bound to the container. The variable's binding will
 not change (it will remain bound to the same container), but the contents
-of the container will change.  %Vari6
-
-Mutable variables are discussed in detail later (TODO: reference).
+of the container will change.
+Mutable variables are discussed in the [Section on Mutable State](#Mutable) later in this book.
 For now, just remember that a variable has a fixed binding to a value
 in a given context.  %Vari7
 
@@ -1174,7 +1173,7 @@ Note that another common use for variables is to define *equations* or
 *constraints*. In this case, it is normal to use algebraic operations to
 simplify or *solve* the equation to find a value for the variable that
 satisfies the equation. While equation solving and constraints are fascinating topics,
-we will not discuss them directly in these notes. For our purposes, we will
+we will not discuss them directly here. For our purposes, we will
 assume that we already know the value of the variable, and that the problem
 is to compute a result using that value.  %Vari8
 
@@ -4698,19 +4697,19 @@ If you really want to experience how messy it is to explicitly program
 error handling, implement error checking where |var| expressions
 can have multiple bindings, and functions can have multiple arguments. %Exer1
 
- ## Mutable State
+ ## Mutable State {#Mutable}
 
 A second common pervasive computational strategy, besides
 error handling, is the use of *mutable state*. 
 
 mutable state
-  ~ Mutable state means means that the state of a program changes or mutates:
+  ~ Mutable state means that the state of a program changes or mutates:
     that a variable can be assigned a new value or a part of a
     data structure can be modified. 
-    
+
 Mutable state is a pervasive
 feature because it is something that happens in addition to
-the normal computation of a value or result from a function. %Muta2
+the normal computation of a value. %Muta2
 
 Here is one typical example of a program that uses mutable variables.
 The code is valid in C, Java or JavaScript: %Muta3
@@ -4792,7 +4791,7 @@ The following table gives the concrete syntax of these operations. %Addr4
 Operation        Meaning
 ---------------- -----------------------
 |mutable e|      Creates a mutable cell with initial value given by |e|
-|@@a|             Accesses the contents stored at address |a|
+|@@e|            Accesses the contents stored at address |e|
 |a = e|          Updates the contents at address |a| to be value of expression |e| %Addr5
 
 Using these operations, the factorial program given above can be expressed
@@ -4872,8 +4871,7 @@ the position or index of the value.
 Such an array is directly analogous
 to the memory of a computer system, which can be thought of as
 an array of 8 bit values. In this chapter memory will be implemented
-as a list of values, although many other representations are certainly
-possible. %Memo3
+as a list of values: %Memo3
 
 INCLUDE:Memo4
 > type Memory = [Value]
@@ -4909,14 +4907,14 @@ Step                    Memory
 *start*                 $[]$
 |x = mutable 1;|        $[1]$
 |i = mutable 2;|        $[1, 2]$
-|x = @@x * @@i;|          $[2, 2]$
-|i = @@i + 1;|           $[2, 3]$
-|x = @@x * @@i;|          $[6, 3]$
-|i = @@i + 1;|           $[6, 4]$
-|x = @@x * @@i;|          $[24, 4]$
-|i = @@i + 1;|           $[24, 5]$
-|x = @@x * @@i;|          $[120, 5]$
-|i = @@i + 1;|           $[120, 6]$ %Memo1
+|x = @@x * @@i;|        $[2, 2]$
+|i = @@i + 1;|          $[2, 3]$
+|x = @@x * @@i;|        $[6, 3]$
+|i = @@i + 1;|          $[6, 4]$
+|x = @@x * @@i;|        $[24, 4]$
+|i = @@i + 1;|          $[24, 5]$
+|x = @@x * @@i;|        $[120, 5]$
+|i = @@i + 1;|          $[120, 6]$ %Memo1
 
  ### Pure Functional Operations on Memory
 
@@ -5064,7 +5062,7 @@ table defines the abstract syntax: %Sema15
 Operation        Abstract Syntax    Meaning
 ---------------- ------------------ -----------------------
 |mutable e|      |Mutable e|        Allocate memory
-|@@a|             |Access a|         Accesses memory
+|@@a|            |Access a|         Accesses memory
 |a = e|          |Assign a e|       Updates memory %Sema16
 
 The abstract syntax is added to the data type representing expressions in
