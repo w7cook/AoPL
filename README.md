@@ -47,7 +47,7 @@ feature.
 I believe Haskell is particularly well suited to writing interpreters. But one
 must be careful to read Haskell code as one would read poetry, not the way one
 would read a romance novel. Ponder each line and extract its deep meaning. Don’t
-skim unless you are pretty sure what you are doing. comment
+skim unless you are pretty sure what you are doing.
 
 The title of this book is derived from one of my favorite books, The Anatomy of
 Lisp (Allen 1978).
