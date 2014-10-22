@@ -1,10 +1,9 @@
 {
-module IncorrectFunctionsParse where
+module Assignment2Parse where
 import Prelude hiding (LT, GT, EQ, id)
 import Data.Char
-import IncorrectFunctions
+import Assignment2
 import Lexer
-import Operators
 }
 
 %name parser
@@ -18,6 +17,7 @@ import Operators
     false { TokenKeyword "false" }
     var   { TokenKeyword "var" }
     ';'   { Symbol ";" }
+    ','   { Symbol "," }
     id    { TokenIdent $$ }
     digits { Digits $$ }
     '='    { Symbol "=" }
@@ -39,12 +39,19 @@ import Operators
     '}'    { Symbol "}" }
 
 %%
-
-Exp : function '(' id ')' '{' Exp '}'  { Literal (Function $3 $6) }
-    | var id '=' Exp ';' Exp           { Declare $2 $4 $6 }
+       
+Exp : function '(' Patterns ')' '{' Exp '}'  { Function (TupleP $3) $6 }
+    | var Pattern '=' Exp ';' Exp           { Declare $2 $4 $6 }
     | if '(' Exp ')' Exp else Exp  { If $3 $5 $7 }
     | Or                               { $1 }
 
+Pattern :  id							{ VarP $1 }
+			  |  '(' Pattern ')' { $2 }
+			  |  '(' Patterns ')' { TupleP $2 }
+			  
+Patterns : Pattern				{ [$1] }
+         | Patterns ',' Pattern  { $1 ++ [$3] }
+  
 Or   : Or '||' And        { Binary Or $1 $3 }
      | And                { $1 }
 
@@ -66,7 +73,7 @@ Factor : Factor '*' Primary    { Binary Mul $1 $3 }
        | Factor '/' Primary    { Binary Div $1 $3 }
        | Primary               { $1 }
 
-Primary : Primary '(' Exp ')' { Call $1 $3 }
+Primary : Primary '(' Exps ')' { Call $1 (Tuple $3) }
         | digits         { Literal (IntV $1) }
         | true           { Literal (BoolV True) }
         | false          { Literal (BoolV False) }
@@ -74,10 +81,14 @@ Primary : Primary '(' Exp ')' { Call $1 $3 }
         | '!' Primary    { Unary Not $2 }
         | id             { Variable $1 }
         | '(' Exp ')'    { $2 }
+        | '(' Exps ')'    { Tuple $2 }
+ 
+Exps : Exp  { [$1] }
+     | Exps ',' Exp { $1 ++ [$3] }
 
 {
 
-symbols = ["+", "-", "*", "/", "(", ")", "{", "}", ";", "==", "=", "<=", ">=", "<", ">", "||", "&&", "!"]
+symbols = ["+", "-", "*", "/", "(", ")", "{", "}", ";", ",", "==", "=", "<=", ">=", "<", ">", "||", "&&", "!"]
 keywords = ["function", "var", "if", "else", "true", "false"]
 parseExp str = parser (lexer symbols keywords str)
 

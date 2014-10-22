@@ -2,6 +2,7 @@ module ErrorChecking where
 
 import Prelude hiding (LT, GT, EQ, id)
 import FirstClassFunctions hiding (evaluate)
+import Operators
 
 --BEGIN:Hand5
 data Checked a = Good a | Error String

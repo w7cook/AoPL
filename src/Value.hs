@@ -1,5 +1,6 @@
 module Value where
 import Prelude hiding (LT, GT, EQ, id)
+import Operators 
 
 --BEGIN:More3
 data Value  =  IntV  Int
@@ -27,16 +28,6 @@ binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
 binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
 binary EQ  a         b         = BoolV (a == b)
 --END:More16
-
---BEGIN:UnBinOps
-data BinaryOp = Add | Sub | Mul | Div | And | Or
-              | GT | LT | LE | GE | EQ
-  deriving (Show, Eq)
-
-data UnaryOp = Neg | Not
-  deriving (Show, Eq)
---END:UnBinOps
-
 
 instance Show Value where
   show (IntV n) = show n

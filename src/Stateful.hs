@@ -3,6 +3,7 @@ module Stateful where
 import Prelude hiding (LT, GT, EQ, id)
 import Base
 import Data.Maybe
+import Operators
 
 --BEGIN:Addr11
 data Value = IntV  Int
@@ -115,12 +116,6 @@ execute exp = v
   where (v, _) = evaluate exp [] []
   
 -- same as in IntBool.hs
-data BinaryOp = Add | Sub | Mul | Div | And | Or
-              | GT | LT | LE | GE | EQ
-  deriving (Eq, Show)
-
-data UnaryOp = Neg | Not
-  deriving (Eq, Show)
 
 unary Not (BoolV b) = BoolV (not b)
 unary Neg (IntV i)  = IntV (-i)

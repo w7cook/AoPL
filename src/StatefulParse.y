@@ -4,6 +4,7 @@ import Prelude hiding (LT, GT, EQ, id)
 import Data.Char
 import Stateful
 import Lexer
+import Operators
 }
 
 %name parser

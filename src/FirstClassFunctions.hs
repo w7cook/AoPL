@@ -3,6 +3,7 @@ module FirstClassFunctions where
 import Prelude hiding (LT, GT, EQ, id)
 import Data.Maybe
 import Data.List
+import Operators
 
 --BEGIN:A42
 data Value = IntV  Int
@@ -86,12 +87,6 @@ paren x = "(" ++ x ++ ")"
 
  
 -- same as in IntBool.hs
-data BinaryOp = Add | Sub | Mul | Div | And | Or
-              | GT | LT | LE | GE | EQ
-  deriving (Eq, Show)
-
-data UnaryOp = Neg | Not
-  deriving (Eq, Show)
 
 unary Not (BoolV b) = BoolV (not b)
 unary Neg (IntV i)  = IntV (-i)

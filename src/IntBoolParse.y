@@ -3,6 +3,7 @@ module IntBoolParse where
 import Prelude hiding (LT, GT, EQ, id)
 import Data.Char
 import Value
+import Operators
 import IntBool
 import Lexer
 }

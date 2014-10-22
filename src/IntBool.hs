@@ -2,6 +2,7 @@ module IntBool where
 import Prelude hiding (LT, GT, EQ, id)
 import Base
 import Value
+import Operators
 import Data.Maybe
 
 --BEGIN:More99

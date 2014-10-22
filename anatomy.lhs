@@ -101,7 +101,7 @@ The concepts of structure and meaning have technical names. %Intr8
 syntax
   ~ The structure of a language is called its *syntax*.
 semantics
-  ~ The rules that defined the meaning of a language are called *semantics*. %Intr9
+  ~ The rules that define the meaning of a language are called *semantics*. %Intr9
 
 Syntax is a particular way to structure information, while
 semantics can be viewed as a mapping from syntax to its meaning, or interpretation.
@@ -134,8 +134,6 @@ machines for the tutorial. %Intr12
  ### Installing Haskell and related tools
 
 If you have your laptop and have not installed Haskell yet, you can try to install it now.
-If you have problems we can try to help you. %Inst1
-
 The Haskell platform is the easiest way to [install Haskell in Windows or Mac OS](http://www.haskell.org/platform). %Inst2
 
 In Ubuntu Linux you can use: %Inst3
@@ -282,7 +280,7 @@ has 4 integer components. One issue with this notation is that it is not clear w
 *mean*. The meaning of each component is specified in a comment. %Data3
 
 The tags are called *constructors* because they are defined to construct values of the data type.
-For example, here are that construct three geometric objects: %Data4
+For example, here are three expressions that construct three geometric objects: %Data4
 
 > Point 3 10
 > Circle 10 10 10
@@ -329,19 +327,6 @@ are always distinguished syntactically in Haskell. Here is an example person: %D
 
 A Haskell program almost always includes more than one data type definition. %Data18
 
- #### Pattern Matching Data Types
-
-Functions are defined over data types by *pattern matching*. For example, to
-compute the area of a geometric figure, one would define: %Patt1
-
-INCLUDE:GEOM2
-> area :: Geometry -> Float
-> area (Point x y)         = 0
-> area (Circle x y r)      = pi * r ^ 2
-> area (Rectangle t l r b) = (b - t) * (r - l)
-> area (Composite cs)      = sum [ area c | c <- cs ]
-> -- %GEOM2
-
 
 
  #### Parametric Polymorphism and Type-Inference
@@ -370,7 +355,7 @@ The answer is: %Para6
 > identity :: a -> a
 > -- %Para7
 
-The function ||identity|| is a (parametrically) polymorphic function. Polymorphism means that
+The function |identity| is a (parametrically) polymorphic function. Polymorphism means that
 the definition works for multiple types; and this type of polymorphism is called parametric
 because it results from abstracting/parametrizing over a type. In the type signature the a
 is a type variable (or parameter). In other words it is a variable that can be replaced by
@@ -422,6 +407,20 @@ here are two definitions with pattern matching on tuples and integers: %Patt9
 > isZero 0 = True
 > isZero n = False
 > -- %Patt11
+
+ #### Pattern Matching Data Types
+
+Functions are defined over data types by *pattern matching*. For example, to
+compute the area of a geometric figure, one would define: %Patt1
+
+INCLUDE:GEOM2
+> area :: Geometry -> Float
+> area (Point x y)         = 0
+> area (Circle x y r)      = pi * r ^ 2
+> area (Rectangle t l r b) = (b - t) * (r - l)
+> area (Composite cs)      = sum [ area c | c <- cs ]
+> -- %GEOM2
+
 
  #### Recursion
 
@@ -845,7 +844,7 @@ in the grammar: %Gram19
 > -- %Gram5
 
 This grammar is similar to the one given above for English, but each
-rule includes an *action* enclosed in curly braces |OPENB ... CLOSEB|. The
+rule includes an *action* enclosed in curly braces |{ ... }|. The
 action says what should happen when that rule is recognized.  In this
 case, the action is some Haskell code with calls to *constructors* to
 create the abstract syntax that corresponds to the concrete syntax of the rule.
@@ -1035,6 +1034,31 @@ INCLUDE:Form12
 >
 > -- %Form12
 
+
+ ### Errors
+
+There are many things that can go wrong when evaluating an expression.
+In our current, very simple language, the only error that can arise
+is attempting to divide by zero. These examples are given in the
+[Simple Examples](./code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
+
+INCLUDE:Erro3
+> testDBZ = evaluate (parseExp "8 / 0")
+> -- %Erro3
+
+In this case, the |div| operator in
+Haskell throws a low-level error, which terminates execution of
+the program and prints an error message: %Erro4
+
+    *** Exception: divide by zero
+    %Erro5
+
+As our language becomes more complex, there will be many more kinds of
+errors that can arise. For now, we will rely on Haskell to
+terminate the program when these situations arise,
+but in [Chapter 5](#Monads) we will investigate how to
+manage errors within our evaluator. %Erro6
+
  ## Object Language and Meta-Language
 
 TODO: talk about meta language: language of study versus language of implementation. Better words? %Abst10
@@ -1068,30 +1092,6 @@ of the two languages are we talking about what we mean is the object
 language. In other words, when referring to the expression |2 + 3| the
 default meaning is the object language expression |2 + 3|. %Obje2
 
-
- ### Errors
-
-There are many things that can go wrong when evaluating an expression.
-In our current, very simple language, the only error that can arise
-is attempting to divide by zero. These examples are given in the
-[Simple Examples](./code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
-
-INCLUDE:Erro3
-> testDBZ = evaluate (parseExp "8 / 0")
-> -- %Erro3
-
-In this case, the |div| operator in
-Haskell throws a low-level error, which terminates execution of
-the program and prints an error message: %Erro4
-
-    *** Exception: divide by zero
-    %Erro5
-
-As our language becomes more complex, there will be many more kinds of
-errors that can arise. For now, we will rely on Haskell to
-terminate the program when these situations arise,
-but in [Chapter 5](#Monads) we will investigate how to
-manage errors within our evaluator. %Erro6
 
  # Variables
 
@@ -1944,7 +1944,7 @@ INCLUDE:More19
 > t5 = "3 + 8 * 2"
 > -- %More19
 
-In addition, new expressions can be defined to represent conditional expressions: %More20
+In addition, new expressions can be defined to test conditional expressions: %More20
 
 INCLUDE:More98
 > t6 = "if (3 > 3*(8 + 5)) 1 else 0"
@@ -2099,7 +2099,7 @@ without return statements: %Top6
 
 These examples provides an outline for the basic concrete syntax of a function: %Top9
 
-|function| *function-name* |(| *parameter-name*, ..., *parameter-name* |)| { *body-expression* } %Top10
+|function| *function-name*|(|*parameter-name*, ..., *parameter-name*|)| { *body-expression* } %Top10
 
 The exact syntax varies from language to language. Some languages
 begin with a keyword |function| or |def|. Other languages require brackets
@@ -2111,11 +2111,13 @@ in many languages. %Top11
 
 A call to a function is an expression that has the following concrete syntax: %Top12
 
-*function-name* |(| *expression*, ..., *expression* |)| %Top13
+*function-name*|(|*expression*, ..., *expression*|)| %Top13
 
 Again, there are some variations on this theme. For example,
-in Haskell the parentheses are optional. The program has a
-series of named functions, each of which has a list of parameter
+in Haskell the parentheses are optional. 
+
+A program is a sequence of function definitions, followed by a main expression.
+Each function definition has a list of parameter
 names and a body expression. The following data type definitions
 provide a means to represent such programs: %Top14
 
@@ -2396,12 +2398,12 @@ lambda or function expression
   ~ A *lambda expression* is an expression that creates a function.
     The general form of a function expression is: %Lamb4
 
-    $\lambda$*var*. *body* %Lamb5
+    $\lambda$*variable*. *body* %Lamb5
 
-This represents a function with parameter *var* that computes a
-result defined by the *body* expression. The *var* may of course
-be used within the *body*. In other words, *var* may be
-free in *body*, but *var* is bound (not free) in $\lambda$*var*. *body*.
+This represents a function with parameter *variable* that computes a
+result defined by the *body* expression. The *variable* may of course
+be used within the *body*. In other words, *variable* may be
+free in *body*, but *variable* is bound (not free) in $\lambda$*variable*. *body*.
 A function expression is sometimes called an *abstraction* or a
 *function abstraction* (TODO: discuss this more later). %Lamb6
 
@@ -3278,10 +3280,12 @@ To clarify the effect of this change, consider these two versions
 of a simple program, written using top-level functions or
 first-class functions: %A10
 
+.
+
 Top-Level Functions (A)            \ \ \  First-Class Functions (B)
 ---------------------------------- ------ ----------------------
-|function f(x) OPENB x * x CLOSEB|        |var f = function(x) OPENB x * x CLOSEB;|
-|f(10)|                                   |f(10)| %A11
+|function f(x) { x * x }|                 |var f = function(x) { x * x };|
+|f(10)|                                       |f(10)| %A11
 
 The explicit abstract syntax for the call in example (A) is: %A12
 
@@ -3301,10 +3305,34 @@ In many cases the
 first expression (the function) will be a *variable* that
 names the function to be called. Since there is no longer any
 special function environment, the names of functions are looked
-up in the normal variable environment. (TODO: should this come
-earlier?)
-TODO: example where function to be called is not a variable. %A17
+up in the normal variable environment. 
 
+There are many examples where the function to be called is not
+a variable. For example, one could call one of two different functions
+depending on a condition. The following example calls either
+|f| or |g| depending on whether |a > b|. 
+
+> (if a > b then f else g)(4)
+
+This is similar to calling a function 
+on a conditional argument:
+
+> f(if a > b then 4 else 7)
+
+Which is equivalent to the perhaps more familiar form:
+
+> if a > b then
+>   f(4)
+> else
+>   f(7)
+
+Another example of not using a variable to name a function is
+the use of *function literals*. The following example applies a 
+function literal that squares a number to the argument 7.
+
+> (function(x) { x * x })(7)
+
+Lets now define the (incorrect) interpreter. 
 The first few cases for evaluation are exactly the same
 as before. In particular, evaluating a literal value is
 the same, except that now the literal value might be a function. %A18
@@ -3332,7 +3360,7 @@ To evaluate a function call |Call fun arg|, %A22
  3. Evaluate the actual argument (|evaluate arg env|) and then extend the environment |env|
     with a binding between the function parameter |x| and the argument value: %A23
 
-    |bindF x (evaluate arg env) env| %A38
+    |newEnv = bindF x (evaluate arg env) env| %A38
  4. Evaluate the |body| of the function in the extended environment |newEnv|: %A24
 
     |evaluate newEnv body| %A25
@@ -3371,17 +3399,6 @@ This program is encoded in our language as follows: %Prob4
 > var add = function(a) { function(b) { b + a } };
 > add(3)(2)
 > -- %Prob32
-
-Here is the abstract syntax for this program: %Prob33
-
-INCLUDE:Prob5
-> testE2 = parseExp ("var add = function(a) { function(b) { a + b } };"++
->                    "    add(3)(2)")
-> -- %Prob5
-
-Rather than work with the ugly constructor syntax in
-Haskell, we will continue to use the convention of writing
-|b + a| to mean |(Binary Add (Variable "b") (Variable "a"))|. %Prob6
 
 Here is how evaluation of this sample program proceeds: %Prob7
 
@@ -3633,6 +3650,109 @@ INCLUDE:Exam7
 > -- %Exam7
 
 ![Environment Diagram 3](figures/env3.png) %Exam4
+
+ ## Call-by-value and Call-by-name
+
+In languages with declarations, functions or first-class functions there are a few 
+different design options when it comes to evaluation. 
+
+ ### Call-by-value
+
+So far all our interpreters have explored one particular design option, called call-by-value. 
+
+call-by-value
+  ~ In *call-by-value* interpretation, expressions, such as parameters of functions arguments or variable initialisers, 
+    are always evaluated before being added to the environment. 
+    
+Here is the code of evaluation for declarations and function application:
+
+> evaluate (Declare x exp body) env = 
+>    case evaluate exp env of 
+>       VException -> VException
+>       v          -> evaluate body ((x,v) : env)
+
+> evaluate (Call fun arg) env = 
+>   case evaluate arg env of
+>      VException -> VException
+>      v -> case evaluate fun env of 
+>             ClosureV name body denv -> evaluate body ((name,v) : denv) 
+
+In the case of |Declare| expressions,  expression |exp| is evaluated before evaluating the 
+body of the declaration. In the case of |Call| expressions the argument |arg| is evaluated before 
+evaluating the function and function |body|. Note also that we need to be a bit more careful 
+in the presence of exception values to ensure that exceptional values propagate. 
+
+Call-by-value is the most common design option for function calls in programming languages. 
+All major programming languages (including C, Java or C#) use call-by-value. 
+Note that some programming languages also support other function call mechanisms. 
+For example, C also supports call-by-reference. 
+
+Drawbacks of call-by-value: Call-by-value can waste resources when evaluating expressions 
+in some cases. For example, consider the following expressions:
+
+> var x = longcomputation; 3
+
+> (\x -> 3) longcomputation 
+
+In the two expressions the idea is that |longcomputation| stands for an expression that 
+takes a long time to compute. In both cases the returned value will be 3 and the final 
+result does not depend on the value that is computed by |longcomputation|. So, in this case, 
+it seems wasteful to spend time computing |longcomputation|. 
+
+ ### Call-by-Name
+
+A different design option is to use call-by-name. 
+
+call-by-name 
+  ~ In call-by-name an expression is not evaluated until it is needed. 
+  
+So, in the programs:
+
+> var x = longcomputation; 3
+
+> (\x -> 3) longcomputation 
+
+the expression |longcomputation| is never evaluated and therefore evaluating such expressions is very fast. 
+
+Haskell is one of the few languages where (a variant of) call-by-name is the default mechanism 
+for evaluating function applications. 
+
+Drawbacks of call-by-name: While for the program above there seems to benefit from using call-by-name, 
+there are also programs where call-by-name is worst than call-by-value. For example:
+
+> var x = longcomputation; x + x
+
+> (\x -> x + x) longcomputation
+
+In both programs a call-by-name language will evaluate |longcomputation| twice. Since evaluation is 
+delayed to the use-point of the expression, the expression bound to |x| is evaluated twice. 
+
+In languages like Haskell this drawback is avoided by using an optimisation of call-by-name 
+called call-by-need. 
+
+call-by-need
+  ~ In call-by-need, when the use of a variable forces the evaluation of an expression, 
+  the result of that evaluation is cached and next time the variable is 
+  needed the cached value is simply returned.
+  
+This means that in call-by-need an expression will be evaluated at most once.
+
+ ### Call-by-Value, Call-by-Name and Exceptions
+
+In a language with exceptions, the same expression may evaluate to different results. 
+under call-by-name or call-by-value. For example:
+
+> var x = 3 / 0; 7
+
+evaluates to:
+
+	1) an exception in a call-by-value language; 
+	2) 7 in a call-by-name language.
+
+The reason is that exceptions propagate. Since in call-by-value all expressions arguments 
+(or initialisers) are evaluated, the program will raise an exception which is then propagated 
+throughout evaluation. In contrast in call-by-name the expression bound to x is not needed 
+to compute the result. Therefore, because that expression is not evaluated, no exception is propagated.
 
  ## Summary of First-Class Functions  {#FirstClassFunctions}
 
@@ -5786,8 +5906,8 @@ the [Section on More Kinds of Data](#MoreData): %A29
 >          | Declare   String Exp Exp
 > -- %A33
 
-
-(NOTE: The language in the tutorial files includes an additional constructor Call. For this question you can ignore that constructor and there is no need to have a case for Call in the type-checker function.) %A81
+(NOTE: The language in the tutorial files includes an additional constructor Call. For this 
+question you can ignore that constructor and there is no need to have a case for Call in the type-checker function.) %A81
 
 For this language types are represented as: %A82
 
@@ -5802,28 +5922,39 @@ Type-checking can fail when the types of subexpressions are incompatible. For ex
 > 3 + true
 > -- %A86
 
-should fail to type-check because addition (+) is an operation that expects two integer values. However in this case, the second argument is not an integer, but a boolean. %A87
+should fail to type-check because addition (+) is an operation that expects two integer values. 
+However in this case, the second argument is not an integer, but a boolean. %A87
 
-Type environments In a language with variables a type-checker needs to track the types of variables. To do this we can use what is called a type environment. %A88
+In a language with variables a type-checker needs to track the types of variables. 
+To do this we can use what is called a type environment. 
+
+Type environments 
+  ~ A *type environment* is a mapping from variable names to types.%A88
 
 > type TEnv = [(String, Type)]
 > -- %A89
 
-A type environment plays a similar role to the environment in a regular interpreter: it is used to track the types of variables during the type-checking process of an expression. %A90
+A type environment plays a similar role to the environment in a regular interpreter: 
+it is used to track the types of variables during the type-checking process of an expression. %A90
 
-Type of the type-checker We are going to use the following type for the type-checker: %A91
+ ### Type of the type-checker 
 
-> typeCheck :: Exp -> TEnv -> Maybe Type
+We are going to use the following type for the type-checker: %A91
+
+> typeCheck :: Exp -> TEnv -> Type
 > -- %A92
 
-Note how similar this type is to the type of an environment-based interpreter except for two differences: %A93
+Note how similar this type is to the type of an environment-based interpreter except for one difference: %A93
 
 1) Where in the concrete interpreter we used |Value|, we now use |Type|.
-2) The return type is now |Maybe Type| %A94
 
-Difference 1) is because if we look at tcheck as an abstract interpreter, then types play the role of abstract values. Difference 2) is for convenience. It is not necessary to use a Maybe type, but using the Maybe type makes the code more robust when tracking for type-checking errors. %A95
+If we look at |typeCheck| as an abstract interpreter, then types play the 
+role of abstract values. 
 
-Typing rules for expressions Most expressions in the language it are fairly obvious to type-check. For example, to type-check an expression of the form: %A96
+ ### Typing rules for expressions 
+
+Most expressions in the language it are fairly obvious to type-check. For example, to type-check 
+an expression of the form: %A96
 
 > e1 + e2
 > -- %A97
@@ -5834,7 +5965,9 @@ we proceed as follows: %A98
 2) check whether the type of |e2| is |TInt|
 3) If both types are |TInt|, return |TInt| as the result type (|Just TInt|); otherwise fail to type-check (|Nothing|) %A99
 
-Typing Declare Expressions To type a declare expression of the form %A100
+ #### Typing Declare Expressions 
+
+To type a declare expression of the form %A100
 
 > var x = e; body
 > -- %A101
@@ -5852,8 +5985,10 @@ For expressions with unbound variables: for example: %A104
 
 you should throw an error. In other words the type-checker works only for valid programs. %A106
 
-Typing |If| Expressions. The only slightly tricky expression to type-check is an if expression.
- The type-checking rule for an if expressions of the form: %A107
+ #### Typing |If| Expressions
+ 
+The only slightly tricky expression to type-check is an |if| expression.
+The type-checking rule for an |if| expressions of the form: %A107
 
 > if (e1) e2 else e3
 > -- %A108
@@ -5912,13 +6047,69 @@ INCLUDE:Type16 %A115
 >
 > -- %Type16
 
-Note that if type-checking any subexpressions fails with a type-error then the type-checking of the if expression will also fail. %A113
+Note that if type-checking any subexpressions fails with a type-error then the type-checking 
+of the |if| expression will also fail. %A113
+
+ ## Type-Checking First-class Functions
+
+In order to support type-checking we need to modify some of the datatypes with additional type-annotations:
+
+> data Value = IntV  Int
+>            | BoolV Bool
+>            | VException
+>            | ClosureV (String,Type) Exp Env -- changed
+>   deriving (Eq, Show)
+
+> data Exp = Literal   Value
+>          | Unary     UnaryOp Exp
+>          | Binary    BinaryOp Exp Exp
+>          | If        Exp Exp Exp
+>          | Variable  String
+>          | Declare   String Exp Exp
+>          | Function  (String,Type) Exp --changed
+>          | Call      Exp Exp      
+>   deriving (Eq, Show)
+
+In expressions functions need to have parameters annotated with types. Similarly in closures, 
+the parameters need a type annotation. These are marked in bold above. 
+
+Types and type-environments are defined as follows:
+
+> data Type = TInt | TBool | TFun Type Type deriving (Show,Eq)
+
+> type TEnv = [(String, Type)]
+
+The interesting thing is that we now have a type for functions denoted by the constructor |TFun|. 
+These types are similar to Haskell function types like |Int -> Int|  or |Bool -> (Int -> Bool)|. 
+Function types are useful to have function arguments. For example:
+
+> function(f : Int -> Int) {
+>   function(x : Int) { 
+>     f(f(x))
+>   }
+> } 
+
+is a function that given a function |f| and an integer |x|, applies |f| twice to |x|.
+
+The file [FirstClassFunctionsTyping](./code/FirstClassFunctionsTyping.hs.htm) adds a function |typeCheck| for doing type-checking.
+
+INCLUDE:TypeSummDecl
+> tcheck :: Exp -> TEnv -> Maybe Type
+
+---BEGIN-HIDE---
+In the file FirstClassFunctionsTest.hs you will also find several definitions 
+|a2| to |a8| commented. You can uncomment these definitions to test your code.
+---END-HIDE---
+
+You can also optionally modify the Happy file to extend parsing so that we 
+can deal with type-annotations in the language.
 
  # More Chapters on the way...
  ## Data Abstraction: Objects and Abstract Data Types
  ## Algebra and Coalgebra
  ## Partial Evaluation
  ## Memory Management
+ ## Lambda Calculus
 
 --------------------BEGIN-HIDE------------------------- %Memo2
 
@@ -5927,12 +6118,6 @@ Note that if type-checking any subexpressions fails with a type-error then the t
  ### Strict versus non-strict
  ### Lazy
 
- # Abstract Interpretation and Types
- ## Abstract Interpretation
- ## Type Checking
- ## Soundness Proofs
- ### Progress
- ### Preservation
 
  # Data Abstraction (content from essay)
  ## Abstract Data Types

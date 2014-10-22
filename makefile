@@ -41,6 +41,7 @@ SOURCES=$(TESTS) \
 			IntBool.hs \
 			Declare.hs \
 			DeclareSubstitute.hs \
+			Operators.hs \
 			Stateful.hs \
 			StatefulMonad.hs \
 			Simple.hs \
@@ -116,6 +117,7 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf
 	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf
 	cp anatomy.htm ~/Public/web/anatomy/anatomy.htm
+	cp anatomy.css ~/Public/web/anatomy/anatomy.css
 	mkdir -p	~/Public/web/anatomy/figures
 	mkdir -p	~/Public/web/anatomy/code
 	cp figures/*.png ~/Public/web/anatomy/figures
@@ -190,6 +192,8 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/CLOSEB/}/g" \
 		| sed "s/AtX/@/g" \
 		| sed "s/ATSIGN/@@/g" \
+		| sed "/|/s/\\\\{/{/g" \
+		| sed "/|/s/\\\\}/}/g" \
 		> temp.lhs
 
 # convert temp.lhs into Verbatim PDF, coverting various character sequences
@@ -197,6 +201,7 @@ temp.lhs: anatomy.mkd template.tex
 anatomyVerbatim.pdf: temp.lhs
 	lhs2TeX --tt temp.lhs \
 		| sed "s/\\\\char'31/\\\\char45{}\\\\char62{}/g" \
+		| sed "s|\\\\char'32|/=|g" \
 		| sed "s/\\\\char'10/\\\\char92{}/g" \
 		| sed "s/\\\\char'06/\\\\char60{}\\\\char45{}/g" \
 		| sed "s/\\\\char'36/==/g" \

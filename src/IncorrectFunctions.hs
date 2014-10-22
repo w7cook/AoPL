@@ -3,6 +3,7 @@ module IncorrectFunctions where
 import Prelude hiding (LT, GT, EQ)
 import Data.Maybe
 import Base
+import Operators
 import FunctionalEnvironment
 
 --BEGIN:A32
@@ -50,13 +51,6 @@ emptyEnv = \x->Nothing
 
 -- Same as IntBool
 execute exp = evaluate exp emptyEnv
-
-data BinaryOp = Add | Sub | Mul | Div | And | Or
-              | GT | LT | LE | GE | EQ
-  deriving (Eq, Show)
-
-data UnaryOp = Neg | Not
-  deriving (Eq, Show)
 
 unary Not (BoolV b) = BoolV (not b)
 unary Neg (IntV i)  = IntV (-i)

@@ -3,6 +3,8 @@ module TopLevelFunctions where
 import Prelude hiding (LT, GT, EQ, showList)
 import Data.Maybe
 import Value
+import Operators
+
 
 --BEGIN:Top15
 type FunEnv = [(String, Function)]
