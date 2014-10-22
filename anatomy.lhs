@@ -4513,19 +4513,15 @@ TODO: explain composition (|.|) operator  %A70
 
 Here are the steps in executing |fix| for a function |g|:  %A71
 
-* |fix g|  %A72
-
+    |fix g|  %A72
     { definition of |fix|}  %A73
-* = |stamp (g . stamp)| %A19
-
+    = |stamp (g . stamp)| %A19
     { definition of |stamp|}  %A74
-* = |(g . stamp)(g . stamp)| %A21
-
+    = |(g . stamp)(g . stamp)| %A21
     { definition of |.|}  %A75
-* = |g(stamp(g . stamp))|  %A36
-
+    = |g(stamp(g . stamp))|  %A36
     { definition of |fix|}  %A76
-* = |g(fix g)|  %A80
+    = |g(fix g)|  %A80
 
 This version of |fix| uses self-application to create
 a self-replicating program, which is then harnessed as
@@ -4540,7 +4536,7 @@ A second problem with this definition of |fix| is that it
 in non-lazy languages. 
 
 diverge
-  ~ A function diverges if it doesn't return a value
+  ~ A function diverges if it doesn't return a value.
 
 Thus it cannot be used in Haskell
 because of self-application, and it cannot be used in
@@ -4807,9 +4803,9 @@ expressions. %Exer5
 In the code given above, all errors cause the program to terminate execution.
 Extend the language with a |try|/|catch| expression that allows
 errors to be caught and handled within a program. The syntax is
-|try { Exp } catch { Exp }|, and the meaning is to evaluate the first Exp and
+|try { Exp } catch { Exp }|, and the meaning is to evaluate the first |Exp| and
 return its value if it is |Good|, otherwise evaluate the second
-expression and return its value (or an Error). %Exer6
+|Exp| and return its value (or an |Error|). %Exer6
 
  #### Exercise 6.3: Multiple Bindings and Arguments
 
@@ -4845,7 +4841,7 @@ for (i = 2; i <= 5; i = i + 1) {
 It declares a local variable named |x| with initial value |1|
 and then performs an iteration where the variable |i| changes
 from 1 to 10. On each iteration of the loop the variable |x|
-is multiplied by |i|. The result of |x| a the end is the
+is multiplied by |i|. The result of |x| at the end is the
 factorial of 5, namely 120. %Muta5
 
 Another typical example of mutable state is modification of
@@ -4930,7 +4926,7 @@ If the variable |x| appears on the right side of an assignment, it must be *dere
 as |@@x|. 
 
 dereferencing
-  ~ A address is *dereferenced* when the contents of the box associated with 
+  ~ A address is *dereferenced* when the contents of the cell associated with 
     the address is looked up and returned.
 
 If the variable appears on the left side of an assignment, it
@@ -5065,7 +5061,7 @@ But it is possible to compute a new data structure
 that is based on an existing one. This is the notion of
 *functional update* or *functional change*: a function can
 act as a transformation of a value into a new value.
-A functional update to memory is a function of type |Memory -> Memory|
+A functional update to memory is a function of type |Memory -> Memory|.
 Such functions take a memory as input and create a *new* memory
 as an output. The new memory is typically nearly identical to the
 input memory, but with a small change. %Upda2
@@ -5082,7 +5078,7 @@ INCLUDE:Upda4
 
 The |update| function works by splitting the memory into the part
 before the address and the part starting with the address |addr|. The pattern
-|_:after| binds |after| to be the memory after the address. The |update|
+|_ : after| binds |after| to be the memory after the address. The |update|
 function then recreates a new memory containing the before part,
 the updated memory cell, and the after part. The function
 is inefficient because it has to copy all the memory cells it has scanned up to that

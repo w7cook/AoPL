@@ -24,7 +24,7 @@ access i mem = mem !! i
 --BEGIN:Upda4
 update :: Int -> Value -> Memory -> Memory
 update addr val mem =
-  let (before, _:after) = splitAt addr mem in
+  let (before, _ : after) = splitAt addr mem in
     before ++ [val] ++ after
 --END:Upda4
 
