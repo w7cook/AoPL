@@ -22,7 +22,7 @@ import Lexer
 %%
 
 -- BEGIN:SimpleGrammar
-Exp  : Term							  { $1 } 
+Exp  : Term               { $1 } 
 
 Term : Term '+' Factor    { Add $1 $3 }
      | Term '-' Factor    { Subtract $1 $3 }

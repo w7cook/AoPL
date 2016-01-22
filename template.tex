@@ -1,231 +1,220 @@
-%!TEX TS-program = xelatex
-\documentclass[12pt]{book}  
-
-\usepackage{amsmath}
-
-\usepackage[english]{babel}
-\usepackage{geometry}
-\usepackage{ctable}
-\geometry{verbose,letterpaper,tmargin=3cm,bmargin=3cm,lmargin=3cm,rmargin=3cm}
-
+\documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$lang$,$endif$$if(papersize)$$papersize$,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
 %include lhs2TeX.fmt
-
-% \setmainfont{Hoefler Text}
-% \setromanfont[Mapping=tex-text,Contextuals={NoWordInitial,NoWordFinal,NoLineInitial,NoLineFinal},Ligatures={NoCommon}]{Hoefler Text}
-
-% Properly one should specify a sanserif font and a monospace font
-% see e.g. the example of Kieran Healy:
-% \setromanfont[Mapping=tex-text,Numbers=OldStyle]{Minion Pro} 
-% \setsansfont[Mapping=tex-text]{Minion Pro} 
-% \setmonofont[Mapping=tex-text,Scale=0.8]{Pragmata}
-
-\usepackage[flushmargin]{footmisc} 
-
-\usepackage{booktabs}
-
-
-% Paragraph format:
-% Pandoc prefers unindented paragraphs in the European style:
-\setlength{\parindent}{0pt}
-%  ... with paragraph breaks marked by a slight lengthening of 
-% the space between paragraphs:
-\setlength{\parskip}{6pt plus 2pt minus 1pt}
-
-% Page format:
-%\pagestyle{plain}  
-
-\usepackage{fancyhdr}
-\usepackage[yyyymmdd,hhmmss]{datetime}
-\pagestyle{fancy}
-\rhead{}
-\rfoot{\today\ \currenttime}
-
-% Footnotes
-% if you have code in your footnotes, the million macro march 
-% kind of bumps into itself.
-% Pandoc, having just rendered your text into LaTeX, 
-% knows whether the 'variable' `verbatim-in-note` is True, and 
-% If it is, it asks for a  LaTeX package that solves the dilemma:
+%include lhs2TeX.sty
+$if(fontfamily)$
+\usepackage{$fontfamily$}
+$else$
+\usepackage{lmodern}
+$endif$
+$if(linestretch)$
+\usepackage{setspace}
+\setstretch{$linestretch$}
+$endif$
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+$if(euro)$
+  \usepackage{eurosym}
+$endif$
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+    \usepackage{xltxtra,xunicode}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+$if(mainfont)$
+    \setmainfont{$mainfont$}
+$endif$
+$if(sansfont)$
+    \setsansfont{$sansfont$}
+$endif$
+$if(monofont)$
+    \setmonofont[Mapping=tex-ansi]{$monofont$}
+$endif$
+$if(mathfont)$
+    \setmathfont(Digits,Latin,Greek){$mathfont$}
+$endif$
+$if(CJKmainfont)$
+    \usepackage{xeCJK}
+    \setCJKmainfont[$CJKoptions$]{$CJKmainfont$}
+$endif$
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+$if(geometry)$
+\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$endif$
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+\usepackage[usenames,dvipsnames]{color}
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={$author-meta$},
+            pdftitle={$title-meta$},
+            colorlinks=true,
+            citecolor=$if(citecolor)$$citecolor$$else$blue$endif$,
+            urlcolor=$if(urlcolor)$$urlcolor$$else$blue$endif$,
+            linkcolor=$if(linkcolor)$$linkcolor$$else$magenta$endif$,
+            pdfborder={0 0 0}}
+\urlstyle{same}  % don't use monospace font for urls
+$if(lang)$
+\ifxetex
+  \usepackage{polyglossia}
+  \setmainlanguage{$mainlang$}
+  \setotherlanguages{$for(otherlang)$$otherlang$$sep$,$endfor$}
+\else
+  \usepackage[shorthands=off,$lang$]{babel}
+\fi
+$endif$
+$if(natbib)$
+\usepackage{natbib}
+\bibliographystyle{$if(biblio-style)$$biblio-style$$else$plainnat$endif$}
+$endif$
+$if(biblatex)$
+\usepackage{biblatex}
+$for(bibliography)$
+\addbibresource{$bibliography$}
+$endfor$
+$endif$
+$if(listings)$
+\usepackage{listings}
+$endif$
+$if(lhs)$
+\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
+$endif$
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
 $if(verbatim-in-note)$
 \usepackage{fancyvrb}
+\VerbatimFootnotes
+$endif$
+$if(tables)$
+\usepackage{longtable,booktabs}
+$endif$
+$if(graphics)$
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+$endif$
+$if(links-as-notes)$
+% Make links footnotes instead of hotlinks:
+\renewcommand{\href}[2]{#2\footnote{\url{#1}}}
+$endif$
+$if(strikeout)$
+\usepackage[normalem]{ulem}
+% avoid problems with \sout in headers with hyperref:
+\pdfstringdefDisableCommands{\renewcommand{\sout}{}}
+$endif$
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+$if(numbersections)$
+\setcounter{secnumdepth}{5}
+$else$
+\setcounter{secnumdepth}{0}
+$endif$
+$if(verbatim-in-note)$
+\VerbatimFootnotes % allows verbatim text in footnotes
 $endif$
 
-% Lists formatting: 
-% note sure what 'fancy enums' are; something to do with lists, 
-% as the further comment suggests: 
-$if(fancy-enums)$
-% -- Redefine labelwidth for lists; otherwise, the enumerate package will cause
-% -- markers to extend beyond the left margin.
-\makeatletter\AtBeginDocument{%
-  \renewcommand{\@listi}
-    {\setlength{\labelwidth}{4em}}
-}\makeatother
-\usepackage{enumerate}
+$if(title)$
+\title{$title$$if(subtitle)$\\\vspace{0.5em}{\large $subtitle$}$endif$}
 $endif$
+$if(author)$
+\author{$for(author)$$author$$sep$ \and $endfor$}
+$endif$
+\date{$date$}
+$for(header-includes)$
+$header-includes$
+$endfor$
 
-
-% Table formatting: 
-% What if you make a table? -- Pandoc knows, of course, and 
-% then declares that its  variable `table` is True and 
-% imports a table package suitable to its pleasantly simple tables. 
-% Needless to say infinitely   complicated tables are possible in 
-% LaTeX with suitable packages. We are spared the temptation:
-
-\usepackage{longtable}
-
-\usepackage{fancyvrb}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\newenvironment{Shaded}{}{}
-\newcommand{\KeywordTok}[1]{\textbf{{#1}}}
-\newcommand{\DataTypeTok}[1]{{#1}}
-\newcommand{\DecValTok}[1]{{#1}}
-\newcommand{\BaseNTok}[1]{{#1}}
-\newcommand{\FloatTok}[1]{{#1}}
-\newcommand{\CharTok}[1]{{#1}}
-\newcommand{\StringTok}[1]{{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
-\newcommand{\OtherTok}[1]{{#1}}
-\newcommand{\AlertTok}[1]{\textbf{{#1}}}
-\newcommand{\FunctionTok}[1]{{#1}}
-\newcommand{\RegionMarkerTok}[1]{{#1}}
-\newcommand{\ErrorTok}[1]{\textbf{{#1}}}
-\newcommand{\NormalTok}[1]{{#1}}
-
-% Continuing on the topic of tables ... (we havent reached `endif`). 
-% The commented out line below is in the default pandoc  latex.template.
-% Some unpleasantness with table formatting must be corrected.
-
-
-\usepackage{color}
-
-\usepackage[framemethod=tikz]{mdframed}
-\definecolor{usethiscolorhere}{rgb}{0.86666,0.78431,0.78431}
-
-\mdfsetup{skipabove=0,skipbelow=0}
-\surroundwithmdframed[
-          linecolor=blue,
-          middlelinewidth=1em,
-          topline=false,
-          bottomline=false,
-          rightline=false,
-          innertopmargin=0
-          ]{description}
-%\usepackage[usenames,dvipsnames]{xcolor}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
 
 \definecolor{Mahogany}{rgb}{0.75, 0.25, 0.0}
 \newcommand{\StartIncorrect}{\color{Mahogany}}
 \newcommand{\EndIncorrect}{\color{black}}
 
-
-% -- This is needed because raggedright in table elements redefines \\:
-\newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
-\let\PBS=\PreserveBackslash
-
-%subst comment a = "{\it-{}- " a "}"
-%format function = "{\textbf{function}}"
-
-
-% Subscripts:
-% Pandoc remembers whether you used subscripts, assigning True to 
-% its `subscript` variable 
-% It then needs to adopt a default with an incantation like this:
-$if(subscript)$
-\newcommand{\textsubscr}[1]{\ensuremath{_{\scriptsize\textrm{#1}}}}
-$endif$
-
-
-% Web-style links:
-
-% markdown inclines us to use links, since our texts can be made into html. 
-% Why not have clickable blue links even in 
-% learned, scientific, religious, juridical, poetical and other suchlike texts? 
-% Never mind that they have been proven to destroy the nervous system!
-
-% First, what about the fact that links like http://example.com are 
-% technically code and thus must not be broken across lines? 
-% [breaklinks=true] to the rescue!
-
-% Nowadays LaTeX can handle all of this with another half million macros:
-
-\usepackage[breaklinks=true]{hyperref}
-\hypersetup{colorlinks,%
-citecolor=blue,%
-filecolor=blue,%
-linkcolor=blue,%
-urlcolor=blue}
-\usepackage{url}
-
-
-
-% Images. 
-% In ye olde LaTeX one could only import a limited range of image
-% types, e.g. the forgotten .eps files.  Or else one simply drew the image with suitable
-% commands and drawing packages.  Today we want to import .jpg files we make with 
-% our smart phones or whatever:
-
-\usepackage{graphicx}
-% -- We will generate all images so they have a width \maxwidth. This means
-% -- that they will get their normal width if they fit onto the page, but
-% -- are scaled down if they would overflow the margins.
-% \makeatletter
-% \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
-% \else\Gin@nat@width\fi}
-% \makeatother
-% \let\Oldincludegraphics\includegraphics
-% \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
-
-
-% Footnotes: 
-% Wait, didn't we already discuss the crisis of code in footnotes?  
-% Evidently the order of unfolding of macros required that
-% we import a package to deal with them earlier
-% and issue a command it defines now. (Or maybe that's not the reason;
-% very often the order does matter as the insane system of macro expansion
-% must take place by stages.)
-$if(verbatim-in-note)$
-\VerbatimFootnotes % -- allows verbatim text in footnotes
-$endif$
-
-% Other stuff you specify on the command line:
-% You can include stuff for the header from a file specified on the command line;
-% I've never done this, but that stuff will go here:
-
-% Title, authors, date.
-% If you specified title authors and date at the start of 
-% your pandoc-markdown file, pandoc knows the 'values' of the
-% variables: title authors date and fills them in.
-
-$if(title)$
-\title{$title$}
-$endif$
-\author{$for(author)$$author$$sep$\\$endfor$}
-$if(date)$
-\date{$date$}
-$endif$
-
-% At last: 
-% The document itself!:
-
-% After filling in all these blanks above, or erasing them 
-% where they are not needed, Pandoc has finished writing the 
-% famous LaTeX *preamble* for your document.
-% Now comes the all-important command \begin{document}
-% which as you can see, will be paired with an \end{document} at the end.
-% Pandoc knows whether you have a title, and has already
-% specified what it is; if so, it demands that the title be rendered.  
-% Pandoc knows whether you want a table of contents, you
-% specify this on the command line.
-% Then, after fiddling with alignments, there comes the real
-% business: pandoc slaps its rendering of your text in the place of
-% the variable `body`
-% It then concludes the document it has been writing. 
-
 \begin{document}
+$if(abstract)$
+\begin{abstract}
+$abstract$
+\end{abstract}
+$endif$
+$if(title)$
 \maketitle
+$endif$
 
+$for(include-before)$
+$include-before$
+
+$endfor$
+$if(toc)$
+{
+\hypersetup{linkcolor=$if(toccolor)$$toccolor$$else$black$endif$}
+\setcounter{tocdepth}{$toc-depth$}
 \tableofcontents
-
+}
+$endif$
+$if(lot)$
+\listoftables
+$endif$
+$if(lof)$
+\listoffigures
+$endif$
 $body$
 
+$if(natbib)$
+$if(bibliography)$
+$if(biblio-title)$
+$if(book-class)$
+\renewcommand\bibname{$biblio-title$}
+$else$
+\renewcommand\refname{$biblio-title$}
+$endif$
+$endif$
+\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+
+$endif$
+$endif$
+$if(biblatex)$
+\printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
+
+$endif$
+$for(include-after)$
+$include-after$
+
+$endfor$
 \end{document}

@@ -13,6 +13,7 @@ data Exp  = Literal   Value
           | Variable  String
           | Declare   String Exp Exp
 --END:More99
+  deriving Show
 
 --BEGIN:More12
 -- Evaluate an expression in an environment
@@ -36,29 +37,3 @@ evaluate (If a b c) env =
 execute exp = evaluate exp []
 --END:More14
 
-
--- Code to display expressions
-
-instance Show Exp where
-  show e = "[" ++ showExp 0 e ++ "]"
-
-showExp level (Literal i)      = show i
-showExp level (Variable x)    = x
-showExp level (Declare x a b) = 
-  if level > 0 then paren result else result
-    where result = "var " ++ x ++ " = " ++ showExp 0 a ++ "; " ++ showExp 0 b
-showExp level (If a b c)    = 
-  if level > 0 then paren result else result
-    where result = "if (" ++ showExp 0 a ++ ") " ++ showExp 0 b ++ " else " ++ showExp 0 c
-showExp level (Unary Neg a)    = "-" ++ showExp 99 a
-showExp level (Unary Not a)    = "!" ++ showExp 99 a
-showExp level (Binary op a b)  = showBinary level (fromJust (lookup op levels)) a (fromJust (lookup op names)) b
-  where levels = [(Or, 1), (And, 2), (GT, 3), (LT, 3), (LE, 3), (GE, 3), (EQ, 3), 
-                  (Add, 4), (Sub, 4), (Mul, 5), (Div, 5)] 
-        names = [(Or, "||"), (And, "&&"), (GT, ">"), (LT, "<"), (LE, "<="), (GE, ">="), (EQ, "=="), 
-                  (Add, "+"), (Sub, "-"), (Mul, "*"), (Div, "/")] 
-
-showBinary outer inner a op b =
-  if inner < outer then paren result else result
-      where result = showExp inner a ++ " " ++ op ++ " " ++ showExp inner b
-      

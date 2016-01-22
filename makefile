@@ -2,7 +2,7 @@
 
 .PHONY: verb pretty update clean
 
-PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib
+PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib --filter pandoc-citeproc
 HSCOLOUR := hscolour -lit
 
 TESTS=SimpleTest.hs \
@@ -15,7 +15,8 @@ TESTS=SimpleTest.hs \
 			StatefulTest.hs \
 			StatefulMonadTest.hs \
 			FunExamples.hs \
-			ErrorCheckingTest.hs 
+			ErrorCheckingTest.hs \
+			FixedPoints.hs
 
 PARSERS=\
 			SimpleParse.y \
@@ -123,7 +124,7 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp figures/*.png ~/Public/web/anatomy/figures
 	cp code/* ~/Public/web/anatomy/code
 	cp -r cc ~/Public/web/anatomy
-	scp -r ~/Public/web/anatomy envy.cs.utexas.edu:public_html
+	scp -r ~/Public/web/anatomy firefly.cs.utexas.edu:public_html
 
 # build the anatomy.mkd file by including all the code, then removing the INCLUDE markers
 # Change the header markers to remove space before them
@@ -194,6 +195,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/ATSIGN/@@/g" \
 		| sed "/|/s/\\\\{/{/g" \
 		| sed "/|/s/\\\\}/}/g" \
+		| sed "s/\\\\newcommand{\\\\VerbBar}{|}/%VerbBar/g" \
 		> temp.lhs
 
 # convert temp.lhs into Verbatim PDF, coverting various character sequences
@@ -210,6 +212,7 @@ anatomyVerbatim.pdf: temp.lhs
 		| sed "s/\\\\char'04/and/g" \
 		| sed "s/\\\\char'37/or/g" \
 		| sed "s/\\\\char'24/forall/g" \
+		| sed "s/\\\\char'07/pi/g" \
 		> anatomyVerbatim.tex
 	pdflatex anatomyVerbatim.tex
 	pdflatex anatomyVerbatim.tex
@@ -232,4 +235,5 @@ clean:
 		scopes-eps-converted-to.pdf temp.lhs anatomy.pdf anatomy.tex \
 		anatomy.toc anatomy.aux anatomy.log anatomy.out anatomy.ptb \
 		anatomyCheck.tex anatomy.htm \
+		src/*Parse.hs src/*.o src/*.hi \
 		code output

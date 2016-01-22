@@ -12,6 +12,7 @@ data Exp = Number     Int
          | Variable   String
          | Declare    String Exp Exp
 --END:Summ3
+   deriving Show
 
 -- An environment is a list of strings and values
 type Env = [(String, Int)]
@@ -34,22 +35,3 @@ evaluate (Declare x exp body) env = evaluate body newEnv
 --BEGIN:DeclExec
 execute e = evaluate e []
 --END:DeclExec
-
--- Helper code to "show" expressions. Showing an expression is the process of converting 
--- the expression into a string. It is complicated by the need to handle precedence
-instance Show Exp where
-  show e = "[" ++ showExp 0 e ++ "]"
-
-showExp level (Number i)      = show i
-showExp level (Variable x)    = x
-showExp level (Declare x a b) = 
-   if level > 0 then paren result else result
-     where result = "var " ++ x ++ " = " ++ showExp 0 a ++ "; " ++ showExp 0 b
-showExp level (Add a b)       = showBinary level 1 a " + " b
-showExp level (Subtract a b)  = showBinary level 1 a " - " b
-showExp level (Multiply a b)  = showBinary level 2 a "*" b
-showExp level (Divide a b)    = showBinary level 2 a "/" b
-
-showBinary outer inner a op b =
-  if inner < outer then paren result else result
-      where result = showExp inner a ++ op ++ showExp inner b

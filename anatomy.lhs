@@ -100,6 +100,7 @@ The concepts of structure and meaning have technical names. %Intr8
 
 syntax
   ~ The structure of a language is called its *syntax*.
+  
 semantics
   ~ The rules that define the meaning of a language are called *semantics*. %Intr9
 
@@ -144,7 +145,7 @@ In Ubuntu Linux you can use: %Inst3
  ### Installing Emacs
 
 We recommend using emacs as the editor for Haskell, since it is quite simple to use
-and it has a nice Haskell mode. In Ubuntu you can do they following to install
+and it has a nice Haskell mode. In Ubuntu you can do the following to install
 emacs and the corresponding Haskell mode: %Inst5
 
 > sudo apt-get install emacs
@@ -203,7 +204,7 @@ After the creation of the file define the module header as follows: %Func25
 > module Tutorial1 where
 > -- %Func26
 
-It is possible to define simple functions in Haskell
+It is possible to define simple functions in Haskell.
 For example, consider a function that computes the absolute value of a number: %Func27
 
 > absolute :: Int -> Int
@@ -225,10 +226,12 @@ usually a *statement*, which does not have a value. %Func31
 
 expression
   ~ An *expression* is a syntactic category for syntax produces a value, and possibly has other side effects.
+
 statement
   ~ A *statement* is a syntactic category for syntax that has a side effect rather than producing a value.
+
 side effect
-  ~ A *side effect* is a effect on the program state. Examples of side effects include allocating memory,
+  ~ A *side effect* is an effect on the program state. Examples of side effects include allocating memory,
     assigning to memory, input/output, or exceptions. %Func32
 
 In Haskell there are no statements, only expressions. As mentioned above, the |if|
@@ -364,7 +367,7 @@ to any type of values. Try the following in |ghci|, and see what is the resultin
 
 > identity 3
 > identity 'c'
-> identity identity   --- you may try instead :t identity identity
+> identity identity   --- you may try instead :t identity
 > -- %Para9
 
 Question 3: Have you seen this form of polymorphism in other languages? Perhaps under a different name? %Para10
@@ -533,8 +536,8 @@ that sums the elements of two lists at the same positions.
 Suggestion: You can define this function recursively, but a simpler solution can be found by
 combining some of the previous functions. %Recu55
 
+Assignment 0 (Optional and not graded):
 
-Assignment 1 (Optional and not graded):
 Your first assignment is to try to complete as many questions in the tutorial as you can. %Recu56
 
  # Expressions, Syntax, and Evaluation {#Chapter1}
@@ -545,19 +548,21 @@ illustrated by a simple language of arithmetic expressions. %Expr2
 
 expression
   ~ An *expression* is a combination of variables, values
-		and operations over these values. For example, the arithmetic expression |2+3|
-		uses two numeric values |2| and |3| and an operation |+| that operates on
-		numeric values.
+    and operations over these values. For example, the arithmetic expression |2+3|
+    uses two numeric values |2| and |3| and an operation |+| that operates on
+    numeric values.
+    
 syntax
   ~ The *syntax* of an expression prescribes how the various
-		components of the expressions can be combined. In general it is not the case that
-		the components of expressions can be combined arbitrarily: they must obey certain
-		rules. For example |2 3| or |+ +| are not valid arithmetic expressions.
+    components of the expressions can be combined. In general it is not the case that
+    the components of expressions can be combined arbitrarily: they must obey certain
+    rules. For example |2 3| or |+ +| are not valid arithmetic expressions.
+
 evaluation
   ~ Each expression has a meaning (or value), which is defined by the
-		*evaluation* of that expression. Evaluation is a process where expressions
-		composed of various components get simplified until eventually we get a value.
-		For example evaluating |2 + 3| results in |5|. %Expr3
+    *evaluation* of that expression. Evaluation is a process where expressions
+    composed of various components get simplified until eventually we get a value.
+    For example evaluating |2 + 3| results in |5|. %Expr3
 
  ## Simple Language of Arithmetic
 
@@ -594,7 +599,7 @@ clearly using pictures. For example, the following pictures make a
 clear description of the underlying arithmetic operations specified in the
 expressions given above: %Simp6
 
-![Graphical illustration of abstract structure](figures/abstract_syntax.eps) %Simp7
+![Graphical illustration of abstract structure](figures/abstract_syntax.eps "a: (+ (-5) 6)    b: (- (- 3 (-2)) (-7))   c: (+ 1 (* 8 2))") %Simp7
 
 These pictures are similar to *sentence diagramming* that is taught in grade school
 to explain the structure of English. %Simp1
@@ -609,10 +614,11 @@ Syntax comes in two forms: abstract and concrete. %Synt1
 
 abstract syntax
   ~ The conceptual structure (illustrated by the pictures) is called the *abstract
-		syntax* of the language.
+    syntax* of the language.
+    
 concrete syntax
   ~ The particular details and rules for writing expressions
-		as strings of characters is called the *concrete syntax*. %Synt2
+    as strings of characters is called the *concrete syntax*. %Synt2
 
 The abstract syntax for arithmetic expressions is very simple, while the concrete syntax
 is quite complex. To make these concepts more precise, we show how to
@@ -627,7 +633,8 @@ parser
 
 This section describes how to represent abstract syntax using Haskell. The code
 for this section is found in the [Simple](./code/Simple.hs.htm) and
-[SimpleParse](./code/SimpleParse.y.htm) files.
+[SimpleParse](./code/SimpleParse.y.htm) files, which are loaded from the 
+[Simple Test](./code/SimpleTest.hs.htm) file.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
 INCLUDE:Abst3
@@ -682,7 +689,7 @@ The first step is to break a text up into *tokens*. %Conc1
 
 Tokens are the basic units of a language. In English, for example,
 words are tokens. But English also uses many symbol tokens, including
-".", "!", "?", "(" and ")". In the example  |"3 + 81 * 2"| the tokens
+".", "!", "?", "(" and ")". In the example  |"3 + 81 * 2"| the tokens 
 are |3|, |"+"|, |81|, |"*"|, and |2|. It is also important to classify tokens
 by their kind. The tokens |3|, |81| and |2| are sequences of digits.
 The tokens |"+"| and |"*"| are *symbol* tokens. %Toke5
@@ -691,6 +698,8 @@ token
   ~ A token is the basic syntactic unit of a language. Tokens can be
     individual characters, or groups of characters. Token are often
     classified into kinds, for example *integers*, *strings*, *identifiers*.
+
+
 identifier
   ~ An identifier is a string of characters that represents a name. Identifiers usually
     begin with a alphabetic character, then continue with one or more
@@ -746,11 +755,11 @@ to identify and *name* the different parts of the language. %Gram33
 
 syntactic category
   ~ The parts of a language are called *syntactic categories*. %Gram2
-		For example, in English there are many different parts, including
-		*verb*, *noun*, *gerund*, *prepositional phrase*,
-		*declarative sentence*, etc. In software langauges, example syntactic
-		categories include *expressions*, *terms, *functions*, *types*,
-		or *classes*. %Gram34
+    For example, in English there are many different parts, including
+    *verb*, *noun*, *gerund*, *prepositional phrase*,
+    *declarative sentence*, etc. In software langauges, example syntactic
+    categories include *expressions*, *terms, *functions*, *types*,
+    or *classes*. %Gram34
 
 It is certainly possible to
 be a fluent English speaker without any explicit awareness of
@@ -785,7 +794,7 @@ Here is a translation of the grammar into English: %Gram7
     - a *sentence* followed by a *prepositional phase* %Gram8
 * a *prepositional phase* is a *preposition* followed by a *noun* %Gram9
 * a *noun* is one of "Dick", "Jane", or "Spot" %Gram10
-* a *verb* is either "tuns" or "talks" %Gram11
+* a *verb* is either "runs" or "talks" %Gram11
 * a *preposition* is either "to" or "with" %Gram12
 
 Some sentences in the language defined by this grammar are: %Gram13
@@ -812,8 +821,10 @@ To summarize, here is a formal description of grammars. %Gram35
 production rule
   ~ A *production rule* defines how a non-terminal
     can be translated into a sequence of tokens and other syntactic categories.
+
 terminal
   ~ A *terminal* is a token used in a grammar rule.
+
 non-terminal
   ~ The *non-terminals* are the names of syntactic categories used in a grammar. %Gram36
 
@@ -917,6 +928,7 @@ precedence
   ~ *Precedence* is an order on grammar rules that defines which rule should
     apply first in cases of ambiguity. Precedence rules are applied before
     associativity rules.
+    
 associativity
   ~ Associativity specifies whether binary operators are grouped from the
     *left* or the *right* in order to resolve ambiguity. %Ambi12
@@ -925,7 +937,7 @@ The grammar can be adjusted to express the precedence and associativity
 of the operators. Here is an example: %Ambi8
 
 INCLUDE:SimpleGrammar
-> Exp  : Term							  { $1 }
+> Exp  : Term                { $1 }
 >
 > Term : Term '+' Factor    { Add $1 $3 }
 >      | Term '-' Factor    { Subtract $1 $3 }
@@ -954,7 +966,7 @@ which allows addition and subtraction to be used under multiplication.
 The grammar notation used above is also a language. It is a language
 of grammars.
 
- how to create simple grammars using the
+How to create simple grammars using the
 [Happy Parser Generator](http://www.haskell.org/happy/). %Pars1
 
 
@@ -1040,7 +1052,7 @@ INCLUDE:Form12
 There are many things that can go wrong when evaluating an expression.
 In our current, very simple language, the only error that can arise
 is attempting to divide by zero. These examples are given in the
-[Simple Examples](./code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
+[Simple Test](./code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
 
 INCLUDE:Erro3
 > testDBZ = evaluate (parseExp "8 / 0")
@@ -1498,7 +1510,7 @@ a hole in the scope of the outer variable: %Scop2
 
 ![Variable Scope](figures/scopes.eps) %Scop3
 
-In this example (Figure 2.2) there are two variables named |x|. Even though
+In this example Figure [Variable Scope] there are two variables named |x|. Even though
 two variables have the same name, they are not the same variable. %Scop4
 
 TODO: talk about *free* versus *bound* variables %Scop5
@@ -1578,6 +1590,7 @@ As a result, divide by zero is a *dynamic* error.
 static
   ~ A *static* property of a program can be determined by examining the text 
     of the program but without executing or evaluating it.
+    
 dynamic
   ~ A *dynamic* property of a program can only be determined by evaluating the program.    
 
@@ -1814,6 +1827,7 @@ The code for this section
 is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)
 and  [Declare Test](./code/DeclareTest.hs.htm) files. %Eval30
 
+
  ## More Kinds of Data: Booleans and Conditionals {#MoreData}
 
 In addition to arithmetic computations, it is useful for expressions
@@ -2025,6 +2039,65 @@ INCLUDE:Type6run
 
 We will discuss techniques for preventing type errors later, but for now
 it is important to realize that programs may fail at runtime. %Type7
+
+ ## Assignment 1: Basic Interpreter {#assign1 -}
+
+Extend the *parser* and *interpreter* of [Section on Evaluating Using Environments](#BasicEvalEnv)
+to allow multiple bindings in a variable binding
+expression. For example, %Basi1
+
+> var x = 3, y = 9;
+> x * y
+> -- %Basi2
+
+The abstract syntax of the |Exp| language with multiple bindings can be expressed
+by changing the |Declare| rule to support a list of pairs of strings and expressions: %Basi3
+
+> data Exp = ...
+>          | Declare [(String, Exp)] Exp
+> -- %Basi4
+
+If a |Declare| expression has duplicate identifiers, your program must signal an error.
+It is legal for a nested |Declare| to reuse the same name. Two examples: %Basi5
+
+> var x = 3, x = x + 2; x*2       -- illegal
+> var x = 3; var x = x + 2; x*2   -- legal
+> -- %Basi6
+
+**The meaning of a |var| declaration is that all of the expressions associated with variables
+are evaluated first, in the environment before the |var| is entered. Then all the variables are
+bound to the values that result from those evaluations. Then these bindings are added to the
+outer environment, creating a new environment that is used to evaluate the body of the |var| declaration.
+This means that the *scope* of all variables is the body of the |var| in which they are defined.** %Basi14
+
+Note that a multiple declare is not the same as multiple nested declares. For examle, %Basi7
+
+> var a = 3; var b = 8; var a = b, b = a; a + b       -- evaluates to 11
+> var a = 3; var b = 8; var a = b; var b = a; a + b   -- evaluates to 16
+> -- %Basi8
+
+You must write and include test cases that amply exercise all of the code you've written. %Basi9
+
+You can assume that the inputs are valid programs and that your program may
+raise arbitrary errors when given invalid input. %Basi10
+
+Here is an example test case: %Basi11
+
+> var a = 2, b = 7; (var m = 5 * a, n = b - 1; a * n + b / m) + a
+> -- %Basi12
+
+The previous version of this example contained an unbound use of the variable |m|: %Basi15
+
+> var a = 2, b = 7; (var m = 5 * a, n = m - 1; a * n + b / m) + a
+> -- %Basi17
+
+The code that you must modify
+is given in the 
+[Declare](./code/Declare.hs.htm), 
+[Declare Parser](./code/DeclareParse.y.htm),
+[Declare Test](./code/DeclareTest.hs.htm),
+[Base](./code/Base.hs.htm), and
+[Lexer](./code/Lexer.hs.htm) files. %Basi13
 
  # Functions
 
@@ -2682,7 +2755,7 @@ lookup function. %Repr8
 The only other thing that is done with an environment is to extend it with
 additional bindings. Let's define bind functions that add a binding to
 an environment, represented as lists or functions. For lists, the |bindL| function
-creates a binding |(val, val)| and then prepends it to the front of the list: %Repr10
+creates a binding |(var, val)| and then prepends it to the front of the list: %Repr10
 
 INCLUDE:Repr11
 > bindL :: String -> Value -> EnvL -> EnvL
@@ -3201,7 +3274,7 @@ callbacks, event handlers, thunks, continuations, etc. %Othe2
 
  ## Evaluating First-Class Functions using Environments
 
-Its now time to define the syntax and semantics of a
+It's now time to define the syntax and semantics of a
 language with first-class functions. Based on the examples
 in the [previous section](#FirstClassExamples), some features are no longer needed.
 For example, variable declaration expressions are not needed because they
@@ -3419,7 +3492,7 @@ Here is how evaluation of this sample program proceeds: %Prob7
 To put this more concisely, the problem arises because the call to |add 3|
 returns |function(b) { b + a }|. But this function expression is not well defined because
 it has a free variable |a|. What happened to the binding for |a|? It had
-a value in Steps 12 through 14 of the explanation above. But this
+a value in Steps 3.c through 3.d of the explanation above. But this
 binding is lost when returning the literal |function(b) { b + a }|. The problem doesn't
 exhibit itself until the function is called. %Prob9
 
@@ -3464,6 +3537,10 @@ The problem is that when |k| is looked up in step 4b, the
 most recent binding for |k| is |9|. This binding is based on the
 *control flow* of the program, not on the *lexical* structure.
 Looking up variables based on control flow is called *dynamic binding*.  %Prob30
+
+dynamic binding
+  ~ dynamic binding occurs when a symbol's value is found by scanning the 
+    dynamic calls for the most recent binding of the symbol.
 
 \EndIncorrect
 
@@ -3718,7 +3795,7 @@ Haskell is one of the few languages where (a variant of) call-by-name is the def
 for evaluating function applications. 
 
 Drawbacks of call-by-name: While for the program above there seems to benefit from using call-by-name, 
-there are also programs where call-by-name is worst than call-by-value. For example:
+there are also programs where call-by-name is worse than call-by-value. For example:
 
 > var x = longcomputation; x + x
 
@@ -3746,8 +3823,8 @@ under call-by-name or call-by-value. For example:
 
 evaluates to:
 
-	1) an exception in a call-by-value language; 
-	2) 7 in a call-by-name language.
+  1) an exception in a call-by-value language; 
+  2) 7 in a call-by-name language.
 
 The reason is that exceptions propagate. Since in call-by-value all expressions arguments 
 (or initialisers) are evaluated, the program will raise an exception which is then propagated 
@@ -3809,6 +3886,54 @@ INCLUDE:Summ14
 > -- %Summ14
 
 A test case can be found in the [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm) file %Summ15
+
+ ## Assignment 2: First-Class Functions {#assign2 -}
+
+Extend the *parser* and *interpreter* of [Section on First-Class Functions](#FirstClassFunctions)
+to allow passing multiple parameters, by adding a *tuple* data type and allowing *patterns* to
+be used in function and variable definitions.  For example: %FCF1
+
+Here are two example test cases: %Assi1
+
+> var f = function(a, b) { a + 2 * b };
+> f(3, 4) - f(5, 2)
+> -- %Assi2
+
+> var z = 10;
+> var (x, y) = (3, z*2);
+> y / z
+> -- %Assi3
+
+You must change the parser to allow creation of tuples, patterns
+in function and variable definitions, and functions called with a tuple.
+Here are suggested changes to your abstract syntax: %Assi4
+
+> data Exp = ...
+>          | Declare Pattern Exp Exp      -- declarations bind using patterns
+>          | Function Pattern Exp         -- functions have patterns
+>          | Tuple [Exp]                  -- tuple expression
+> -- %Assi5
+
+> data Pattern = VarP String              -- variable patterns
+>              | TupleP [Pattern]         -- tuple patterns
+> -- %Assi6
+
+> data Value = ...
+>            | ClosureV Pattern Exp Env   -- functions have patterns
+>            | TupleV [Value]             -- tuple value
+>   deriving (Eq, Show)
+> -- %Assi7
+
+You must write and include test cases that amply exercise all of the code you've written.
+You can assume that the inputs are valid programs and that your program may raise arbitrary
+errors when given invalid input (except as mentioned above). %Assi8
+
+The files you need are
+[First Class Functions](./code/FirstClassFunctions.hs.htm),
+[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm),
+and
+[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm).
+And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Assi9
 
  # Recursive Definitions
 
@@ -3932,9 +4057,7 @@ definitions. While fixed points can be implemented directly, they are not the
 most efficient approach, especially in conventional languages. As a result, we will
 consider a third implementation, based on self application. This explanation is
 messy but practical. In fact, it is the basis for real-world implementations of
-C++ and Java. A forth explanation
-A fourth explanation,
-languages in traditional imperative languages. %Thre2
+C++ and Java. %Thre2
 
  ## Understanding Recursion using Haskell Recursion {#Cyclic}
 
@@ -4176,14 +4299,21 @@ book, like "Theory of Lambda Conversion".  %Unde29
 Fixed-points can also be identified for simple mathematical
 functions: %Fixe2
 
-*function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  *fixed point(s)*
---------------------                     --------------------
-$i_{10}(x) = 10 - x$                     $5$
-$square(x) = x^2$                        $0, 1$
-$g_\phi(x) = 1 + \cfrac{1}{x}$           $1.6180339887...$
-$k_4(x) = 4$                             $4$
-$id(x) = x$                              all values are fixed points
-$inc(x) = x + 1$                         no fixed points %Fixe3
++------------------------------------------+--------------------------------+
+| *function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  | *fixed point(s)*               | 
++------------------------------------------+--------------------------------+
+| $i_{10}(x) = 10 - x$                     | $5$                            | 
++------------------------------------------+--------------------------------+
+| $square(x) = x^2$                        | $0, 1$                         | 
++------------------------------------------+--------------------------------+
+| $g_\phi(x) = 1 + \cfrac{1}{x}$           | $1.6180339887...$              | 
++------------------------------------------+--------------------------------+
+| $k_4(x) = 4$                             | $4$                            | 
++------------------------------------------+--------------------------------+
+| $id(x) = x$                              | all values are fixed points    | 
++------------------------------------------+--------------------------------+
+| $inc(x) = x + 1$                         | no fixed points %Fixe3         | 
++------------------------------------------+--------------------------------+
 
 As you can see, some functions have one fixed point.
 Some functions have multiple fixed points. Others have
@@ -4269,6 +4399,8 @@ The next column shows just the application of $g_\phi$ to the
 previous result. The final column gives the result for that
 iteration.  %Fixe19
 
+--------------------BEGIN-HIDE-------------------------
+
 \#  power            previous                     result
 --  ---------------- -------------------------- - ------------
  1  $g_\phi^{1}(1) $ $g_\phi(1)               $ = 2
@@ -4288,6 +4420,8 @@ iteration.  %Fixe19
 15  $g_\phi^{15}(1)$ $g_\phi(1.61803278688525)$ = 1.6180344478
 16  $g_\phi^{16}(1)$ $g_\phi(1.61803444782168)$ = 1.6180338134
 17  $g_\phi^{17}(1)$ $g_\phi(1.61803381340013)$ = 1.6180340557  %Fixe20
+
+--------------------END-HIDE-------------------------
 
 Here is a plot of how the function converges: %Fixe48
 
@@ -4315,14 +4449,21 @@ can be computed by repeated function application. Here are
 the results for this technique, when applied to the examples
 given above:  %Fixe26
 
-*function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  result for repeated invocation
---------------------                     --------------------
-$inv_{10}(x) = 10 - x$                   infinite loop
-$square(x) = x^2$                        infinite loop
-$g_\phi(x) = 1 + \cfrac{1}{x}$           $1.6180339887...$
-$const_4(x) = 4$                         $4$
-$id(x) = x$                              infinite loop
-$inc(x) = x + 1$                         infinite loop  %Fixe27
++------------------------------------------+--------------------------------+
+| *function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  | result for repeated invocation |
++==========================================+================================+
+| $inv_{10}(x) = 10 - x$                   | infinite loop                  |
++------------------------------------------+--------------------------------+
+| $square(x) = x^2$                        | infinite loop                  |
++------------------------------------------+--------------------------------+
+| $g_\phi(x) = 1 + \cfrac{1}{x}$           | $1.6180339887...$              |
++------------------------------------------+--------------------------------+
+| $const_4(x) = 4$                         | $4$                            |
++------------------------------------------+--------------------------------+
+| $id(x) = x$                              | infinite loop                  |
++------------------------------------------+--------------------------------+
+| $inc(x) = x + 1$                         | infinite loop  %Fixe27         |
++------------------------------------------+--------------------------------+
 
 Only two of the six examples worked. Fixed points are not a general
 method for solving numeric equations.  %Fixe28
@@ -4349,7 +4490,7 @@ input                   output                input = output
 
 The function |g_twos| can be applied to any list. If it is applied to
 any finite list, then the input and output lists cannot be the same
-because the output is one element longer then the input. This is not a
+because the output is one element longer than the input. This is not a
 problem for infinite lists, because adding an item to the front of
 an infinite list is still an infinite list. Adding a 2 onto the front
 of an infinite list of 2s will return an infinite list of 2s. Thus
@@ -4440,7 +4581,7 @@ original mathematic definition of a fixed point: |fix|$(f)$ is a value $x$ such
 that $x = f(x)$. Substituting |fix|$(f)$ for $x$ gives the definition
 above. %A4
 
-From an algorithmic viewpoint, the definition of only works because of
+From an algorithmic viewpoint, the definition of |fix| only works because of
 lazy evaluation in Haskell. To compute |fix g| Haskell evaluates
 |g (fix g)| but does not immediately evaluate the argument |fix g|.
 Remember that arguments in Haskell are only evaluated if they are *needed*.
@@ -4840,7 +4981,7 @@ for (i = 2; i <= 5; i = i + 1) {
 
 It declares a local variable named |x| with initial value |1|
 and then performs an iteration where the variable |i| changes
-from 1 to 10. On each iteration of the loop the variable |x|
+from 1 to 5. On each iteration of the loop the variable |x|
 is multiplied by |i|. The result of |x| at the end is the
 factorial of 5, namely 120. %Muta5
 
@@ -4874,7 +5015,7 @@ The code for this section is in the [Mutable State](./code/Stateful.hs.htm) file
  ### Addresses
 
 Imperative languages typically allow everything to be mutable
-by default: all variables and mutable and all data structures
+by default: all variables are mutable and all data structures
 are mutable. While this is often convenient, it has the disadvantage
 that there is no way to turn off mutation. Many variables and
 data structures, even in imperative languages, are logically immutable.
@@ -5502,6 +5643,7 @@ The type of the bind operators is also interesting: %Abst33
 
 Checked: %Abst43
   ~ $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
+  
 Stateful: %Abst45
   ~ $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
 
@@ -5595,8 +5737,7 @@ INCLUDE:Monad5
 > -- %Monad5
 
 It turns out to be a little more complex to define the stateful monad instance, so this topic
-is delayed until the end of this section. The code for error checking using monads is
-give in the [Checked Monad](./code/CheckedMonad.hs.htm) file. %Monad6
+is delayed until the end of this section.  %Monad6
 
  ### Haskell |do| Notation
 
@@ -5670,6 +5811,8 @@ cleanly using monads. %Usin25
  ### Monadic Error Checking {#MonadicErrors}
 
 Here is a version of error checking using the |Checked| monad defined above: %Mona14
+The code for error checking using monads is
+given in the [Checked Monad](./code/CheckedMonad.hs.htm) file.
 
 INCLUDE:Mona13
 > evaluate :: Exp -> Env -> Checked Value
@@ -5715,7 +5858,8 @@ the [Section on Error Checking](#ErrorCheckingMonMonadic). %Mona17
  ### Monadic Mutable State {#MonadicState}
 
 The full code for the stateful evaluator using monads is
-give in the [Stateful Monad](./code/StatefulMonad.hs.htm) file. %Mona15
+give in the [Stateful Monad](./code/StatefulMonad.hs.htm) file
+and the [Stateful Parser](./code/StatefulParse.y.htm). %Mona15
 
 The main complexity in defining a stateful monad is that monads in Haskell
 can only be defined for |data| types, which have explicit constructor labels.
@@ -5816,6 +5960,18 @@ INCLUDE:StatefulHelper3 %Mona26
 > updateMemory val i = ST (\mem-> (val, update i val mem))
 > -- %StatefulHelper3
 
+ ## Assignment 3: Defining a Monad for State and Error handling  {#assign3 -}
+
+Combine the monads and interpreters for [Error Checking](#MonadicErrors) and
+[Mutable State](#MonadicState) into a single monad that performs both error checking
+and mutable state. You must also combine the evaluation functions. %Assi10
+
+The type of your monad must combine |Checked| and |Stateful|. There are several
+ways to do this, but then one needed for this assignment is: %Assi11
+
+> data CheckedStateful t = CST (Memory -> (Checked t, Memory))
+> -- %Assi12
+
  # Abstract Interpretation and Types
 
 So far we have been focused on writing interpreters for small
@@ -5835,12 +5991,15 @@ abstraction of the result of executing a program. %Abst16
 
 abstract value
   ~ An abstract value is a value that represents a collection of concrete values.
+  
 concrete interpreter
   ~ A *concrete interpreter* is a normal interpreter that evaluates
     with normal values.
+
 abstract interpreter
   ~ A *abstract interpreter* is an interpreter that operates over
     abstact values using abstract operations. 
+    
 validity
   ~ An abstract interpreter is *valid* if the concrete value result is a member
     of the set of values of the abstact value evaluation result, for all evaluations. 
@@ -6050,19 +6209,14 @@ of the |if| expression will also fail. %A113
 
 In order to support type-checking we need to modify some of the datatypes with additional type-annotations:
 
-> data Value = IntV  Int
->            | BoolV Bool
->            | VException
->            | ClosureV (String,Type) Exp Env -- changed
->   deriving (Eq, Show)
-
+INCLUDE:TypeA42
 > data Exp = Literal   Value
 >          | Unary     UnaryOp Exp
 >          | Binary    BinaryOp Exp Exp
 >          | If        Exp Exp Exp
 >          | Variable  String
 >          | Declare   String Exp Exp
->          | Function  (String,Type) Exp --changed
+>          | Function  (String, Type) Exp --changed
 >          | Call      Exp Exp      
 >   deriving (Eq, Show)
 
@@ -6071,8 +6225,10 @@ the parameters need a type annotation. These are marked in bold above.
 
 Types and type-environments are defined as follows:
 
+INCLUDE:TypeA49
 > data Type = TInt | TBool | TFun Type Type deriving (Show,Eq)
 
+INCLUDE:TypeAEnv
 > type TEnv = [(String, Type)]
 
 The interesting thing is that we now have a type for functions denoted by the constructor |TFun|. 
@@ -6087,6 +6243,17 @@ Function types are useful to have function arguments. For example:
 
 is a function that given a function |f| and an integer |x|, applies |f| twice to |x|.
 
+Type checking a function definition is straighforward, given the argument type as part of the 
+definition. It  type checks the body of the function in a type environment extended with
+a declaration of the argument.
+
+INCLUDE:TypeA41
+ 
+Type checking a function call is also straightforward: it matches the actual argument
+type with the declared function argument type.
+
+INCLUDE:TypeA47
+ 
 The file [FirstClassFunctionsTyping](./code/FirstClassFunctionsTyping.hs.htm) adds a function |typeCheck| for doing type-checking.
 
 INCLUDE:TypeSummDecl
@@ -6100,6 +6267,15 @@ In the file FirstClassFunctionsTest.hs you will also find several definitions
 You can also optionally modify the Happy file to extend parsing so that we 
 can deal with type-annotations in the language.
 
+
+--------------------BEGIN-HIDE------------------------- %Memo2
+
+# Data Abstraction
+
+# Objects
+
+# Abstract Data Types
+
  # More Chapters on the way...
  ## Data Abstraction: Objects and Abstract Data Types
  ## Algebra and Coalgebra
@@ -6107,7 +6283,6 @@ can deal with type-annotations in the language.
  ## Memory Management
  ## Lambda Calculus
 
---------------------BEGIN-HIDE------------------------- %Memo2
 
  ### Special Kinds of States: Readers and Writers
  ## Order of Evaluation
@@ -6135,124 +6310,8 @@ can deal with type-annotations in the language.
  ## Attribute grammars
  ## State machines (???)
 
+ # References
 --------------------END-HIDE-------------------------
-
- # Appendix A: Assignments {-}
-
- ## Assignment 1: Basic Interpreter {#assign1 -}
-
-Extend the *parser* and *interpreter* of [Section on Evaluating Using Environments](#BasicEvalEnv)
-to allow multiple bindings in a variable binding
-expression. For example, %Basi1
-
-> var x = 3, y = 9;
-> x * y
-> -- %Basi2
-
-The abstract syntax of the |Exp| language with multiple bindings can be expressed
-by changing the |Declare| rule to support a list of pairs of strings and expressions: %Basi3
-
-> data Exp = ...
->          | Declare [(String, Exp)] Exp
-> -- %Basi4
-
-If a |Declare| expression has duplicate identifiers, your program must signal an error.
-It is legal for a nested |Declare| to reuse the same name. Two examples: %Basi5
-
-> var x = 3, x = x + 2; x*2       -- illegal
-> var x = 3; var x = x + 2; x*2   -- legal
-> -- %Basi6
-
-**The meaning of a var declaration is that all of the expressions associated with variables
-are evaluated first, in the environment before the var is entered. Then all the variables are
-bound to the values that result from those evaluations. Then these bindings are added to the
-outer environment, creating a new environment that is used to evaluate the body of the var declaration.
-This means that the *scope* of all variables is the body of the var in which they are defined.** %Basi14
-
-Note that a multiple declare is not the same as multiple nested declares. For examle, %Basi7
-
-> var a = 3; var b = 8; var a = b, b = a; a + b       -- evaluates to 11
-> var a = 3; var b = 8; var a = b; var b = a; a + b   -- evaluates to 16
-> -- %Basi8
-
-You must write and include test cases that amply exercise all of the code you've written. %Basi9
-
-You can assume that the inputs are valid programs and that your program may
-raise arbitrary errors when given invalid input. %Basi10
-
-Here is an example test case: %Basi11
-
-> var a = 2, b = 7; (var m = 5 * a, n = b - 1; a * n + b / m) + a
-> -- %Basi12
-
-The previous version of this example contained an unbound use of the variable |m|: %Basi15
-
-> var a = 2, b = 7; (var m = 5 * a, n = m - 1; a * n + b / m) + a
-> -- %Basi17
-
-The code that you must modify
-is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)
-and  [Declare Test](./code/DeclareTest.hs.htm) files. %Basi13
-
- ## Assignment 2: First-Class Functions {#assign2 -}
-
-Extend the *parser* and *interpreter* of [Section on First-Class Functions](#FirstClassFunctions)
-to allow passing multiple parameters, by adding a *tuple* data type and allowing *patterns* to
-be used in function and variable definitions.  For example: %FCF1
-
-Here are two example test cases: %Assi1
-
-> var f = function(a, b) { a + 2 * b };
-> f(3, 4) - f(5, 2)
-> -- %Assi2
-
-> var z = 10;
-> var (x, y) = (3, z*2);
-> y / z
-> -- %Assi3
-
-You must change the parser to allow creation of tuples, patterns
-in function and variable definitions, and functions called with a tuple.
-Here are suggested changes to your abstract syntax: %Assi4
-
-> data Exp = ...
->          | Declare Pattern Exp Exp      -- declarations bind using patterns
->          | Function Pattern Exp         -- functions have patterns
->          | Tuple [Exp]                  -- tuple expression
-> -- %Assi5
-
-> data Pattern = VarP String              -- variable patterns
->              | TupleP [Pattern]         -- tuple patterns
-> -- %Assi6
-
-> data Value = ...
->            | ClosureV Pattern Exp Env   -- functions have patterns
->            | TupleV [Value]             -- tuple value
->   deriving (Eq, Show)
-> -- %Assi7
-
-You must write and include test cases that amply exercise all of the code you've written.
-You can assume that the inputs are valid programs and that your program may raise arbitrary
-errors when given invalid input (except as mentioned above). %Assi8
-
-The files you need are
-[First Class Functions](./code/FirstClassFunctions.hs.htm),
-[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm),
-and
-[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm).
-And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Assi9
-
- ## Assignment 3: Defining a Monad for State and Error handling  {#assign3 -}
-
-Combine the monads and interpreters for [Error Checking](#MonadicErrors) and
-[Mutable State](#MonadicState) into a single monad that performs both error checking
-and mutable state. You must also combine the evaluation functions. %Assi10
-
-The type of your monad must combine |Checked| and |Stateful|. There are several
-ways to do this, but then one needed for this assignment is: %Assi11
-
-> data CheckedStateful t = CST (Memory -> (Checked t, Memory))
-> -- %Assi12
 
  ## Files on Lambda Calculus {#LambdaExp -}
 
@@ -6260,4 +6319,4 @@ Here two files that can be used to represent and parse lambda-expressions:
 [Lambda Abstract Syntax](./code/Lambda.hs.htm) and
 [Lambda Parser](./code/LambdaParse.y.htm) %File1
 
- # References
+ 

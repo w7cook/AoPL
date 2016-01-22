@@ -5,46 +5,43 @@ import Data.Maybe
 import Data.List
 import Operators
 
---BEGIN:TypeA42
+--BEGIN:TypeA49
 data Type = IntT
            | BoolT
            | FunT Type Type  -- new
   deriving (Eq, Show)
---END:TypeA42
+--END:TypeA49
 
---BEGIN:TypeA42
 data Value = IntV  Int
            | BoolV Bool
   deriving (Eq, Show)
---END:TypeA42
 
+--BEGIN:TypeA42
 data Exp = Literal   Value
          | Unary     UnaryOp Exp
          | Binary    BinaryOp Exp Exp
          | If        Exp Exp Exp
          | Variable  String
          | Declare   String Exp Exp
-         | Function  String Type Exp      -- changed
+         | Function  (String, Type) Exp      -- changed
          | Call      Exp Exp         
   deriving (Eq, Show)
+--END:TypeA42
 
-
+--BEGIN:TypeAEnv
 type TypeEnv = [(String, Type)]
+--END:TypeAEnv
 
 --BEGIN:TypeSumm14
 
+--BEGIN:Type12
 --BEGIN:TypeSummDecl
 typeCheck :: Exp -> TypeEnv -> Type
 --END:TypeSummDecl
 typeCheck (Literal (IntV _)) env = IntT
 typeCheck (Literal (BoolV _)) env = BoolT
-
-typeCheck (Unary op a) env = 
-  checkUnary op (typeCheck a env)
-
-typeCheck (Binary op a b) env = 
-  checkBinary op (typeCheck a env) (typeCheck b env)
-
+typeCheck (Unary op a) env =    checkUnary op (typeCheck a env)
+typeCheck (Binary op a b) env = checkBinary op (typeCheck a env) (typeCheck b env)
 typeCheck (If a b c) env = 
   if BoolT /= typeCheck a env then
     error ("Conditional must return a boolean: " ++ show a)
@@ -54,27 +51,27 @@ typeCheck (If a b c) env =
     typeCheck b env
 
 typeCheck (Variable x) env = fromJust (lookup x env)
-
 typeCheck (Declare x exp body) env = typeCheck body newEnv
   where newEnv = (x, typeCheck exp env) : env
+--END:Type12
 
-typeCheck (Function x t body) env = FunT t (typeCheck body newEnv)     -- new
+--BEGIN:TypeA41
+typeCheck (Function (x, t) body) env = FunT t (typeCheck body newEnv)     -- new
   where newEnv = (x, t) : env
+--END:TypeA41
 
 --BEGIN:TypeA47
 typeCheck (Call fun arg) env = 
   case typeCheck fun env of
-    FunT a b -> if a /= typeCheck arg env then
-                  error "Invalid argument type"
-                else
-                  b
+    FunT a b -> if a /= typeCheck arg env 
+                then error "Invalid argument type"
+                else b
     _ -> error "Expected function"
 --END:TypeSumm14 END:TypeA47
 
 execute exp = typeCheck exp []
 
--- same as IntBoolTyping.hs
-
+--BEGIN:Type16
 checkUnary Not BoolT = BoolT
 checkUnary Neg IntT  = IntT
 checkUnary op  a     = error ("Mismatched argument for " ++ 
@@ -94,3 +91,4 @@ checkBinary EQ  a     b     | a == b = BoolT
 checkBinary op  a     b      = 
   error ("Mismatched binary types for " ++ 
          show a ++ " " ++ show op ++ " " ++ show b)
+--END:Type16

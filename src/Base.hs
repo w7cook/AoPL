@@ -3,6 +3,7 @@
 module Base where
 import Prelude hiding (catch)
 import Control.Exception
+import System.Environment
 
 check msg a b = putStrLn (if a == b then "OK" else "*** CHECK " ++ msg ++ " Failed ***")
 
@@ -27,3 +28,8 @@ showError ex = putStr ("Exception: " ++ trimError (show ex))  where
       
 paren x = "(" ++ x ++ ")"
 
+genMain = do
+  args <- getArgs
+  case args of
+    [] -> getContents
+    [file] -> readFile file

@@ -18,6 +18,7 @@ import Lexer
     '/'    { Symbol "/" }
     '('    { Symbol "(" }
     ')'    { Symbol ")" }
+    ','    { Symbol "," }
 -- END:SubstLexer
 
 %%
@@ -35,6 +36,8 @@ Primary : digits         { Number $1 }
         | '-' digits     { Number (- $2) }
         | id             { Variable $1 }
         | '(' Term ')'   { $2 }
+        
+        
 -- END:SubstGrammar
 
 {

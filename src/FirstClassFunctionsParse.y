@@ -38,6 +38,9 @@ import Operators
     '{'    { Symbol "{" }
     '}'    { Symbol "}" }
 
+%nonassoc '!' PRE
+%nonassoc '('
+
 %%
 
 -- BEGIN:FCFGrammar1
@@ -74,7 +77,7 @@ Primary : Primary '(' Exp ')' { Call $1 $3 }
         | digits         { Literal (IntV $1) }
         | true           { Literal (BoolV True) }
         | false          { Literal (BoolV False) }
-        | '-' Primary    { Unary Neg $2 }
+        | '-' Primary %prec PRE   { Unary Neg $2 }
         | '!' Primary    { Unary Not $2 }
         | id             { Variable $1 }
         | '(' Exp ')'    { $2 }
