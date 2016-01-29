@@ -100,7 +100,7 @@ The concepts of structure and meaning have technical names. %Intr8
 
 syntax
   ~ The structure of a language is called its *syntax*.
-  
+
 semantics
   ~ The rules that define the meaning of a language are called *semantics*. %Intr9
 
@@ -1107,12 +1107,15 @@ default meaning is the object language expression |2 + 3|. %Obje2
 
  # Variables
 
-Arithmetic expressions often contain variables in addition
+Arithmetic expressions often contain *variables* in addition
 to constants. In grade school the first introduction to variables
 is usually to evaluate an expression where a variable has a specific value.
 For example, young students learn to evaluate $x+2$ where $x=5$.
 The rule is to substitute every occurrence of $x$ with the value $5$
 and the perform the required arithmetic computations. %Vari2
+
+variable
+  ~ A *variable* is a symbol that refers to a value.
 
 To program this in Haskell, the first thing needed is to extend
 the abstract syntax of expressions to include variables.
