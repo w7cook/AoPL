@@ -24,19 +24,6 @@ substitute1 (var, val) exp = subst exp where
                           else Variable name
 --END:Subs9
 
---BEGIN:Subs12
-rename1:: (String, String) -> Exp -> Exp
-rename1 (var, newvar) exp = rename exp where
-  rename (Number i)       = Number i
-  rename (Add a b)        = Add (rename a) (rename b)
-  rename (Subtract a b)   = Subtract (rename a) (rename b)
-  rename (Multiply a b)   = Multiply (rename a) (rename b)
-  rename (Divide a b)     = Divide (rename a) (rename b)
-  rename (Variable name)  = if var == name
-                            then Variable newvar
-                            else Variable name
---END:Subs12
-
 --BEGIN:Mult6
 type Env = [(String, Int)]
 --END:Mult6

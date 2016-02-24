@@ -56,23 +56,5 @@ testP = let k = 2 in
       double k
 --END:Prob22
 
---BEGIN:Exam5
-testE5 = let k = 2 in
-  let double = \n -> k * n in
-    let k = 9 in
-      double k
---END:Exam5
-
---BEGIN:Exam6
-testE6 = let add = \a -> (\b -> b + a) in (add 3) 2
---END:Exam6
-
---BEGIN:Exam7
-testE7 = let m = 2 in
-  let proc = \n -> m + n
-      part = \(g, n) -> \m -> n * g(m)
-  in let inc = part(proc, 3) in
-      inc 7
---END:Exam7
 
 main = return ()

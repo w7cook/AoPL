@@ -878,6 +878,8 @@ Written out explicitly, this grammar means: %Gram21
         * which creates a |Multiply| node containing the value of the expressions
     - an expression followed by a |/| followed by an expression %Gram27
         * which creates a |Divide| node containing the value of the expressions %Gram28
+    - a open parenthesis '(' followed by an  expression followed by a close parenthesis ')'
+        * which returns the expression an throws away the parentheses %Gram28a
 
 Given this lengthy and verbose explanation, I hope you can see the value
 of using a more concise notation! %Gram29
@@ -1269,21 +1271,6 @@ It is important to keep in mind that there are now two stages for
 evaluating an expression containing a variable. The first stage
 is to *substitute* the variable for its value, then the second
 stage is to *evaluate* the resulting arithmetic expression. %Subs14
-
-INCLUDE:Subs12 %Subs22
-> rename1:: (String, String) -> Exp -> Exp
-> rename1 (var, newvar) exp = rename exp where
->   rename (Number i)       = Number i
->   rename (Add a b)        = Add (rename a) (rename b)
->   rename (Subtract a b)   = Subtract (rename a) (rename b)
->   rename (Multiply a b)   = Multiply (rename a) (rename b)
->   rename (Divide a b)     = Divide (rename a) (rename b)
->   rename (Variable name)  = if var == name
->                             then Variable newvar
->                             else Variable name
-> -- %Subs12
-
-TODO: talk about *renaming* variables, or substituting one variable for another %Subs15
 
  ### Multiple Substitution using Environments
 
@@ -3702,32 +3689,33 @@ expression. %Envi3
 
  ### Example 1
 
-INCLUDE:Exam5
-> testE5 = let k = 2 in
->   let double = \n -> k * n in
->     let k = 9 in
->       double k
-> -- %Exam5
+````JavaScript
+var k = 2;
+var double = function (n) { k * n };
+var k = 9;
+double(k)
+````
 
 ![Environment Diagram 1](figures/env1.eps) %Exam3
 
  ### Example 2
 
-INCLUDE:Exam6
-> testE6 = let add = \a -> (\b -> b + a) in (add 3) 2
-> -- %Exam6
+````JavaScript
+var add = function(a) { function(b) { b + a } };
+add(3)(2)
+````
 
 ![Environment Diagram 2](figures/env2.eps)  %Exam1
 
  ### Example 3
 
-INCLUDE:Exam7
-> testE7 = let m = 2 in
->   let proc = \n -> m + n
->       part = \(g, n) -> \m -> n * g(m)
->   in let inc = part(proc, 3) in
->       inc 7
-> -- %Exam7
+````JavaScript
+var m = 2;
+var proc = function(n) { m + n },
+    part = function(g, n) { funtion(m) { n * g(m) }};
+var inc = part(proc, 3);
+inc(7)
+````
 
 ![Environment Diagram 3](figures/env3.png) %Exam4
 
