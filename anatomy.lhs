@@ -2740,7 +2740,7 @@ represented. All we need to do is call it to get the desired answer.[^2] There i
 no need to use a |lookup| function, because the functional environment *is* the
 lookup function. %Repr8
 
-[^2]: This kind of behavioral representation will come again when we discuss object-oriented programming. %Repr9
+[^2]: This kind of behavioral representation will come up again when we discuss object-oriented programming. %Repr9
 
 The only other thing that is done with an environment is to extend it with
 additional bindings. Let's define bind functions that add a binding to
@@ -5510,7 +5510,7 @@ expressed in a uniform format. %Mona1
 The first step is to examine how the two evaluators deal with
 simple computations that return values.
 Consider the way that the |Literal| expression is evaluated for
-both the Checked and the Stateful evaluators. %Abst13
+both the |Checked| and the |Stateful| evaluators. %Abst13
 
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
@@ -5576,7 +5576,7 @@ Checked                                 \ \ \ \ \ \  Stateful
 This *first-part* corresponds to |evaluate a env| or |evaluate b env| in both the original
 versions. The *second-part* represents the remainder of the computation. It is just everything that
 appears after the main pattern, but with all the free variables made explicit.
-For the Checked case, the only variable needed in the *second-part* is the
+For the |Checked| case, the only variable needed in the *second-part* is the
 variable |v| that comes form the |Good| case. For the Stateful case,
 in addition to |v| the *second-part* also requires access to |mem'| %Abst24
 
@@ -5593,8 +5593,8 @@ Checked                                 \ \ \ \ \ \  Stateful
 \ \ \ \ |Error msg -> Error msg|                     \ \ \ \ \ \ \ \ \ \ \ \ \ |F v mem'|
 \ \ \ \ |Good v -> F v|
 
-These generic operators for Checked $\rhd_C$ and Stateful $\rhd_S$ computations
-abstract away the core pattern composing two Checked or Stateful computations.
+These generic operators for |Checked| $\rhd_C$ and |Stateful| $\rhd_S$ computations
+abstract away the core pattern composing two |Checked| or |Stateful| computations.
 The family of operators $\rhd$ are called *bind* operators, because they
 bind together computations. %Abst26
 
@@ -5606,7 +5606,7 @@ Checked                                          \ \ \ \ \ \  Stateful
 \ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|vb.|               \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|vb.|
 \ \ \ \ |checked_binary op av bv|))                           \ \ \ \ $\lambda$|mem.(Binary op av bv, mem)|))
 
-All mention of |Error| and |Good| have been removed from the Checked version!
+All mention of |Error| and |Good| have been removed from the |Checked| version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
 from the Stateful version, but there is still a little at the end. But the pattern
 that has emerged is the same one that was identified in the previous section, where
@@ -5736,7 +5736,7 @@ Haskell also supports special syntax for writing programs that use monads, which
 simplifies the use of the bind operator.
 The problem with the monadic version of the program is apparent in the code for
 evaluation of binary expressions. The code given above is ugly because of the nested
-use of lambda functions. Here an attempt to make the Checked case more readable: %Hask1
+use of lambda functions. Here an attempt to make the |Checked| case more readable: %Hask1
 
 |evaluate (Binary op a b) env =| \
 \ |(evaluate a env)| $\rhd_C$ ($\lambda$|va.| \
@@ -5849,7 +5849,7 @@ the [Section on Error Checking](#ErrorCheckingMonMonadic). %Mona17
  ### Monadic Mutable State {#MonadicState}
 
 The full code for the stateful evaluator using monads is
-give in the [Stateful Monad](./code/StatefulMonad.hs.htm) file
+given in the [Stateful Monad](./code/StatefulMonad.hs.htm) file
 and the [Stateful Parser](./code/StatefulParse.y.htm). %Mona15
 
 The main complexity in defining a stateful monad is that monads in Haskell
@@ -5871,6 +5871,13 @@ INCLUDE:StatefulMonad1
 The data type is isomorphic to the function type, because it is just
 a type with a label. %Mona19
 
+The |Stateful| monad is an instance of |Monad|. It is fairly complex, 
+mostly because of the need to deal with the type tag. 
+
+It defines |return| to return a value without changing memmory. It does this by
+returning a |ST| with a function that takes a memory and returns the
+value with the memory unchanged. 
+
 INCLUDE:StatefulMonad2 %Mona20
 > instance Monad Stateful where
 >   return val = ST (\m -> (val, m))
@@ -5881,6 +5888,13 @@ INCLUDE:StatefulMonad2 %Mona20
 >           f' m'
 >       )
 > -- %StatefulMonad2
+
+It defines the bind operator |>>=| to take a stateful value |c| and a function |f|.
+It returns a new |Stateful| value that accepts a memory |m|, it then passes this 
+memory to |c| and captures the result as a |val| and a new memeory |m'|.
+It then applies the function |f| to the value |val| and captures the resulting
+|Stateful| value. This function |f'| is applied to the new memory |m'| to
+create the |Stateful| result.
 
 Here is a version of evaluator using the |Stateful| monad defined above: %Mona21
 

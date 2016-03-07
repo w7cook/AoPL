@@ -28,7 +28,7 @@ evaluate (Binary op a b) env = do
 evaluate (If a b c) env = do
   av <- evaluate a env
   case av of
-    (BoolV cond) -> evaluate (if cond then b else c) env
+    BoolV cond -> evaluate (if cond then b else c) env
     _ -> Error ("Expected boolean but found " ++ show av)
 -- variables and declarations
 evaluate (Variable x) env    =
