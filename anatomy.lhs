@@ -5602,8 +5602,8 @@ Using these operators, the *original* code can be written in simpler form: %Abst
 
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ ----------------------
-(|evaluate a env|) $\rhd_C$ ($\lambda$|va.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|va.|
-\ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|vb.|               \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|vb.|
+(|evaluate a env|) $\rhd_C$ ($\lambda$|av.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|
+\ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|bv.|               \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|bv.|
 \ \ \ \ |checked_binary op av bv|))                           \ \ \ \ $\lambda$|mem.(Binary op av bv, mem)|))
 
 All mention of |Error| and |Good| have been removed from the |Checked| version!
@@ -5619,8 +5619,8 @@ Using |return|$_S$ the result is: %Abst31
 
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ ----------------------
-(|evaluate a env|) $\rhd_C$ ($\lambda$|va.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|va.|
-\ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|vb.|               \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|vb.|
+(|evaluate a env|) $\rhd_C$ ($\lambda$|av.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|
+\ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|bv.|               \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|bv.|
 \ \ \ \ |checked_binary op av bv|))                            \ \ \ \ |return|$_S$ (|Binary op av bv|)))
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
@@ -5739,8 +5739,8 @@ evaluation of binary expressions. The code given above is ugly because of the ne
 use of lambda functions. Here an attempt to make the |Checked| case more readable: %Hask1
 
 |evaluate (Binary op a b) env =| \
-\ |(evaluate a env)| $\rhd_C$ ($\lambda$|va.| \
-\ \ |(evaluate b env)| $\rhd_C$ ($\lambda$|vb.| \
+\ |(evaluate a env)| $\rhd_C$ ($\lambda$|av.| \
+\ \ |(evaluate b env)| $\rhd_C$ ($\lambda$|bv.| \
 \ \ \ |checked_binary op av bv|))
 
 The effect here is for |av| to be bound to the value produced by the |evaluate a env|,
