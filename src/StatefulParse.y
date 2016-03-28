@@ -40,6 +40,11 @@ import Operators
     '{'    { Symbol "{" }
     '}'    { Symbol "}" }
 
+%nonassoc '!' PRE '@' '-' mutable
+%nonassoc '('
+%right ';' var
+
+
 %%
 
 Exp : function '(' id ')' '{' Exp '}'  { Function $3 $6 }

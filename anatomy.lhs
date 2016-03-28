@@ -3616,7 +3616,7 @@ INCLUDE:A47
 
 The code starts by evaluating both the function part |fun| to
 produce a value. The |where| clause
-|Closure x body newEnv = evaluate fun env| says that the result of
+|ClosureV x body newEnv = evaluate fun env| says that the result of
 evaluating |fun| must be a closure, and the variables |x|,
 |body|, and |newEnv| are bound to the parts of the closure.
 If the result is not a closure, Haskell throws a runtime error.  %A52
