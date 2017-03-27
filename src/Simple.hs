@@ -8,7 +8,7 @@ data Exp = Number     Int
          | Multiply   Exp Exp
          | Divide     Exp Exp
 -- END:Abst3
-	deriving Show
+  deriving Show
 
 --BEGIN:Eval3
 evaluate :: Exp -> Int
@@ -18,3 +18,4 @@ evaluate (Subtract a b)  = evaluate a - evaluate b
 evaluate (Multiply a b)  = evaluate a * evaluate b
 evaluate (Divide a b)    = evaluate a `div` evaluate b
 --END:Eval3
+

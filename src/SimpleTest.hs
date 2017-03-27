@@ -21,17 +21,9 @@ main'2 = do
   print (evaluate t1)
 --END:Eval5
 
---BEGIN:Form8
-main'3 = do
-  test "evaluate" evaluate (parseExp "4")
-  test "evaluate" evaluate (parseExp "-5 + 6")
-  test "evaluate" evaluate (parseExp "3 - -2 - -7")
-  test "evaluate" evaluate (parseExp "3 * (8 + 5)")
-  test "evaluate" evaluate (parseExp "1 + 8 * 2")
---END:Form8
+execute script = show (evaluate (parseExp script))
 
 main = do
   tagged "Eval7" main'2
-  tagged "Form12"main'3
 
   

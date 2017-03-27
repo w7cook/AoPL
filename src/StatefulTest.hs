@@ -16,20 +16,13 @@ testMul10 = mul10 1 [IntV 3, IntV 4, IntV 5, IntV 6]
 mul10 :: Int -> Memory -> Memory
 --END:Upda13
 
-t1 = parseExp ("var x = mutable 3;"++
-     "var y = mutable true;"++
-     "if (@y) { x = @x + 1 } else { x };"++
-     "@x")
-
-t2 = parseExp ("var x = mutable 3;"++
-     "var y = mutable 7;"++
-     "x = @x + @y;"++
-     "@x * @y")
-
-main'2 = do
-  print testMul10
+ -- execute evaluates an expression in an empty environment
+--BEGIN:DeclExec
+executeX exp = show v 
+  where (v, _) = evaluate exp [] []
+--END:DeclExec
 
 main = do
-  tagged "Upda11" main'2
-  test "evaluate" execute t1
-  test "evaluate" execute t2
+  tagged "Upda11" (print testMul10)
+  testMain parseExp executeX
+     

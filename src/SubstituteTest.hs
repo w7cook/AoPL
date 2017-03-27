@@ -11,6 +11,12 @@ t3 = parseExp "x"
 t4 = parseExp "x*x+x"
 t5 = parseExp "x+2*y+z"
 
+test msg fun input = do 
+    putStrLn (msg ++ " " ++ show input ++ "")
+    putStr " ==> "
+    putStrLn (show (fun input))     -- `catch` showError
+    putStrLn ""
+    
 --BEGIN:Subs11
 main'1 = do
   test "substitute1 (\"x\", 5)" (substitute1 ("x", 5)) t1

@@ -1,4 +1,3 @@
-
 import Base
 import FirstClassFunctions hiding (evaluate, execute)
 import FirstClassFunctionsParse

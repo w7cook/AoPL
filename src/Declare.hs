@@ -31,7 +31,4 @@ evaluate (Declare x exp body) env = evaluate body newEnv
   where newEnv = (x, evaluate exp env) : env
 --END:Eval38 END:Impl3
 
--- execute evaluates an expression in an empty environment
---BEGIN:DeclExec
-execute e = evaluate e []
---END:DeclExec
+

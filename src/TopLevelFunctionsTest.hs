@@ -3,8 +3,10 @@ import Prelude hiding (LT, GT, EQ)
 import TopLevelFunctions
 import TopLevelFunctionsParse
 
-p1 = parseExp "function power(n, m) { if (m == 0) 1 else n*power(n, m-1) } power(3, 4)"
+--BEGIN:Eval41
+execute :: Program -> String
+execute (Program funEnv main) = show (evaluate main [] funEnv)
+--END:Eval41
 
-main = do
-  tagged "Top22" (test "execute" execute p1)
+main = tagged "Top22" (testMain parseExp execute)
   

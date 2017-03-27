@@ -10,18 +10,12 @@ import Operators
 type FunEnv = [(String, Function)]
 data Function = Function [String] Exp
 --END:Top15
-	deriving Show
+  deriving Show
 
 --BEGIN:Top18
 data Program = Program FunEnv Exp
 --END:Top18
-	deriving Show
-
---BEGIN:Eval41
-execute :: Program -> Value
-execute (Program funEnv main) = evaluate main [] funEnv
---END:Eval41
-
+  deriving Show
 
 --BEGIN:Summ12
 data Exp = Literal   Value

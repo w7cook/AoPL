@@ -2,16 +2,16 @@
 % William R. Cook
 % Copyright (C) 2013
 
- # Preliminaries
+= Preliminaries
 
- ## Preface
+== Preface
 
- ### What?
+=== What?
 
 This document is a series of notes about programming languages, originally written for
 students of the undergraduate programming languages course at UT. %What2
 
- ### Why?
+=== Why?
 
 I'm writing these notes because I want to teach the theory of programming
 languages with a practical focus, but I don't want to use Scheme (or ML) as the
@@ -37,7 +37,7 @@ The title of this book is derived from one of my favorite books,
 [*The Anatomy of Lisp*](http://www.amazon.com/Anatomy-Lisp-McGraw-Hill-computer-science/dp/007001115X)
 [@Allen:1978:AL:542865]. %Why5
 
- ### Who?
+=== Who?
 
 These notes assume knowledge of programming, and in particular assume basic
 knowledge of programming in Haskell. When I teach the course I give a few hours
@@ -55,7 +55,7 @@ I recommend
 or the
 [Gentle Introduction To Haskell](http://www.haskell.org/tutorial/). %Who2
 
- #### Acknowledgments
+==== Acknowledgments
 
 I thank the students in the spring 2013 semester of CS 345 *Programming Languages*
 at the University of Texas at Austin, who helped out while I was writing the book.
@@ -64,7 +64,7 @@ and Monty Zukowski for careful proofreading. Tyler Allman Young
 captured notes in class. Chris Cotter improved the makefile and wrote the initial
 text for some sections. %Ackn2
 
- ## Introduction
+== Introduction
 
 In order to understand programming languages, it is useful to spend some time thinking
 about *languages* in general. %Intr1
@@ -123,7 +123,7 @@ Familiar examples of metaprograms
 include compilers, interpreters, virtual machines. In this course we will read, write and
 discuss many metaprograms. %Intr7
 
- ## Introduction to Haskell Programming
+== Introduction to Haskell Programming
 
 The goal of this tutorial is to get the students familiar with Haskell Programming.
 Students are encouraged to bring their own laptops to go through the installation
@@ -132,7 +132,7 @@ install Haskell before or if they had problems with the installation. In any cas
 the lab machines will have Haskell installed and students can also use these
 machines for the tutorial. %Intr12
 
- ### Installing Haskell and related tools
+=== Installing Haskell and related tools
 
 If you have your laptop and have not installed Haskell yet, you can try to install it now.
 The Haskell platform is the easiest way to [install Haskell in Windows or Mac OS](http://www.haskell.org/platform). %Inst2
@@ -142,7 +142,7 @@ In Ubuntu Linux you can use: %Inst3
 > sudo apt-get install haskell-platform
 > -- %Inst4
 
- ### Installing Emacs
+=== Installing Emacs
 
 We recommend using emacs as the editor for Haskell, since it is quite simple to use
 and it has a nice Haskell mode. In Ubuntu you can do the following to install
@@ -159,7 +159,7 @@ However students are welcome to use whatever editor they prefer.
 If students are more comfortable using Vim, for example, they are
 welcome to. The choice of the editor is not important. %Inst8
 
- ### Basic steps in Haskell
+=== Basic steps in Haskell
 
 In this tutorial we are going to implement our first Haskell code.
 To begin with, Haskell has normal data as in other programming languages.
@@ -196,7 +196,7 @@ Tuples are fixed length but can contain different types of values.
 Lists are variable length but must contain only one type of value.
 The colon function |:| adds a new item to the front of a list. %Basi21
 
- #### Functions
+==== Functions
 
 First, create a file called "Tutorial1.hs".
 After the creation of the file define the module header as follows: %Func25
@@ -225,7 +225,7 @@ This is different from a conventional imperative language, where the body of a d
 usually a *statement*, which does not have a value. %Func31
 
 expression
-  ~ An *expression* is a syntactic category for syntax produces a value, and possibly has other side effects.
+  ~ An *expression* is a syntactic category for syntax that produces a value, and possibly has other side effects.
 
 statement
   ~ A *statement* is a syntactic category for syntax that has a side effect rather than producing a value.
@@ -263,7 +263,7 @@ int m(int x) {
 %Func39
 ````
 
- #### Data Types
+==== Data Types
 
 Data types in Haskell are defined by variants and components. In other words, a data type
 has a set of variants each with their own constructor, or tag, and each variant has
@@ -276,7 +276,7 @@ a set of components or fields. For example, here is a data type for simple geome
 
 A data type definition always begins with |data| and is followed by the name of the data type,
 in this case |Geometry|. There then follows a list of variants with unique tag names, in this
-case |Point|, |Circle|, and |Rectangle|, which are separated by vertical bar| BAR|. Following
+case |Point|, |Circle|, and |Rectangle|, which are separated by a vertical bar | BAR |. Following
 each constructor tag is a list of data types specifying the types of components of that variant.
 A |Point| has two components, both integers. A |Circle| has three components, and a rectangle
 has 4 integer components. One issue with this notation is that it is not clear what the components
@@ -332,7 +332,7 @@ A Haskell program almost always includes more than one data type definition. %Da
 
 
 
- #### Parametric Polymorphism and Type-Inference
+==== Parametric Polymorphism and Type-Inference
 
 We have seen that Haskell supports definitions with a type-signature or without.
 When a definition does not have a signature, Haskell infers one and it is still
@@ -372,7 +372,7 @@ to any type of values. Try the following in |ghci|, and see what is the resultin
 
 Question 3: Have you seen this form of polymorphism in other languages? Perhaps under a different name? %Para10
 
- #### Pattern matching
+==== Pattern matching
 
 One feature that many functional languages support is pattern matching. Pattern matching plays a
 role similar to conditional expressions, allowing us to create definitions depending on whether
@@ -385,7 +385,8 @@ a list returns the first element of the list: %Patt3
 > -- %Patt4
 
 In this definition, the pattern |[]| denotes the empty list, whereas the pattern |(x:xs)| denotes
-a list where the first element (or the head) is |x| and the remainder of the list is |xs|.
+a list where the first element (or the head) is |x| and the remainder of the list is |xs|. The
+parentheses are required because |hd x:xs| would group as |(hd x):xs| which is meaningless.
 Note that instead of a single clause in the definition there are now two clauses for each case. %Patt5
 
 Question 4: Define a |tl| function that given a list, drops the first element and returns
@@ -411,7 +412,7 @@ here are two definitions with pattern matching on tuples and integers: %Patt9
 > isZero n = False
 > -- %Patt11
 
- #### Pattern Matching Data Types
+==== Pattern Matching Data Types
 
 Functions are defined over data types by *pattern matching*. For example, to
 compute the area of a geometric figure, one would define: %Patt1
@@ -425,7 +426,7 @@ INCLUDE:GEOM2
 > -- %GEOM2
 
 
- #### Recursion
+==== Recursion
 
 In functional languages mutable state is generally avoided and in the case of Haskell
 (which is purely functional) it is actually forbidden. So how can we write many of the
@@ -540,7 +541,7 @@ Assignment 0 (Optional and not graded):
 
 Your first assignment is to try to complete as many questions in the tutorial as you can. %Recu56
 
- # Expressions, Syntax, and Evaluation {#Chapter1}
+= Expressions, Syntax, and Evaluation {#Chapter1}
 
 This chapter introduces three fundamental concepts in programming
 languages: *expressions*, *syntax* and *evaluation*. These concepts are
@@ -564,7 +565,7 @@ evaluation
     composed of various components get simplified until eventually we get a value.
     For example evaluating |2 + 3| results in |5|. %Expr3
 
- ## Simple Language of Arithmetic
+== Simple Language of Arithmetic
 
 Lets have a closer look at the language of arithmetic, which is
 familiar to every grade-school child. %Simp2
@@ -608,7 +609,7 @@ The last picture represents the last two expressions in the previous example.
 This is because the pictures do not need parentheses, since the grouping
 structure is explicit. %Simp8
 
- ## Syntax
+== Syntax
 
 Syntax comes in two forms: abstract and concrete. %Synt1
 
@@ -629,12 +630,12 @@ parser
   ~ A parser is a program that converts concrete syntax into abstract syntax.
     A parser typically inputs text and outputs the abstract syntax structure. %Synt3
 
- ### Abstract Syntax in Haskell
+=== Abstract Syntax in Haskell
 
 This section describes how to represent abstract syntax using Haskell. The code
 for this section is found in the [Simple](./code/Simple.hs.htm) and
 [SimpleParse](./code/SimpleParse.y.htm) files, which are loaded from the 
-[Simple Test](./code/SimpleTest.hs.htm) file.
+[Simple Test](./code/SimpleTest.hs.htm) and [Simple Test Input](./code/SimpleTest.js.htm) file.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
 INCLUDE:Abst3
@@ -677,7 +678,7 @@ Haskell data structure. This is not a defect of Haskell, it is
 merely because we haven't developed a way to convert concrete syntax
 into abstract syntax. %Abst8
 
- ### Concrete Syntax and Grammars
+=== Concrete Syntax and Grammars
 
 The concrete syntax of a language describes how the abstract
 concepts in the language are represented as text. For example,
@@ -685,7 +686,7 @@ lets consider how to convert the string |"3+81*2"| into the
 abstract syntax |Add (Number 3) (Multiply (Number 81) (Number 2))|.
 The first step is to break a text up into *tokens*. %Conc1
 
- #### Tokens
+==== Tokens
 
 Tokens are the basic units of a language. In English, for example,
 words are tokens. But English also uses many symbol tokens, including
@@ -741,7 +742,7 @@ that transforms a string (i.e. a list of characters) into a list of tokens.
 The |lexer| function takes as input a list of symbols and a list of
 keywords. %Toke8
 
- #### Grammars
+==== Grammars
 
 Grammars are familiar from studying natural languages, but they are
 especialy important when studying computer languages. %Gram31
@@ -836,7 +837,7 @@ side. As long as the resulting sentence still has non-terminals
 that haven't been replaced by real words, the
 process is not done (not terminated). %Gram18
 
- #### Grammar Actions and Construction of Abstract Syntax
+==== Grammar Actions and Construction of Abstract Syntax
 
 In addition to specifying the set of legal sentences, a grammar
 can also specify the meaning of those sentences. Rather than
@@ -888,7 +889,7 @@ Just like other kinds of software, there are many design
 decisions that must be made in creating a grammar. Some grammars
 work better than others, depending on the situation. %Gram30
 
- #### Ambiguity, Precedence and Associativity
+==== Ambiguity, Precedence and Associativity
 
 One problem with the straightforward grammar is allows for *ambiguity*. %Ambi10
 
@@ -963,7 +964,7 @@ non-terminal allows primitive constructs, including a parenthesized expression,
 which allows addition and subtraction to be used under multiplication.
 %Ambi9
 
- #### Parser Generators
+==== Parser Generators
 
 The grammar notation used above is also a language. It is a language
 of grammars.
@@ -972,7 +973,7 @@ How to create simple grammars using the
 [Happy Parser Generator](http://www.haskell.org/happy/). %Pars1
 
 
- ## Evaluating Arithmetic Expressions
+== Evaluating Arithmetic Expressions
 
 The normal meaning assigned to arithmetic expressions is the evaluation of the
 arithmetic operators to compute a final answer. This evaluation process is
@@ -1049,7 +1050,7 @@ INCLUDE:Form12
 > -- %Form12
 
 
- ### Errors
+=== Errors
 
 There are many things that can go wrong when evaluating an expression.
 In our current, very simple language, the only error that can arise
@@ -1073,7 +1074,7 @@ terminate the program when these situations arise,
 but in [Chapter 5](#Monads) we will investigate how to
 manage errors within our evaluator. %Erro6
 
- ## Object Language and Meta-Language
+== Object Language and Meta-Language
 
 TODO: talk about meta language: language of study versus language of implementation. Better words? %Abst10
 
@@ -1107,7 +1108,7 @@ language. In other words, when referring to the expression |2 + 3| the
 default meaning is the object language expression |2 + 3|. %Obje2
 
 
- # Variables
+= Variables
 
 Arithmetic expressions often contain *variables* in addition
 to constants. In grade school the first introduction to variables
@@ -1147,7 +1148,7 @@ binding
 Bindings can be represented in Haskell as a pair. For example, the
 binding of $x \mapsto 5$ can be represented as |("x", 5)|. %Vari5
 
- ### Variable Discussion
+=== Variable Discussion
 
 We are used to calling $x$ and $y$ "variables" without really thinking
 much about what it means to be a "variable". Intuitively a variable is something
@@ -1194,7 +1195,7 @@ we will not discuss them directly here. For our purposes, we will
 assume that we already know the value of the variable, and that the problem
 is to compute a result using that value.  %Vari8
 
- ## Substitution
+== Substitution
 
 Substitution replaces a variable with a value in an expression.
 Here are some examples of substitution: %Subs2
@@ -1272,7 +1273,7 @@ evaluating an expression containing a variable. The first stage
 is to *substitute* the variable for its value, then the second
 stage is to *evaluate* the resulting arithmetic expression. %Subs14
 
- ### Multiple Substitution using Environments
+=== Multiple Substitution using Environments
 
 There can be multiple variables in a single expression. For example,
 evaluating $2 * x + y$ where $x=3$ and $y=-2$. A collection of bindings
@@ -1397,7 +1398,7 @@ INCLUDE:Mult14
 The |foldr fun init list| function applies a given function to each item
 in a list, starting with a given initial value. %Mult15
 
- ### Local Variables
+=== Local Variables
 
 So far all variables have been defined *outside*
 the expression itself. It is also useful to allow variables to be
@@ -1485,7 +1486,7 @@ another case to the definition of expressions: %Loca21
 where the string is the variable name, the first |Exp| is the *bound expression*
 and the second |Exp| is the *body*. %Loca23
 
- ### Scope
+=== Scope
 
 Variables have a range of text in which they are defined.
 
@@ -1507,7 +1508,7 @@ TODO: talk about *free* versus *bound* variables %Scop5
 
 TODO: talk about renaming %Scop6
 
- ### Substituting into Variable Declarations {#BasicSubst}
+=== Substituting into Variable Declarations {#BasicSubst}
 
 When substituting a variable into an expression, care must
 be taken to correctly deal with holes in the variable's scope.
@@ -1531,7 +1532,7 @@ same as the variable |x| defined in the variable declaration.  %Subs16
 
 TODO: need some test cases here  %Subs18
 
- ### Evaluating Variable Declarations using Substitution
+=== Evaluating Variable Declarations using Substitution
 
 The evaluation of a variable declaration is based on substitution.
 To evaluate |var| *x* |=| *e*|;| *b*,
@@ -1548,7 +1549,7 @@ INCLUDE:Eval28
 
 TODO: need some test cases here  %Eval29
 
- ### Undefined Variable Errors
+=== Undefined Variable Errors
 
 With the introduction of variables into our language, a new kind of
 error can arise: attempting to evaluate an expression
@@ -1591,7 +1592,7 @@ executed at runtime. Thus the boundary between static and dynamic errors is not
 absolute. The issue of static versus dynamic properties of programs
 is discussed in more detail later (TODO: reference to chapter on Types). %Unde6
 
- ### Summary
+=== Summary
 
 Here is the full code evaluation using substitution of a language
 with local variables. %Summ2
@@ -1632,7 +1633,7 @@ INCLUDE:Summ4
 > evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
 > -- %Summ4
 
- ## Evaluation using Environments {#BasicEvalEnv}
+== Evaluation using Environments {#BasicEvalEnv}
 
 For the basic evaluator substitution and evaluation were
 completely separate, but the evaluation rule for variable
@@ -1814,11 +1815,16 @@ INCLUDE:DeclTest1
 > -- %DeclTest1
 
 The code for this section
-is given in the [Declare](./code/Declare.hs.htm), [Declare Parser](./code/DeclareParse.y.htm)
-and  [Declare Test](./code/DeclareTest.hs.htm) files. %Eval30
+is given in the 
+[Declare](./code/Declare.hs.htm), 
+[Declare Parser](./code/DeclareParse.y.htm),
+[Declare Test](./code/DeclareTest.hs.htm),
+[Declare Test Input](./code/DeclareTest.js.htm),
+[Base](./code/Base.hs.htm), and
+[Lexer](./code/Lexer.hs.htm) files. %Eval30
 
 
- ## More Kinds of Data: Booleans and Conditionals {#MoreData}
+== More Kinds of Data: Booleans and Conditionals {#MoreData}
 
 In addition to arithmetic computations, it is useful for expressions
 to include conditions and also return different kinds of values.
@@ -1981,7 +1987,7 @@ INCLUDE:More23
 >
 > -- %More23
 
- ### Type Errors
+=== Type Errors
 
 Now that our language supports two kinds of values, it is possible for
 an expression to get *type errors*. A type error occurs when evaluation of
@@ -2030,7 +2036,7 @@ INCLUDE:Type6run
 We will discuss techniques for preventing type errors later, but for now
 it is important to realize that programs may fail at runtime. %Type7
 
- ## Assignment 1: Basic Interpreter {#assign1 -}
+== Assignment 1: Basic Interpreter {#assign1 -}
 
 Extend the *parser* and *interpreter* of [Section on Evaluating Using Environments](#BasicEvalEnv)
 to allow multiple bindings in a variable binding
@@ -2086,10 +2092,11 @@ is given in the
 [Declare](./code/Declare.hs.htm), 
 [Declare Parser](./code/DeclareParse.y.htm),
 [Declare Test](./code/DeclareTest.hs.htm),
+[Declare Test Input](./code/DeclareTest.js.htm),
 [Base](./code/Base.hs.htm), and
 [Lexer](./code/Lexer.hs.htm) files. %Basi13
 
- # Functions
+= Functions
 
 Functions are familiar to any student of mathematics. The first hint of
 a function in grade school may be some of the standard operators that
@@ -2112,7 +2119,7 @@ first we will implement the ability to evaluate a restricted subset of functions
 in our developing language. Then, to help you actually answer the question of what a function is, we will
 explore the idea of functions as first-class values in a programming language. %Func4
 
- ## Top-Level Function Definitions {#TopLevel}
+== Top-Level Function Definitions {#TopLevel}
 
 Some programming languages, including C and ACL2, allow functions to be defined only
 at the top level of the program. The "top level" means outside of
@@ -2121,7 +2128,10 @@ function definitions followed by a main expression. The
 main expression in a C program is an implicit call to a
 function named |main|. Even if a programming language does support more flexible
 definition of functions, top-level functions are quite common. The code
-for this section is given in the [Top Level Functions](./code/TopLevelFunctions.hs.htm) file.
+for this section is given in the [Top Level Functions](./code/TopLevelFunctions.hs.htm),
+[Top Level Functions Test](./code/TopLevelFunctionsTest.hs.htm), and
+[Top Level Functions Test Input](./code/TopLevelFunctionsTest.js.htm) 
+files.
 Here is an example of some top-level functions, written in JavaScript: %Top2
 
 ````Java
@@ -2219,7 +2229,7 @@ INCLUDE:Top22
 >
 > -- %Top22
 
- ### Evaluating Top-Level Functions {#EvalTopLevel}
+=== Evaluating Top-Level Functions {#EvalTopLevel}
 
 A new function, |execute|, runs a program. It does so
 by evaluating the main expression in the context of the
@@ -2337,12 +2347,12 @@ because the function definitions can be used in any expression,
 including in the body of the functions themselves. This means that
 all functions have *global scope*.  %Eval57
 
- ### Stack Diagrams
+=== Stack Diagrams
 
 TODO: illustrate how stacks work in languages that don't have
 first-class functions %Stac2
 
- ### Summary
+=== Summary
 
 Here is the full code for the evaluator supporting
 top-level functions definitions, taken from the
@@ -2382,14 +2392,14 @@ INCLUDE:Summ12
 >         newEnv = zip xs [evaluate a env funEnv | a <- args]
 > -- %Summ12
 
- #### Exercise 3.1: Stack-based evaluation
+==== Exercise 3.1: Stack-based evaluation
 
 Modify the evaluator for top-level functions to use a stack with a list of
 values, rather than an environment. Use a function to look up the position of
 a variable in an argument list, then access the corresponding position from
 the top of the stack. %Exer3
 
- ## First-Class Functions
+== First-Class Functions
 
 In the [Section on Top-Level Functions](#TopLevel), function definitions were defined using
 special syntax and only at the top of a program.
@@ -2444,7 +2454,7 @@ To 'solve for |f|' we need some new notation, just the
 way that the square root symbol $\sqrt{x}$ was introduced
 to represent a new operation. %Firs11
 
- ## Lambda Notation
+== Lambda Notation
 
 The standard solution is to use a *lambda expression*, or
 *function expression*,
@@ -2488,7 +2498,7 @@ calculus has had huge influence on programming languages.
 We will study the lambda calculus in more detail in a
 later section, but the basic concepts are introduced here. %Lamb8
 
- ### Using Lambdas in Haskell {#LambdaDefinition}
+=== Using Lambdas in Haskell {#LambdaDefinition}
 
 Haskell is based directly on the lambda calculus. In
 fact, the example illustrating how to "solve" for the
@@ -2530,7 +2540,7 @@ implicitly a lambda expression, you have already been
 using lambdas without realizing it. As the old
 dishwashing soap commercial said "You are soaking in it." %Usin7
 
- ### Function Calls
+=== Function Calls
 
 A function call in Haskell is represented by placing
 one expression next to another expression. Placing two
@@ -2598,7 +2608,7 @@ For now this is an informal definition.
 We will make it more precise when we
 write an evaluator that handles function expressions correctly. %Func12
 
- ## Examples of First-Class Functions {#FirstClassExamples}
+== Examples of First-Class Functions {#FirstClassExamples}
 
 Before we begin a full analysis of the semantics of first-class
 functions, and subsequently implementing them in Haskell, it is useful
@@ -2606,7 +2616,7 @@ to explore some examples of first-class functions. Even if you have
 used first-class functions before, you might find these examples
 interesting. %Exam2
 
- ### Function Composition {#Compose}
+=== Function Composition {#Compose}
 
 One of the simplest examples of a using functions as values is
 defining a general operator for *function composition*. The
@@ -2647,7 +2657,7 @@ INCLUDE:Func24
 > areaD = compose areaR (\x -> x / 2)
 > -- %Func24
 
- ### Mapping and List Comprehensions {#Map}
+=== Mapping and List Comprehensions {#Map}
 
 One of the earliest and widely cited examples of first class functions
 is in the definition of a |map| function, which applies a function to
@@ -2690,7 +2700,7 @@ The comprehensions used earlier in this document could be replaced by invocation
 
 TODO: is a function that returns a function also called higher order? %Mapp14
 
- ### Representing Environments as Functions {#EnvAsFun}
+=== Representing Environments as Functions {#EnvAsFun}
 
 In [Chapter 1](#Chapter1), an environment was represented as a list of bindings.
 However, it is often useful to consider the *behavior* of a concept
@@ -2889,7 +2899,7 @@ blurry. %Repr35
 
 TODO: define "shadow" and use it in the right places. %Repr36
 
- ### Multiple Arguments and Currying {#Curry}
+=== Multiple Arguments and Currying {#Curry}
 
 Functions in the lambda calculus always have exactly *one* argument.
 If Haskell is based on Lambda calculus, how should we
@@ -3061,12 +3071,12 @@ uncurrying
 
 
 
- ### Church Encodings
+=== Church Encodings
 
 Other kinds of data besides environments can be represented as functions.
 These examples are known as Church encodings. %Chur2
 
- #### Booleans
+==== Booleans
 
 Booleans represent a choice between two alternatives. Viewing the
 boolean itself as a behavior leads to a view of a boolean as a
@@ -3143,7 +3153,7 @@ Church Boolean
     arguments, which returns the first argument for true, and the second 
     argument for false.
   
- #### Natural Numbers
+==== Natural Numbers
 
 Natural numbers can also be represented functionally. The Church encoding
 of natural numbers is known as *Church Numerals*. The idea behind
@@ -3240,7 +3250,7 @@ We can use these functions to produce simple arithmetic equations. %Natu24
 > a = plus x (mul y z) -- is equivalent to church 20
 > -- %Natu25
 
- ### Relationship between Declarations and Functions
+=== Relationship between Declarations and Functions
 
 TODO: prove that |var x =| $e$|;| $b$ is equivalent to
    ($\lambda$|x.|$b$)$e$ %Rela2
@@ -3257,12 +3267,12 @@ Calling |foo(|$e$|)| is equivalent to  |var x =| $e$|;| $b$.
 So, a |var| statement is another rewording of a lambda function that takes a certain
 argument binding before interpretting the body. %Rela3
 
- #### Others
+==== Others
 
 There are many other uses of first-class functions, including
 callbacks, event handlers, thunks, continuations, etc. %Othe2
 
- ## Evaluating First-Class Functions using Environments
+== Evaluating First-Class Functions using Environments
 
 It's now time to define the syntax and semantics of a
 language with first-class functions. Based on the examples
@@ -3284,7 +3294,7 @@ TODO: move this discussion earlier!   %Eval9
 
 \StartIncorrect
 
- ### A Non-Solution: Function Expressions as Values
+=== A Non-Solution: Function Expressions as Values
 
 The first idea for achieving "functions are values" is
 to make function expressions be values. It turns out that
@@ -3298,7 +3308,9 @@ colored red to remind you that the solution it presents
 is *incorrect*. The correct solution is given in
 the [next section, on closures](#Closures). The code for
 the incorrect soluiton mentioned here is in the
-[Incorrect Functions](./code/IncorrectFunctions.hs.htm) file. %A2
+[Incorrect Functions](./code/IncorrectFunctions.hs.htm),
+ [Incorrect Functions Test](./code/IncorrectFunctionsTest.hs.htm)
+and [Incorrect Functions Input](./code/IncorrectFunctionsTest.js.htm) files. %A2
 
 To try this approach, function expressions
 are included in the |Value| data type, which
@@ -3445,7 +3457,7 @@ as values, and the other with passing functions as arguments.
 They both involve the handling of free variables in the
 function expression. %A30
 
- #### Problems with Returning Functions as Values
+==== Problems with Returning Functions as Values
 
 Let's look at the problem of returning functions as values first.
 The section on [Multiple Arguments](#Curry) showed how a two-argument
@@ -3494,7 +3506,7 @@ were number or booleans. But function expressions are different because
 they contain variables, so care must be taken to avoid losing the
 bindings for the variables. %Prob10
 
- #### Problems with Rebinding Variables
+==== Problems with Rebinding Variables
 
 A second problem can arise when passing functions as values. This
 problem can occur, for example, when [composing two functions](#Compose),
@@ -3534,7 +3546,7 @@ dynamic binding
 
 \EndIncorrect
 
- ### A Correct Solution: Closures {#Closures}
+=== A Correct Solution: Closures {#Closures}
 
 As we saw in the previous section, the problem with using a
 function expression as a value is that the bindings of the free variables
@@ -3633,13 +3645,13 @@ environment, |evaluate body newEnv|.  %A55
 
 TODO: give an example of how this runs?  %A56
 
- #### Exercise 3.2: Multiple Arguments
+==== Exercise 3.2: Multiple Arguments
 
 Modify the definition of |Function| and |Call| to allow multiple
 arguments. Modify the |evaluate| function to correctly handle the
 extra arguments. %Exer4
 
- ## Environment/Closure Diagrams
+== Environment/Closure Diagrams
 
 The behavior of this evaluator is quite complex, but its
 operation on specific programs can be illustrated by showing
@@ -3687,7 +3699,7 @@ expression. %Envi3
 
         Set the environment of the closure to be the current environment %Envi15
 
- ### Example 1
+=== Example 1
 
 ````JavaScript
 var k = 2;
@@ -3698,7 +3710,7 @@ double(k)
 
 ![Environment Diagram 1](figures/env1.eps) %Exam3
 
- ### Example 2
+=== Example 2
 
 ````JavaScript
 var add = function(a) { function(b) { b + a } };
@@ -3707,7 +3719,7 @@ add(3)(2)
 
 ![Environment Diagram 2](figures/env2.eps)  %Exam1
 
- ### Example 3
+=== Example 3
 
 ````JavaScript
 var m = 2;
@@ -3719,12 +3731,12 @@ inc(7)
 
 ![Environment Diagram 3](figures/env3.png) %Exam4
 
- ## Call-by-value and Call-by-name
+== Call-by-value and Call-by-name
 
 In languages with declarations, functions or first-class functions there are a few 
 different design options when it comes to evaluation. 
 
- ### Call-by-value
+=== Call-by-value
 
 So far all our interpreters have explored one particular design option, called call-by-value. 
 
@@ -3767,7 +3779,7 @@ takes a long time to compute. In both cases the returned value will be 3 and the
 result does not depend on the value that is computed by |longcomputation|. So, in this case, 
 it seems wasteful to spend time computing |longcomputation|. 
 
- ### Call-by-Name
+=== Call-by-Name
 
 A different design option is to use call-by-name. 
 
@@ -3805,7 +3817,7 @@ call-by-need
   
 This means that in call-by-need an expression will be evaluated at most once.
 
- ### Call-by-Value, Call-by-Name and Exceptions
+=== Call-by-Value, Call-by-Name and Exceptions
 
 In a language with exceptions, the same expression may evaluate to different results. 
 under call-by-name or call-by-value. For example:
@@ -3822,7 +3834,7 @@ The reason is that exceptions propagate. Since in call-by-value all expressions 
 throughout evaluation. In contrast in call-by-name the expression bound to x is not needed 
 to compute the result. Therefore, because that expression is not evaluated, no exception is propagated.
 
- ## Summary of First-Class Functions  {#FirstClassFunctions}
+== Summary of First-Class Functions  {#FirstClassFunctions}
 
 Here is the full code for first-class functions with non-recursive definitions.
 The grammar changes are as follows, taken from
@@ -3876,9 +3888,11 @@ INCLUDE:Summ14
 >         newEnv = (x, evaluate arg env) : closeEnv
 > -- %Summ14
 
-A test case can be found in the [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm) file %Summ15
+A test case can be found in 
+  the [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm) file
+  and the [First Class Functions Test Input](./code/FirstClassFunctionsTest.js.htm) file. %Summ15
 
- ## Assignment 2: First-Class Functions {#assign2 -}
+== Assignment 2: First-Class Functions {#assign2 -}
 
 Extend the *parser* and *interpreter* of [Section on First-Class Functions](#FirstClassFunctions)
 to allow passing multiple parameters, by adding a *tuple* data type and allowing *patterns* to
@@ -3922,11 +3936,11 @@ errors when given invalid input (except as mentioned above). %Assi8
 The files you need are
 [First Class Functions](./code/FirstClassFunctions.hs.htm),
 [First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm),
-and
-[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm).
+[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm),
+and [First Class Functions Test Input](./code/FirstClassFunctionsTest.js.htm) files.
 And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Assi9
 
- # Recursive Definitions
+= Recursive Definitions
 
 One consequence of using a simple |var| expression to define functions
 is that it is no longer possible to define *recursive functions*, which
@@ -3980,7 +3994,7 @@ In this case the result is |9900| because |x = 100| and
 |y = 99|. It works because the binding expression for |x|, namely |y + 1|,
 is in the scope of |y|. %Recu10
 
- ## Semantics of Recursion
+== Semantics of Recursion
 
 A more fundamental question is *what does a recursive definition* **mean**?
 In grade school we get used to dealing with equations that have the same
@@ -4034,7 +4048,7 @@ the computation will perform $3n + 1$ steps. Since it will handle any natural nu
 there is no bound on the number of steps it performs. If you tried to write out
 the steps that might be performed, then the list of steps would be infinite. %Sema14
 
- ### Three Analyses of Recursion
+=== Three Analyses of Recursion
 
 In what follows we will explore three ways to understand recursion. The first
 explanation just allows us to define recursive |var| expression by using
@@ -4050,7 +4064,7 @@ consider a third implementation, based on self application. This explanation is
 messy but practical. In fact, it is the basis for real-world implementations of
 C++ and Java. %Thre2
 
- ## Understanding Recursion using Haskell Recursion {#Cyclic}
+== Understanding Recursion using Haskell Recursion {#Cyclic}
 
 Haskell makes it easy to create infinite structures and functions. Understanding
 how this works can help us in implementing our language. We've already seen many
@@ -4119,7 +4133,7 @@ data constructor (e.g. |:|) or inside a function (in the body of a lambda),
 then it will probably not loop infinitely. This is because both
 data constructors and functions are lazy in Haskell. %Unde18
 
- ### Using Results of Functions as Arguments
+=== Using Results of Functions as Arguments
 
 Another interesting use of recursion and laziness is the ability to
 use the result of a calling a function as one of the arguments to the function call itself. %Usin1
@@ -4196,7 +4210,7 @@ is passed as an argument to the function call itself! %Usin23
 
 TODO: Explain how this works, and give a picture. %Usin24
 
- ### Implementing Recursive Variable Declarations with Haskell
+=== Implementing Recursive Variable Declarations with Haskell
 
 The powerful techniques for recursive definition illustrated
 in the previous section are sufficient to implement recursive |var|
@@ -4236,7 +4250,7 @@ does recursion work? %Impl7
 TODO: come up with a *name* for the little language we are defining
 and exploring. PLAI uses names like ArithC and ExprC. %Impl8
 
- #### Recursive Definitions in Environment/Closure Diagrams
+==== Recursive Definitions in Environment/Closure Diagrams
 
 For the case of recursive bindings, the only difference is that the
 order of step 2 and 3 is swapped:  %Recu1
@@ -4257,7 +4271,7 @@ environment *before* it is fully defined.  %Recu20
 
 TODO: examples here  %Recu21
 
- ## Understanding Recursion with Fixed Points
+== Understanding Recursion with Fixed Points
 
 Another way to explain recursion is by using the mathematical
 concept of a fixed point. 
@@ -4285,7 +4299,7 @@ TODO: give citations to appropriate books.  %Unde28
 TODO: nice picture of the book and the fixed point? Use a fun
 book, like "Theory of Lambda Conversion".  %Unde29
 
- ### Fixed Points of Numeric Functions
+=== Fixed Points of Numeric Functions
 
 Fixed-points can also be identified for simple mathematical
 functions: %Fixe2
@@ -4366,7 +4380,7 @@ hasn't been defined yet, and maybe cannot be defined. Is it
 possible to automatically find a fixed point of any function?
 Does the function |fix| exist? Can it be defined? %Fixe16
 
- ### Fixed Points by Iterative Application
+=== Fixed Points by Iterative Application
 
 It turns out that there is no way to find fixed points for
 *any* arbitrary function $f$, but for a certain class of
@@ -4459,7 +4473,7 @@ given above:  %Fixe26
 Only two of the six examples worked. Fixed points are not a general
 method for solving numeric equations.  %Fixe28
 
- ### Fixed Points for Recursive Structures
+=== Fixed Points for Recursive Structures
 
 The infinite recursive structures discussed in
 [Section on Haskell Recursion](#Cyclic) can also be defined using fixed points:  %Fixe29
@@ -4544,7 +4558,7 @@ By staring with the empty list and then applying |g_numbers| repeatedly,
 the result eventually converges on the fixed point. Each step is a
 better approximation of the final answer. %Fixe18
 
- ### Fixed Points of Higher-Order Functions
+=== Fixed Points of Higher-Order Functions
 
 TODO: text explaining how to implement |fact| using fix.  %Fixe44
 
@@ -4558,7 +4572,7 @@ INCLUDE:Fixe46
 
 more...  %Fixe47
 
- ### A Recursive Definition of |fix|
+=== A Recursive Definition of |fix|
 
 Haskell allows an elegant definition of |fix| using recursion, which
 avoids the issue of selecting a starting value for the iteration.  %A57
@@ -4579,7 +4593,7 @@ Remember that arguments in Haskell are only evaluated if they are *needed*.
 Instead it begins evaluating the body of |g|, which may or may not
 use its argument.  %A59
 
- ### A Non-Recursive Definition of |fix|
+=== A Non-Recursive Definition of |fix|
 
 It is also possible to define |fix| non-recursively, by using *self application*.
 
@@ -4680,7 +4694,7 @@ Y = |stamp|($\lambda$f.($\lambda$x.f($\lambda$v.(|stamp| x v)))) %A28
 Finally, explicit fixed points involve creation of
 many closures.  %A79
 
- ## Understanding Recursion with Self-Application
+== Understanding Recursion with Self-Application
 
 Another way to implement recursion is by writing
 self-application directly into a function. For
@@ -4722,7 +4736,7 @@ One interesting thing about this final implementation
 strategy is that it is *exactly* the strategy used in
 the actual implementation of languages, including C++ and Java. %Unde9
 
- # Computational Strategies {#Monads}
+= Computational Strategies {#Monads}
 
 In previous sections the Exp language was extended with
 specific kinds of expressions and values, for example
@@ -4732,7 +4746,7 @@ consider extensions that have a general impact on every part of the
 language. Some examples are error handling, tracing of code,
 and mutable state. %Comp2
 
- ## Error Checking {#ErrorCheckingMonMonadic}
+== Error Checking {#ErrorCheckingMonMonadic}
 
 Errors are an important aspect of computation. They
 are typically a pervasive feature of a language, beause they affect
@@ -4770,7 +4784,7 @@ which represents a computation that may either be a good value or an error.
 
 ![A computation that may produce an error.](figures/ErrroShape.eps) %Err9
 
- ### Error Checking in Basic Expressions
+=== Error Checking in Basic Expressions
 
 To keep things simple and focused on errors,
 this section will only consider expressions
@@ -4799,7 +4813,7 @@ INCLUDE:Hand11
 >     Just v  -> Good v
 > -- %Hand11
 
- ### Error Checking in Multiple Sub-expressions
+=== Error Checking in Multiple Sub-expressions
 
 The case for binary operations is more interesting.
 Here is the original rule for evaluating binary expressions: %Hand12
@@ -4877,7 +4891,7 @@ INCLUDE:Hand17
 All the other cases are the same as before, so |checked_binary|
 calls |binary| and then tags the resulting value as |Good|. %Hand18
 
- ### Examples of Errors
+=== Examples of Errors
 
 Evaluating an expression may now return an error for unbound variables: %Hand27
 
@@ -4908,7 +4922,7 @@ is messy and tedious. The code for binary operators has to deal with
 errors, even though most binary operators don't have anything to do with
 error handling. %Hand35
 
- #### Exercise 6.1: Complete Error Checking
+==== Exercise 6.1: Complete Error Checking
 
 Extend the evaluator with error checking for the
 remaining expression cases, including
@@ -4930,7 +4944,7 @@ And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Exer2
 As a bonus, implement error checking for recursive |var|
 expressions. %Exer5
 
- #### Exercise 6.2: Error Handling
+==== Exercise 6.2: Error Handling
 
 In the code given above, all errors cause the program to terminate execution.
 Extend the language with a |try|/|catch| expression that allows
@@ -4939,13 +4953,13 @@ errors to be caught and handled within a program. The syntax is
 return its value if it is |Good|, otherwise evaluate the second
 |Exp| and return its value (or an |Error|). %Exer6
 
- #### Exercise 6.3: Multiple Bindings and Arguments
+==== Exercise 6.3: Multiple Bindings and Arguments
 
 If you really want to experience how messy it is to explicitly program
 error handling, implement error checking where |var| expressions
 can have multiple bindings, and functions can have multiple arguments. %Exer1
 
- ## Mutable State {#Mutable}
+== Mutable State {#Mutable}
 
 A second common pervasive computational strategy, besides
 error handling, is the use of *mutable state*. 
@@ -5001,9 +5015,12 @@ because we have chosen to write the evaluator in Haskell, a pure functional lang
 The hope is that detailed and explicit analysis of how mutation
 works in programming languages will
 lead to insights about the costs and benefits of using mutation.
-The code for this section is in the [Mutable State](./code/Stateful.hs.htm) file. %Muta9
+The code for this section is in the [Mutable State](./code/Stateful.hs.htm),
+[Mutable State Test](./code/StatefulTest.hs.htm), 
+and [Mutable State Test Input](./code/StatefulTest.js.htm)
+files. %Muta9
 
- ### Addresses
+=== Addresses
 
 Imperative languages typically allow everything to be mutable
 by default: all variables are mutable and all data structures
@@ -5098,7 +5115,7 @@ Introducing cells and addresses does not fundamentally change the nature or capa
 imperative languages, it just modifies how the imperative features
 are expressed. %Addr13
 
- #### Memory
+==== Memory
 
 The current value of all mutable cells used in a program is called
 *memory*. 
@@ -5164,13 +5181,13 @@ Step                    Memory
 |x = @@x * @@i;|        $[120, 5]$
 |i = @@i + 1;|          $[120, 6]$ %Memo1
 
- ### Pure Functional Operations on Memory
+=== Pure Functional Operations on Memory
 
 The two fundamental operations on memory are memory *access*,
 which looks up the contents of a memory cell, and *update*, which
 modifies the contents of a memory cell. %Pure2
 
- #### Access
+==== Access
 
 The memory |access| function takes a memory address $i$
 and a memory (list) and returns the item of the list at position $i$
@@ -5184,7 +5201,7 @@ INCLUDE:Acce3
 
 TODO: rename "access" to be "contents"? %Acce1
 
- #### Update
+==== Update
 
 It is not possible to actually *change* memory in pure functional
 languages, including Haskell, because there is no way to modify a
@@ -5248,7 +5265,7 @@ INCLUDE:Upda13
 This means that |mul10| takes an memory address as an input and returns
 a function that transforms an input memory into an output memory. %Upda14
 
- ### Stateful Computations {#Stateful}
+=== Stateful Computations {#Stateful}
 
 A stateful computation is one that produces a value and *also* accesses
 and potentially updates memory. In changing |evaluate| to be a
@@ -5301,7 +5318,7 @@ This type is very similar to the type given for |evaluate| in the error
 section, where |Checked| was used in place of |Stateful|. This similarity
 is not an accident, as we will see in a later chapter. %Stat12
 
- ### Semantics of a Language with Mutation
+=== Semantics of a Language with Mutation
 
 The first step in creating a function with mutable cells is to add
 abstract syntax for the three operations on mutable cells. The following
@@ -5358,7 +5375,7 @@ INCLUDE:Sema25
 >       (ev, update i ev mem'')
 > -- %Sema25
 
- #### Mutable State with Multiple Sub-expressions
+==== Mutable State with Multiple Sub-expressions
 
 The interesting thing is that even parts of the evaluator
 that have nothing to do with mutable cells have to be
@@ -5394,7 +5411,7 @@ Note that |var| can also be used to implement sequences of operations:
 |e1; e2| can be represented as |var dummy = e1; e2| where |dummy| is a
 variable that is not used anywhere in the program. %Muta13
 
- ### Summary of Mutable State {#NonMonadicMutableState}
+=== Summary of Mutable State {#NonMonadicMutableState}
 
 Again, the take-away should be that mutation is messy when
 programmed in this way. Mutation affects every part of the
@@ -5480,7 +5497,7 @@ INCLUDE:Summ11
 >       (ev, update i ev mem'')
 > -- %Summ11
 
- ## Monads: Abstract Computational Strategies
+== Monads: Abstract Computational Strategies
 
 At first glance it does not seem there is anything that can be
 done about the messy coding involved in implementing errors
@@ -5505,7 +5522,7 @@ expressed in a uniform format. %Mona1
 
 ![Modified Dilbert Cartoon](figures/23956strip.png)  %Mona2
 
- ### Abstracting Simple Computations
+=== Abstracting Simple Computations
 
 The first step is to examine how the two evaluators deal with
 simple computations that return values.
@@ -5540,7 +5557,7 @@ Checked                                          \ \ \ \ \ \  Stateful
 |evaluate :: Exp -> Env -> Checked Value|                     |evaluate :: Exp -> Env -> Stateful Value|
 |evaluate (Literal v) env = return|$_C$ |v|                   |evaluate (Literal v) env = return|$_S$ |v| %Abst21
 
- ### Abstracting Computation Composition
+=== Abstracting Computation Composition
 
 The next step is to unify the case when there are multiple sub-expressions
 that must be evaluated. The binary operator provides a good example
@@ -5552,7 +5569,7 @@ Checked                                          \ \ \ \ \ \  Stateful
 |evaluate (Binary op a b) env =|                              |evaluate (Binary op a b) =|
 \ \ |case evaluate a env of|                                  \ \ $\lambda$|mem.let (av, mem') = evaluate a env mem in|
 \ \ \ \ |Error msg -> Error msg|                              \ \ \ \ \ \ \ \ \ \ \ \ \ |let (bv, mem'') = evaluate b env mem' in|
-\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |(Binary op av bv, mem'')|
+\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |(binary op av bv, mem'')|
 \ \ \ \ \ \ |case evaluate b env of|
 \ \ \ \ \ \ \ \ |Error msg -> Error msg|
 \ \ \ \ \ \ \ \ |Good bv ->|
@@ -5604,7 +5621,7 @@ Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ ----------------------
 (|evaluate a env|) $\rhd_C$ ($\lambda$|av.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|
 \ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|bv.|               \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|bv.|
-\ \ \ \ |checked_binary op av bv|))                           \ \ \ \ $\lambda$|mem.(Binary op av bv, mem)|))
+\ \ \ \ |checked_binary op av bv|))                           \ \ \ \ $\lambda$|mem.(binary op av bv, mem)|))
 
 All mention of |Error| and |Good| have been removed from the |Checked| version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
@@ -5643,7 +5660,7 @@ pattern, which has to do with the structure of the underlying computation: is it
 checked computation or a stateful computation? Other forms of computation are also
 possible. %Abst35
 
- ### Monads Defined
+=== Monads Defined
 monad
 
 :   A *monad* $m$ is a computational structure that involves three parts: %Mona3
@@ -5689,7 +5706,7 @@ the output of the first computation $A$ can be passed to $F$, there is not probl
 
 TODO: mention the monad laws. %Mona11
 
- ## Monads in Haskell
+== Monads in Haskell
 
 The concept of a monad allows pervasive computational features, e.g. error checking and
 mutable state, to be defined in using a high-level interface that allows hides the plumbing
@@ -5697,7 +5714,7 @@ involved in managing errors or state. Unfortunately, the resulting programs are 
 somewhat cumbersome to work with. Haskell provides special support for working with monads
 that makes them easy to use. %Mona12
 
- ### The Monad Type Class
+=== The Monad Type Class
 
 Haskell allow monads to be defined very cleanly using *type classes*. 
 
@@ -5730,7 +5747,7 @@ INCLUDE:Monad5
 It turns out to be a little more complex to define the stateful monad instance, so this topic
 is delayed until the end of this section.  %Monad6
 
- ### Haskell |do| Notation
+=== Haskell |do| Notation
 
 Haskell also supports special syntax for writing programs that use monads, which
 simplifies the use of the bind operator.
@@ -5794,12 +5811,12 @@ selected automatically. %Hask5
 
 TODO: mention |let| in |do|, and the case where no variable is used. %Hask12
 
- ## Using Haskell Monads
+== Using Haskell Monads
 
 The messy evaluators for error checking and mutable state can be rewritten much more
 cleanly using monads. %Usin25
 
- ### Monadic Error Checking {#MonadicErrors}
+=== Monadic Error Checking {#MonadicErrors}
 
 Here is a version of error checking using the |Checked| monad defined above: %Mona14
 The code for error checking using monads is
@@ -5846,11 +5863,13 @@ Other parts of the code, for example the case for |Binary| and |Declare| do not
 explicitly mention errors. This is very different from the code given in
 the [Section on Error Checking](#ErrorCheckingMonMonadic). %Mona17
 
- ### Monadic Mutable State {#MonadicState}
+=== Monadic Mutable State {#MonadicState}
 
 The full code for the stateful evaluator using monads is
-given in the [Stateful Monad](./code/StatefulMonad.hs.htm) file
-and the [Stateful Parser](./code/StatefulParse.y.htm). %Mona15
+given in the [Stateful Monad](./code/StatefulMonad.hs.htm),
+ the [Stateful Parser](./code/StatefulParse.y.htm),
+ the [Stateful Monad Test](./code/StatefulMonadTest.hs.htm),
+ and the [Stateful Test Input](./code/StatefulMonadTest.js.htm) files. %Mona15
 
 The main complexity in defining a stateful monad is that monads in Haskell
 can only be defined for |data| types, which have explicit constructor labels.
@@ -5965,7 +5984,7 @@ INCLUDE:StatefulHelper3 %Mona26
 > updateMemory val i = ST (\mem-> (val, update i val mem))
 > -- %StatefulHelper3
 
- ## Assignment 3: Defining a Monad for State and Error handling  {#assign3 -}
+== Assignment 3: Defining a Monad for State and Error handling  {#assign3 -}
 
 Combine the monads and interpreters for [Error Checking](#MonadicErrors) and
 [Mutable State](#MonadicState) into a single monad that performs both error checking
@@ -5977,7 +5996,7 @@ ways to do this, but then one needed for this assignment is: %Assi11
 > data CheckedStateful t = CST (Memory -> (Checked t, Memory))
 > -- %Assi12
 
- # Abstract Interpretation and Types
+= Abstract Interpretation and Types
 
 So far we have been focused on writing interpreters for small
 languages. An interpreter is a meta-program that evaluates a program in a
@@ -6030,7 +6049,7 @@ fact abstract interpretation is a huge area of research in programming
 languages because various forms of abstract interpretation are useful
 to prove certain properties about programs.[TODO: more references] %Abst37
 
- ## Languages with a Single Type of Values
+== Languages with a Single Type of Values
 
 In a language with a single type of data type-checking
 is trivial. For example, in the language of arithmetic, which
@@ -6046,7 +6065,7 @@ In other words, all expressions have type |TInt| and type-checking
 cannot fail, since there are no type-errors. Therefore, type-checking
 only really makes sense in a language with at least two types of data. %Lang3
 
- ## A Language with Integers and Booleans
+== A Language with Integers and Booleans
 
 In this tutorial we are going to write a type-checker for a language
 with Integers and Booleans.  The language with integer and booleans
@@ -6097,7 +6116,7 @@ Type environments
 A type environment plays a similar role to the environment in a regular interpreter: 
 it is used to track the types of variables during the type-checking process of an expression. %A90
 
- ### Type of the type-checker 
+=== Type of the type-checker 
 
 We are going to use the following type for the type-checker: %A91
 
@@ -6111,7 +6130,7 @@ Note how similar this type is to the type of an environment-based interpreter ex
 If we look at |typeCheck| as an abstract interpreter, then types play the 
 role of abstract values. 
 
- ### Typing rules for expressions 
+=== Typing rules for expressions 
 
 Most expressions in the language it are fairly obvious to type-check. For example, to type-check 
 an expression of the form: %A96
@@ -6125,7 +6144,7 @@ we proceed as follows: %A98
 2) check whether the type of |e2| is |TInt|
 3) If both types are |TInt|, return |TInt| as the result type (|Just TInt|); otherwise fail to type-check (|Nothing|) %A99
 
- #### Typing Declare Expressions 
+==== Typing Declare Expressions 
 
 To type a declare expression of the form %A100
 
@@ -6145,7 +6164,7 @@ For expressions with unbound variables: for example: %A104
 
 you should throw an error. In other words the type-checker works only for valid programs. %A106
 
- #### Typing |If| Expressions
+==== Typing |If| Expressions
  
 The only slightly tricky expression to type-check is an |if| expression.
 The type-checking rule for an |if| expressions of the form: %A107
@@ -6210,7 +6229,7 @@ INCLUDE:Type16 %A115
 Note that if type-checking any subexpressions fails with a type-error then the type-checking 
 of the |if| expression will also fail. %A113
 
- ## Type-Checking First-class Functions
+== Type-Checking First-class Functions
 
 In order to support type-checking we need to modify some of the datatypes with additional type-annotations:
 
@@ -6281,44 +6300,44 @@ can deal with type-annotations in the language.
 
 # Abstract Data Types
 
- # More Chapters on the way...
- ## Data Abstraction: Objects and Abstract Data Types
- ## Algebra and Coalgebra
- ## Partial Evaluation
- ## Memory Management
- ## Lambda Calculus
+= More Chapters on the way...
+== Data Abstraction: Objects and Abstract Data Types
+== Algebra and Coalgebra
+== Partial Evaluation
+== Memory Management
+== Lambda Calculus
 
 
- ### Special Kinds of States: Readers and Writers
- ## Order of Evaluation
- ### Strict versus non-strict
- ### Lazy
+=== Special Kinds of States: Readers and Writers
+== Order of Evaluation
+=== Strict versus non-strict
+=== Lazy
 
 
- # Data Abstraction (content from essay)
- ## Abstract Data Types
- ## Objects (content from essay and partial evaluation paper)
- ### Inheritance & Delegation
+= Data Abstraction (content from essay)
+== Abstract Data Types
+== Objects (content from essay and partial evaluation paper)
+=== Inheritance & Delegation
 
- # Alternative Approaches to Semantics
- ## Rule-based Specifications
- ## Small-step semantics
+= Alternative Approaches to Semantics
+== Rule-based Specifications
+== Small-step semantics
 
- # Additional Topics
- ## Algebra and Coalgebra
- ## Partial Evaluation
- ## Memory Management (??)
- ## Continuations
+= Additional Topics
+== Algebra and Coalgebra
+== Partial Evaluation
+== Memory Management (??)
+== Continuations
 
- # Domain-Specific Languages
- ## Parsing
- ## Attribute grammars
- ## State machines (???)
+= Domain-Specific Languages
+== Parsing
+== Attribute grammars
+== State machines (???)
 
- # References
+= References
 --------------------END-HIDE-------------------------
 
- ## Files on Lambda Calculus {#LambdaExp -}
+== Files on Lambda Calculus {#LambdaExp -}
 
 Here two files that can be used to represent and parse lambda-expressions:
 [Lambda Abstract Syntax](./code/Lambda.hs.htm) and

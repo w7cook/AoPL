@@ -112,9 +112,6 @@ evaluate (Assign a e) env mem =
 --END:Sema25
 --END:Summ11
 
-execute exp = v
-  where (v, _) = evaluate exp [] []
-  
 -- same as in IntBool.hs
 
 unary Not (BoolV b) = BoolV (not b)

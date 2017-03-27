@@ -5,7 +5,7 @@ import Operators
 --BEGIN:More3
 data Value  =  IntV  Int
             |  BoolV Bool
- deriving (Eq)
+ deriving (Show, Eq)
 --END:More3
 
 --BEGIN:EnvDef
@@ -29,7 +29,3 @@ binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
 binary EQ  a         b         = BoolV (a == b)
 --END:More16
 
-instance Show Value where
-  show (IntV n) = show n
-  show (BoolV True) = "true"
-  show (BoolV False) = "false"

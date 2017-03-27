@@ -4,14 +4,22 @@ import Prelude hiding (LT, GT, EQ, id)
 import Base
 import Data.Maybe
 import Stateful hiding (Stateful, evaluate)
+import Control.Monad
 
 --BEGIN:StatefulMonad1
 data Stateful t = ST (Memory -> (t, Memory))
 --END:StatefulMonad1
 
---BEGIN:StatefulMonad2
+instance Functor Stateful where
+  fmap  = liftM
+
+--BEGIN:StatefulMonad2 
+instance Applicative Stateful where
+  pure val = ST (\m -> (val, m))
+  (<*>) = ap 
+
 instance Monad Stateful where
-  return val = ST (\m -> (val, m))
+  return = pure
   (ST c) >>= f = 
     ST (\m -> 
       let (val, m') = c m in
@@ -83,7 +91,6 @@ updateMemory val i = ST (\mem-> (val, update i val mem))
 runStateful (ST c) = 
    let (val, mem) = c [] in val
 
-execute exp = runStateful (evaluate exp [])
 
 
   

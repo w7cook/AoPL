@@ -2,7 +2,7 @@
 
 .PHONY: verb pretty update clean
 
-PANDOC := pandoc --no-wrap -sS --bibliography=anatomy.bib --filter pandoc-citeproc
+PANDOC := pandoc --wrap=none -N --atx-headers -sS --bibliography=anatomy.bib --filter pandoc-citeproc
 HSCOLOUR := hscolour -lit
 
 TESTS=SimpleTest.hs \
@@ -10,7 +10,6 @@ TESTS=SimpleTest.hs \
 			DeclareTest.hs \
 			IntBoolTest.hs \
 			TopLevelFunctionsTest.hs \
-			IncorrectFunctionsTest.hs \
 			FirstClassFunctionsTest.hs \
 			StatefulTest.hs \
 			StatefulMonadTest.hs \
@@ -102,18 +101,29 @@ code/%.y : src/%.y makefile $(addprefix src/,$(SOURCES))
 		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
 		> $@.htm
 
+code/%.js : src/%.js makefile $(addprefix src/,$(SOURCES))
+	@mkdir -p code
+	cat $< \
+		| sed "/BEGIN:/d" \
+		| sed "/END:/d" \
+		> $@
+	(echo '<pre>'; cat $@; echo '</pre>') \
+		| perl -pe "s/import ([a-zA-Z]+) *\$$/import <a href=\$$1.hs.htm>\$$1<\\/a>/ if !/Prelude/" \
+		| perl -pe "s/import ([a-zA-Z]+) /import <a href=\$$1.hs.htm>\$$1<\\/a> / if !/Prelude/" \
+		> $@.htm
+
 # generate code from the sources and parsers
 code:	$(addprefix code/,$(SOURCES)) $(addprefix code/,$(PARSERS))
 
 # generate the output 
 output/%.out : code/%.hs makefile $(addprefix code/,$(SOURCES))
 	@mkdir -p output
-	cd code; runghc $(notdir $<) > ../output/$(addsuffix .out, $(basename $(notdir $<)))
+	cd code; runghc $(notdir $<) $(addsuffix .js, $(basename $(notdir $<))) > ../output/$(addsuffix .out, $(basename $(notdir $<)))
 
 # run all the code and build the tests
 execute: code $(addprefix output/, $(addsuffix .out, $(basename $(notdir $(TESTS)))))
 
-# updte the server copy (requires server access)
+# update the server copy (requires server access)
 update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm code
 	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf
 	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf
@@ -148,7 +158,7 @@ anatomy.htm: anatomy.mkd
 		| sed "s/VERTICAL_BAR/||/g" \
 		> foo.mkd
 	cat foo.mkd \
-		| $(PANDOC) --mathjax --number-sections --toc -f markdown+lhs -t html --css anatomy.css --css cc/commentCloud.css --chapters \
+		| $(PANDOC) --mathjax --toc -f markdown+lhs -t html --css anatomy.css --css cc/commentCloud.css --top-level-division=chapter \
 		| sed "s/\\.eps/.png/" \
 		> foo2.mkd
 	cat foo2.mkd \
@@ -177,7 +187,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/@/ATSIGN/g" \
 		> foo.lhs
 	cat foo.lhs \
-		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex --chapters \
+		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex -V documentclass=report --top-level-division=chapter \
 		| sed "s/{verbatim}/{spec}/g" \
 		| sed "s/@/@@/g" \
 		| sed "s/\\\\textbar{}/|/g" \

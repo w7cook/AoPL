@@ -3,10 +3,18 @@ module CheckedMonad where
 import Prelude hiding (LT, GT, EQ, id)
 import FirstClassFunctions hiding (evaluate)
 import ErrorChecking hiding (evaluate)
+import Control.Monad
 
+instance Functor Checked where
+  fmap  = liftM
+  
 --BEGIN:Monad5
+instance Applicative Checked where
+  pure val = ST (\m -> (val, m))
+  (<*>) = ap 
+
 instance Monad Checked where
-  return v = Good v
+  return = pure
   a >>= f =
     case a of
       Error msg -> Error msg

@@ -54,7 +54,6 @@ evaluate (Call fun arg) env = evaluate body newEnv    -- changed
         newEnv = (x, evaluate arg env) : closeEnv
 --END:Summ14 END:A47
 
-execute exp = evaluate exp []
 
  
 -- same as in IntBool.hs

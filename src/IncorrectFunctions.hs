@@ -50,7 +50,6 @@ evaluate (Call fun arg) env = evaluate body newEnv
 emptyEnv = \x->Nothing
 
 -- Same as IntBool
-execute exp = evaluate exp emptyEnv
 
 unary Not (BoolV b) = BoolV (not b)
 unary Neg (IntV i)  = IntV (-i)
