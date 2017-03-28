@@ -5627,7 +5627,7 @@ All mention of |Error| and |Good| have been removed from the |Checked| version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
 from the Stateful version, but there is still a little at the end. But the pattern
 that has emerged is the same one that was identified in the previous section, where
-the |return|$_S$ function converts a value (the result of |Binary op av bv|) into
+the |return|$_S$ function converts a value (the result of |binary op av bv|) into
 a default stateful computation. To see how this works, consider that %Abst29
 
 |return|$_S$ x\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|mem. (x, mem)| %Abst30
@@ -5638,14 +5638,14 @@ Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ ----------------------
 (|evaluate a env|) $\rhd_C$ ($\lambda$|av.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|
 \ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|bv.|               \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|bv.|
-\ \ \ \ |checked_binary op av bv|))                            \ \ \ \ |return|$_S$ (|Binary op av bv|)))
+\ \ \ \ |checked_binary op av bv|))                            \ \ \ \ |return|$_S$ (|binary op av bv|)))
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
 rules for |Mutable|, assignment, and access there will be explicit references to memory.
 Similarly, in the cases where errors are generated, for example for undefined variables, the
 code will still have to create |Error| values. What we have done here is examine the parts of
 the program that *don't* involve errors or memory, namely literals and binary operators, and
-figured out way to hide the complexity of error checking and mutable memory. This complexity
+figured out a way to hide the complexity of error checking and mutable memory. This complexity
 has been hidden in two new operators, |return| and bind $\rhd$.
 The type of the bind operators is also interesting: %Abst33
 
@@ -5765,7 +5765,7 @@ and for |bv| to be bound to the result of |evaluate b env|. Unfortunately, the v
 come *to the right* of the expression that produces the value, which is not the way we
 naturally think about binding. Also, the nested lambdas and parenthesis are distracting. %Hask2
 
-Haskell has a special notation, the |do| notations, for the bind operator that allows the variables
+Haskell has a special notation, the |do| notation, for the bind operator that allows the variables
 to be written in the right order. Using |do| the program above can be written as follows: %Hask3
 
 INCLUDE:Hask4
