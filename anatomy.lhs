@@ -5591,16 +5591,16 @@ Checked                                 \ \ \ \ \ \  Stateful
 \ \ |Good v ->| *next-part* |v|
 
 This *first-part* corresponds to |evaluate a env| or |evaluate b env| in both the original
-versions. The *second-part* represents the remainder of the computation. It is just everything that
+versions. The *next-part* represents the remainder of the computation. It is just everything that
 appears after the main pattern, but with all the free variables made explicit.
-For the |Checked| case, the only variable needed in the *second-part* is the
+For the |Checked| case, the only variable needed in the *next-part* is the
 variable |v| that comes form the |Good| case. For the Stateful case,
-in addition to |v| the *second-part* also requires access to |mem'| %Abst24
+in addition to |v| the *next-part* also requires access to |mem'| %Abst24
 
 These patterns can be made explicit as a special operator that combines
 the two parts, where the second part is a function with the appropriate arguments.
 To be more concrete, these parts are converted into explicit variables.
-The *first-part* is named |A| and the *second-part*, which is a function,
+The *first-part* is named |A| and the *next-part*, which is a function,
 is named |F|: %Abst25
 
 Checked                                 \ \ \ \ \ \  Stateful
