@@ -5798,7 +5798,7 @@ the monadic computation produced by |e1|, but is bound to the value that the com
 generates. %Hask10
 
 For a concrete example, if |m| is |Checked| then |e1| must have type |Checked t1|
-for some type |t1|. The value of expressions |e1|, which is a |Checked t1|, could be
+for some type |t1|. The value of expression |e1|, which is a |Checked t1|, could be
 a good value or an error. If |e1| produces an error then the
 compututation stops, |x| is never bound to any value, and |e2| is not called.
 But if |e1| produces a good value |v|, then |x| will be bound
