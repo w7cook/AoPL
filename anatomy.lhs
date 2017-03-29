@@ -276,7 +276,7 @@ a set of components or fields. For example, here is a data type for simple geome
 
 A data type definition always begins with |data| and is followed by the name of the data type,
 in this case |Geometry|. There then follows a list of variants with unique tag names, in this
-case |Point|, |Circle|, and |Rectangle|, which are separated by a vertical bar | BAR |. Following
+case |Point|, |Circle|, and |Rectangle|, which are separated by a vertical bar BAR. Following
 each constructor tag is a list of data types specifying the types of components of that variant.
 A |Point| has two components, both integers. A |Circle| has three components, and a rectangle
 has 4 integer components. One issue with this notation is that it is not clear what the components
@@ -3724,7 +3724,7 @@ add(3)(2)
 ````JavaScript
 var m = 2;
 var proc = function(n) { m + n },
-    part = function(g, n) { funtion(m) { n * g(m) }};
+    part = function(g, n) { function(m) { n * g(m) }};
 var inc = part(proc, 3);
 inc(7)
 ````
