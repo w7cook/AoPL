@@ -10,7 +10,7 @@ instance Functor Checked where
   
 --BEGIN:Monad5
 instance Applicative Checked where
-  pure val = ST (\m -> (val, m))
+  pure val = Good val
   (<*>) = ap 
 
 instance Monad Checked where

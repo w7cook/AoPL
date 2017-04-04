@@ -1,7 +1,7 @@
 import Base
-import FirstClassFunctions hiding (evaluate, execute)
+import Prelude hiding (LT, GT, EQ)
+import CheckedMonad
 import FirstClassFunctionsParse
-import ErrorChecking
 
 execute exp = show (evaluate exp [])
 

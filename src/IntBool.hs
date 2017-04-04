@@ -33,7 +33,5 @@ evaluate (If a b c) env =
   let BoolV test = evaluate a env in
     if test then evaluate b env
             else evaluate c env
-
-execute exp = evaluate exp []
 --END:More14
 

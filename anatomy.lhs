@@ -633,9 +633,7 @@ parser
 === Abstract Syntax in Haskell
 
 This section describes how to represent abstract syntax using Haskell. The code
-for this section is found in the [Simple](./code/Simple.hs.htm) and
-[SimpleParse](./code/SimpleParse.y.htm) files, which are loaded from the 
-[Simple Test](./code/SimpleTest.hs.htm) and [Simple Test Input](./code/SimpleTest.js.htm) file.
+for this section is found in the [Simple.zip](./packages/Simple.zip) file.
 Arithmetic expressions can be represented in Haskell with the following data type: %Abst2
 
 INCLUDE:Abst3
@@ -736,7 +734,7 @@ For example, the tokens from the string |"3 + 81 * 2"| are: %Toke6
 > Digits 2
 > -- %Toke7
 
-The [Lexer](./code/Lexer.hs.htm) file contains the code for a simple
+The Lexer.hs file contains the code for a simple
 lexer that creates tokens in this form. It defines a function |lexer|
 that transforms a string (i.e. a list of characters) into a list of tokens.
 The |lexer| function takes as input a list of symbols and a list of
@@ -1055,7 +1053,7 @@ INCLUDE:Form12
 There are many things that can go wrong when evaluating an expression.
 In our current, very simple language, the only error that can arise
 is attempting to divide by zero. These examples are given in the
-[Simple Test](./code/SimpleTest.hs.htm) file. For example, consider this small expression: %Erro2
+[Simple zip](./packages/Simple.zip) file. For example, consider this small expression: %Erro2
 
 INCLUDE:Erro3
 > testDBZ = evaluate (parseExp "8 / 0")
@@ -1125,7 +1123,7 @@ the abstract syntax of expressions to include variables.
 Since the name of a variable "x" can be represented
 as a string of characters, it is easy to represent variables as an additional
 kind of expression. The code for the section is given in
-the [Substitute](./code/Substitute.hs.htm) file.
+the [Substitute zip](./packages/Substitute.zip) file.
 The following data definition modifies |Exp| to include
 a |Variable| case. %Vari3
 
@@ -1816,12 +1814,7 @@ INCLUDE:DeclTest1
 
 The code for this section
 is given in the 
-[Declare](./code/Declare.hs.htm), 
-[Declare Parser](./code/DeclareParse.y.htm),
-[Declare Test](./code/DeclareTest.hs.htm),
-[Declare Test Input](./code/DeclareTest.js.htm),
-[Base](./code/Base.hs.htm), and
-[Lexer](./code/Lexer.hs.htm) files. %Eval30
+[Declare zip](./packages/Declare.zip) file. %Eval30
 
 
 == More Kinds of Data: Booleans and Conditionals {#MoreData}
@@ -1830,7 +1823,7 @@ In addition to arithmetic computations, it is useful for expressions
 to include conditions and also return different kinds of values.
 Until now our expressions have always returned |Int| results, because
 they have only performed arithmetic computations. The code for this section
-is given in the [Int Bool](./code/IntBool.hs.htm) and [Int Bool Parser](./code/IntBoolParse.y.htm) files. The type |Value|
+is given in the [Int Bool zip](./packages/IntBool.zip) file. The type |Value|
 is defined to support multiple different kinds of values: %More2
 
 INCLUDE:More3
@@ -2089,12 +2082,7 @@ The previous version of this example contained an unbound use of the variable |m
 
 The code that you must modify
 is given in the 
-[Declare](./code/Declare.hs.htm), 
-[Declare Parser](./code/DeclareParse.y.htm),
-[Declare Test](./code/DeclareTest.hs.htm),
-[Declare Test Input](./code/DeclareTest.js.htm),
-[Base](./code/Base.hs.htm), and
-[Lexer](./code/Lexer.hs.htm) files. %Basi13
+[Declare zip](./packages/Declare.zip) file. %Basi13
 
 = Functions
 
@@ -2128,10 +2116,7 @@ function definitions followed by a main expression. The
 main expression in a C program is an implicit call to a
 function named |main|. Even if a programming language does support more flexible
 definition of functions, top-level functions are quite common. The code
-for this section is given in the [Top Level Functions](./code/TopLevelFunctions.hs.htm),
-[Top Level Functions Test](./code/TopLevelFunctionsTest.hs.htm), and
-[Top Level Functions Test Input](./code/TopLevelFunctionsTest.js.htm) 
-files.
+for this section is given in the [Top Level Functions zip](./packages/TopLevelFunctions.zip) file.
 Here is an example of some top-level functions, written in JavaScript: %Top2
 
 ````Java
@@ -2356,7 +2341,7 @@ first-class functions %Stac2
 
 Here is the full code for the evaluator supporting
 top-level functions definitions, taken from the
-[Top Level Functions](./code/TopLevelFunctions.hs.htm) file.  %Summ1
+[Top Level Functions zip](./packages/TopLevelFunctions.zip) file.  %Summ1
 
 INCLUDE:Summ12
 > data Exp = Literal   Value
@@ -2503,9 +2488,8 @@ later section, but the basic concepts are introduced here. %Lamb8
 Haskell is based directly on the lambda calculus. In
 fact, the example illustrating how to "solve" for the
 function |f| can be written in Haskell. The
-[Examples](./code/Examples.hs.htm) file contains the code for the
-simples examples in this section, while the [Function Examples](./code/FunExamples.hs.htm)
-file contains the more complex examples given in the subsections below.
+[Examples zip](./packages/Examples.zip) file contains the code for the
+simples examples in this section, and the more complex examples given in the subsections below.
 The following
 definitions are all equivalent in Haskell: %Usin2
 
@@ -3308,9 +3292,7 @@ colored red to remind you that the solution it presents
 is *incorrect*. The correct solution is given in
 the [next section, on closures](#Closures). The code for
 the incorrect soluiton mentioned here is in the
-[Incorrect Functions](./code/IncorrectFunctions.hs.htm),
- [Incorrect Functions Test](./code/IncorrectFunctionsTest.hs.htm)
-and [Incorrect Functions Input](./code/IncorrectFunctionsTest.js.htm) files. %A2
+[Incorrect Functions zip](./packages/IncorrectFunctions.zip) file. %A2
 
 To try this approach, function expressions
 are included in the |Value| data type, which
@@ -3563,7 +3545,7 @@ as a part of the program that *creates* a function. The actual
 function value is represented by a closure, which captures the
 current environment at the point when the function expression is
 executed. The code for this section is given in the
-[First-Class Functions](./code/FirstClassFunctions.hs.htm) file. %A40
+[First-Class Functions zip](./packages/FirstClassFunctions.zip) file. %A40
 
 To implement this idea, we revise the definition of |Exp|
 and |Value|. First we add function expressions as a new kind
@@ -3838,7 +3820,7 @@ to compute the result. Therefore, because that expression is not evaluated, no e
 
 Here is the full code for first-class functions with non-recursive definitions.
 The grammar changes are as follows, taken from
-the [First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm) file: %Summ13
+the FirstClassFunctionsParse.y file: %Summ13
 
 INCLUDE:FCFGrammar1
 > Exp : function '(' id ')' '{' Exp '}'  { Function $3 $6 }
@@ -3847,7 +3829,7 @@ INCLUDE:FCFGrammar2
 > -- %FCFGrammar2
 
 Here is the definition of the abstract syntax and the evaluator,
-taken from the [First Class Functions](./code/FirstClassFunctions.hs.htm) file:   %Summ16
+taken from the [First Class Functions zip](./packages/FirstClassFunctions.zip) file:   %Summ16
 
 INCLUDE:Summ14
 > data Exp = Literal   Value
@@ -3888,9 +3870,8 @@ INCLUDE:Summ14
 >         newEnv = (x, evaluate arg env) : closeEnv
 > -- %Summ14
 
-A test case can be found in 
-  the [First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm) file
-  and the [First Class Functions Test Input](./code/FirstClassFunctionsTest.js.htm) file. %Summ15
+Test cases can be found in 
+  and the FirstClassFunctionsTest.js file. %Summ15
 
 == Assignment 2: First-Class Functions {#assign2 -}
 
@@ -3934,11 +3915,7 @@ You can assume that the inputs are valid programs and that your program may rais
 errors when given invalid input (except as mentioned above). %Assi8
 
 The files you need are
-[First Class Functions](./code/FirstClassFunctions.hs.htm),
-[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm),
-[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm),
-and [First Class Functions Test Input](./code/FirstClassFunctionsTest.js.htm) files.
-And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Assi9
+[First Class Functions zip](./packages/FirstClassFunctions.zip) file. %Assi9
 
 = Recursive Definitions
 
@@ -4755,7 +4732,7 @@ the expression |a+b| may not cause any errors,
 but if evaluating |a| or |b| can cause an error,
 then the evaluation of |a+b| will have to deal with the
 possibility that |a| or |b| is an error. The full code is
-given in the [Error Checking](./code/ErrorChecking.hs.htm) file. %Hand2
+given in the [Error Checking zip](./packages/ErrorChecking.zip) file. %Hand2
 
 Error checking is a notorious problem in programming languages.
 When coding in C, everyone agrees that the return codes of
@@ -4934,12 +4911,7 @@ rather than causing Haskell execution errors. %Exer8
 Start with the files for First Class Functions and Error Checking and
 combine them and complete the error cases.
 The files you need are
-[Error Checking](./code/ErrorChecking.hs.htm),
-[First Class Functions](./code/FirstClassFunctions.hs.htm),
-[First Class Functions Parser](./code/FirstClassFunctionsParse.y.htm),
-[First Class Functions Test](./code/FirstClassFunctionsTest.hs.htm), and
-[Error Checking Test](./code/ErrorCheckingTest.hs.htm).
-And the files that they link to (including [Lexer](./code/Lexer.hs.htm)). %Exer2
+[Error Checking zip](./packages/ErrorChecking.zip) file. %Exer2
 
 As a bonus, implement error checking for recursive |var|
 expressions. %Exer5
@@ -5015,10 +4987,7 @@ because we have chosen to write the evaluator in Haskell, a pure functional lang
 The hope is that detailed and explicit analysis of how mutation
 works in programming languages will
 lead to insights about the costs and benefits of using mutation.
-The code for this section is in the [Mutable State](./code/Stateful.hs.htm),
-[Mutable State Test](./code/StatefulTest.hs.htm), 
-and [Mutable State Test Input](./code/StatefulTest.js.htm)
-files. %Muta9
+The code for this section is in the [Mutable State zip](./packages/Stateful.zip) file. %Muta9
 
 === Addresses
 
@@ -5820,7 +5789,7 @@ cleanly using monads. %Usin25
 
 Here is a version of error checking using the |Checked| monad defined above: %Mona14
 The code for error checking using monads is
-given in the [Checked Monad](./code/CheckedMonad.hs.htm) file.
+given in the [Checked Monad zip](./packages/CheckedMonad.zip) file.
 
 INCLUDE:Mona13
 > evaluate :: Exp -> Env -> Checked Value
@@ -5866,10 +5835,7 @@ the [Section on Error Checking](#ErrorCheckingMonMonadic). %Mona17
 === Monadic Mutable State {#MonadicState}
 
 The full code for the stateful evaluator using monads is
-given in the [Stateful Monad](./code/StatefulMonad.hs.htm),
- the [Stateful Parser](./code/StatefulParse.y.htm),
- the [Stateful Monad Test](./code/StatefulMonadTest.hs.htm),
- and the [Stateful Test Input](./code/StatefulMonadTest.js.htm) files. %Mona15
+given in the [Stateful Monad zip](./packages/StatefulMonad.zip) file. %Mona15
 
 The main complexity in defining a stateful monad is that monads in Haskell
 can only be defined for |data| types, which have explicit constructor labels.
@@ -6278,7 +6244,7 @@ type with the declared function argument type.
 
 INCLUDE:TypeA47
  
-The file [FirstClassFunctionsTyping](./code/FirstClassFunctionsTyping.hs.htm) adds a function |typeCheck| for doing type-checking.
+The file FirstClassFunctionsTyping.hs adds a function |typeCheck| for doing type-checking.
 
 INCLUDE:TypeSummDecl
 > tcheck :: Exp -> TEnv -> Maybe Type
@@ -6335,12 +6301,12 @@ can deal with type-annotations in the language.
 == State machines (???)
 
 = References
---------------------END-HIDE-------------------------
 
 == Files on Lambda Calculus {#LambdaExp -}
 
 Here two files that can be used to represent and parse lambda-expressions:
 [Lambda Abstract Syntax](./code/Lambda.hs.htm) and
 [Lambda Parser](./code/LambdaParse.y.htm) %File1
+--------------------END-HIDE-------------------------
 
  

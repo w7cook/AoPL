@@ -13,7 +13,6 @@ import Lexer
 
 %token 
     if    { TokenKeyword "if" }
-    then  { TokenKeyword "then" }
     else  { TokenKeyword "else" }
     true  { TokenKeyword "true" }
     false { TokenKeyword "false" }
@@ -53,7 +52,7 @@ Comp : Comp '==' Term     { Binary EQ $1 $3 }
      | Comp '<' Term      { Binary LT $1 $3 }
      | Comp '>' Term      { Binary GT $1 $3 }
      | Comp '<=' Term     { Binary LE $1 $3 }
-     | Comp '<=' Term     { Binary GE $1 $3 }
+     | Comp '>=' Term     { Binary GE $1 $3 }
      | Term               { $1 }
 
 Term : Term '+' Factor    { Binary Add $1 $3 }

@@ -32,8 +32,6 @@ evaluate (Binary op a b) env =
           checked_binary op av bv
 --END:Hand15
 
-execute exp = evaluate exp []
-
 --BEGIN:Hand17
 checked_unary :: UnaryOp -> Value -> Checked Value
 checked_unary Not (BoolV b) = Good (BoolV (not b))
