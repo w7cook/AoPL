@@ -161,6 +161,7 @@ anatomy.htm: anatomy.mkd packages
 		| sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
 		| sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
 		> anatomy.htm
+	rm foo.mkd foo2.mkd
 	mkdir -p cc
 	cp ../CommentCloud/*.js cc
 	cp ../CommentCloud/*.css cc
@@ -197,6 +198,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "/|/s/\\\\}/}/g" \
 		| sed "s/\\\\newcommand{\\\\VerbBar}{|}/%VerbBar/g" \
 		> temp.lhs
+	rm foo.lhs		
 
 # convert temp.lhs into Verbatim PDF, coverting various character sequences
 # from fancy format to normal text, so that the verbatim PDF will look more verbatim
