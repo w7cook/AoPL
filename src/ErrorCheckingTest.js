@@ -3,11 +3,9 @@
 x
 
 # Error "Variable x undefined"
-
 --END:Hand28
 
 --BEGIN:Hand32
-
 3 / 0
 
 # Error "Divide by zero"

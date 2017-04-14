@@ -18,7 +18,7 @@ input = File.new("anatomy.lhs", "r")
 while (line = input.gets)
   line = line.rstrip
   # if its a section header
-  if line =~ / *#+ ([a-zA-Z0-9]+)/
+  if line =~ /=+ ([a-zA-Z0-9]+)/
     tag = $1.slice(0,4)
     num = 0
   end
@@ -31,7 +31,7 @@ while (line = input.gets)
     checkTags[$1] = true
   end
   if (prev && prev != "" && prev[0] != "\\" && prev[0] != "%" && prev[0] != "`" && !(prev =~ /END-HIDE/) &&
-      (needNewTag || (!(prev =~ /%[a-zA-Z0-9]+$/) && !(prev =~ /^ *#/))) && 
+      (needNewTag || (!(prev =~ /%[a-zA-Z0-9]+$/) && !(prev =~ /^=/))) && 
       (line == "" || line =~ /^ *\* / || line =~ /^ *[1-9]+\. / || line =~ /^   *[a-z]\. / || line[0] == "`"))
     # need a new tag
     $stderr << "FOO: [#{prev}]\n" if line[0] == "`"

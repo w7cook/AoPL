@@ -43,7 +43,7 @@ def process(input, output, marker, content, location)
   sectionFiles = []
   section = ""
   input.each do |line|
-    if line =~ /^ *\#+ /
+    if line =~ /^\=+ /
       if sectionFiles.size > 0
         # $stderr << "#{section}: #{sectionFiles}\n"
         sectionFiles = []

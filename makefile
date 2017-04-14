@@ -6,6 +6,7 @@ PANDOC := pandoc --wrap=none -N --atx-headers -sS --bibliography=anatomy.bib --f
 HSCOLOUR := hscolour -lit
 
 TESTS=SimpleTest.hs \
+      SubstituteTest.hs \
 			DeclareTest.hs \
 			IntBoolTest.hs \
 			TopLevelFunctionsTest.hs \
@@ -64,9 +65,9 @@ updates: new.lhs
 diff: new.lhs
 	diff anatomy.lhs new.lhs
 
-new.lhs: anatomy.lhs	
+new.lhs: anatomy.lhs output/*.out
 	ruby tags.rb \
-	| ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" \
+	| ruby includes.rb "src/*.hs" "src/*.y" "src/*.js" "output/*.out" ">" \
 	| perl -pe "s/ +$$//" \
 	> new.lhs
 
@@ -129,13 +130,15 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm packages
 # build the anatomy.mkd file by including all the code, then removing the INCLUDE markers
 # Change the header markers to remove space before them
 anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
-	ruby includes.rb "src/*.hs" "src/*.y" "output/*.out" ">" < anatomy.lhs \
+	ruby includes.rb "src/*.hs" "src/*.y" "src/*.js" ">" < anatomy.lhs \
 		| sed "/^INCLUDE:/d" \
 		| sed "s/^ #/#/" \
 		| sed "s/'[0-9][0-9a-z]*//g" \
 		| sed "s/^> test[^= ][^= ]* =/> /g" \
 		| sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
+		| sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		> anatomy.mkd
+		 # move last line from here to use of anatomy.mkd
 
 # build the HTML version. 
 # First deal with |foo| -> `foo` and ||-> ||
@@ -156,8 +159,8 @@ anatomy.htm: anatomy.mkd packages
 		| sed "s/BAR/|/g" \
 		| sed "s/OPENB/{/g" \
 		| sed "s/CLOSEB/}/g" \
-		| perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)/ <a href='' id='Comment:\$$1' ><\\/a>/g" \
-		| perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)/<a href='' id='Comment:\$$1' ><\\/a>/g" \
+		| perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)//g" \
+		| perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)//g" \
 		| sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
 		| sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
 		> anatomy.htm
@@ -165,13 +168,14 @@ anatomy.htm: anatomy.mkd packages
 	mkdir -p cc
 	cp ../CommentCloud/*.js cc
 	cp ../CommentCloud/*.css cc
+	# <a href='' id='Comment:\$$1' ><\\/a> 
+	# <a href='' id='Comment:\$$1' ><\\/a> 
 
 # convert the markdown+lhs into a latex+lhs file
 # first, remove the HTML paragraph markdown
 # Then perform translations that are common to both PDF formats
 temp.lhs: anatomy.mkd template.tex
 	cat anatomy.mkd \
-		| sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		| sed "/^%[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		| sed "s/%[a-zA-Z0-9][a-zA-Z0-9]*//g" \
 		| sed "s/@@/AtX/g" \

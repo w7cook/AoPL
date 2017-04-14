@@ -99,7 +99,7 @@ of the answers to these questions. %Intr4
 The concepts of structure and meaning have technical names. %Intr8
 
 syntax
-  ~ The structure of a language is called its *syntax*.
+  ~ The structure of a language is called its *syntax*. %Intr13
 
 semantics
   ~ The rules that define the meaning of a language are called *semantics*. %Intr9
@@ -225,10 +225,10 @@ This is different from a conventional imperative language, where the body of a d
 usually a *statement*, which does not have a value. %Func31
 
 expression
-  ~ An *expression* is a syntactic category for syntax that produces a value, and possibly has other side effects.
+  ~ An *expression* is a syntactic category for syntax that produces a value, and possibly has other side effects. %expr1
 
 statement
-  ~ A *statement* is a syntactic category for syntax that has a side effect rather than producing a value.
+  ~ A *statement* is a syntactic category for syntax that has a side effect rather than producing a value. %expr2
 
 side effect
   ~ A *side effect* is an effect on the program state. Examples of side effects include allocating memory,
@@ -537,7 +537,7 @@ that sums the elements of two lists at the same positions.
 Suggestion: You can define this function recursively, but a simpler solution can be found by
 combining some of the previous functions. %Recu55
 
-Assignment 0 (Optional and not graded):
+Assignment 0 (Optional and not graded): %01
 
 Your first assignment is to try to complete as many questions in the tutorial as you can. %Recu56
 
@@ -551,13 +551,13 @@ expression
   ~ An *expression* is a combination of variables, values
     and operations over these values. For example, the arithmetic expression |2+3|
     uses two numeric values |2| and |3| and an operation |+| that operates on
-    numeric values.
-    
+    numeric values. %Expr1
+
 syntax
   ~ The *syntax* of an expression prescribes how the various
     components of the expressions can be combined. In general it is not the case that
     the components of expressions can be combined arbitrarily: they must obey certain
-    rules. For example |2 3| or |+ +| are not valid arithmetic expressions.
+    rules. For example |2 3| or |+ +| are not valid arithmetic expressions. %Expr4
 
 evaluation
   ~ Each expression has a meaning (or value), which is defined by the
@@ -615,8 +615,8 @@ Syntax comes in two forms: abstract and concrete. %Synt1
 
 abstract syntax
   ~ The conceptual structure (illustrated by the pictures) is called the *abstract
-    syntax* of the language.
-    
+    syntax* of the language. %Synt4
+
 concrete syntax
   ~ The particular details and rules for writing expressions
     as strings of characters is called the *concrete syntax*. %Synt2
@@ -688,7 +688,7 @@ The first step is to break a text up into *tokens*. %Conc1
 
 Tokens are the basic units of a language. In English, for example,
 words are tokens. But English also uses many symbol tokens, including
-".", "!", "?", "(" and ")". In the example  |"3 + 81 * 2"| the tokens 
+".", "!", "?", "(" and ")". In the example  |"3 + 81 * 2"| the tokens
 are |3|, |"+"|, |81|, |"*"|, and |2|. It is also important to classify tokens
 by their kind. The tokens |3|, |81| and |2| are sequences of digits.
 The tokens |"+"| and |"*"| are *symbol* tokens. %Toke5
@@ -696,7 +696,7 @@ The tokens |"+"| and |"*"| are *symbol* tokens. %Toke5
 token
   ~ A token is the basic syntactic unit of a language. Tokens can be
     individual characters, or groups of characters. Token are often
-    classified into kinds, for example *integers*, *strings*, *identifiers*.
+    classified into kinds, for example *integers*, *strings*, *identifiers*. %Toke10
 
 
 identifier
@@ -819,10 +819,10 @@ To summarize, here is a formal description of grammars. %Gram35
 
 production rule
   ~ A *production rule* defines how a non-terminal
-    can be translated into a sequence of tokens and other syntactic categories.
+    can be translated into a sequence of tokens and other syntactic categories. %Gram37
 
 terminal
-  ~ A *terminal* is a token used in a grammar rule.
+  ~ A *terminal* is a token used in a grammar rule. %Gram38
 
 non-terminal
   ~ The *non-terminals* are the names of syntactic categories used in a grammar. %Gram36
@@ -877,7 +877,7 @@ Written out explicitly, this grammar means: %Gram21
         * which creates a |Multiply| node containing the value of the expressions
     - an expression followed by a |/| followed by an expression %Gram27
         * which creates a |Divide| node containing the value of the expressions %Gram28
-    - a open parenthesis '(' followed by an  expression followed by a close parenthesis ')'
+    - a open parenthesis '(' followed by an  expression followed by a close parenthesis ')' %Gram39
         * which returns the expression an throws away the parentheses %Gram28a
 
 Given this lengthy and verbose explanation, I hope you can see the value
@@ -928,8 +928,8 @@ we say that multiplication has higher *precedence* than subtraction. %Ambi7
 precedence
   ~ *Precedence* is an order on grammar rules that defines which rule should
     apply first in cases of ambiguity. Precedence rules are applied before
-    associativity rules.
-    
+    associativity rules. %Ambi14
+
 associativity
   ~ Associativity specifies whether binary operators are grouped from the
     *left* or the *right* in order to resolve ambiguity. %Ambi12
@@ -938,7 +938,7 @@ The grammar can be adjusted to express the precedence and associativity
 of the operators. Here is an example: %Ambi8
 
 INCLUDE:SimpleGrammar
-> Exp  : Term                { $1 }
+> Exp  : Term               { $1 }
 >
 > Term : Term '+' Factor    { Add $1 $3 }
 >      | Term '-' Factor    { Subtract $1 $3 }
@@ -950,7 +950,7 @@ INCLUDE:SimpleGrammar
 >
 > Primary : digits         { Number $1 }
 >         | '-' digits     { Number (- $2) }
->         | '(' Term ')'   { $2 }
+>         | '(' Exp ')'   { $2 }
 > -- %SimpleGrammar
 
 This grammar works by splitting the |Exp| non-terminal of the original
@@ -965,7 +965,7 @@ which allows addition and subtraction to be used under multiplication.
 ==== Parser Generators
 
 The grammar notation used above is also a language. It is a language
-of grammars.
+of grammars. %Pars2
 
 How to create simple grammars using the
 [Happy Parser Generator](http://www.haskell.org/happy/). %Pars1
@@ -1004,7 +1004,7 @@ The output is %Eval6
 
 INCLUDE:Eval7
 > Evaluating the following expression:
->   [3 - -2 - -7]
+>   Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
 > Produces the following result:
 >   12
 > -- %Eval7
@@ -1019,32 +1019,11 @@ The following main program invokes |test| to evaluate each of the
 five sample expressions defined above: %Form7
 
 INCLUDE:Form8
-> main'3 = do
->   test "evaluate" evaluate (parseExp "4")
->   test "evaluate" evaluate (parseExp "-5 + 6")
->   test "evaluate" evaluate (parseExp "3 - -2 - -7")
->   test "evaluate" evaluate (parseExp "3 * (8 + 5)")
->   test "evaluate" evaluate (parseExp "1 + 8 * 2")
 > -- %Form8
 
 Running this main program produces the following results: %Form9
 
 INCLUDE:Form12
-> evaluate [4]
->  ==> 4
->
-> evaluate [-5 + 6]
->  ==> 1
->
-> evaluate [3 - -2 - -7]
->  ==> 12
->
-> evaluate [3*(8 + 5)]
->  ==> 39
->
-> evaluate [1 + 8*2]
->  ==> 17
->
 > -- %Form12
 
 
@@ -1116,7 +1095,7 @@ The rule is to substitute every occurrence of $x$ with the value $5$
 and the perform the required arithmetic computations. %Vari2
 
 variable
-  ~ A *variable* is a symbol that refers to a value.
+  ~ A *variable* is a symbol that refers to a value. %Vari4
 
 To program this in Haskell, the first thing needed is to extend
 the abstract syntax of expressions to include variables.
@@ -1134,15 +1113,15 @@ INCLUDE:Vari99
 >           | Multiply  Exp Exp
 >           | Divide    Exp Exp
 >           | Variable  String        -- added
->           deriving (Eq)
+>    deriving (Eq, Show)
 > -- %Vari99
 
 An association of a variable $x$ with a value $v$ is called a *binding*,
-which can be written $x \mapsto v$.
+which can be written $x \mapsto v$. %Numb1
 
 binding
-  ~ A *binding* is an association of a variable with its value.
-  
+  ~ A *binding* is an association of a variable with its value. %Numb2
+
 Bindings can be represented in Haskell as a pair. For example, the
 binding of $x \mapsto 5$ can be represented as |("x", 5)|. %Vari5
 
@@ -1166,11 +1145,11 @@ $x+2$ can be evaluated in different contexts, for example, where $x=7$.  %Vari1
 This interplay between being constant and being variable can be quite confusing,
 especially since variables in most programming languages *can change*
 over time. The process of actually changing a variable's value over time, within a
-single context, is called *mutation*.
+single context, is called *mutation*. %Vari6
 
 mutation
   ~ Mutation refers to the ability of a variable or data structure to change
-    over time.
+    over time. %Vari9
 
 This seems to be a major difference between programming language
 variables and mathematical variables. However, if you think about things
@@ -1236,20 +1215,20 @@ then the value is the substitution |val|. %Subs10
 Running a few tests produces the following results: %Subs12
 
 INCLUDE:Subs13
-> substitute1 ("x", 5) [x + 2]
->  ==> [5 + 2]
+> substitute1 ("x", 5) Add (Variable "x") (Number 2)
+>  ==> Add (Number 5) (Number 2)
 >
-> substitute1 ("x", 5) [32]
->  ==> [32]
+> substitute1 ("x", 5) Number 32
+>  ==> Number 32
 >
-> substitute1 ("x", 5) [x]
->  ==> [5]
+> substitute1 ("x", 5) Variable "x"
+>  ==> Number 5
 >
-> substitute1 ("x", 5) [x*x + x]
->  ==> [5*5 + 5]
+> substitute1 ("x", 5) Add (Multiply (Variable "x") (Variable "x")) (Variable "x")
+>  ==> Add (Multiply (Number 5) (Number 5)) (Number 5)
 >
-> substitute1 ("x", 5) [x + 2*y + z]
->  ==> [5 + 2*y + z]
+> substitute1 ("x", 5) Add (Add (Variable "x") (Multiply (Number 2) (Variable "y"))) (Variable "z")
+>  ==> Add (Add (Number 5) (Multiply (Number 2) (Variable "y"))) (Variable "z")
 >
 > -- %Subs13
 
@@ -1278,7 +1257,7 @@ evaluating $2 * x + y$ where $x=3$ and $y=-2$. A collection of bindings
 is called an *environment*. %Mult2
 
 environment
-  ~ An *environment* is a mapping from variables to values.
+  ~ An *environment* is a mapping from variables to values. %Mult50
 
 Since a binding is represented as a pair, an environment can be
 represented as a list of pairs. The environment mentioned above
@@ -1311,7 +1290,7 @@ possibility by signaling an error or triggering an exception. %Mult44
 
 unbound variable
   ~ An *unbound variable* is a variable that does not have a binding.
-    Unbound variables are a common form of errors in programs.
+    Unbound variables are a common form of errors in programs. %Mult51
 
 Haskell already provides a function, called |lookup|, that implements
 the functionality that is needed for variable lookup. The type of |lookup|
@@ -1370,20 +1349,20 @@ INCLUDE:Mult4
 > -- %Mult4
 
 INCLUDE:Mult11
-> substitute e1 [x + 2]
->  ==> [3 + 2]
+> substitute e1 Add (Variable "x") (Number 2)
+>  ==> Add (Number 3) (Number 2)
 >
-> substitute e1 [32]
->  ==> [32]
+> substitute e1 Number 32
+>  ==> Number 32
 >
-> substitute e1 [x]
->  ==> [3]
+> substitute e1 Variable "x"
+>  ==> Number 3
 >
-> substitute e1 [x*x + x]
->  ==> [3*3 + 3]
+> substitute e1 Add (Multiply (Variable "x") (Variable "x")) (Variable "x")
+>  ==> Add (Multiply (Number 3) (Number 3)) (Number 3)
 >
-> substitute e1 [x + 2*y + z]
->  ==> [3 + 2*-1 + z]
+> substitute e1 Add (Add (Variable "x") (Multiply (Number 2) (Variable "y"))) (Variable "z")
+>  ==> Add (Add (Number 3) (Multiply (Number 2) (Number (-1)))) (Variable "z")
 >
 > -- %Mult11
 
@@ -1486,12 +1465,12 @@ and the second |Exp| is the *body*. %Loca23
 
 === Scope
 
-Variables have a range of text in which they are defined.
+Variables have a range of text in which they are defined. %Scop1
 
 scope
   ~ The *scope* of a variable is the portion of the text of a program
-    in which a variable is defined. 
-    
+    in which a variable is defined. %Scop7
+
 Normally the scope of a local
 variable is all of the body of the declaration in which the variable is defined.
 However, it is possible for a variable to be redefined, which creates
@@ -1571,17 +1550,17 @@ error message: %Unde4
 
 The fact that a variable is undefined is a *static* property of the
 program: whether a variable is undefined depends only on the text of the program,
-not upon the particular data that the program is manipulating. 
+not upon the particular data that the program is manipulating.
 This is different
 from the divide by zero error, which depends upon the particular data that the program is manipulating.
-As a result, divide by zero is a *dynamic* error. 
+As a result, divide by zero is a *dynamic* error. %31
 
 static
-  ~ A *static* property of a program can be determined by examining the text 
-    of the program but without executing or evaluating it.
-    
+  ~ A *static* property of a program can be determined by examining the text
+    of the program but without executing or evaluating it. %32
+
 dynamic
-  ~ A *dynamic* property of a program can only be determined by evaluating the program.    
+  ~ A *dynamic* property of a program can only be determined by evaluating the program. %33
 
 Of course, it might be possible to identify, just from
 examining the text of a program, that it will always divide by zero. Alternatively,
@@ -1783,37 +1762,17 @@ of the original environment |x| $\mapsto$ 3. %Eval24
 It is useful to define an |execute| function that supplies the default, empty, environment: %Eval62
 
 INCLUDE:DeclExec %Eval63
-> execute e = evaluate e []
+> executeX exp = show v
+>   where (v, _) = evaluate exp [] []
 > -- %DeclExec
 
 Here are some test cases for evaluating expressions with declarations: %Eval33
 
 INCLUDE:DeclTest1
-> execute [4]
->  ==> 4
->
-> execute [-4 - 6]
->  ==> -10
->
-> execute [var x = 3; x]
->  ==> 3
->
-> execute [var x = 3; var y = x*x; x]
->  ==> 3
->
-> execute [var x = 3; var x = x*x; x]
->  ==> 9
->
-> execute [var x = 3; var y = x*x; y]
->  ==> 9
->
-> execute [2 + (var x = 2; x)]
->  ==> 4
->
 > -- %DeclTest1
 
 The code for this section
-is given in the 
+is given in the
 [Declare zip](./packages/Declare.zip) file. %Eval30
 
 
@@ -1829,7 +1788,7 @@ is defined to support multiple different kinds of values: %More2
 INCLUDE:More3
 > data Value  =  IntV  Int
 >             |  BoolV Bool
->  deriving (Eq)
+>  deriving (Show, Eq)
 > -- %More3
 
 Some example values are |BoolV True| and
@@ -1910,8 +1869,6 @@ INCLUDE:More14
 >   let BoolV test = evaluate a env in
 >     if test then evaluate b env
 >             else evaluate c env
->
-> execute exp = evaluate exp []
 > -- %More14
 
 The binary and unary helper functions perform case analysis on the operator
@@ -1940,44 +1897,44 @@ Using the new format, here are the expressions for the test
 cases given above: %More18
 
 INCLUDE:More19
-> t1 = "4"
-> t2 = "-4 - 6"
-> t3 = "if (3==6) -2 else -7"
-> t4 = "3*(8 + 5)"
-> t5 = "3 + 8 * 2"
+>
+> 4
+>
+> # IntV 4
+>
+> -4 - 6
+>
+> # IntV (-10)
+>
+> if (3==6) -2 else -7
+>
+> # IntV (-7)
+>
+> 3*(8 + 5)
+>
+> # IntV 39
+>
+> 3 + 8 * 2
+>
+> # IntV 19
 > -- %More19
 
 In addition, new expressions can be defined to test conditional expressions: %More20
 
 INCLUDE:More98
-> t6 = "if (3 > 3*(8 + 5)) 1 else 0"
-> t7 = "2 + (if (3 <= 0) 9 else -5)"
+> if (3 > 3*(8 + 5)) 1 else 0
+>
+> # IntV 0
+>
+> 2 + (if (3 <= 0) 9 else -5)
+>
+> # IntV (-3)
+>
 > -- %More98
 
 Running these test cases with the |test| function defined above yields these results: %More22
 
 INCLUDE:More23
-> execute [4]
->  ==> 4
->
-> execute [-4 - 6]
->  ==> -10
->
-> execute [if (3 == 6) -2 else -7]
->  ==> -7
->
-> execute [3 * (8 + 5)]
->  ==> 39
->
-> execute [3 + 8 * 2]
->  ==> 19
->
-> execute [if (3 > 3 * (8 + 5)) 1 else 0]
->  ==> 0
->
-> execute [2 + (if (3 >= 0) 9 else -5)]
->  ==> 11
->
 > -- %More23
 
 === Type Errors
@@ -2002,28 +1959,28 @@ handled by the |binary| function. As a result, Haskell generates a
 Here are some examples of expression that generate type errors: %Type5
 
 INCLUDE:Type6
-> err1 = "if (3) 5 else 8"
-> err2 = "3 + true"
-> err3 = "3 || true"
-> err4 = "-true"
+> if (true) 5 else 8
+>
+> # IntV 5
+>
+> 3 + true
+>
+> # Error: Value.hs:(19,1)-(29,47): Non-exhaustive patterns in function binary
+>
+> 3 || true
+>
+> # Error: Value.hs:(19,1)-(29,47): Non-exhaustive patterns in function binary
+>
+> -true
+>
+> # Error: Value.hs:(16,1)-(17,31): Non-exhaustive patterns in function unary
+>
 > -- %Type6
 
 Running these tests produce error messages, but the errors are not
 very descriptive of the problem that actually took place. %Type1
 
 INCLUDE:Type6run
-> execute [if (3) 5 else 8]
->  ==> Exception: Irrefutable pattern failed for pattern Value.BoolV test
->
-> execute [3 + true]
->  ==> Exception: Non-exhaustive patterns in function binary
->
-> execute [3 || true]
->  ==> Exception: Non-exhaustive patterns in function binary
->
-> execute [-true]
->  ==> Exception: Non-exhaustive patterns in function unary
->
 > -- %Type6run
 
 We will discuss techniques for preventing type errors later, but for now
@@ -2081,7 +2038,7 @@ The previous version of this example contained an unbound use of the variable |m
 > -- %Basi17
 
 The code that you must modify
-is given in the 
+is given in the
 [Declare zip](./packages/Declare.zip) file. %Basi13
 
 = Functions
@@ -2172,7 +2129,7 @@ A call to a function is an expression that has the following concrete syntax: %T
 *function-name*|(|*expression*, ..., *expression*|)| %Top13
 
 Again, there are some variations on this theme. For example,
-in Haskell the parentheses are optional. 
+in Haskell the parentheses are optional. %02
 
 A program is a sequence of function definitions, followed by a main expression.
 Each function definition has a list of parameter
@@ -2206,11 +2163,15 @@ of actual argument expressions: %Top19
 As an example, here is an encoding of the example program: %Top21
 
 INCLUDE:Top22
-> execute function power(n, m) {
->   if (m == 0) 1 else n * power(n, m - 1)
+> function power(n, m) {
+>  if (m == 0)
+>    1
+>  else
+>    n * power(n, m - 1)
 > }
+>
 > power(3, 4)
->  ==> 81
+> =>> IntV 81
 >
 > -- %Top22
 
@@ -2221,8 +2182,8 @@ by evaluating the main expression in the context of the
 programs' function environment and an empty variable environment:  %Eval39
 
 INCLUDE:Eval41
-> execute :: Program -> Value
-> execute (Program funEnv main) = evaluate main [] funEnv
+> execute :: Program -> String
+> execute (Program funEnv main) = show (evaluate main [] funEnv)
 > -- %Eval41
 
 The evaluator is extended to take a function environment |funEnv| as
@@ -2351,7 +2312,7 @@ INCLUDE:Summ12
 >          | Variable  String
 >          | Declare   String Exp Exp
 >          | Call      String [Exp]
->
+>   deriving Show
 >
 > evaluate :: Exp -> Env -> FunEnv -> Value
 > evaluate (Literal v) env funEnv      = v
@@ -2400,11 +2361,11 @@ concept of functions presented above to integrate them into
 the language, so that functions are *first-class* values. %Firs2
 
 first-class values
-  ~ A *first-class value* is a value that can be used 
+  ~ A *first-class value* is a value that can be used
     like any other value. A value is first class if it can be
     passed to functions, returned from functions, and stored
-    in a variable binding.
-    
+    in a variable binding. %Firs1
+
 Consider the following function definition: %Firs3
 
 INCLUDE:Firs4
@@ -2450,7 +2411,7 @@ Here is a solution for |f| using a lambda: %Lamb2
 
 The symbol $\lambda$ is the greek letter *lambda*. Just like
 the symbol $\sqrt{x}$, $\lambda$ has no inherent meaning, but
-is assigned a meaning for our purposes. 
+is assigned a meaning for our purposes. %Lamb1
 
 lambda or function expression
   ~ A *lambda expression* is an expression that creates a function.
@@ -3001,57 +2962,65 @@ arguments that change rarely should be placed early in the argument list. %Mult2
 It is also possible to convert between functions that take multiple arguments
 and chains of functions taking one argument. The standard way to represent multiple
 arguments in Haskell is with a *tuple*, or a collection of values. One simple
-case of a tuple is a *pair*. For example, here are two pairs:
+case of a tuple is a *pair*. For example, here are two pairs: %if1
 
 > (3, 5)
 > ("test", 99)
+> -- %if2
 
-A Haskell function that takes a tuple as an argument resembles functions in most 
-other programming languages:
+A Haskell function that takes a tuple as an argument resembles functions in most
+other programming languages: %if3
 
 > max(a, b) = if a > b then a else b
+> -- %if4
 
 But in Haskell this is really just a function taking one argument, which is pattern
 matched to be a tuple, in this case a pair that binds |a| to the first component and |b|
 to the second component. This function performs that same computation as the standard
 |max| function, which is a function that takes a single argument and returns a function
-that takes the second argument,
+that takes the second argument, %if5
 
 > max a b = if a > b then a else b
+> -- %if6
 
-which is equivalent to
+which is equivalent to %if7
 
 > max = \a-> \b-> if a > b then a else b
+> -- %if8
 
-Note that multiple functions can be represented in a lambda expression as well:
+Note that multiple functions can be represented in a lambda expression as well: %if9
 
 > max = \a b-> if a > b then a else b   -- equivalent to above definition
+> -- %if10
 
 currying
   ~ The process of converting from a function taking a tuple to a chain of functions
-    that take one argument at a time is called *currying*.
+    that take one argument at a time is called *currying*. %if11
 
-A curry function is a higher-order function that performs this operation:
- 
+A curry function is a higher-order function that performs this operation: %if12
+
 > curry2 f = \a b-> f(a, b)
+> -- %if13
 
 The function |curry2| converts a function |f| that takes a pair to a new function that
 takes one argument and returns a function that takes the second argument. %Mult27
-A function that takes a 3-tuple and converts it to curryied form can also be defined:
+A function that takes a 3-tuple and converts it to curryied form can also be defined: %if14
 
 > curry3 f = \a b c-> f(a, b, c)
+> -- %if15
 
 In Haskell it is not possible to take a arbitrary length tuple and curry it.
 It is possible to write |uncurry| functions that perform that opposite transformation,
-from a function with multiple arguments to a function with a single tuple argument:
+from a function with multiple arguments to a function with a single tuple argument: %if16
 
 > uncurry2 f = \(a, b)   -> f a b
 > uncurry3 f = \(a, b, c)-> f a b c
+> -- %if17
 
 uncurrying
   ~ The process of converting from a chain of functions
     that take one argument at a time into a function that takes a single tuple argument
-    is called *uncurrying*.
+    is called *uncurrying*. %if18
 
 
 
@@ -3134,9 +3103,9 @@ function that chooses one of two alternatives. %Bool17
 
 Church Boolean
   ~ A *Church Boolean* is a encoding of a boolean value as a function of two
-    arguments, which returns the first argument for true, and the second 
-    argument for false.
-  
+    arguments, which returns the first argument for true, and the second
+    argument for false. %if19
+
 ==== Natural Numbers
 
 Natural numbers can also be represented functionally. The Church encoding
@@ -3268,11 +3237,11 @@ by returning functions from functions.  %Eval58
 
 Evaluation of first-class functions (lambdas) is
 complicated by the need to properly enforce *lexical scoping*
-rules. 
+rules. %Eval64
 
-lexical scope 
+lexical scope
   ~ *Lexical scope* means that a variable refers to the
-     closest enclosing definition of that variable.
+     closest enclosing definition of that variable. %Eval65
 
 TODO: move this discussion earlier!   %Eval9
 
@@ -3337,7 +3306,7 @@ To clarify the effect of this change, consider these two versions
 of a simple program, written using top-level functions or
 first-class functions: %A10
 
-.
+. %IntV1
 
 Top-Level Functions (A)            \ \ \  First-Class Functions (B)
 ---------------------------------- ------ ----------------------
@@ -3362,34 +3331,38 @@ In many cases the
 first expression (the function) will be a *variable* that
 names the function to be called. Since there is no longer any
 special function environment, the names of functions are looked
-up in the normal variable environment. 
+up in the normal variable environment. %func1
 
 There are many examples where the function to be called is not
 a variable. For example, one could call one of two different functions
 depending on a condition. The following example calls either
-|f| or |g| depending on whether |a > b|. 
+|f| or |g| depending on whether |a > b|. %func2
 
 > (if a > b then f else g)(4)
+> -- %func3
 
-This is similar to calling a function 
-on a conditional argument:
+This is similar to calling a function
+on a conditional argument: %func4
 
 > f(if a > b then 4 else 7)
+> -- %func5
 
-Which is equivalent to the perhaps more familiar form:
+Which is equivalent to the perhaps more familiar form: %func6
 
 > if a > b then
 >   f(4)
 > else
 >   f(7)
+> -- %func7
 
 Another example of not using a variable to name a function is
-the use of *function literals*. The following example applies a 
-function literal that squares a number to the argument 7.
+the use of *function literals*. The following example applies a
+function literal that squares a number to the argument 7. %func8
 
 > (function(x) { x * x })(7)
+> -- %func9
 
-Lets now define the (incorrect) interpreter. 
+Lets now define the (incorrect) interpreter.
 The first few cases for evaluation are exactly the same
 as before. In particular, evaluating a literal value is
 the same, except that now the literal value might be a function. %A18
@@ -3523,8 +3496,8 @@ most recent binding for |k| is |9|. This binding is based on the
 Looking up variables based on control flow is called *dynamic binding*.  %Prob30
 
 dynamic binding
-  ~ dynamic binding occurs when a symbol's value is found by scanning the 
-    dynamic calls for the most recent binding of the symbol.
+  ~ dynamic binding occurs when a symbol's value is found by scanning the
+    dynamic calls for the most recent binding of the symbol. %91
 
 \EndIncorrect
 
@@ -3535,11 +3508,11 @@ function expression as a value is that the bindings of the free variables
 in the function expression are either lost or may be overwritten.
 The solution is to *preserve the bindings that existed at the
 point when the function was defined*. The mechanism for doing
-this is called a *closure*. 
+this is called a *closure*. %A17
 
 closure
-  ~ A closure is a combination of a function expression and an environment. 
-  
+  ~ A closure is a combination of a function expression and an environment. %A94
+
 Rather than think of a function expression as a function value, instead think of it
 as a part of the program that *creates* a function. The actual
 function value is represented by a closure, which captures the
@@ -3688,6 +3661,7 @@ var k = 2;
 var double = function (n) { k * n };
 var k = 9;
 double(k)
+%92
 ````
 
 ![Environment Diagram 1](figures/env1.eps) %Exam3
@@ -3697,6 +3671,7 @@ double(k)
 ````JavaScript
 var add = function(a) { function(b) { b + a } };
 add(3)(2)
+%func10
 ````
 
 ![Environment Diagram 2](figures/env2.eps)  %Exam1
@@ -3709,112 +3684,122 @@ var proc = function(n) { m + n },
     part = function(g, n) { function(m) { n * g(m) }};
 var inc = part(proc, 3);
 inc(7)
+%part1
 ````
 
 ![Environment Diagram 3](figures/env3.png) %Exam4
 
 == Call-by-value and Call-by-name
 
-In languages with declarations, functions or first-class functions there are a few 
-different design options when it comes to evaluation. 
+In languages with declarations, functions or first-class functions there are a few
+different design options when it comes to evaluation. %Call1
 
 === Call-by-value
 
-So far all our interpreters have explored one particular design option, called call-by-value. 
+So far all our interpreters have explored one particular design option, called call-by-value. %Call2
 
 call-by-value
-  ~ In *call-by-value* interpretation, expressions, such as parameters of functions arguments or variable initialisers, 
-    are always evaluated before being added to the environment. 
-    
-Here is the code of evaluation for declarations and function application:
+  ~ In *call-by-value* interpretation, expressions, such as parameters of functions arguments or variable initialisers,
+    are always evaluated before being added to the environment. %Call3
 
-> evaluate (Declare x exp body) env = 
->    case evaluate exp env of 
+Here is the code of evaluation for declarations and function application: %Call4
+
+> evaluate (Declare x exp body) env =
+>    case evaluate exp env of
 >       VException -> VException
 >       v          -> evaluate body ((x,v) : env)
+> -- %Call5
 
-> evaluate (Call fun arg) env = 
+> evaluate (Call fun arg) env =
 >   case evaluate arg env of
 >      VException -> VException
->      v -> case evaluate fun env of 
->             ClosureV name body denv -> evaluate body ((name,v) : denv) 
+>      v -> case evaluate fun env of
+>             ClosureV name body denv -> evaluate body ((name,v) : denv)
+> -- %Call6
 
-In the case of |Declare| expressions,  expression |exp| is evaluated before evaluating the 
-body of the declaration. In the case of |Call| expressions the argument |arg| is evaluated before 
-evaluating the function and function |body|. Note also that we need to be a bit more careful 
-in the presence of exception values to ensure that exceptional values propagate. 
+In the case of |Declare| expressions,  expression |exp| is evaluated before evaluating the
+body of the declaration. In the case of |Call| expressions the argument |arg| is evaluated before
+evaluating the function and function |body|. Note also that we need to be a bit more careful
+in the presence of exception values to ensure that exceptional values propagate. %Call7
 
-Call-by-value is the most common design option for function calls in programming languages. 
-All major programming languages (including C, Java or C#) use call-by-value. 
-Note that some programming languages also support other function call mechanisms. 
-For example, C also supports call-by-reference. 
+Call-by-value is the most common design option for function calls in programming languages.
+All major programming languages (including C, Java or C#) use call-by-value.
+Note that some programming languages also support other function call mechanisms.
+For example, C also supports call-by-reference. %Call8
 
-Drawbacks of call-by-value: Call-by-value can waste resources when evaluating expressions 
-in some cases. For example, consider the following expressions:
+Drawbacks of call-by-value: Call-by-value can waste resources when evaluating expressions
+in some cases. For example, consider the following expressions: %Call9
 
 > var x = longcomputation; 3
+> -- %long1
 
-> (\x -> 3) longcomputation 
+> (\x -> 3) longcomputation
+> -- %long2
 
-In the two expressions the idea is that |longcomputation| stands for an expression that 
-takes a long time to compute. In both cases the returned value will be 3 and the final 
-result does not depend on the value that is computed by |longcomputation|. So, in this case, 
-it seems wasteful to spend time computing |longcomputation|. 
+In the two expressions the idea is that |longcomputation| stands for an expression that
+takes a long time to compute. In both cases the returned value will be 3 and the final
+result does not depend on the value that is computed by |longcomputation|. So, in this case,
+it seems wasteful to spend time computing |longcomputation|. %long3
 
 === Call-by-Name
 
-A different design option is to use call-by-name. 
+A different design option is to use call-by-name. %Call10
 
-call-by-name 
-  ~ In call-by-name an expression is not evaluated until it is needed. 
-  
-So, in the programs:
+call-by-name
+  ~ In call-by-name an expression is not evaluated until it is needed. %Call11
+
+So, in the programs: %Call12
 
 > var x = longcomputation; 3
+> -- %long4
 
-> (\x -> 3) longcomputation 
+> (\x -> 3) longcomputation
+> -- %long5
 
-the expression |longcomputation| is never evaluated and therefore evaluating such expressions is very fast. 
+the expression |longcomputation| is never evaluated and therefore evaluating such expressions is very fast. %long6
 
-Haskell is one of the few languages where (a variant of) call-by-name is the default mechanism 
-for evaluating function applications. 
+Haskell is one of the few languages where (a variant of) call-by-name is the default mechanism
+for evaluating function applications. %long7
 
-Drawbacks of call-by-name: While for the program above there seems to benefit from using call-by-name, 
-there are also programs where call-by-name is worse than call-by-value. For example:
+Drawbacks of call-by-name: While for the program above there seems to benefit from using call-by-name,
+there are also programs where call-by-name is worse than call-by-value. For example: %long8
 
 > var x = longcomputation; x + x
+> -- %long9
 
 > (\x -> x + x) longcomputation
+> -- %long10
 
-In both programs a call-by-name language will evaluate |longcomputation| twice. Since evaluation is 
-delayed to the use-point of the expression, the expression bound to |x| is evaluated twice. 
+In both programs a call-by-name language will evaluate |longcomputation| twice. Since evaluation is
+delayed to the use-point of the expression, the expression bound to |x| is evaluated twice. %long11
 
-In languages like Haskell this drawback is avoided by using an optimisation of call-by-name 
-called call-by-need. 
+In languages like Haskell this drawback is avoided by using an optimisation of call-by-name
+called call-by-need. %long12
 
 call-by-need
-  ~ In call-by-need, when the use of a variable forces the evaluation of an expression, 
-  the result of that evaluation is cached and next time the variable is 
-  needed the cached value is simply returned.
-  
-This means that in call-by-need an expression will be evaluated at most once.
+  ~ In call-by-need, when the use of a variable forces the evaluation of an expression,
+  the result of that evaluation is cached and next time the variable is
+  needed the cached value is simply returned. %long13
+
+This means that in call-by-need an expression will be evaluated at most once. %long14
 
 === Call-by-Value, Call-by-Name and Exceptions
 
-In a language with exceptions, the same expression may evaluate to different results. 
-under call-by-name or call-by-value. For example:
+In a language with exceptions, the same expression may evaluate to different results.
+under call-by-name or call-by-value. For example: %Call13
 
 > var x = 3 / 0; 7
+> -- %34
 
-evaluates to:
+evaluates to: %35
 
-  1) an exception in a call-by-value language; 
-  2) 7 in a call-by-name language.
+  1) an exception in a call-by-value language;
+  2) 7 in a call-by-name language. %36
 
-The reason is that exceptions propagate. Since in call-by-value all expressions arguments 
-(or initialisers) are evaluated, the program will raise an exception which is then propagated 
-throughout evaluation. In contrast in call-by-name the expression bound to x is not needed 
-to compute the result. Therefore, because that expression is not evaluated, no exception is propagated.
+The reason is that exceptions propagate. Since in call-by-value all expressions arguments
+(or initialisers) are evaluated, the program will raise an exception which is then propagated
+throughout evaluation. In contrast in call-by-name the expression bound to x is not needed
+to compute the result. Therefore, because that expression is not evaluated, no exception is propagated. %37
 
 == Summary of First-Class Functions  {#FirstClassFunctions}
 
@@ -3840,7 +3825,7 @@ INCLUDE:Summ14
 >          | Declare   String Exp Exp
 >          | Function  String Exp      -- new
 >          | Call      Exp Exp         -- changed
->   deriving (Eq)
+>   deriving (Eq, Show)
 >
 > type Env = [(String, Value)]
 >
@@ -3870,7 +3855,7 @@ INCLUDE:Summ14
 >         newEnv = (x, evaluate arg env) : closeEnv
 > -- %Summ14
 
-Test cases can be found in 
+Test cases can be found in
   and the FirstClassFunctionsTest.js file. %Summ15
 
 == Assignment 2: First-Class Functions {#assign2 -}
@@ -3921,10 +3906,10 @@ The files you need are
 
 One consequence of using a simple |var| expression to define functions
 is that it is no longer possible to define *recursive functions*, which
-were supported in the [Section on Top-Level Functions](#TopLevel). 
+were supported in the [Section on Top-Level Functions](#TopLevel). %Recu57
 
 recursive function
-  ~ A recursive function is a function that calls itself within its own definition.
+  ~ A recursive function is a function that calls itself within its own definition. %Recu58
 
 For example, consider this definition of the factorial function: %Recu2
 
@@ -4003,11 +3988,11 @@ and subtract conditionals, to get both occurrences of |fact| onto the same
 side of the equation. We are going to have to take another approach. %Sema12
 
 The first thing to notice is that |fact| is a function, and like most functions
-it is an *infinite* structure. 
+it is an *infinite* structure. %11
 
 infinite structure
   ~ An *infinite structure* is a structure that is conceptually infinite,
-    but cannot be represented explicitly in its entirety.
+    but cannot be represented explicitly in its entirety. %12
 
 This makes sense in several ways. It is infinite in the sense that it defines
 the factorial for every natural number, and there is an infinity of natural numbers.
@@ -4251,10 +4236,10 @@ TODO: examples here  %Recu21
 == Understanding Recursion with Fixed Points
 
 Another way to explain recursion is by using the mathematical
-concept of a fixed point. 
+concept of a fixed point. %Unde34
 
 fixed point
-  ~ A *fixed point* of a function $f$ is a value $x$ where $x = f(x)$. 
+  ~ A *fixed point* of a function $f$ is a value $x$ where $x = f(x)$. %f1
 
 If you think of a function as
 a transformation on values, then fixed points are values that
@@ -4282,20 +4267,20 @@ Fixed-points can also be identified for simple mathematical
 functions: %Fixe2
 
 +------------------------------------------+--------------------------------+
-| *function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  | *fixed point(s)*               | 
+| *function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  | *fixed point(s)*               |
 +------------------------------------------+--------------------------------+
-| $i_{10}(x) = 10 - x$                     | $5$                            | 
+| $i_{10}(x) = 10 - x$                     | $5$                            |
 +------------------------------------------+--------------------------------+
-| $square(x) = x^2$                        | $0, 1$                         | 
+| $square(x) = x^2$                        | $0, 1$                         |
 +------------------------------------------+--------------------------------+
-| $g_\phi(x) = 1 + \cfrac{1}{x}$           | $1.6180339887...$              | 
+| $g_\phi(x) = 1 + \cfrac{1}{x}$           | $1.6180339887...$              |
 +------------------------------------------+--------------------------------+
-| $k_4(x) = 4$                             | $4$                            | 
+| $k_4(x) = 4$                             | $4$                            |
 +------------------------------------------+--------------------------------+
-| $id(x) = x$                              | all values are fixed points    | 
+| $id(x) = x$                              | all values are fixed points    |
 +------------------------------------------+--------------------------------+
-| $inc(x) = x + 1$                         | no fixed points %Fixe3         | 
-+------------------------------------------+--------------------------------+
+| $inc(x) = x + 1$                         | no fixed points %Fixe3         |
++------------------------------------------+--------------------------------+ %x1
 
 As you can see, some functions have one fixed point.
 Some functions have multiple fixed points. Others have
@@ -4318,11 +4303,11 @@ equation using a new helper function, $g$: %Fixe7
 $g(x) = 10 - x$ %Fixe8
 
 Functions created in this way are called *generators* for
-recursive equations.
+recursive equations. %101
 
 generator
   ~ A function that is passed as an argument to the fixed-point function,
-    with the intent of creating an infinite value.
+    with the intent of creating an infinite value. %102
 
 Given the generator $g$, the original equation can be rewritten as: %Fixe9
 
@@ -4381,7 +4366,7 @@ The next column shows just the application of $g_\phi$ to the
 previous result. The final column gives the result for that
 iteration.  %Fixe19
 
---------------------BEGIN-HIDE-------------------------
+--------------------BEGIN-HIDE------------------------- %13
 
 \#  power            previous                     result
 --  ---------------- -------------------------- - ------------
@@ -4445,7 +4430,7 @@ given above:  %Fixe26
 | $id(x) = x$                              | infinite loop                  |
 +------------------------------------------+--------------------------------+
 | $inc(x) = x + 1$                         | infinite loop  %Fixe27         |
-+------------------------------------------+--------------------------------+
++------------------------------------------+--------------------------------+ %x2
 
 Only two of the six examples worked. Fixed points are not a general
 method for solving numeric equations.  %Fixe28
@@ -4572,10 +4557,10 @@ use its argument.  %A59
 
 === A Non-Recursive Definition of |fix|
 
-It is also possible to define |fix| non-recursively, by using *self application*.
+It is also possible to define |fix| non-recursively, by using *self application*. %A95
 
 self application
-  ~ Self application is when a function is applied to itself.
+  ~ Self application is when a function is applied to itself. %A116
 
 This works because functions are values, so a function can be
 passed as an argument to itself. For example, consider the identity
@@ -4656,10 +4641,10 @@ the definition of |stamp| expanded.  %A77
 
 A second problem with this definition of |fix| is that it
 *diverges*, or creates an infinite loop, when executed
-in non-lazy languages. 
+in non-lazy languages. %stam1
 
 diverge
-  ~ A function diverges if it doesn't return a value.
+  ~ A function diverges if it doesn't return a value. %stam2
 
 Thus it cannot be used in Haskell
 because of self-application, and it cannot be used in
@@ -4873,26 +4858,18 @@ calls |binary| and then tags the resulting value as |Good|. %Hand18
 Evaluating an expression may now return an error for unbound variables: %Hand27
 
 INCLUDE:Hand28
-> testUBV = execute (parseExp "x")
+> x
+>
+> # Error "Variable x undefined"
 > -- %Hand28
-
-The result of evaluation is: %Hand29
-
-INCLUDE:testUBV
-> Error "Variable x undefined"
-> -- %testUBV
 
 Or for divide by zero: %Hand31
 
 INCLUDE:Hand32
-> testDBZ2 = execute (parseExp "3 / 0")
+> 3 / 0
+>
+> # Error "Divide by zero"
 > -- %Hand32
-
-The result of evaluation is: %Hand33
-
-INCLUDE:testDBZ2
-> Error "Divide by zero"
-> -- %testDBZ2
 
 Your take-away from this section should be that checking error everywhere
 is messy and tedious. The code for binary operators has to deal with
@@ -4934,12 +4911,12 @@ can have multiple bindings, and functions can have multiple arguments. %Exer1
 == Mutable State {#Mutable}
 
 A second common pervasive computational strategy, besides
-error handling, is the use of *mutable state*. 
+error handling, is the use of *mutable state*. %Muta14
 
 mutable state
   ~ Mutable state means that the state of a program changes or mutates:
     that a variable can be assigned a new value or a part of a
-    data structure can be modified. 
+    data structure can be modified. %Muta15
 
 Mutable state is a pervasive
 feature because it is something that happens in addition to
@@ -5003,15 +4980,15 @@ the programmer to make this intention explicit. %Addr2
 To rectify this situation, at the cost of being somewhat unconventional,
 this book takes a different approach to mutable state, where mutability must
 be explicitly declared. Variables are not mutable by default. Instead
-a new kind of value, an *address*, is introduced to support mutation.
+a new kind of value, an *address*, is introduced to support mutation. %Addr1
 
 address
   ~ An address identifies a mutable container that stores a single value,
-    but whose contents can change over time. Addresses are sometimes called *locations*.
+    but whose contents can change over time. Addresses are sometimes called *locations*. %Addr14
 
 The storage identified by an
 address is sometimes called a *cell*. You can think of it as a *box*
-that contains a value.  
+that contains a value.
 (Note that the concept of an address of a mutable container is also used in
 ML and BLISS for mutable values, where they are known as |ref| values. This is
 also closely related to the concept of an address of a memory cell, as it appears
@@ -5041,11 +5018,11 @@ for (i = mutable 2; @i <= 5; i = @i + 1) {
 
 In this model a variable always denotes the address to which it is bound.
 If the variable |x| appears on the right side of an assignment, it must be *dereferenced*
-as |@@x|. 
+as |@@x|. %muta1
 
 dereferencing
-  ~ A address is *dereferenced* when the contents of the cell associated with 
-    the address is looked up and returned.
+  ~ A address is *dereferenced* when the contents of the cell associated with
+    the address is looked up and returned. %muta2
 
 If the variable appears on the left side of an assignment, it
 denotes an address that is updated. %Addr8
@@ -5087,11 +5064,11 @@ are expressed. %Addr13
 ==== Memory
 
 The current value of all mutable cells used in a program is called
-*memory*. 
+*memory*. %Memo13
 
 memory
-  ~ memory is a map or association of addresses to values. 
-  
+  ~ memory is a map or association of addresses to values. %Memo14
+
 The same techniques used for environments could
 be used for memories, as a list of pairs or a function.
 Memory can also be represented as a function mapping integers
@@ -5190,7 +5167,7 @@ contents of a single address with a new value. %Upda3
 INCLUDE:Upda4
 > update :: Int -> Value -> Memory -> Memory
 > update addr val mem =
->   let (before, _:after) = splitAt addr mem in
+>   let (before, _ : after) = splitAt addr mem in
 >     before ++ [val] ++ after
 > -- %Upda4
 
@@ -5266,12 +5243,12 @@ INCLUDE:Stat8
 > -- %Stat8
 
 This is a *generic* type for a memory-based computation which returns
-a value of type |t|. 
+a value of type |t|. %Memo15
 
 stateful computation
   ~ A stateful computation is represented functionally as a function
-    that takes an initial state and returns a value and an updated state.
-    
+    that takes an initial state and returns a value and an updated state. %Memo16
+
 Just as in the case of errors, it is useful to
 give a visual form to the shape of a stateful computation: %Stat9
 
@@ -5620,7 +5597,7 @@ The type of the bind operators is also interesting: %Abst33
 
 Checked: %Abst43
   ~ $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
-  
+
 Stateful: %Abst45
   ~ $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
 
@@ -5630,7 +5607,7 @@ checked computation or a stateful computation? Other forms of computation are al
 possible. %Abst35
 
 === Monads Defined
-monad
+monad %Mona27
 
 :   A *monad* $m$ is a computational structure that involves three parts: %Mona3
 
@@ -5650,7 +5627,7 @@ The fact that it is a "stateful computation" implies that there is a memory whic
 as input to the computation, and that it produces an updated memory in addition to the string result. %Mona7
 
 return
-  ~ The |return|$_m$ function specifies how values are converted into $m$-computations. 
+  ~ The |return|$_m$ function specifies how values are converted into $m$-computations. %Mona28
 
 The |return|$_m$ function has type $t \rightarrow m\ t$ for any type $t$. What this means is that it
 converts a value of type $t$ into an $m$-computation that just returns the value. It is
@@ -5658,7 +5635,7 @@ important that the computation *just* returns the value, so, for example, it is 
 the stateful return function to modify memory. Examples of return were given in the previous section. %Mona8
 
 bind
-  ~ The *bind* function $\rhd_m$ specifies how $m$-computations are combined together. 
+  ~ The *bind* function $\rhd_m$ specifies how $m$-computations are combined together. %Mona29
 
 In general the behavior of $A \rhd_m F$ is to perform the $m$-computation $A$ and then pass the value
 it produces to the function $F$ to create a second $m$-computation, which is returned as the
@@ -5685,11 +5662,11 @@ that makes them easy to use. %Mona12
 
 === The Monad Type Class
 
-Haskell allow monads to be defined very cleanly using *type classes*. 
+Haskell allow monads to be defined very cleanly using *type classes*. %The1
 
 type class
-  ~ A type class is a Haskell mechanism for overloading functios based on their type.
-  
+  ~ A type class is a Haskell mechanism for overloading functios based on their type. %The2
+
 The |Monad| class has the following definition: %Monad1
 
 > class Monad m where
@@ -5705,8 +5682,12 @@ rather than $\rhd$. %Monad3
 The type |Checked| is an instance of the |Monad| class: %Monad4
 
 INCLUDE:Monad5
+> instance Applicative Checked where
+>   pure val = Good val
+>   (<*>) = ap
+>
 > instance Monad Checked where
->   return v = Good v
+>   return = pure
 >   a >>= f =
 >     case a of
 >       Error msg -> Error msg
@@ -5789,7 +5770,7 @@ cleanly using monads. %Usin25
 
 Here is a version of error checking using the |Checked| monad defined above: %Mona14
 The code for error checking using monads is
-given in the [Checked Monad zip](./packages/CheckedMonad.zip) file.
+given in the [Checked Monad zip](./packages/CheckedMonad.zip) file. %Mona30
 
 INCLUDE:Mona13
 > evaluate :: Exp -> Env -> Checked Value
@@ -5804,7 +5785,7 @@ INCLUDE:Mona13
 > evaluate (If a b c) env = do
 >   av <- evaluate a env
 >   case av of
->     (BoolV cond) -> evaluate (if cond then b else c) env
+>     BoolV cond -> evaluate (if cond then b else c) env
 >     _ -> Error ("Expected boolean but found " ++ show av)
 > -- variables and declarations
 > evaluate (Variable x) env    =
@@ -5856,16 +5837,20 @@ INCLUDE:StatefulMonad1
 The data type is isomorphic to the function type, because it is just
 a type with a label. %Mona19
 
-The |Stateful| monad is an instance of |Monad|. It is fairly complex, 
-mostly because of the need to deal with the type tag. 
+The |Stateful| monad is an instance of |Monad|. It is fairly complex,
+mostly because of the need to deal with the type tag. %ST1
 
 It defines |return| to return a value without changing memmory. It does this by
 returning a |ST| with a function that takes a memory and returns the
-value with the memory unchanged. 
+value with the memory unchanged. %ST2
 
 INCLUDE:StatefulMonad2 %Mona20
+> instance Applicative Stateful where
+>   pure val = ST (\m -> (val, m))
+>   (<*>) = ap
+>
 > instance Monad Stateful where
->   return val = ST (\m -> (val, m))
+>   return = pure
 >   (ST c) >>= f =
 >     ST (\m ->
 >       let (val, m') = c m in
@@ -5875,11 +5860,11 @@ INCLUDE:StatefulMonad2 %Mona20
 > -- %StatefulMonad2
 
 It defines the bind operator |>>=| to take a stateful value |c| and a function |f|.
-It returns a new |Stateful| value that accepts a memory |m|, it then passes this 
+It returns a new |Stateful| value that accepts a memory |m|, it then passes this
 memory to |c| and captures the result as a |val| and a new memeory |m'|.
 It then applies the function |f| to the value |val| and captures the resulting
 |Stateful| value. This function |f'| is applied to the new memory |m'| to
-create the |Stateful| result.
+create the |Stateful| result. %f2
 
 Here is a version of evaluator using the |Stateful| monad defined above: %Mona21
 
@@ -5980,19 +5965,19 @@ values*. Those interpreters, called abstract interpreters, return some
 abstraction of the result of executing a program. %Abst16
 
 abstract value
-  ~ An abstract value is a value that represents a collection of concrete values.
-  
+  ~ An abstract value is a value that represents a collection of concrete values. %Abst39
+
 concrete interpreter
   ~ A *concrete interpreter* is a normal interpreter that evaluates
-    with normal values.
+    with normal values. %Abst40
 
 abstract interpreter
   ~ A *abstract interpreter* is an interpreter that operates over
-    abstact values using abstract operations. 
-    
+    abstact values using abstract operations. %Abst41
+
 validity
   ~ An abstract interpreter is *valid* if the concrete value result is a member
-    of the set of values of the abstact value evaluation result, for all evaluations. 
+    of the set of values of the abstact value evaluation result, for all evaluations. %Abst42
 
 The most common and familiar example of abstract interpretation is
 *type-checking* or *type-inference*. A type-checker analyses a program in
@@ -6051,7 +6036,7 @@ the [Section on More Kinds of Data](#MoreData): %A29
 >          | Declare   String Exp Exp
 > -- %A33
 
-(NOTE: The language in the tutorial files includes an additional constructor Call. For this 
+(NOTE: The language in the tutorial files includes an additional constructor Call. For this
 question you can ignore that constructor and there is no need to have a case for Call in the type-checker function.) %A81
 
 For this language types are represented as: %A82
@@ -6067,22 +6052,22 @@ Type-checking can fail when the types of subexpressions are incompatible. For ex
 > 3 + true
 > -- %A86
 
-should fail to type-check because addition (+) is an operation that expects two integer values. 
+should fail to type-check because addition (+) is an operation that expects two integer values.
 However in this case, the second argument is not an integer, but a boolean. %A87
 
-In a language with variables a type-checker needs to track the types of variables. 
-To do this we can use what is called a type environment. 
+In a language with variables a type-checker needs to track the types of variables.
+To do this we can use what is called a type environment. %TInt1
 
-Type environments 
+Type environments
   ~ A *type environment* is a mapping from variable names to types.%A88
 
 > type TEnv = [(String, Type)]
 > -- %A89
 
-A type environment plays a similar role to the environment in a regular interpreter: 
+A type environment plays a similar role to the environment in a regular interpreter:
 it is used to track the types of variables during the type-checking process of an expression. %A90
 
-=== Type of the type-checker 
+=== Type of the type-checker
 
 We are going to use the following type for the type-checker: %A91
 
@@ -6091,14 +6076,14 @@ We are going to use the following type for the type-checker: %A91
 
 Note how similar this type is to the type of an environment-based interpreter except for one difference: %A93
 
-1) Where in the concrete interpreter we used |Value|, we now use |Type|.
+1) Where in the concrete interpreter we used |Value|, we now use |Type|. %Type8
 
-If we look at |typeCheck| as an abstract interpreter, then types play the 
-role of abstract values. 
+If we look at |typeCheck| as an abstract interpreter, then types play the
+role of abstract values. %Type9
 
-=== Typing rules for expressions 
+=== Typing rules for expressions
 
-Most expressions in the language it are fairly obvious to type-check. For example, to type-check 
+Most expressions in the language it are fairly obvious to type-check. For example, to type-check
 an expression of the form: %A96
 
 > e1 + e2
@@ -6110,7 +6095,7 @@ we proceed as follows: %A98
 2) check whether the type of |e2| is |TInt|
 3) If both types are |TInt|, return |TInt| as the result type (|Just TInt|); otherwise fail to type-check (|Nothing|) %A99
 
-==== Typing Declare Expressions 
+==== Typing Declare Expressions
 
 To type a declare expression of the form %A100
 
@@ -6131,7 +6116,7 @@ For expressions with unbound variables: for example: %A104
 you should throw an error. In other words the type-checker works only for valid programs. %A106
 
 ==== Typing |If| Expressions
- 
+
 The only slightly tricky expression to type-check is an |if| expression.
 The type-checking rule for an |if| expressions of the form: %A107
 
@@ -6150,54 +6135,52 @@ The code for the |typeCheck| function is as follows: %A111
 INCLUDE:Type12 %A112
 > -- Type-check an expression in a typing environment
 > typeCheck :: Exp -> TypeEnv -> Type
-> typeCheck (Literal (IntV _)) env  = TInt
-> typeCheck (Literal (BoolV _)) env = TBool
+> typeCheck (Literal (IntV _)) env  = IntT
+> typeCheck (Literal (BoolV _)) env = BoolT
 > typeCheck (Unary op a) env     = checkUnary op (typeCheck a env)
 > typeCheck (Binary op a b) env  = checkBinary op (typeCheck a env) (typeCheck b env)
 > typeCheck (Variable x) env     = fromJust (lookup x env)
 > typeCheck (Declare x exp body) env = typeCheck body newEnv
 >   where newEnv = (x, typeCheck exp env) : env
 > typeCheck (If a b c) env =
->   if TBool == typeCheck a env then
->     if typeCheck b env == typeCheck c env then
->       typeCheck b env
->     else
->       error ("Result types are not the same in " ++ show b ++ ", " ++ show c)
->   else
+>   if BoolT /= typeCheck a env then
 >     error ("Conditional must return a boolean: " ++ show a)
+>   else if typeCheck b env /= typeCheck c env then
+>     error ("Result types are not the same in " ++ show b ++ ", " ++ show c)
+>   else
+>     typeCheck b env
 > -- %Type12
 
 Here are the two helper functions, which are the abstract versions of binary and unary: %A114
 
 INCLUDE:Type16 %A115
-> checkUnary Not TBool = TBool
-> checkUnary Neg TInt  = TInt
+> checkUnary Not BoolT = BoolT
+> checkUnary Neg IntT  = IntT
 > checkUnary op  a     = error ("Mismatched argument for " ++
 >                               show op ++ " " ++ show a)
 >
-> checkBinary Add TInt  TInt  = TInt
-> checkBinary Sub TInt  TInt  = TInt
-> checkBinary Mul TInt  TInt  = TInt
-> checkBinary Div TInt  TInt  = TInt
-> checkBinary And TBool TBool = TBool
-> checkBinary Or  TBool TBool = TBool
-> checkBinary LT  TInt  TInt  = TBool
-> checkBinary LE  TInt  TInt  = TBool
-> checkBinary GE  TInt  TInt  = TBool
-> checkBinary GT  TInt  TInt  = TBool
-> checkBinary EQ  a     b     | a == b = TBool
+> checkBinary Add IntT  IntT  = IntT
+> checkBinary Sub IntT  IntT  = IntT
+> checkBinary Mul IntT  IntT  = IntT
+> checkBinary Div IntT  IntT  = IntT
+> checkBinary And BoolT BoolT = BoolT
+> checkBinary Or  BoolT BoolT = BoolT
+> checkBinary LT  IntT  IntT  = BoolT
+> checkBinary LE  IntT  IntT  = BoolT
+> checkBinary GE  IntT  IntT  = BoolT
+> checkBinary GT  IntT  IntT  = BoolT
+> checkBinary EQ  a     b     | a == b = BoolT
 > checkBinary op  a     b      =
 >   error ("Mismatched binary types for " ++
 >          show a ++ " " ++ show op ++ " " ++ show b)
->
 > -- %Type16
 
-Note that if type-checking any subexpressions fails with a type-error then the type-checking 
+Note that if type-checking any subexpressions fails with a type-error then the type-checking
 of the |if| expression will also fail. %A113
 
 == Type-Checking First-class Functions
 
-In order to support type-checking we need to modify some of the datatypes with additional type-annotations:
+In order to support type-checking we need to modify some of the datatypes with additional type-annotations: %Type10
 
 INCLUDE:TypeA42
 > data Exp = Literal   Value
@@ -6206,65 +6189,83 @@ INCLUDE:TypeA42
 >          | If        Exp Exp Exp
 >          | Variable  String
 >          | Declare   String Exp Exp
->          | Function  (String, Type) Exp --changed
->          | Call      Exp Exp      
+>          | Function  (String, Type) Exp      -- changed
+>          | Call      Exp Exp
 >   deriving (Eq, Show)
+> -- %TypeA42
 
-In expressions functions need to have parameters annotated with types. Similarly in closures, 
-the parameters need a type annotation. These are marked in bold above. 
+In expressions functions need to have parameters annotated with types. Similarly in closures,
+the parameters need a type annotation. These are marked in bold above. %Lite2
 
-Types and type-environments are defined as follows:
+Types and type-environments are defined as follows: %Lite3
 
 INCLUDE:TypeA49
-> data Type = TInt | TBool | TFun Type Type deriving (Show,Eq)
+> data Type = IntT
+>            | BoolT
+>            | FunT Type Type  -- new
+>   deriving (Eq, Show)
+> -- %TypeA49
 
 INCLUDE:TypeAEnv
-> type TEnv = [(String, Type)]
+> type TypeEnv = [(String, Type)]
+> -- %TypeAEnv
 
-The interesting thing is that we now have a type for functions denoted by the constructor |TFun|. 
-These types are similar to Haskell function types like |Int -> Int|  or |Bool -> (Int -> Bool)|. 
-Function types are useful to have function arguments. For example:
+The interesting thing is that we now have a type for functions denoted by the constructor |TFun|.
+These types are similar to Haskell function types like |Int -> Int|  or |Bool -> (Int -> Bool)|.
+Function types are useful to have function arguments. For example: %TInt4
 
 > function(f : Int -> Int) {
->   function(x : Int) { 
+>   function(x : Int) {
 >     f(f(x))
 >   }
-> } 
+> }
+> -- %TInt5
 
-is a function that given a function |f| and an integer |x|, applies |f| twice to |x|.
+is a function that given a function |f| and an integer |x|, applies |f| twice to |x|. %TInt6
 
-Type checking a function definition is straighforward, given the argument type as part of the 
+Type checking a function definition is straighforward, given the argument type as part of the
 definition. It  type checks the body of the function in a type environment extended with
-a declaration of the argument.
+a declaration of the argument. %TInt7
 
-INCLUDE:TypeA41
- 
+INCLUDE:TypeA41 %TInt8
+> typeCheck (Function (x, t) body) env = FunT t (typeCheck body newEnv)     -- new
+>   where newEnv = (x, t) : env
+> -- %TypeA41
+
 Type checking a function call is also straightforward: it matches the actual argument
-type with the declared function argument type.
+type with the declared function argument type. %TInt9
 
-INCLUDE:TypeA47
- 
-The file FirstClassFunctionsTyping.hs adds a function |typeCheck| for doing type-checking.
+INCLUDE:TypeA47 %TInt10
+> typeCheck (Call fun arg) env =
+>   case typeCheck fun env of
+>     FunT a b -> if a /= typeCheck arg env
+>                 then error "Invalid argument type"
+>                 else b
+>     _ -> error "Expected function"
+> -- %TypeA47
+
+The file FirstClassFunctionsTyping.hs adds a function |typeCheck| for doing type-checking. %TInt11
 
 INCLUDE:TypeSummDecl
-> tcheck :: Exp -> TEnv -> Maybe Type
+> typeCheck :: Exp -> TypeEnv -> Type
+> -- %TypeSummDecl
 
 ---BEGIN-HIDE---
-In the file FirstClassFunctionsTest.hs you will also find several definitions 
+In the file FirstClassFunctionsTest.hs you will also find several definitions
 |a2| to |a8| commented. You can uncomment these definitions to test your code.
 ---END-HIDE---
 
-You can also optionally modify the Happy file to extend parsing so that we 
-can deal with type-annotations in the language.
+You can also optionally modify the Happy file to extend parsing so that we
+can deal with type-annotations in the language. %TInt13
 
 
 --------------------BEGIN-HIDE------------------------- %Memo2
 
-# Data Abstraction
+# Data Abstraction %TInt14
 
-# Objects
+# Objects %TInt15
 
-# Abstract Data Types
+# Abstract Data Types %TInt16
 
 = More Chapters on the way...
 == Data Abstraction: Objects and Abstract Data Types
@@ -6309,4 +6310,4 @@ Here two files that can be used to represent and parse lambda-expressions:
 [Lambda Parser](./code/LambdaParse.y.htm) %File1
 --------------------END-HIDE-------------------------
 
- 
+
