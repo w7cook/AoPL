@@ -974,7 +974,9 @@ How to create simple grammars using the
 == Evaluating Arithmetic Expressions
 
 The normal meaning assigned to arithmetic expressions is the evaluation of the
-arithmetic operators to compute a final answer. This evaluation process is
+arithmetic operators to compute a final answer. This section describes how
+to define a simple evaluator as defined in the [Simple.zip](./packages/Simple.zip) file.
+This evaluation process is
 defined by cases in Haskell: %Eval2
 
 INCLUDE:Eval3
@@ -1264,7 +1266,7 @@ represented as a list of pairs. The environment mentioned above
 would be %Mult3
 
 INCLUDE:Mult4
-> e1 = [ ("x", 3), ("y", -1) ]
+> e1 = [ ("x", 3), ("y", -2) ]
 > -- %Mult4
 
 The corresponding type is %Mult5
@@ -1278,7 +1280,7 @@ is an operation that given a variable name and an environment looks up that
 variable in the environment. For example: %Mult10
 
 * lookup $x$ in $e1$                       $\longrightarrow$ $3$ %Mult16
-* lookup $y$ in $e1$                       $\longrightarrow$ $-1$ %Mult28
+* lookup $y$ in $e1$                       $\longrightarrow$ $-2$ %Mult28
 
 In each case the corresponding value of the variable being looked up in the environment
 is returned. However what happens when a variable that is not in the environment is looked up? %Mult42
@@ -1345,7 +1347,7 @@ The test results below show that multiple variables are substituted with
 values, but that unknown variables are left intact: %Mult99
 
 INCLUDE:Mult4
-> e1 = [ ("x", 3), ("y", -1) ]
+> e1 = [ ("x", 3), ("y", -2) ]
 > -- %Mult4
 
 INCLUDE:Mult11

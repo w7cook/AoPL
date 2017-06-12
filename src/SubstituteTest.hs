@@ -27,7 +27,7 @@ main'1 = do
 --END:Subs11
 
 --BEGIN:Mult4
-e1 = [ ("x", 3), ("y", -1) ]
+e1 = [ ("x", 3), ("y", -2) ]
 --END:Mult4
 
 main'2 = do
