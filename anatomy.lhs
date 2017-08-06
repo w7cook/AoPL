@@ -2295,11 +2295,6 @@ because the function definitions can be used in any expression,
 including in the body of the functions themselves. This means that
 all functions have *global scope*.  %Eval57
 
-=== Stack Diagrams
-
-TODO: illustrate how stacks work in languages that don't have
-first-class functions %Stac2
-
 === Summary
 
 Here is the full code for the evaluator supporting
@@ -4282,7 +4277,7 @@ functions: %Fixe2
 | $id(x) = x$                              | all values are fixed points    |
 +------------------------------------------+--------------------------------+
 | $inc(x) = x + 1$                         | no fixed points %Fixe3         |
-+------------------------------------------+--------------------------------+ %x1
++------------------------------------------+--------------------------------+
 
 As you can see, some functions have one fixed point.
 Some functions have multiple fixed points. Others have
@@ -4432,7 +4427,7 @@ given above:  %Fixe26
 | $id(x) = x$                              | infinite loop                  |
 +------------------------------------------+--------------------------------+
 | $inc(x) = x + 1$                         | infinite loop  %Fixe27         |
-+------------------------------------------+--------------------------------+ %x2
++------------------------------------------+--------------------------------+
 
 Only two of the six examples worked. Fixed points are not a general
 method for solving numeric equations.  %Fixe28
@@ -5514,7 +5509,7 @@ of multiple sub-expressions. %Abst22
 Checked                                          \ \ \ \ \ \  Stateful
 ------------------------------------------------ ------------ --------------
 |evaluate :: Exp -> Env -> Checked Value|                     |evaluate :: Exp -> Env -> Stateful Value|
-|evaluate (Binary op a b) env =|                              |evaluate (Binary op a b) =|
+|evaluate (Binary op a b) env =|                              |evaluate (Binary op a b) env =|
 \ \ |case evaluate a env of|                                  \ \ $\lambda$|mem.let (av, mem') = evaluate a env mem in|
 \ \ \ \ |Error msg -> Error msg|                              \ \ \ \ \ \ \ \ \ \ \ \ \ |let (bv, mem'') = evaluate b env mem' in|
 \ \ \ \ |Good av ->|                                          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |(binary op av bv, mem'')|

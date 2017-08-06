@@ -39,6 +39,7 @@ SOURCES=$(TESTS) \
 			ErrorChecking.hs \
 			Examples.hs \
 			FirstClassFunctions.hs \
+			FirstClassFunctionsTyping.hs \
 			FunctionalEnvironment.hs \
 			IncorrectFunctions.hs \
 			IntBool.hs \
@@ -251,6 +252,8 @@ packages: $(addprefix code/,$(SOURCES))$
 	  code/StatefulMonad* code/Stateful.hs code/StatefulParse.y
 	zip packages/CheckedMonad.zip code/Base.hs code/Lexer.hs code/Operators.hs code/CheckedMonad* \
 	  code/FirstClassFunctionsParse.y code/FirstClassFunctions.hs code/ErrorChecking.hs
+	zip packages/Typing.zip code/Base.hs code/Lexer.hs code/Operators.hs \
+	  code/FirstClassFunctionsTyping* code/FirstClassFunctionsParse.y
 	zip packages/Examples.zip code/*Examples*
 	
   	  
