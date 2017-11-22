@@ -15,3 +15,6 @@ backup/*
 code/*
 packages/*
 cc/*
+/packages/
+/output/
+/code/
