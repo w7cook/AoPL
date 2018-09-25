@@ -1,0 +1,13 @@
+FIgure 4.2: second closure should have b.
+
+4.4.6: problem with proof has a circle in PDF
+
+problem with BooleanF type 
+
+explain orF
+
+
+
+Sukiyabashi Jiro.
+
+

@@ -1761,18 +1761,6 @@ single binding. The next two variable declarations create environments %Eval21
 Internally Haskell allows these two environments to share the definition
 of the original environment |x| $\mapsto$ 3. %Eval24
 
-It is useful to define an |execute| function that supplies the default, empty, environment: %Eval62
-
-INCLUDE:DeclExec %Eval63
-> executeX exp = show v
->   where (v, _) = evaluate exp [] []
-> -- %DeclExec
-
-Here are some test cases for evaluating expressions with declarations: %Eval33
-
-INCLUDE:DeclTest1
-> -- %DeclTest1
-
 The code for this section
 is given in the
 [Declare zip](./packages/Declare.zip) file. %Eval30
@@ -2041,7 +2029,7 @@ The previous version of this example contained an unbound use of the variable |m
 
 The code that you must modify
 is given in the
-[Declare zip](./packages/Declare.zip) file. %Basi13
+[Declare.zip](./packages/Declare.zip) file. %Basi13
 
 = Functions
 
@@ -3619,20 +3607,20 @@ expression. %Envi3
     Set current environment to empty environment $\emptyset$ %Envi5
 
 * Case |Declare x e body| %Envi1
-    1.  Draw binding box for |x| with unknown value %Envi6
+    1.  Draw binding box for |x| with unknown value. %Envi6
+    
+        Set parent of new binding to be the current environment. %Envi16
+    2.  Create the diagram for bound expression |e|. %Envi7
 
-        Set parent of new binding to be the current environment %Envi16
-    2.  Create the diagram for bound expression |e| %Envi7
-
-        Put the value of |e| into the binding as the value of |x| %Envi17
-    3.  Set current environment to be the new binding %Envi18
-    4.  Draw diagram for |body| and remember value %Envi19
-    5.  Set current environment back to what it was before %Envi8
+        Put the value of |e| into the binding as the value of |x|. %Envi17
+    3.  Set current environment to be the new binding. %Envi18
+    4.  Draw diagram for |body| and remember value. %Envi19
+    5.  Set current environment back to what it was before. %Envi8
 
 * Case |Call fun arg| %Envi20
-    1.  Draw diagram for |fun| %Envi9
+    1.  Draw diagram for |fun|. If it is just a variable, then there is no diagram. %Envi9
 
-        Result must be a closure with variable |x|, |body| and |env| %Envi21
+        Result must be a closure with variable |x|, |body| and |env|. %Envi21
     2.  Make binding for argument using name |x| from closure %Envi10
 
         Set parent of new binding to be the environment of the closure |env| %Envi22
@@ -6255,6 +6243,7 @@ In the file FirstClassFunctionsTest.hs you will also find several definitions
 You can also optionally modify the Happy file to extend parsing so that we
 can deal with type-annotations in the language. %TInt13
 
+Here is a package of Haskell files for [Typing](./packages/Typing.zip).
 
 --------------------BEGIN-HIDE------------------------- %Memo2
 
