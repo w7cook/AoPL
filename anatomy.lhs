@@ -1122,7 +1122,7 @@ An association of a variable $x$ with a value $v$ is called a *binding*,
 which can be written $x \mapsto v$. %Numb1
 
 binding
-  ~ A *binding* is an association of a variable with its value. %Numb2
+  ~ A *binding* $x \mapsto v$ is an association of a variable with its value. %Numb2
 
 Bindings can be represented in Haskell as a pair. For example, the
 binding of $x \mapsto 5$ can be represented as |("x", 5)|. %Vari5
@@ -1279,13 +1279,13 @@ An important operation on environments is *variable lookup*. Variable lookup
 is an operation that given a variable name and an environment looks up that
 variable in the environment. For example: %Mult10
 
-* lookup $x$ in $e1$                       $\longrightarrow$ $3$ %Mult16
-* lookup $y$ in $e1$                       $\longrightarrow$ $-2$ %Mult28
+* lookup "x" in $e1$                       $\longrightarrow$ $3$ %Mult16
+* lookup "y" in $e1$                       $\longrightarrow$ $-2$ %Mult28
 
 In each case the corresponding value of the variable being looked up in the environment
 is returned. However what happens when a variable that is not in the environment is looked up? %Mult42
 
-* lookup $z$ in $e1$                       $\longrightarrow$ $???$ %Mult43
+* lookup "z" in $e1$                       $\longrightarrow$ $???$ %Mult43
 
 In this case variable lookup fails, and it is necessary to deal with this
 possibility by signaling an error or triggering an exception. %Mult44
@@ -1708,7 +1708,7 @@ $\emptyset$                                         |2| $\Rightarrow$ |2|
                                                     { evaluate bound expression |y + 2| }
 |y| $\mapsto$ 3, |x| $\mapsto$ 2                    |y + 2| $\Rightarrow$ |5|
                                                     { add new binding for |z| and evaluate body of variable declaration }
-|z| $\mapsto$ 5, |y| $\mapsto$ 3, |x| $\mapsto$ 2   |x * y * z| $\Rightarrow$ |70| %Eval13
+|z| $\mapsto$ 5, |y| $\mapsto$ 3, |x| $\mapsto$ 2   |x * y * z| $\Rightarrow$ |30| %Eval13
 
 In the |Declare| case of |evaluate|, a new environment |newEnv| is created and used
 as the environment for evaluation of the body |b|. %Eval14

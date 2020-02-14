@@ -40,9 +40,9 @@ evaluate (Binary op a b) env = do
   bv <- evaluate b env
   return (binary op av bv)
 evaluate (If a b c) env = do
-  BoolV cond <- evaluate a env
-  evaluate (if cond then b else c) env
-
+  cond <- evaluate a env
+  case cond of 
+    BoolV t -> evaluate (if t then b else c) env
 -- variables and declarations
 evaluate (Declare x e body) env = do    -- non-recursive case
   ev <- evaluate e env
@@ -55,10 +55,12 @@ evaluate (Variable x) env =
 evaluate (Function x body) env = 
   return (ClosureV  x body env)
 evaluate (Call fun arg) env = do
-  ClosureV  x body closeEnv <- evaluate fun env
-  argv <- evaluate arg env
-  let newEnv = (x, argv) : closeEnv
-  evaluate body newEnv
+  closure <- evaluate fun env
+  case closure of
+    ClosureV x body closeEnv -> do
+      argv <- evaluate arg env
+      let newEnv = (x, argv) : closeEnv
+      evaluate body newEnv
 
 -- mutation operations
 evaluate (Seq a b) env = do
@@ -68,12 +70,14 @@ evaluate (Mutable e) env = do
   ev <- evaluate e env
   newMemory ev        
 evaluate (Access a) env = do
-  AddressV i <- evaluate a env
-  readMemory i
+  addr <- evaluate a env
+  case addr of
+    AddressV i -> readMemory i
 evaluate (Assign a e) env = do
-  AddressV i <- evaluate a env
+  addr <- evaluate a env
   ev <- evaluate e env
-  updateMemory ev i
+  case addr of
+    AddressV i -> updateMemory ev i
 --END:StatefulMonad3
 
 --BEGIN:StatefulHelper1
