@@ -81,15 +81,15 @@ evaluate (Assign a e) env = do
 --END:StatefulMonad3
 
 --BEGIN:StatefulHelper1
-newMemory val = ST (\mem-> (AddressV (length mem), mem ++ [val]))
+newMemory val = ST (\mem -> (AddressV (length mem), mem ++ [val]))
 --END:StatefulHelper1
 
 --BEGIN:StatefulHelper2
-readMemory i = ST (\mem-> (access i mem, mem))
+readMemory i = ST (\mem -> (access i mem, mem))
 --END:StatefulHelper2
 
 --BEGIN:StatefulHelper3
-updateMemory val i = ST (\mem-> (val, update i val mem))
+updateMemory val i = ST (\mem -> (val, update i val mem))
 --END:StatefulHelper3
 
 runStateful (ST c) = 

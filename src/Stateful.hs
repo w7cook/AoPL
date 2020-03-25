@@ -56,59 +56,59 @@ evaluate :: Exp -> Env -> Stateful Value
 --END:Stat11
 evaluate (Literal v) env mem  = (v, mem)
 
-evaluate (Unary op a) env mem =
-  let (av, mem') = evaluate a env mem in
-    (unary op av, mem')
+evaluate (Unary op a) env mem1 =
+  let (av, mem2) = evaluate a env mem1 in
+    (unary op av, mem2)
 
 --BEGIN:Sema27
-evaluate (Binary op a b) env mem =
-  let (av, mem') = evaluate a env mem in
-    let (bv, mem'') = evaluate b env mem' in
-      (binary op av bv, mem'')
+evaluate (Binary op a b) env mem1 =
+  let (av, mem2) = evaluate a env mem1 in
+    let (bv, mem3) = evaluate b env mem2 in
+      (binary op av bv, mem3)
 --END:Sema27
 
-evaluate (If a b c) env mem =
-  let (BoolV test, mem') = evaluate a env mem in
-    evaluate (if test then b else c) env mem'
+evaluate (If a b c) env mem1 =
+  let (BoolV test, mem2) = evaluate a env mem1 in
+    evaluate (if test then b else c) env mem2
 
 evaluate (Variable x) env mem = (fromJust (lookup x env), mem)
 
-evaluate (Declare x e body) env mem =
-  let (ev, mem') = evaluate e env mem
+evaluate (Declare x e body) env mem1 =
+  let (ev, mem2) = evaluate e env mem1
       newEnv = (x, ev) : env
   in
-    evaluate body newEnv mem'
+    evaluate body newEnv mem2
 
 evaluate (Function x body) env mem = (ClosureV x body env, mem)
 
-evaluate (Call f a) env mem  =
-  let (ClosureV x body closeEnv, mem') = evaluate f env mem
-      (av, mem'') = evaluate a env mem'
+evaluate (Call f a) env mem1 =
+  let (ClosureV x body closeEnv, mem2) = evaluate f env mem1
+      (av, mem3) = evaluate a env mem2
       newEnv = (x, av) : closeEnv
   in
-    evaluate body newEnv mem''
+    evaluate body newEnv mem3
 
-evaluate (Seq a b) env mem  =
-  let (_, mem') = evaluate a env mem in
-    evaluate b env mem'
+evaluate (Seq a b) env mem1  =
+  let (_, mem2) = evaluate a env mem1 in
+    evaluate b env mem2
 
 --END:Summ9 BEGIN:Summ11 BEGIN:Sema20
-evaluate (Mutable e) env mem =
-  let (ev, mem') = evaluate e env mem in
-    (AddressV (length mem'), mem' ++ [ev])
+evaluate (Mutable e) env mem1 =
+  let (ev, mem2) = evaluate e env mem1 in
+    (AddressV (length mem2), mem2 ++ [ev])
 --END:Sema20
 
 --BEGIN:Sema23
-evaluate (Access a) env mem =
-  let (AddressV i, mem') = evaluate a env mem in
-    (access i mem', mem')
+evaluate (Access a) env mem1 =
+  let (AddressV i, mem2) = evaluate a env mem1 in
+    (access i mem2, mem2)
 --END:Sema23
 
 --BEGIN:Sema25
-evaluate (Assign a e) env mem =
-  let (AddressV i, mem') = evaluate a env mem in
-    let (ev, mem'') = evaluate e env mem' in
-      (ev, update i ev mem'')
+evaluate (Assign a e) env mem1 =
+  let (AddressV i, mem2) = evaluate a env mem1 in
+    let (ev, mem3) = evaluate e env mem2 in
+      (ev, update i ev mem3)
 --END:Sema25
 --END:Summ11
 

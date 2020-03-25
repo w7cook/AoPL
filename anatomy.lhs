@@ -1,6 +1,9 @@
-% Anatomy of Programming Languages
-% William R. Cook
-% Copyright (C) 2013
+---
+title: Anatomy of Programming Languages
+author: William R. Cook
+date: January 20, 2013
+bibliography: anatomy.bib
+---
 
 = Preliminaries
 
@@ -17,14 +20,14 @@ I'm writing these notes because I want to teach the theory of programming
 languages with a practical focus, but I don't want to use Scheme (or ML) as the
 host language.
 Thus many excellent books do not fit my needs, including
-[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/\~sk/Publications/Books/ProgLangs) [@sk],
-[*Essentials of Programming Languages*](http://www.cs.indiana.edu/eopl) [@Friedman:2008:EPL:1378240]
-or [*Concepts in Programming Languages*](http://theory.stanford.edu/\~jcm/books.html) [@Mitchell:2001:CPL:580408]. %Why2
+[*Programming Languages: Application and Interpretation*](http://cs.brown.edu/\~sk/Publications/Books/ProgLangs),
+[*Essentials of Programming Languages*](http://www.cs.indiana.edu/eopl)
+or [*Concepts in Programming Languages*](http://theory.stanford.edu/\~jcm/books.html). %Why2
 
 This book uses Haskell, a pure functional language.
-Phil Wadler [@Wadler:1987:CAS:24697.24706] gives some good reasons why to prefer Haskell
-over Scheme in his review of Structure and Interpretation of
-Computer Programs [@Abelson:1996:SIC:547755]. I agree with most but not
+Phil Wadler  gives some good reasons why to prefer Haskell
+over Scheme in his review of [*Structure and Interpretation of
+Computer Programs*](https://web.mit.edu/alexmv/6.037/sicp.pdf). I agree with most but not
 all of his points. For example, I do not care much for the fact that Haskell is
 lazy. Only small portions of this book rely upon this feature. %Why3
 
@@ -34,8 +37,7 @@ the way one would read a romance novel. Ponder each line and extract its
 deep meaning. Don't skim unless you are pretty sure what you are doing. %Why4
 
 The title of this book is derived from one of my favorite books,
-[*The Anatomy of Lisp*](http://www.amazon.com/Anatomy-Lisp-McGraw-Hill-computer-science/dp/007001115X)
-[@Allen:1978:AL:542865]. %Why5
+[*The Anatomy of Lisp*](http://www.amazon.com/Anatomy-Lisp-McGraw-Hill-computer-science/dp/007001115X). %Why5
 
 === Who?
 
@@ -49,7 +51,7 @@ Finally, I give a quick introduction to type classes so student will understand
 how |Eq| and |Show| work. During the course I teach more advanced topics,
 including first-class functions and monads. As background resources,
 I point students to the many excellent tutorials on Haskell.
-[Search Google for "Haskell Tutorial" to find one](https://www.google.com/search?q=Haskell+Tutorial).
+[Search Google for "Haskell Tutorial"](https://www.google.com/search?q=Haskell+Tutorial).
 I recommend
 [Learn You a Haskell for Great Good!](http://learnyouahaskell.com/)
 or the
@@ -218,7 +220,7 @@ to compute the result.
 Everything is an expression in Haskell. This means that everything, including |if| expressions,
 have a value. Generally speaking Haskell definitions have the following basic form: %Func29
 
-|name arg|$_1$ $\ ...\ $ |arg|$_n$ |= expression| %Func30
+|name arg|~1~ ... |arg|~n~ |= expression| %Func30
 
 Note that in the right side of |=| (the body of the definition) is an expression.
 This is different from a conventional imperative language, where the body of a definition is
@@ -451,11 +453,13 @@ The answer is to use recursive functions. For example here is how to write a fun
 > sumList (x:xs) = x + sumList xs
 > -- %Recu24
 
-Question 5: The factorial function can be defined mathematically as follows: %Recu25
+Question 5: The factorial function can be defined as follows: %Recu25
 
-$n! = \left\{ \begin{array}{ll} 1          & \mathrm{if\ } n = 0 \\
-                                n * (n-1)! & \mathrm{if\ } n > 0 \end{array} \right.$ %Recu26
-
++------+------------+----------+
+| n! = | 1          | if n = 0 |
++------+------------+----------+
+|      | n * (n-1)! | if n > 0 |
++------+------------+----------+
 
 Translate this definition into Haskell using recursion and pattern matching. %Recu27
 
@@ -478,7 +482,7 @@ Question 7: Write a function: %Recu33
 > mapList :: (a -> b) -> [a] -> [b]
 > -- %Recu34
 
-that applies the function of type |a->b| to every element of a list. For example: %Recu35
+that applies the function of type |a -> b| to every element of a list. For example: %Recu35
 
 > Prelude> mapList absolute [4, -5, 9, -7]
 > [4, 5, 9, 7]
@@ -680,7 +684,7 @@ into abstract syntax. %Abst8
 
 The concrete syntax of a language describes how the abstract
 concepts in the language are represented as text. For example,
-lets consider how to convert the string |"3+81*2"| into the
+lets consider how to convert the string |"3 + 81 * 2"| into the
 abstract syntax |Add (Number 3) (Multiply (Number 81) (Number 2))|.
 The first step is to break a text up into *tokens*. %Conc1
 
@@ -689,9 +693,9 @@ The first step is to break a text up into *tokens*. %Conc1
 Tokens are the basic units of a language. In English, for example,
 words are tokens. But English also uses many symbol tokens, including
 ".", "!", "?", "(" and ")". In the example  |"3 + 81 * 2"| the tokens
-are |3|, |"+"|, |81|, |"*"|, and |2|. It is also important to classify tokens
+are |3|, |"+"|, |81|, |"STAR"|, and |2|. It is also important to classify tokens
 by their kind. The tokens |3|, |81| and |2| are sequences of digits.
-The tokens |"+"| and |"*"| are *symbol* tokens. %Toke5
+The tokens |"+"| and |"STAR"| are *symbol* tokens. %Toke5
 
 token
   ~ A token is the basic syntactic unit of a language. Tokens can be
@@ -1011,23 +1015,7 @@ INCLUDE:Eval7
 >   12
 > -- %Eval7
 
-FOO: Explain Show %Test1
-
-To test many different
-kinds of functions, it is useful to define a generalized test function. %Form5
-The |test| function takes a function and an input as arguments. It
-prints the input and then prints the result of applying the function to the input.
-The following main program invokes |test| to evaluate each of the
-five sample expressions defined above: %Form7
-
-INCLUDE:Form8
-> -- %Form8
-
-Running this main program produces the following results: %Form9
-
-INCLUDE:Form12
-> -- %Form12
-
+TODO: Explain Show %Test1
 
 === Errors
 
@@ -1634,7 +1622,7 @@ three times:  %Eval32
 The steps are as follows:  %Eval34
 
 Step                                 Result
--------------------------            -----------------------------------
+----------------------------------   -----------------------------------
 initial expression                   |var x = 2;|
                                      |var y = x + 1;|
                                      |var z = y + 2;|
@@ -1792,7 +1780,7 @@ booleans. Some examples are |4 < 10| and |3 * 10 = 7|. Once booleans are include
 in the language, it is possible to define a *conditional* expression, with the following
 concrete syntax: %More6
 
-|if (|*test*|)| *true-exp*| else| *false-exp* %More7
+|if (| *test* |)| *true-exp* |else| *false-exp* %More7
 
 A conditional expression allows selection of one of two different values
 based on whether a boolean is true or false. Note that a conditional *expression* is
@@ -1922,11 +1910,6 @@ INCLUDE:More98
 >
 > -- %More98
 
-Running these test cases with the |test| function defined above yields these results: %More22
-
-INCLUDE:More23
-> -- %More23
-
 === Type Errors
 
 Now that our language supports two kinds of values, it is possible for
@@ -1969,9 +1952,6 @@ INCLUDE:Type6
 
 Running these tests produce error messages, but the errors are not
 very descriptive of the problem that actually took place. %Type1
-
-INCLUDE:Type6run
-> -- %Type6run
 
 We will discuss techniques for preventing type errors later, but for now
 it is important to realize that programs may fail at runtime. %Type7
@@ -2237,7 +2217,6 @@ in the following (silly) example:  %Eval52
         var pow = pow(pow - 1);
         pow * pow(pow - 2)
       )
-%Eval40
 ````
 
 This is the same as the following function, in which variables
@@ -2251,7 +2230,6 @@ are renamed to be less confusing:  %Eval53
         var b = pow(a - 1);
         b * pow(b - 2)
       )
-%Eval42
 ````
 
 When renaming variables, the *functions* are *not* renamed.
@@ -2409,7 +2387,7 @@ result defined by the *body* expression. The *variable* may of course
 be used within the *body*. In other words, *variable* may be
 free in *body*, but *variable* is bound (not free) in $\lambda$*variable*. *body*.
 A function expression is sometimes called an *abstraction* or a
-*function abstraction* (TODO: discuss this more later). %Lamb6
+*function abstraction* (we). %Lamb6
 
 Thus |f =| $\lambda$|x|. |x * 2| means that |f| is defined to be a function of one
 parameter |x| that computes the result |x * 2| when
@@ -2521,7 +2499,7 @@ interchangeably. %Func6
 > -- %Func7
 
 The A and B versions of this expression are equivalent. The latter is a
-juxtaposition of a function expression |\x->x * 2| with its argument, |3|.
+juxtaposition of a function expression |\x -> x * 2| with its argument, |3|.
 When a function expression is used on its own, without giving it a name, it is
 called an *anonymous function*. %Func8
 
@@ -2532,7 +2510,7 @@ in the body of the function expression. %Func9
 
 **Rule of Function Invocation** (informal): %Func10
 
-($\lambda$*var*. *body*)arg  \ \ \ **evaluates to** \ \ \  *body* with *arg* substituted for *var* %Func11
+($\lambda$ *var* . *body* ) *arg*  \ \ \ **evaluates to** \ \ \  *body* with *arg* substituted for *var* %Func11
 
 For now this is an informal definition.
 We will make it more precise when we
@@ -2626,7 +2604,7 @@ are functions that *return* functions as results. %Mapp10
 The comprehensions used earlier in this document could be replaced by invocations of
 |map|: %Mapp11
 
-|[evaluate a env BAR a <- args]|   \ \ \ \  $\equiv$  \ \ \ \  |map (\a-> evaluate a env) args| %Mapp12
+|[evaluate a env BAR a <- args]|   \ \ \ \  $\equiv$  \ \ \ \  |map (\a -> evaluate a env) args| %Mapp12
 
 TODO: is a function that returns a function also called higher order? %Mapp14
 
@@ -2970,12 +2948,12 @@ that takes the second argument, %if5
 
 which is equivalent to %if7
 
-> max = \a-> \b-> if a > b then a else b
+> max = \a -> \b -> if a > b then a else b
 > -- %if8
 
 Note that multiple functions can be represented in a lambda expression as well: %if9
 
-> max = \a b-> if a > b then a else b   -- equivalent to above definition
+> max = \a b -> if a > b then a else b   -- equivalent to above definition
 > -- %if10
 
 currying
@@ -2984,22 +2962,22 @@ currying
 
 A curry function is a higher-order function that performs this operation: %if12
 
-> curry2 f = \a b-> f(a, b)
+> curry2 f = \a b -> f(a, b)
 > -- %if13
 
 The function |curry2| converts a function |f| that takes a pair to a new function that
 takes one argument and returns a function that takes the second argument. %Mult27
 A function that takes a 3-tuple and converts it to curryied form can also be defined: %if14
 
-> curry3 f = \a b c-> f(a, b, c)
+> curry3 f = \a b c -> f(a, b, c)
 > -- %if15
 
 In Haskell it is not possible to take a arbitrary length tuple and curry it.
 It is possible to write |uncurry| functions that perform that opposite transformation,
 from a function with multiple arguments to a function with a single tuple argument: %if16
 
-> uncurry2 f = \(a, b)   -> f a b
-> uncurry3 f = \(a, b, c)-> f a b c
+> uncurry2 f = \(a, b)    -> f a b
+> uncurry3 f = \(a, b, c) -> f a b c
 > -- %if17
 
 uncurrying
@@ -3291,12 +3269,13 @@ To clarify the effect of this change, consider these two versions
 of a simple program, written using top-level functions or
 first-class functions: %A10
 
-. %IntV1
-
-Top-Level Functions (A)            \ \ \  First-Class Functions (B)
----------------------------------- ------ ----------------------
-|function f(x) { x * x }|                 |var f = function(x) { x * x };|
-|f(10)|                                       |f(10)| %A11
++---------------------------+----------------------------------+
+| Top-Level Functions (A)   | First-Class Functions (B)        |
++:==========================+:=================================+
+| |function f(x) { x * x }| | |var f = function(x) { x * x };| |
++---------------------------+----------------------------------+
+| |f(10)|                   | |f(10)|                          |
++---------------------------+----------------------------------+
 
 The explicit abstract syntax for the call in example (A) is: %A12
 
@@ -4251,21 +4230,21 @@ book, like "Theory of Lambda Conversion".  %Unde29
 Fixed-points can also be identified for simple mathematical
 functions: %Fixe2
 
-+------------------------------------------+--------------------------------+
-| *function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  | *fixed point(s)*               |
-+------------------------------------------+--------------------------------+
-| $i_{10}(x) = 10 - x$                     | $5$                            |
-+------------------------------------------+--------------------------------+
-| $square(x) = x^2$                        | $0, 1$                         |
-+------------------------------------------+--------------------------------+
-| $g_\phi(x) = 1 + \cfrac{1}{x}$           | $1.6180339887...$              |
-+------------------------------------------+--------------------------------+
-| $k_4(x) = 4$                             | $4$                            |
-+------------------------------------------+--------------------------------+
-| $id(x) = x$                              | all values are fixed points    |
-+------------------------------------------+--------------------------------+
-| $inc(x) = x + 1$                         | no fixed points %Fixe3         |
-+------------------------------------------+--------------------------------+
++---------------------------------+--------------------------------+
+| *function*                      | *fixed point(s)*               |
++=================================+================================+
+| $i_{10}(x) = 10 - x$            | $5$                            |
++---------------------------------+--------------------------------+
+| $square(x) = x^2$               | $0, 1$                         |
++---------------------------------+--------------------------------+
+| $g_\phi(x) = 1 + \cfrac{1}{x}$  | $1.6180339887...$              |
++---------------------------------+--------------------------------+
+| $k_4(x) = 4$                    | $4$                            |
++---------------------------------+--------------------------------+
+| $id(x) = x$                     | all values are fixed points    |
++---------------------------------+--------------------------------+
+| $inc(x) = x + 1$                | no fixed points %Fixe3         |
++---------------------------------+--------------------------------+
 
 As you can see, some functions have one fixed point.
 Some functions have multiple fixed points. Others have
@@ -4401,20 +4380,20 @@ can be computed by repeated function application. Here are
 the results for this technique, when applied to the examples
 given above:  %Fixe26
 
++--------------------------------+--------------------------------+
+| *function*                     | result for repeated invocation |
++:===============================+:===============================+
+| $inv_{10}(x) = 10 - x$         | infinite loop                  |
++--------------------------------+--------------------------------+
+| $square(x) = x^2$              | infinite loop                  |
 +------------------------------------------+--------------------------------+
-| *function*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \  | result for repeated invocation |
-+==========================================+================================+
-| $inv_{10}(x) = 10 - x$                   | infinite loop                  |
+| $g_\phi(x) = 1 + \cfrac{1}{x}$ | $1.6180339887...$              |
 +------------------------------------------+--------------------------------+
-| $square(x) = x^2$                        | infinite loop                  |
-+------------------------------------------+--------------------------------+
-| $g_\phi(x) = 1 + \cfrac{1}{x}$           | $1.6180339887...$              |
-+------------------------------------------+--------------------------------+
-| $const_4(x) = 4$                         | $4$                            |
-+------------------------------------------+--------------------------------+
-| $id(x) = x$                              | infinite loop                  |
-+------------------------------------------+--------------------------------+
-| $inc(x) = x + 1$                         | infinite loop  %Fixe27         |
+| $const_4(x) = 4$               | $4$                            |
++--------------------------------+--------------------------------+
+| $id(x) = x$                    | infinite loop                  |
++--------------------------------+--------------------------------+
+| $inc(x) = x + 1$               | infinite loop  %Fixe27         |
 +------------------------------------------+--------------------------------+
 
 Only two of the six examples worked. Fixed points are not a general
@@ -4725,7 +4704,7 @@ The declaration defines a generic |Checked| type that has a parameter |a|
 representing the type of the good value. The |Checked| type has two constructors,
 |Good| and |Error|. The |Good| constructor takes a value of type |a|
 and labels it as good. The |Error| constructor has an error message.
-The following figure is an abstraction illustration of a |Checked| value,
+The following figure is an abstract illustration of a |Checked| value,
 which represents a computation that may either be a good value or an error.
 %Hand6
 
@@ -4779,7 +4758,7 @@ INCLUDE:Hand15
 > evaluate (Unary op a) env =
 >   case evaluate a env of
 >     Error msg -> Error msg
->     Good av ->   checked_unary op av
+>     Good av   -> checked_unary op av
 > evaluate (Binary op a b) env =
 >   case evaluate a env of
 >     Error msg -> Error msg
@@ -5277,9 +5256,9 @@ be taken to allocate the new cell in the new memory. The address of
 the new memory cell is just the length of the memory. %Sema1
 
 INCLUDE:Sema20
-> evaluate (Mutable e) env mem =
->   let (ev, mem') = evaluate e env mem in
->     (AddressV (length mem'), mem' ++ [ev])
+> evaluate (Mutable e) env mem1 =
+>   let (ev, mem2) = evaluate e env mem1 in
+>     (AddressV (length mem2), mem2 ++ [ev])
 > -- %Sema20
 
 The access expression |@@a| evaluates the address
@@ -5289,9 +5268,9 @@ raises an error. This is another case where error handling, as in the previous
 section, could be used. %Sema19
 
 INCLUDE:Sema23
-> evaluate (Access a) env mem =
->   let (AddressV i, mem') = evaluate a env mem in
->     (access i mem', mem')
+> evaluate (Access a) env mem1 =
+>   let (AddressV i, mem2) = evaluate a env mem1 in
+>     (access i mem2, mem2)
 > -- %Sema23
 
 An assignment statement |a = e| first evaluates the target expression |a|
@@ -5300,10 +5279,10 @@ Then the source expression |e| is evaluated.
 Evaluating |a| and |e| may update the memory, so %Sema21
 
 INCLUDE:Sema25
-> evaluate (Assign a e) env mem =
->   let (AddressV i, mem') = evaluate a env mem in
->     let (ev, mem'') = evaluate e env mem' in
->       (ev, update i ev mem'')
+> evaluate (Assign a e) env mem1 =
+>   let (AddressV i, mem2) = evaluate a env mem1 in
+>     let (ev, mem3) = evaluate e env mem2 in
+>       (ev, update i ev mem3)
 > -- %Sema25
 
 ==== Mutable State with Multiple Sub-expressions
@@ -5314,9 +5293,9 @@ completely rewritten: %Sema26
 
 INCLUDE:Sema27
 > evaluate (Binary op a b) env mem =
->   let (av, mem') = evaluate a env mem in
->     let (bv, mem'') = evaluate b env mem' in
->       (binary op av bv, mem'')
+>   let (av, mem2) = evaluate a env mem in
+>     let (bv, mem3) = evaluate b env mem2 in
+>       (binary op av bv, mem3)
 > -- %Sema27
 
 This form of composition is illustrated in the following diagram: %Muta1
@@ -5376,38 +5355,38 @@ INCLUDE:Summ9
 > evaluate (Literal v) env mem  = (v, mem)
 >
 > evaluate (Unary op a) env mem =
->   let (av, mem') = evaluate a env mem in
->     (unary op av, mem')
+>   let (av, mem2) = evaluate a env mem in
+>     (unary op av, mem2)
 >
 > evaluate (Binary op a b) env mem =
->   let (av, mem') = evaluate a env mem in
->     let (bv, mem'') = evaluate b env mem' in
->       (binary op av bv, mem'')
+>   let (av, mem2) = evaluate a env mem in
+>     let (bv, mem3) = evaluate b env mem2 in
+>       (binary op av bv, mem3)
 >
 > evaluate (If a b c) env mem =
->   let (BoolV test, mem') = evaluate a env mem in
->     evaluate (if test then b else c) env mem'
+>   let (BoolV test, mem2) = evaluate a env mem in
+>     evaluate (if test then b else c) env mem2
 >
 > evaluate (Variable x) env mem = (fromJust (lookup x env), mem)
 >
 > evaluate (Declare x e body) env mem =
->   let (ev, mem') = evaluate e env mem
+>   let (ev, mem2) = evaluate e env mem
 >       newEnv = (x, ev) : env
 >   in
->     evaluate body newEnv mem'
+>     evaluate body newEnv mem2
 >
 > evaluate (Function x body) env mem = (ClosureV x body env, mem)
 >
 > evaluate (Call f a) env mem  =
->   let (ClosureV x body closeEnv, mem') = evaluate f env mem
->       (av, mem'') = evaluate a env mem'
+>   let (ClosureV x body closeEnv, mem2) = evaluate f env mem
+>       (av, mem3) = evaluate a env mem2
 >       newEnv = (x, av) : closeEnv
 >   in
->     evaluate body newEnv mem''
+>     evaluate body newEnv mem3
 >
 > evaluate (Seq a b) env mem  =
->   let (_, mem') = evaluate a env mem in
->     evaluate b env mem'
+>   let (_, mem2) = evaluate a env mem in
+>     evaluate b env mem2
 >
 > -- %Summ9
 
@@ -5415,17 +5394,17 @@ Here are the mutation-specific parts of the evaluator: %Summ10
 
 INCLUDE:Summ11
 > evaluate (Mutable e) env mem =
->   let (ev, mem') = evaluate e env mem in
->     (AddressV (length mem'), mem' ++ [ev])
+>   let (ev, mem2) = evaluate e env mem in
+>     (AddressV (length mem2), mem2 ++ [ev])
 >
 > evaluate (Access a) env mem =
->   let (AddressV i, mem') = evaluate a env mem in
->     (access i mem', mem')
+>   let (AddressV i, mem2) = evaluate a env mem in
+>     (access i mem2, mem2)
 >
 > evaluate (Assign a e) env mem =
->   let (AddressV i, mem') = evaluate a env mem in
->     let (ev, mem'') = evaluate e env mem' in
->       (ev, update i ev mem'')
+>   let (AddressV i, mem2) = evaluate a env mem in
+>     let (ev, mem3) = evaluate e env mem2 in
+>       (ev, update i ev mem3)
 > -- %Summ11
 
 == Monads: Abstract Computational Strategies
@@ -5451,8 +5430,6 @@ details into helper functions. By defining appropriate helper
 functions that have the same interface, the two examples can be
 expressed in a uniform format. %Mona1
 
-![Modified Dilbert Cartoon](figures/23956strip.png)  %Mona2
-
 === Abstracting Simple Computations
 
 The first step is to examine how the two evaluators deal with
@@ -5460,10 +5437,13 @@ simple computations that return values.
 Consider the way that the |Literal| expression is evaluated for
 both the |Checked| and the |Stateful| evaluators. %Abst13
 
-Checked                                          \ \ \ \ \ \  Stateful
------------------------------------------------- ------------ --------------
-|evaluate :: Exp -> Env -> Checked Value|                     |evaluate :: Exp -> Env -> Stateful Value|
-|evaluate (Literal v) env = Good v|                           |evaluate (Literal v) env mem = (v, mem)| %Abst14
++-----------------------------------------------+--------------------------------------------+
+| Checked                                       | Stateful                                   |
++:==============================================+:===========================================+
+| |evaluate :: Exp -> Env -> Checked Value|     | |evaluate :: Exp -> Env -> Stateful Value| |
++-----------------------------------------------+--------------------------------------------+
+| |evaluate (Literal v) env = Good v|           | |evaluate (Literal v) env mem = (v, mem)|  |
++-----------------------------------------------+--------------------------------------------+
 
 One important point is that literal values never cause errors
 and they do not modify memory. They represent the simple good
@@ -5474,19 +5454,25 @@ computations are different, but they both have same interface:
 they take a value as input and output an appropriate checked or
 stateful value. %Abst18
 
-Checked                                          \ \ \ \ \ \  Stateful
------------------------------------------------- ------------ --------------
-|return|$_C$ |:: Value -> Checked Value|                      |return|$_S$ |:: Value -> Stateful Value|
-|return|$_C$ |v = Good v|                                     |return|$_S$ |v =| $\lambda$ |mem.(v, mem)| %Abst19
++-----------------------------------------------+---------------------------------------------+
+| Checked                                       | Stateful                                    |
++:==============================================+:============================================+
+| |return|$_C$ |:: Value -> Checked Value|      | |return|$_S$ |:: Value -> Stateful Value|   |
++-----------------------------------------------+---------------------------------------------+
+| |return|$_C$ |v = Good v|                     | |return|$_S$ |v =| $\lambda$ |mem.(v, mem)| |
++-----------------------------------------------+---------------------------------------------+
 
 Using these return functions, the original |evaluate| code can be written
 so that the two cases are nearly identical. The details of how to deal
 with the checked or stateful values are hidden in the |return| helper functions. %Abst20
 
-Checked                                          \ \ \ \ \ \  Stateful
------------------------------------------------- ------------ --------------
-|evaluate :: Exp -> Env -> Checked Value|                     |evaluate :: Exp -> Env -> Stateful Value|
-|evaluate (Literal v) env = return|$_C$ |v|                   |evaluate (Literal v) env = return|$_S$ |v| %Abst21
++-------------------------------------------------+---------------------------------------------+
+| Checked                                         | Stateful                                    |
++:================================================+:============================================+
+| |evaluate :: Exp -> Env -> Checked Value|       | |evaluate :: Exp -> Env -> Stateful Value|  |
++-------------------------------------------------+---------------------------------------------+
+| |evaluate (Literal v) env = return|$_C$ |v|     | |evaluate (Literal v) env = return|$_S$ |v| |
++-------------------------------------------------+---------------------------------------------+
 
 === Abstracting Computation Composition
 
@@ -5494,17 +5480,27 @@ The next step is to unify the case when there are multiple sub-expressions
 that must be evaluated. The binary operator provides a good example
 of multiple sub-expressions. %Abst22
 
-Checked                                          \ \ \ \ \ \  Stateful
------------------------------------------------- ------------ --------------
-|evaluate :: Exp -> Env -> Checked Value|                     |evaluate :: Exp -> Env -> Stateful Value|
-|evaluate (Binary op a b) env =|                              |evaluate (Binary op a b) env =|
-\ \ |case evaluate a env of|                                  \ \ $\lambda$|mem.let (av, mem') = evaluate a env mem in|
-\ \ \ \ |Error msg -> Error msg|                              \ \ \ \ \ \ \ \ \ \ \ \ \ |let (bv, mem'') = evaluate b env mem' in|
-\ \ \ \ |Good av ->|                                          \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |(binary op av bv, mem'')|
-\ \ \ \ \ \ |case evaluate b env of|
-\ \ \ \ \ \ \ \ |Error msg -> Error msg|
-\ \ \ \ \ \ \ \ |Good bv ->|
-\ \ \ \ \ \ \ \ \ \ |checked_binary op av bv|
++---------------------------------------------+---------------------------------------------------------------+
+| Checked                                     | Stateful                                                      |
++:============================================+:==============================================================+
+| |evaluate :: Exp -> Env -> Checked Value|   | |evaluate :: Exp -> Env -> Stateful Value|                    |
++---------------------------------------------+---------------------------------------------------------------+
+| |evaluate (Binary op a b) env =|            | |evaluate (Binary op a b) env =|                              | 
++---------------------------------------------+---------------------------------------------------------------+
+| \ |case evaluate a env of|                  | \ \ $\lambda$|mem1 . let (av, mem2) = evaluate a env mem1 in| |
++---------------------------------------------+---------------------------------------------------------------+
+| \ \ |Error msg -> Error msg|                | \ \ \ \ |let (bv, mem3) = evaluate b env mem2 in|             |
++---------------------------------------------+---------------------------------------------------------------+
+| \ \ |Good av ->|                            | \ \ \ \ |(binary op av bv, mem3)|                             |
++---------------------------------------------+---------------------------------------------------------------+
+| \ \ \ |case evaluate b env of|              |                                                               |
++---------------------------------------------+---------------------------------------------------------------+
+| \ \ \ \ |Error msg -> Error msg|            |                                                               |
++---------------------------------------------+---------------------------------------------------------------+
+| \ \ \ \ \ |Good bv ->|                      |                                                               |
++---------------------------------------------+---------------------------------------------------------------+
+| \ \ \ \ \ \ |checked_binary op av bv|       |                                                               |
++---------------------------------------------+---------------------------------------------------------------+
 
 TODO: note that the |mem| argument has become a lambda! %Abst36
 
@@ -5515,18 +5511,22 @@ appropriate). They both have a similar pattern of code for dealing with
 the evaluation of |a| and |b|. Factoring out the common
 parts as *first-part* and *next-part*, the core of the pattern is: %Abst23
 
-Checked                                 \ \ \ \ \ \  Stateful
---------------------------------------- ------------ ----------------------
-|case| *first-part* |of|                             $\lambda$|mem.let (v, mem') =| *first-part* |mem in|
-\ \ |Error msg -> Error msg|                         \ \ \ \ \ \ \ \ \ \ \ *next-part* |v| |mem'|
-\ \ |Good v ->| *next-part* |v|
++--------------------------------------+-----------------------------------------------------------+
+| Checked                              | Stateful                                                  |
++:=====================================+:==========================================================+
+| |case| *first-part* |of|             | $\lambda$|mem1 . let (v, mem2) =| *first-part* |mem1 in|  |
++--------------------------------------+-----------------------------------------------------------+
+| \ \ |Error msg -> Error msg|         | \ \ \ \ \ \ \ \ \ \ \ *next-part* |v| |mem2|              |
++--------------------------------------+-----------------------------------------------------------+
+| \ \ |Good v ->| *next-part* |v|      |                                                           |
++--------------------------------------+-----------------------------------------------------------+
 
 This *first-part* corresponds to |evaluate a env| or |evaluate b env| in both the original
 versions. The *next-part* represents the remainder of the computation. It is just everything that
 appears after the main pattern, but with all the free variables made explicit.
 For the |Checked| case, the only variable needed in the *next-part* is the
 variable |v| that comes form the |Good| case. For the Stateful case,
-in addition to |v| the *next-part* also requires access to |mem'| %Abst24
+in addition to |v| the *next-part* also requires access to |mem2| %Abst24
 
 These patterns can be made explicit as a special operator that combines
 the two parts, where the second part is a function with the appropriate arguments.
@@ -5534,12 +5534,17 @@ To be more concrete, these parts are converted into explicit variables.
 The *first-part* is named |A| and the *next-part*, which is a function,
 is named |F|: %Abst25
 
-Checked                                 \ \ \ \ \ \  Stateful
---------------------------------------- ------------ ----------------------
-|A| $\rhd_C$ |F =|                                   |A| $\rhd_S$ |F =|
-\ \ |case A of|                                      \ \ $\lambda$|mem.let (v, mem') = A mem in|
-\ \ \ \ |Error msg -> Error msg|                     \ \ \ \ \ \ \ \ \ \ \ \ \ |F v mem'|
-\ \ \ \ |Good v -> F v|
++--------------------------------------+-------------------------------------------------+
+| Checked                              | Stateful                                        |
++:=====================================+:================================================+
+| |A| $\rhd_C$ |F =|                   | |A| $\rhd_S$ |F =|                              |
++--------------------------------------+-------------------------------------------------+
+| \ \ |case A of|                      | \ \ $\lambda$|mem1 .let (v, mem2) = A mem1 in|  |
++--------------------------------------+-------------------------------------------------+
+| \ \ \ \ |Error msg -> Error msg|     | \ \ \ \ \ \ \ \ \ \ \ \ \ |F v mem2|            |
++--------------------------------------+-------------------------------------------------+
+| \ \ \ \ |Good v -> F v|              |                                                 |
++--------------------------------------+-------------------------------------------------+
 
 These generic operators for |Checked| $\rhd_C$ and |Stateful| $\rhd_S$ computations
 abstract away the core pattern composing two |Checked| or |Stateful| computations.
@@ -5548,11 +5553,15 @@ bind together computations. %Abst26
 
 Using these operators, the *original* code can be written in simpler form: %Abst27
 
-Checked                                          \ \ \ \ \ \  Stateful
------------------------------------------------- ------------ ----------------------
-(|evaluate a env|) $\rhd_C$ ($\lambda$|av.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|
-\ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|bv.|               \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|bv.|
-\ \ \ \ |checked_binary op av bv|))                           \ \ \ \ $\lambda$|mem.(binary op av bv, mem)|))
++---------------------------------------------------+-------------------------------------------------+
+| Checked                                           | Stateful                                        |
++:==================================================+:================================================+
+| (|evaluate a env|) $\rhd_C$ ($\lambda$|av.|       | (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|     |
++---------------------------------------------------+-------------------------------------------------+
+| \ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|bv.|   | \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|bv.| |
++---------------------------------------------------+-------------------------------------------------+
+| \ \ \ \ |checked_binary op av bv|))               | \ \ \ \ $\lambda$|mem.(binary op av bv, mem)|)) |
++---------------------------------------------------+-------------------------------------------------+
 
 All mention of |Error| and |Good| have been removed from the |Checked| version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
@@ -5565,11 +5574,15 @@ a default stateful computation. To see how this works, consider that %Abst29
 
 Using |return|$_S$ the result is: %Abst31
 
-Checked                                          \ \ \ \ \ \  Stateful
------------------------------------------------- ------------ ----------------------
-(|evaluate a env|) $\rhd_C$ ($\lambda$|av.|                   (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|
-\ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|bv.|               \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|bv.|
-\ \ \ \ |checked_binary op av bv|))                            \ \ \ \ |return|$_S$ (|binary op av bv|)))
++---------------------------------------------------+-------------------------------------------------+
+| Checked                                           | Stateful                                        |
++:==================================================+:================================================+
+| (|evaluate a env|) $\rhd_C$ ($\lambda$|av.|       | (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|     |
++---------------------------------------------------+-------------------------------------------------+
+| \ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|bv.|   | \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|bv.| |
++---------------------------------------------------+-------------------------------------------------+
+| \ \ \ \ |checked_binary op av bv|))               | \ \ \ \ |return|$_S$ (|binary op av bv|)))      |
++---------------------------------------------------+-------------------------------------------------+
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
 rules for |Mutable|, assignment, and access there will be explicit references to memory.
@@ -5749,7 +5762,20 @@ TODO: mention |let| in |do|, and the case where no variable is used. %Hask12
 == Using Haskell Monads
 
 The messy evaluators for error checking and mutable state can be rewritten much more
-cleanly using monads. %Usin25
+cleanly using monads. In the format of the previous chapter's comparison of
+Checked and Stateful computations, here they are using monads: %Usin25
+
++------------------------------+----------------------------+
+| Checked                      | Stateful                   |
++:=============================+:===========================+
+| |av <- evaluate a env|       | |av <- evaluate a env|     |
++------------------------------+----------------------------+
+| |bv <- evaluate b env|       | |bv <- evaluate b env|     |
++------------------------------+----------------------------+
+| |checked_binary op av bv|    | |return (binary op av bv)| |
++------------------------------+----------------------------+
+
+Look closely, and they are nearly identical!
 
 === Monadic Error Checking {#MonadicErrors}
 
@@ -5813,7 +5839,8 @@ INCLUDE:Stat8
 > type Stateful t = Memory -> (t, Memory)
 > -- %Stat8
 
-To define a monad, Haskell requires a *data* type that labels the function: %Mona18
+To define a monad, Haskell requires a |data| type that labels the function with a constructpr.
+In this case, the constructor is named |ST|: %Mona18
 
 INCLUDE:StatefulMonad1
 > data Stateful t = ST (Memory -> (t, Memory))
@@ -5837,7 +5864,7 @@ INCLUDE:StatefulMonad2 %Mona20
 > instance Monad Stateful where
 >   return = pure
 >   (ST c) >>= f =
->     ST (\m ->
+>     ST (\m1 ->
 >       let (val, m') = c m in
 >         let ST f' = f val in
 >           f' m'
@@ -5977,7 +6004,7 @@ A type-checker works in a similar way to a concrete interpreter. The
 difference is that instead of returning a (concrete) value, it returns
 a type. A type is an abstraction of values. When the type
 of an expression is |Int|, it is not known exactly which concrete number
-will that expression evaluate to. However it is known that that expression
+that expression evaluate to. However it is known that that expression
 will evaluate to an integer value and not to a boolean value. %Abst32
 
 Type-checking is not the only example of abstract interpretation. In
@@ -6245,6 +6272,36 @@ can deal with type-annotations in the language. %TInt13
 
 Here is a package of Haskell files for [Typing](./packages/Typing.zip).
 
+= Data
+
+So far we have focused on how to define and use static-scoped binding and
+higher-order functions, how to use *monads* to define pervasive computational strategies, 
+like error checking and mutable state, and static type-checking. While these
+are important topics, they are certainly not all that you need to know
+in order to understand programming languages. This chapter delves into
+the possibility for defining and refining data in many different ways.
+
+While we have defined primitive data types, including |int| and |bool|,
+and *closures* and *addresses* for functions and mutable state, we haven't
+examined the nature of data itself. 
+The most complex data we have encountered is the use of |data| in Haskell
+to define the structure of abstract syntax |Exp| and values |Value|, and 
+function types mentioned in this paragraph.
+We have not addressed how to define data within the languages that 
+we have been studying.
+
+The main topic of the chapter is how to define and implement *data abstraction*.
+By *data* we mean the information that appears in a program. Data is a
+complex topic, encompasing primitive data, data structures, algebraic data,
+abstract data types, objects in object-oriented programming, and databases.
+*Abstraction* is a concept that has appeared in several important places in this book already.
+It was used to describe *function abstraction*, or the definition of reusable
+transformations from inputs to outputs. It was used in the chapter on 
+typing in the concept of *abstract interpretation*, where all values are
+abstracted to combine similar values together to operate on categories
+of values.
+
+
 --------------------BEGIN-HIDE------------------------- %Memo2
 
 # Data Abstraction %TInt14
@@ -6296,4 +6353,4 @@ Here two files that can be used to represent and parse lambda-expressions:
 [Lambda Parser](./code/LambdaParse.y.htm) %File1
 --------------------END-HIDE-------------------------
 
-
+= Bibliography

@@ -47,7 +47,7 @@ evaluate (Call fun arg) env = evaluate body newEnv
         newEnv = bindF x (evaluate arg env) env
 --END:A35
 
-emptyEnv = \x->Nothing
+emptyEnv = \x -> Nothing
 
 -- Same as IntBool
 

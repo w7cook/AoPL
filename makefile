@@ -2,7 +2,7 @@
 
 .PHONY: verb pretty update clean
 
-PANDOC := pandoc --wrap=none -N --atx-headers -sS --bibliography=anatomy.bib --filter pandoc-citeproc
+PANDOC := pandoc --wrap=none -N --atx-headers 
 HSCOLOUR := hscolour -lit
 
 TESTS=SimpleTest.hs \
@@ -54,6 +54,8 @@ SOURCES=$(TESTS) \
 			Value.hs \
 			Lambda.hs \
 			IntBoolTyping.hs 
+
+all: anatomy.pdf anatomyVerbatim.pdf anatomy.htm
 
 verb: anatomyVerbatim.pdf
 	open anatomyVerbatim.pdf
@@ -130,8 +132,8 @@ update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm packages
 
 # build the anatomy.mkd file by including all the code, then removing the INCLUDE markers
 # Change the header markers to remove space before them
-anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
-	ruby includes.rb "src/*.hs" "src/*.y" "src/*.js" ">" < anatomy.lhs \
+anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute output/*.out
+	ruby includes.rb "src/*.hs" "src/*.y" "src/*.js" "output/*.out" ">" < anatomy.lhs \
 		| sed "/^INCLUDE:/d" \
 		| sed "s/^ #/#/" \
 		| sed "s/'[0-9][0-9a-z]*//g" \
@@ -139,25 +141,31 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
 		| sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
 		| sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		> anatomy.mkd
-		 # move last line from here to use of anatomy.mkd
 
 # build the HTML version. 
 # First deal with |foo| -> `foo` and ||-> ||
 # then run panddoc to convert markdown+lhs to html
 # finally perform some cleanups, and implement the paragraph comment system
-anatomy.htm: anatomy.mkd packages
+
+anatomy.htm: anatomy.mkd
+  # convert | to ` for inline haskell
 	cat anatomy.mkd \
 		| sed "s/||/VERTICAL_BAR/g" \
 		| perl -pe 's/\|([^ ][^|]*)\|/\`$$1\`/g;' \
 		| sed "s/VERTICAL_BAR/||/g" \
+		| replace "$$\\\sqrt{x}$$" "√x"  \
+		| replace "\\\sqrt{5}" "√5"  \
 		> foo.mkd
+  # process markdown+lhs to html
 	cat foo.mkd \
-		| $(PANDOC) --mathjax --toc -f markdown+lhs -t html --css anatomy.css --css cc/commentCloud.css --top-level-division=chapter \
+		| $(PANDOC) --toc -f markdown+lhs -t html --css anatomy.css --css cc/commentCloud.css  --filter pandoc-citeproc --top-level-division=chapter \
 		| sed "s/\\.eps/.png/" \
 		> foo2.mkd
+  # fix problems in HTML
 	cat foo2.mkd \
 		| sed "s/@@/@/g" \
 		| sed "s/BAR/|/g" \
+		| sed "s/STAR/*/g" \
 		| sed "s/OPENB/{/g" \
 		| sed "s/CLOSEB/}/g" \
 		| perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)//g" \
@@ -183,27 +191,31 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/@/ATSIGN/g" \
 		> foo.lhs
 	cat foo.lhs \
-		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex -V documentclass=report --top-level-division=chapter \
+		| $(PANDOC) -f markdown+lhs -t latex+lhs --template=template.tex -V documentclass=report  --filter pandoc-citeproc --top-level-division=chapter \
+		> foo2.lhs
+	cat foo2.lhs \
 		| sed "s/{verbatim}/{spec}/g" \
 		| sed "s/@/@@/g" \
 		| sed "s/\\\\textbar{}/|/g" \
+		| sed "s/\\\\textbar /|/g" \
+		| sed "s/\\\\textbar/|/g" \
 		| sed "s/\\\\textless{}/</g" \
 		| sed "s/\\\\textgreater{}/>/g" \
+		| sed "s/\\\\textgreater/>/g" \
 		| sed "s/\\\\ldots{}/.../g" \
 		| sed "s/\\\\textbackslash{}/\\\\/g" \
 		| sed "/|/s/\\\\_/_/g" \
 		| sed "s/{\[}/[/g" \
 		| sed "s/{\]}/]/g" \
 		| sed "s/BAR/||/g" \
-		| sed "s/OPENB/{/g" \
-		| sed "s/CLOSEB/}/g" \
+		| sed "s/STAR/*/g" \
 		| sed "s/AtX/@/g" \
 		| sed "s/ATSIGN/@@/g" \
 		| sed "/|/s/\\\\{/{/g" \
 		| sed "/|/s/\\\\}/}/g" \
 		| sed "s/\\\\newcommand{\\\\VerbBar}{|}/%VerbBar/g" \
 		> temp.lhs
-	rm foo.lhs		
+	rm foo.lhs	foo2.lhs	
 
 # convert temp.lhs into Verbatim PDF, coverting various character sequences
 # from fancy format to normal text, so that the verbatim PDF will look more verbatim
@@ -243,7 +255,7 @@ packages: $(addprefix code/,$(SOURCES))$
 	zip packages/IntBool.zip code/Base.hs code/Lexer.hs code/Operators.hs code/IntBool*
 	zip packages/IncorrectFunctions.zip code/Base.hs code/Lexer.hs code/Operators.hs code/IncorrectFunctions*
 	zip packages/TopLevelFunctions.zip code/Base.hs code/Lexer.hs code/Operators.hs code/TopLevelFunctions*
-	zip packages/FirstClassFunctions.zip code/Base.hs code/Lexer.hs code/Operators.hs code/FirstClassFunctions*
+	zip packages/FirstClassFunctions.zip code/Base.hs code/Lexer.hs code/Operators.hs code/FirstClassFunctions.hs code/FirstClassFunctionsParse.hs code/FirstClassFunctionsParse.y code/FirstClassFunctionsTest.hs code/FirstClassFunctionsTest.js
 	zip packages/ErrorChecking.zip code/Base.hs code/Lexer.hs code/Operators.hs \
 		code/FirstClassFunctions.hs code/FirstClassFunctionsParse.hs code/ErrorChecking*
 	zip packages/Stateful.zip code/Base.hs code/Lexer.hs code/Operators.hs \
