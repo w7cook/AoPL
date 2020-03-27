@@ -20,12 +20,13 @@ data Exp  = Literal   Value
 --BEGIN:Stat2
 evaluate :: Exp -> Env -> Value
 --END:Stat2
-evaluate (Literal v) env      = v
-evaluate (Unary op a) env     = unary op (evaluate a env)
+evaluate (Literal v) env   = v
+evaluate (Unary op a) env  = unary op (evaluate a env)
 --BEGIN:Hand13
-evaluate (Binary op a b) env  = binary op (evaluate a env) (evaluate b env)
+evaluate (Binary op a b) env = 
+  binary op (evaluate a env) (evaluate b env)
 --END:Hand13
-evaluate (Variable x) env     = fromJust (lookup x env)
+evaluate (Variable x) env         = fromJust (lookup x env)
 evaluate (Declare x exp body) env = evaluate body newEnv
   where newEnv = (x, evaluate exp env) : env
 --END:More12 BEGIN:More14

@@ -2,7 +2,8 @@ module Declare where
 import Base
 import Data.Maybe
 
--- Define the data type for the abstract syntax of expressions, including variable declarations
+-- Define the data type for the abstract syntax of expressions, 
+-- including variable declarations
 --BEGIN:Summ3
 data Exp = Number     Int
          | Add        Exp Exp

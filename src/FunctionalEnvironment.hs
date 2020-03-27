@@ -23,10 +23,18 @@ type EnvF = String -> Maybe Value
 --BEGIN:Repr34
 -- Evaluate an expression in a (functional) environment
 evaluateF :: Exp -> EnvF -> Value
-evaluateF (Literal v) env      = v
-evaluateF (Unary op a) env     = unary op (evaluateF a env)
-evaluateF (Binary op a b) env  = binary op (evaluateF a env) (evaluateF b env)
-evaluateF (Variable x) env     = fromJust (env x)        -- changed
-evaluateF (Declare x exp body) env = evaluateF body newEnv
-  where newEnv = bindF x (evaluateF exp env) env             -- changed
+evaluateF (Literal v) env  = v
+
+evaluateF (Unary op a) env = 
+    unary op (evaluateF a env)
+
+evaluateF (Binary op a b) env = 
+    binary op (evaluateF a env) (evaluateF b env)
+
+evaluateF (Variable x) env = 
+    fromJust (env x)                                 -- changed
+
+evaluateF (Declare x exp body) env = 
+    evaluateF body newEnv
+      where newEnv = bindF x (evaluateF exp env) env -- changed
 --END:Repr34

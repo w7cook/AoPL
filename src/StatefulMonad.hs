@@ -32,28 +32,34 @@ instance Monad Stateful where
 evaluate :: Exp -> Env -> Stateful Value
 -- basic operations
 evaluate (Literal v) env = return v
+
 evaluate (Unary op a) env = do
   av <- evaluate a env
   return (unary op av)
+
 evaluate (Binary op a b) env = do
   av <- evaluate a env
   bv <- evaluate b env
   return (binary op av bv)
+
 evaluate (If a b c) env = do
   cond <- evaluate a env
   case cond of 
     BoolV t -> evaluate (if t then b else c) env
+
 -- variables and declarations
 evaluate (Declare x e body) env = do    -- non-recursive case
   ev <- evaluate e env
   let newEnv = (x, ev) : env
   evaluate body newEnv
+
 evaluate (Variable x) env = 
   return (fromJust (lookup x env))
 
 -- first-class functions
 evaluate (Function x body) env = 
   return (ClosureV  x body env)
+
 evaluate (Call fun arg) env = do
   closure <- evaluate fun env
   case closure of
@@ -66,13 +72,16 @@ evaluate (Call fun arg) env = do
 evaluate (Seq a b) env = do
   evaluate a env
   evaluate b env
+
 evaluate (Mutable e) env = do
   ev <- evaluate e env
   newMemory ev        
+
 evaluate (Access a) env = do
   addr <- evaluate a env
   case addr of
     AddressV i -> readMemory i
+
 evaluate (Assign a e) env = do
   addr <- evaluate a env
   ev <- evaluate e env

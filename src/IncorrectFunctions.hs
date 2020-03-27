@@ -27,16 +27,22 @@ type Env = String -> Maybe Value
 -- most of this is the same as IntBool
 --BEGIN:A34
 evaluate :: Exp -> Env -> Value
-evaluate (Literal v) env      = v
+evaluate (Literal v) env = v
 --END:A34
-evaluate (Unary op a) env     = unary op (evaluate a env)
-evaluate (Binary op a b) env  = binary op (evaluate a env) (evaluate b env)
+evaluate (Unary op a) env = 
+  unary op (evaluate a env)
+
+evaluate (Binary op a b) env = 
+  binary op (evaluate a env) (evaluate b env)
+
 evaluate (If a b c) env = 
   let BoolV test = evaluate a env in
     if test then evaluate b env
             else evaluate c env
+
 evaluate (Declare x exp body) env = evaluate body newEnv
   where newEnv = bindF x (evaluate exp env) env
+
 evaluate (Variable x) env     =
   case env x of
     Nothing -> error ("Variable " ++ x ++ " undefined")

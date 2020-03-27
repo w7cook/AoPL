@@ -40,24 +40,31 @@ typeCheck :: Exp -> TypeEnv -> Type
 --END:TypeSummDecl
 typeCheck (Literal (IntV _)) env = IntT
 typeCheck (Literal (BoolV _)) env = BoolT
-typeCheck (Unary op a) env =    checkUnary op (typeCheck a env)
-typeCheck (Binary op a b) env = checkBinary op (typeCheck a env) (typeCheck b env)
+typeCheck (Unary op a) env =    
+  checkUnary op (typeCheck a env)
+
+typeCheck (Binary op a b) env = 
+  checkBinary op (typeCheck a env) (typeCheck b env)
+
 typeCheck (If a b c) env = 
   if BoolT /= typeCheck a env then
     error ("Conditional must return a boolean: " ++ show a)
   else if typeCheck b env /= typeCheck c env then
-    error ("Result types are not the same in " ++ show b ++ ", " ++ show c)
+    error ("Result types are not the same in " 
+         ++ show b ++ ", " ++ show c)
   else
     typeCheck b env
 
 typeCheck (Variable x) env = fromJust (lookup x env)
+
 typeCheck (Declare x exp body) env = typeCheck body newEnv
   where newEnv = (x, typeCheck exp env) : env
 --END:Type12
 
 --BEGIN:TypeA41
-typeCheck (Function (x, t) body) env = FunT t (typeCheck body newEnv)     -- new
-  where newEnv = (x, t) : env
+typeCheck (Function (x, t) body) env = 
+  FunT t (typeCheck body newEnv)     -- new
+    where newEnv = (x, t) : env
 --END:TypeA41
 
 --BEGIN:TypeA47

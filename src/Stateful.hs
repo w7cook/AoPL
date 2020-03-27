@@ -128,4 +128,5 @@ binary LE  (IntV a)  (IntV b)  = BoolV (a <= b)
 binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
 binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
 binary EQ  a         b         = BoolV (a == b)
-binary op  a         b         = error ("Invalid binary " ++ show op ++ " operation: " ++ show a ++ ", " ++ show b) 
+binary op  a         b         = error ("Invalid binary " 
+  ++ show op ++ " operation: " ++ show a ++ ", " ++ show b) 

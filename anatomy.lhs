@@ -2084,7 +2084,7 @@ without return statements: %Top6
 
 These examples provides an outline for the basic concrete syntax of a function: %Top9
 
-|function| *function-name*|(|*parameter-name*, ..., *parameter-name*|)| { *body-expression* } %Top10
+|function| *name*|(|*parameter*, ..., *parameter*|)| { *body-expression* } %Top10
 
 The exact syntax varies from language to language. Some languages
 begin with a keyword |function| or |def|. Other languages require brackets
@@ -2096,7 +2096,7 @@ in many languages. %Top11
 
 A call to a function is an expression that has the following concrete syntax: %Top12
 
-*function-name*|(|*expression*, ..., *expression*|)| %Top13
+*name*|(|*expression*, ..., *expression*|)| %Top13
 
 Again, there are some variations on this theme. For example,
 in Haskell the parentheses are optional. %02
@@ -2380,12 +2380,12 @@ lambda or function expression
   ~ A *lambda expression* is an expression that creates a function.
     The general form of a function expression is: %Lamb4
 
-    $\lambda$*variable*. *body* %Lamb5
+    $\lambda$ *variable* . *body* %Lamb5
 
 This represents a function with parameter *variable* that computes a
 result defined by the *body* expression. The *variable* may of course
 be used within the *body*. In other words, *variable* may be
-free in *body*, but *variable* is bound (not free) in $\lambda$*variable*. *body*.
+free in *body*, but *variable* is bound (not free) in $\lambda$ *variable* . *body*.
 A function expression is sometimes called an *abstraction* or a
 *function abstraction* (we). %Lamb6
 
@@ -2426,7 +2426,7 @@ INCLUDE:Usin3
 The last example uses Haskell's notation for writing a lambda expression.
 Because $\lambda$ is not a standard character on most
 keyboards (and it is not part of ASCII), Haskell uses
-an *ASCII art* rendition of $\lambda$ as a backslash |\ |.
+an ASCII art rendition of $\lambda$ as a backslash \\.
 The dot used in a traditional lambda expression is replaced
 by ASCII art |->| for an arrow. The idea is that the function
 maps from |x| to its result, so an arrow makes some sense. %Usin4
@@ -2689,7 +2689,8 @@ function |bindF| takes an |EnvF| as an input and returns a new |EnvF|. %Repr14
 
 Expanding the definition of |EnvF| makes the higher-order nature of |bindF| clear: %Repr16
 
-> bindF :: String -> Value -> (String -> Maybe Int) -> (String -> Maybe Int)
+> bindF :: String -> Value -> 
+              (String -> Maybe Int) -> (String -> Maybe Int)
 > -- %Repr17
 
 The definition of |bindF| is quite different from |bindL|: %Repr18
@@ -3169,7 +3170,7 @@ We can use these functions to produce simple arithmetic equations. %Natu24
 === Relationship between Declarations and Functions
 
 TODO: prove that |var x =| $e$|;| $b$ is equivalent to
-   ($\lambda$|x.|$b$)$e$ %Rela2
+   ($\lambda$|x|.$b$)$e$ %Rela2
 
 The variable declaration expression in our language is not necessary, because
 a |var| can be simulated using a function. In particular, any
@@ -3844,18 +3845,18 @@ in function and variable definitions, and functions called with a tuple.
 Here are suggested changes to your abstract syntax: %Assi4
 
 > data Exp = ...
->          | Declare Pattern Exp Exp      -- declarations bind using patterns
->          | Function Pattern Exp         -- functions have patterns
->          | Tuple [Exp]                  -- tuple expression
+>          | Declare Pattern Exp Exp  -- declarations bind patterns
+>          | Function Pattern Exp     -- functions have patterns
+>          | Tuple [Exp]              -- tuple expression
 > -- %Assi5
 
-> data Pattern = VarP String              -- variable patterns
->              | TupleP [Pattern]         -- tuple patterns
+> data Pattern = VarP String          -- variable patterns
+>              | TupleP [Pattern]     -- tuple patterns
 > -- %Assi6
 
 > data Value = ...
->            | ClosureV Pattern Exp Env   -- functions have patterns
->            | TupleV [Value]             -- tuple value
+>            | ClosureV Pattern Exp Env -- functions have patterns
+>            | TupleV [Value]           -- tuple value
 >   deriving (Eq, Show)
 > -- %Assi7
 
@@ -4006,7 +4007,7 @@ Remember that the |:| operator adds an item to the front of a list.
 This means that |twos| is a list with |2| concatenated onto the front of
 the list |twos|. In other words, |twos| is an infinite list of 2's:  %Unde20
 
-> twos  ==>  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ... ]
+> twos  ==>  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ... ]
 > -- %Unde22
 
 It's also possible to make infinite lists that change:  %Unde23
@@ -4017,7 +4018,7 @@ INCLUDE:Unde7
 
 This creates an infinite list of the natural numbers: %Unde8
 
-> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, ...]
+> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...]
 > -- %Unde24
 
 All these definitions work in Haskell because of *laziness*.
@@ -4230,21 +4231,21 @@ book, like "Theory of Lambda Conversion".  %Unde29
 Fixed-points can also be identified for simple mathematical
 functions: %Fixe2
 
-+---------------------------------+--------------------------------+
-| *function*                      | *fixed point(s)*               |
-+=================================+================================+
-| $i_{10}(x) = 10 - x$            | $5$                            |
-+---------------------------------+--------------------------------+
-| $square(x) = x^2$               | $0, 1$                         |
-+---------------------------------+--------------------------------+
-| $g_\phi(x) = 1 + \cfrac{1}{x}$  | $1.6180339887...$              |
-+---------------------------------+--------------------------------+
-| $k_4(x) = 4$                    | $4$                            |
-+---------------------------------+--------------------------------+
-| $id(x) = x$                     | all values are fixed points    |
-+---------------------------------+--------------------------------+
-| $inc(x) = x + 1$                | no fixed points %Fixe3         |
-+---------------------------------+--------------------------------+
++------------------------+--------------------------------+
+| *function*             | *fixed point(s)*               |
++:=======================+:===============================+
+| $i_{10}(x) = 10 - x$   | $5$                            |
++------------------------+--------------------------------+
+| $square(x) = x^2$      | $0, 1$                         |
++------------------------+--------------------------------+
+| $g_\phi(x) = 1 + 1/x$  | $1.6180339887...$              |
++------------------------+--------------------------------+
+| $k_4(x) = 4$           | $4$                            |
++------------------------+--------------------------------+
+| $id(x) = x$            | all values are fixed points    |
++------------------------+--------------------------------+
+| $inc(x) = x + 1$       | no fixed points %Fixe3         |
++------------------------+--------------------------------+
 
 As you can see, some functions have one fixed point.
 Some functions have multiple fixed points. Others have
@@ -4315,7 +4316,7 @@ automatically. In this case, "well behaved" means that
 the function converges on the solution when applied repeatedly.
 For example, consider function $g_\phi$ defined above:  %Fixe1
 
-$g_\phi(x) = 1 + \cfrac{1}{x}$  %Fixe17
+$g_\phi(x) = 1 + 1/x$  %Fixe17
 
 Consider multiple invocations of $g_\phi$ starting
 with $g_\phi(1)$. The following table summarizes this
@@ -4386,15 +4387,15 @@ given above:  %Fixe26
 | $inv_{10}(x) = 10 - x$         | infinite loop                  |
 +--------------------------------+--------------------------------+
 | $square(x) = x^2$              | infinite loop                  |
-+------------------------------------------+--------------------------------+
-| $g_\phi(x) = 1 + \cfrac{1}{x}$ | $1.6180339887...$              |
-+------------------------------------------+--------------------------------+
++--------------------------------+--------------------------------+
+| $g_\phi(x) = 1 + 1/x$          | $1.6180339887...$              |
++--------------------------------+--------------------------------+
 | $const_4(x) = 4$               | $4$                            |
 +--------------------------------+--------------------------------+
 | $id(x) = x$                    | infinite loop                  |
 +--------------------------------+--------------------------------+
 | $inc(x) = x + 1$               | infinite loop  %Fixe27         |
-+------------------------------------------+--------------------------------+
++--------------------------------+--------------------------------+
 
 Only two of the six examples worked. Fixed points are not a general
 method for solving numeric equations.  %Fixe28
@@ -4417,7 +4418,7 @@ input                   output                input = output
 |[1]|                   |[2, 1]|              no
 |[3, 4, 5]|             |[2, 3, 4, 5]|        no
 |[2, 2, 2, 2, 2]|       |[2, 2, 2, 2, 2, 2]|  no
-|[2, 2, 2, ...]|        |[2, 2, 2, ...]|      *yes*  %Fixe32
+|[2, 2, 2, |...|]|      |[2, 2, 2, |...|]|    *yes*  %Fixe32
 
 The function |g_twos| can be applied to any list. If it is applied to
 any finite list, then the input and output lists cannot be the same
@@ -4453,26 +4454,26 @@ list and then puts a |0| on the front of the list.  %Fixe38
 
 Here are the result when applied to the same test cases listed above:  %Fixe39
 
-input                   output                input = output
-------------------      ------------          ----------------
-|[]|                    |[0]|                 no
-|[1]|                   |[0, 2]|              no
-|[3, 4, 5]|             |[0, 4, 5, 6]|        no
-|[2, 2, 2, 2, 2]|       |[0, 3, 3, 3, 3, 3]|  no
-|[2, 2, 2, ...]|        |[0, 3, 3, 3, ...]|   no  %Fixe40
+input               output                input = output
+------------------  --------------------- --------------
+|[]|                |[0]|                 no
+|[1]|               |[0, 2]|              no
+|[3, 4, 5]|         |[0, 4, 5, 6]|        no
+|[2, 2, 2, 2, 2]|   |[0, 3, 3, 3, 3, 3]|  no
+|[2, 2, 2, |...|]|  |[0, 3, 3, 3, |...|]| no  %Fixe40
 
 A more interesting set of test cases involves starting with the empty
 list,  then using each function result as the next test case:  %Fixe41
 
-input                     output                         input = output
-------------------        ------------                   ----------------
-|[]|                      |[0]|                          no
-|[0]|                     |[0, 1]|                       no
-|[0, 1]|                  |[0, 1, 2]|                    no
-|[0, 1, 2]|               |[0, 1, 2, 3]|                 no
-|[0, 1, 2, 3]|            |[0, 1, 2, 3, 4]|              no
-|[0, 1, 2, 3, 4]|         |[0, 1, 2, 3, 4, 5]|           no
-|[0, 1, 2, 3, 4, 5, ...]| |[0, 1, 2, 3, 4, 5, 6, ...]|   *yes*  %Fixe42
+input                       output                         input = output
+--------------------------- ------------------------------ --------------
+|[]|                        |[0]|                          no
+|[0]|                       |[0, 1]|                       no
+|[0, 1]|                    |[0, 1, 2]|                    no
+|[0, 1, 2]|                 |[0, 1, 2, 3]|                 no
+|[0, 1, 2, 3]|              |[0, 1, 2, 3, 4]|              no
+|[0, 1, 2, 3, 4]|           |[0, 1, 2, 3, 4, 5]|           no
+|[0, 1, 2, 3, 4, 5, |...|]| |[0, 1, 2, 3, 4, 5, 6, |...|]| *yes*  %Fixe42
 
 The only list that is unchanged after applying |g_numbers|
 is the list of natural numbers:  %Fixe43
@@ -4581,19 +4582,21 @@ a function infinitely many times.  %A69
 > fix g = stamp (g . stamp)
 > -- %A53
 
-TODO: explain composition (|.|) operator  %A70
+The composition (|.|) operator composes two functions:
+
+> f . g = \x -> f (g x)
 
 Here are the steps in executing |fix| for a function |g|:  %A71
 
-    |fix g|  %A72
-    { definition of |fix|}  %A73
-    = |stamp (g . stamp)| %A19
-    { definition of |stamp|}  %A74
-    = |(g . stamp)(g . stamp)| %A21
-    { definition of |.|}  %A75
-    = |g(stamp(g . stamp))|  %A36
-    { definition of |fix|}  %A76
-    = |g(fix g)|  %A80
+*   |fix g|  %A72
+*   \{ definition of |fix| \}  %A73
+*   \= |stamp (g . stamp)| %A19
+*   \{ definition of |stamp| \}  %A74
+*   \= |(g . stamp)(g . stamp)| %A21
+*   \{ definition of |.| \}  %A75
+*   \= |g(stamp(g . stamp))|  %A36
+*   \{ definition of |fix| \}  %A76
+*   \= |g(fix g)|  %A80
 
 This version of |fix| uses self-application to create
 a self-replicating program, which is then harnessed as
@@ -5437,13 +5440,11 @@ simple computations that return values.
 Consider the way that the |Literal| expression is evaluated for
 both the |Checked| and the |Stateful| evaluators. %Abst13
 
-+-----------------------------------------------+--------------------------------------------+
-| Checked                                       | Stateful                                   |
-+:==============================================+:===========================================+
-| |evaluate :: Exp -> Env -> Checked Value|     | |evaluate :: Exp -> Env -> Stateful Value| |
-+-----------------------------------------------+--------------------------------------------+
-| |evaluate (Literal v) env = Good v|           | |evaluate (Literal v) env mem = (v, mem)|  |
-+-----------------------------------------------+--------------------------------------------+
++--------------------------------------+----------------------------------------+
+| Checked                              | Stateful                               |
++:=====================================+:=======================================+
+| |evaluate (Literal v) env = Good v|  | |evaluate (Literal v) env m = (v, m)|  |
++--------------------------------------+----------------------------------------+
 
 One important point is that literal values never cause errors
 and they do not modify memory. They represent the simple good
@@ -5454,25 +5455,25 @@ computations are different, but they both have same interface:
 they take a value as input and output an appropriate checked or
 stateful value. %Abst18
 
-+-----------------------------------------------+---------------------------------------------+
-| Checked                                       | Stateful                                    |
-+:==============================================+:============================================+
-| |return|$_C$ |:: Value -> Checked Value|      | |return|$_S$ |:: Value -> Stateful Value|   |
-+-----------------------------------------------+---------------------------------------------+
-| |return|$_C$ |v = Good v|                     | |return|$_S$ |v =| $\lambda$ |mem.(v, mem)| |
-+-----------------------------------------------+---------------------------------------------+
++-------------------------------------------+--------------------------------------------+
+| Checked                                   | Stateful                                   |
++:==========================================+:===========================================+
+| |return|$_C$\ |:: Value -> Checked Value| | |return|$_S$\ |:: Value -> Stateful Value| |
++-------------------------------------------+--------------------------------------------+
+| |return|$_C$ |v = Good v|                 | |return|$_S$ |v =| $\lambda$ |m|.|(v, m)|  |
++-------------------------------------------+--------------------------------------------+
 
 Using these return functions, the original |evaluate| code can be written
 so that the two cases are nearly identical. The details of how to deal
 with the checked or stateful values are hidden in the |return| helper functions. %Abst20
 
-+-------------------------------------------------+---------------------------------------------+
-| Checked                                         | Stateful                                    |
-+:================================================+:============================================+
-| |evaluate :: Exp -> Env -> Checked Value|       | |evaluate :: Exp -> Env -> Stateful Value|  |
-+-------------------------------------------------+---------------------------------------------+
-| |evaluate (Literal v) env = return|$_C$ |v|     | |evaluate (Literal v) env = return|$_S$ |v| |
-+-------------------------------------------------+---------------------------------------------+
++---------------------------------+----------------------------------+
+| Checked                         | Stateful                         |
++:================================+:=================================+
+| |evaluate (Literal v) env =|    | |evaluate (Literal v) env =|     |
++---------------------------------+----------------------------------+
+| \ \ |return|$_C$ |v|             | \ \ |return|$_S$ |v|            |
++---------------------------------+----------------------------------+
 
 === Abstracting Computation Composition
 
@@ -5480,88 +5481,88 @@ The next step is to unify the case when there are multiple sub-expressions
 that must be evaluated. The binary operator provides a good example
 of multiple sub-expressions. %Abst22
 
-+---------------------------------------------+---------------------------------------------------------------+
-| Checked                                     | Stateful                                                      |
-+:============================================+:==============================================================+
-| |evaluate :: Exp -> Env -> Checked Value|   | |evaluate :: Exp -> Env -> Stateful Value|                    |
-+---------------------------------------------+---------------------------------------------------------------+
-| |evaluate (Binary op a b) env =|            | |evaluate (Binary op a b) env =|                              | 
-+---------------------------------------------+---------------------------------------------------------------+
-| \ |case evaluate a env of|                  | \ \ $\lambda$|mem1 . let (av, mem2) = evaluate a env mem1 in| |
-+---------------------------------------------+---------------------------------------------------------------+
-| \ \ |Error msg -> Error msg|                | \ \ \ \ |let (bv, mem3) = evaluate b env mem2 in|             |
-+---------------------------------------------+---------------------------------------------------------------+
-| \ \ |Good av ->|                            | \ \ \ \ |(binary op av bv, mem3)|                             |
-+---------------------------------------------+---------------------------------------------------------------+
-| \ \ \ |case evaluate b env of|              |                                                               |
-+---------------------------------------------+---------------------------------------------------------------+
-| \ \ \ \ |Error msg -> Error msg|            |                                                               |
-+---------------------------------------------+---------------------------------------------------------------+
-| \ \ \ \ \ |Good bv ->|                      |                                                               |
-+---------------------------------------------+---------------------------------------------------------------+
-| \ \ \ \ \ \ |checked_binary op av bv|       |                                                               |
-+---------------------------------------------+---------------------------------------------------------------+
++-----------------------------------------+--------------------------------------------------+
+| Checked evaluate                        | Stateful evaluate                                |
++:========================================+:=================================================+
+| |evaluate (Binary op a b) env =|        | |evaluate (Binary op a b) env = |$\lambda$|m1| . | 
++-----------------------------------------+--------------------------------------------------+
+| \ |case evaluate a env of|              | \ |let (av, m2) = evaluate a env m1 in|          |
++-----------------------------------------+--------------------------------------------------+
+| \ \ |Error msg -> Error msg|            | \ \ |let (bv, m3) = evaluate b env m2 in|        |
++-----------------------------------------+--------------------------------------------------+
+| \ \ |Good av ->|                        | \ \ |(binary op av bv, m3)|                      |
++-----------------------------------------+--------------------------------------------------+
+| \ \ \ |case evaluate b env of|          |                                                  |
++-----------------------------------------+--------------------------------------------------+
+| \ \ \ \ |Error msg -> Error msg|        |                                                  |
++-----------------------------------------+--------------------------------------------------+
+| \ \ \ \ \ |Good bv ->|                  |                                                  |
++-----------------------------------------+--------------------------------------------------+
+| \ \ \ \ \ \ |checked_binary op av bv|   |                                                  |
++-----------------------------------------+--------------------------------------------------+
 
-TODO: note that the |mem| argument has become a lambda! %Abst36
+Note that the memory |m1| argument has become a lambda! This is an instance of the
+*Rule of Function Arguments*. It was done to allow the first
+lines to be equivalent |evaluate (Binary op a b) env|. %Abst36
 
 In this case computation proceeds in steps: first
 evaluate one expression (checking errors and updating memory) and then
 evaluating the second expression (checking errors and updating memory as
 appropriate). They both have a similar pattern of code for dealing with
 the evaluation of |a| and |b|. Factoring out the common
-parts as *first-part* and *next-part*, the core of the pattern is: %Abst23
+parts as *first* and *next*, the core of the pattern is: %Abst23
 
-+--------------------------------------+-----------------------------------------------------------+
-| Checked                              | Stateful                                                  |
-+:=====================================+:==========================================================+
-| |case| *first-part* |of|             | $\lambda$|mem1 . let (v, mem2) =| *first-part* |mem1 in|  |
-+--------------------------------------+-----------------------------------------------------------+
-| \ \ |Error msg -> Error msg|         | \ \ \ \ \ \ \ \ \ \ \ *next-part* |v| |mem2|              |
-+--------------------------------------+-----------------------------------------------------------+
-| \ \ |Good v ->| *next-part* |v|      |                                                           |
-+--------------------------------------+-----------------------------------------------------------+
++---------------------------------+-----------------------------------------------+
+| Checked                         | Stateful                                      |
++:================================+:==============================================+
+| |case| *first* |of|             | $\lambda$|m1|.|let (v, m2) =| *first* |m1 in| |
++---------------------------------+-----------------------------------------------+
+| \ \ |Error msg -> Error msg|    | \ \ \ \ \ \ \ \ \ \ \ *next* |v| |m2|         |
++---------------------------------+-----------------------------------------------+
+| \ \ |Good v ->| *next* |v|      |                                               |
++---------------------------------+-----------------------------------------------+
 
-This *first-part* corresponds to |evaluate a env| or |evaluate b env| in both the original
-versions. The *next-part* represents the remainder of the computation. It is just everything that
+This *first* corresponds to |evaluate a env| or |evaluate b env| in both the original
+versions. The *next* represents the remainder of the computation. It is just everything that
 appears after the main pattern, but with all the free variables made explicit.
-For the |Checked| case, the only variable needed in the *next-part* is the
+For the |Checked| case, the only variable needed in *next* is the
 variable |v| that comes form the |Good| case. For the Stateful case,
-in addition to |v| the *next-part* also requires access to |mem2| %Abst24
+in addition to |v| the *next* also requires access to |m2| %Abst24
 
-These patterns can be made explicit as a special operator that combines
+These patterns can be made explicit as a special operator named *bind* |BIND| that combines
 the two parts, where the second part is a function with the appropriate arguments.
 To be more concrete, these parts are converted into explicit variables.
-The *first-part* is named |A| and the *next-part*, which is a function,
+The *first* is named |A| and the *next*, which is a function,
 is named |F|: %Abst25
 
-+--------------------------------------+-------------------------------------------------+
-| Checked                              | Stateful                                        |
-+:=====================================+:================================================+
-| |A| $\rhd_C$ |F =|                   | |A| $\rhd_S$ |F =|                              |
-+--------------------------------------+-------------------------------------------------+
-| \ \ |case A of|                      | \ \ $\lambda$|mem1 .let (v, mem2) = A mem1 in|  |
-+--------------------------------------+-------------------------------------------------+
-| \ \ \ \ |Error msg -> Error msg|     | \ \ \ \ \ \ \ \ \ \ \ \ \ |F v mem2|            |
-+--------------------------------------+-------------------------------------------------+
-| \ \ \ \ |Good v -> F v|              |                                                 |
-+--------------------------------------+-------------------------------------------------+
++--------------------------------------+-----------------------------------------------+
+| Checked                              | Stateful                                      |
++:=====================================+:==============================================+
+| |A| |BIND|$_C$ |F =|                 | |A| |BIND|$_S$ |F =|                          |
++--------------------------------------+-----------------------------------------------+
+| \ \ |case A of|                      | \ \ $\lambda$|m1|.|let (v, m2) = A m1 in|     |
++--------------------------------------+-----------------------------------------------+
+| \ \ \ \ |Error msg -> Error msg|     | \ \ \ \ \ \ \ \ \ \ \ \ \ |F v m2|            |
++--------------------------------------+-----------------------------------------------+
+| \ \ \ \ |Good v -> F v|              |                                               |
++--------------------------------------+-----------------------------------------------+
 
-These generic operators for |Checked| $\rhd_C$ and |Stateful| $\rhd_S$ computations
+These generic operators for |Checked| |BIND|$_C$ and |Stateful| |BIND|$_S$ computations
 abstract away the core pattern composing two |Checked| or |Stateful| computations.
-The family of operators $\rhd$ are called *bind* operators, because they
-bind together computations. %Abst26
+The family of operators |BIND| are called *bind* operators, because they
+bind together computations. This is unrelated to bindings discussed in earler chapters.%Abst26
 
 Using these operators, the *original* code can be written in simpler form: %Abst27
 
-+---------------------------------------------------+-------------------------------------------------+
-| Checked                                           | Stateful                                        |
-+:==================================================+:================================================+
-| (|evaluate a env|) $\rhd_C$ ($\lambda$|av.|       | (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|     |
-+---------------------------------------------------+-------------------------------------------------+
-| \ \ (|evaluate b env)| $\rhd_C$ ($\lambda$|bv.|   | \ \ (|evaluate b env)| $\rhd_S$ ($\lambda$|bv.| |
-+---------------------------------------------------+-------------------------------------------------+
-| \ \ \ \ |checked_binary op av bv|))               | \ \ \ \ $\lambda$|mem.(binary op av bv, mem)|)) |
-+---------------------------------------------------+-------------------------------------------------+
++---------------------------------------------------+---------------------------------------------------+
+| Checked                                           | Stateful                                          |
++:==================================================+:==================================================+
+| (|evaluate a env|) |BIND|$_C$ ($\lambda$|av|.     | (|evaluate a env|) |BIND|$_S$ ($\lambda$|av|.     |
++---------------------------------------------------+---------------------------------------------------+
+| \ \ (|evaluate b env)| |BIND|$_C$ ($\lambda$|bv|. | \ \ (|evaluate b env)| |BIND|$_S$ ($\lambda$|bv|. |
++---------------------------------------------------+---------------------------------------------------+
+| \ \ \ \ |checked_binary op av bv|))               | \ \ \ \ $\lambda$|m|. |(binary op av bv, m)|))    |
++---------------------------------------------------+---------------------------------------------------+
 
 All mention of |Error| and |Good| have been removed from the |Checked| version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
@@ -5570,19 +5571,19 @@ that has emerged is the same one that was identified in the previous section, wh
 the |return|$_S$ function converts a value (the result of |binary op av bv|) into
 a default stateful computation. To see how this works, consider that %Abst29
 
-|return|$_S$ x\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|mem. (x, mem)| %Abst30
+|return|$_S$ x\ \ \ \  $\equiv$ \ \ \ \ $\lambda$|m|. |(x, m)| %Abst30
 
 Using |return|$_S$ the result is: %Abst31
 
-+---------------------------------------------------+-------------------------------------------------+
-| Checked                                           | Stateful                                        |
-+:==================================================+:================================================+
-| (|evaluate a env|) $\rhd_C$ ($\lambda$|av.|       | (|evaluate a env|) $\rhd_S$ ($\lambda$|av.|     |
-+---------------------------------------------------+-------------------------------------------------+
-| \ \ (|evaluate b env|) $\rhd_C$ ($\lambda$|bv.|   | \ \ (|evaluate b env|) $\rhd_S$ ($\lambda$|bv.| |
-+---------------------------------------------------+-------------------------------------------------+
-| \ \ \ \ |checked_binary op av bv|))               | \ \ \ \ |return|$_S$ (|binary op av bv|)))      |
-+---------------------------------------------------+-------------------------------------------------+
++---------------------------------------------------+---------------------------------------------------+
+| Checked                                           | Stateful                                          |
++:==================================================+:==================================================+
+| (|evaluate a env|) |BIND|$_C$ ($\lambda$|av|.     | (|evaluate a env|) |BIND|$_S$ ($\lambda$|av|.     |
++---------------------------------------------------+---------------------------------------------------+
+| \ \ (|evaluate b env|) |BIND|$_C$ ($\lambda$|bv|. | \ \ (|evaluate b env|) |BIND|$_S$ ($\lambda$|bv|. |
++---------------------------------------------------+---------------------------------------------------+
+| \ \ \ \ |checked_binary op av bv|))               | \ \ \ \ |return|$_S$ (|binary op av bv|)))        |
++---------------------------------------------------+---------------------------------------------------+
 
 Now all references to memory have been removed in these cases. Of course, in the evaluation
 rules for |Mutable|, assignment, and access there will be explicit references to memory.
@@ -5590,14 +5591,14 @@ Similarly, in the cases where errors are generated, for example for undefined va
 code will still have to create |Error| values. What we have done here is examine the parts of
 the program that *don't* involve errors or memory, namely literals and binary operators, and
 figured out a way to hide the complexity of error checking and mutable memory. This complexity
-has been hidden in two new operators, |return| and bind $\rhd$.
+has been hidden in two new operators, |return| and bind |BIND|.
 The type of the bind operators is also interesting: %Abst33
 
 Checked: %Abst43
-  ~ $\rhd_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
+  ~ |BIND|$_C$ |:: Checked Value -> (Value -> Checked Value) -> Checked Value| %Abst44
 
 Stateful: %Abst45
-  ~ $\rhd_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
+  ~ |BIND|$_S$ |:: Stateful Value -> (Value -> Stateful Value) -> Stateful Value| %Abst34
 
 It should be clear that an consistent pattern has emerged. This is a *very* abstract
 pattern, which has to do with the structure of the underlying computation: is it a
@@ -5611,7 +5612,7 @@ monad %Mona27
 
     * A generic data type $m$ %Mona4
     * A *return* function |return|$_m :: t \rightarrow m\ t$ %Mona5
-    * A *bind* function $\rhd_m :: m\ t \rightarrow (t \rightarrow m\ s) \rightarrow m\ s$ %Mona6
+    * A *bind* function |BIND|$_m :: m\ t \rightarrow (t \rightarrow m\ s) \rightarrow m\ s$ %Mona6
 
 The symbol $m$ gives the name of the monad and also defines the *shape* of the computation.
 A program that uses the monad $m$ is called an $m$-computation.
@@ -5632,21 +5633,21 @@ converts a value of type $t$ into an $m$-computation that just returns the value
 important that the computation *just* returns the value, so, for example, it is not legal for
 the stateful return function to modify memory. Examples of return were given in the previous section. %Mona8
 
-bind
-  ~ The *bind* function $\rhd_m$ specifies how $m$-computations are combined together. %Mona29
+|BIND|
+  ~ The *bind* function |BIND|$_m$ specifies how $m$-computations are combined together. %Mona29
 
-In general the behavior of $A \rhd_m F$ is to perform the $m$-computation $A$ and then pass the value
-it produces to the function $F$ to create a second $m$-computation, which is returned as the
+In general the behavior of |A BIND|$_m$| F| is to perform the $m$-computation |A| and then pass the value
+it produces to the function |F| to create a second $m$-computation, which is returned as the
 result of the bind operation.
-Note that the $A$ may not produce a value, in which case $F$ is not
-called. This happens, for example, in the |Checked| monad, if $A$ produces an error.
-At a high level, bind combines the computation $A$ with the (parameterized) computation $F$ to
-form a composite computation, which performs the effect of both $A$ and $F$. %Mona9
+Note that the |A| may not produce a value, in which case |F| is not
+called. This happens, for example, in the |Checked| monad, if |A| produces an error.
+At a high level, bind combines the computation |A| with the (parameterized) computation |F| to
+form a composite computation, which performs the effect of both |A| and |F|. %Mona9
 
 The type of bind given here is slightly more general than the type of bind used in the previous examples.
 In the previous examples, the type was $m\ t \rightarrow (t \rightarrow m\ t) \rightarrow m\ t$.
 However, it is possible for the return types of the two computations to differ. As long as
-the output of the first computation $A$ can be passed to $F$, there is not problem. %Mona10
+the output of the first computation |A| can be passed to |F|, there is no problem. %Mona10
 
 TODO: mention the monad laws. %Mona11
 
@@ -5672,10 +5673,8 @@ The |Monad| class has the following definition: %Monad1
 >   return :: t -> m t
 > -- %Monad2
 
-It say that for a generic type |m| to be a monad, it must have two functions, bind (|>>=|) and
-|return|, with the appropriate types.
-The only difference from the definition given above is that the bind operator is called |>>=|
-rather than $\rhd$. %Monad3
+It say that for a generic type |m| to be a monad, it must have two functions, bind (|BIND|) and
+|return|, with the appropriate types. %Monad3
 
 The type |Checked| is an instance of the |Monad| class: %Monad4
 
@@ -5704,8 +5703,8 @@ evaluation of binary expressions. The code given above is ugly because of the ne
 use of lambda functions. Here an attempt to make the |Checked| case more readable: %Hask1
 
 |evaluate (Binary op a b) env =| \
-\ |(evaluate a env)| $\rhd_C$ ($\lambda$|av.| \
-\ \ |(evaluate b env)| $\rhd_C$ ($\lambda$|bv.| \
+\ |(evaluate a env)| |BIND|$_C$ ($\lambda$|av|. \
+\ \ |(evaluate b env)| |BIND|$_C$ ($\lambda$|bv|. \
 \ \ \ |checked_binary op av bv|))
 
 The effect here is for |av| to be bound to the value produced by the |evaluate a env|,
@@ -5732,7 +5731,7 @@ Here is the basic pattern for |do| notation: %Hask6
 
 This is equivalent to this form, using bind: %Hask8
 
-|e1 >>= | ($\lambda$|x.e2)| %Hask9
+|e1 >>= | ($\lambda$ |x| . |e2)| %Hask9
 
 The expressions |e1| and |e2| must be expressions that produce
 values in the same monad |m|. To be precise, if |e1| has type |m| $t_1$
@@ -5871,7 +5870,7 @@ INCLUDE:StatefulMonad2 %Mona20
 >       )
 > -- %StatefulMonad2
 
-It defines the bind operator |>>=| to take a stateful value |c| and a function |f|.
+It defines the bind operator |BIND| to take a stateful value |c| and a function |f|.
 It returns a new |Stateful| value that accepts a memory |m|, it then passes this
 memory to |c| and captures the result as a |val| and a new memeory |m'|.
 It then applies the function |f| to the value |val| and captures the resulting
@@ -6300,6 +6299,89 @@ transformations from inputs to outputs. It was used in the chapter on
 typing in the concept of *abstract interpretation*, where all values are
 abstracted to combine similar values together to operate on categories
 of values.
+
+*Abstraction* applied to *data* means that data is constructed, manipulated, and observed
+without being tied to a particular representation. Thus there is an abstract
+view of data, which is used by *clients* of the data. And there is a concrete
+representation of data, which is created and managed by an *implementor*.
+
+There are several benefits
+to having an abstract view of data. The first benefit is that only the essential 
+properties of the data are visible to the prorgrammer -- all non-essential details
+are hidden. This allows a programmer to focus on what is important, and
+ignore implementation details. A second benefit is that the implementation of 
+the data can be changed, for example to be more reliable, smaller, or more efficient, without
+having to change a program that uses the data. This works as long as the abstract
+view of the data doesn't change, only the hidden implementation details change.
+It is also possible to choose different representations for data structures, for example, to
+change a program from small-scale data to managing large data. If these forms of
+data are sufficiently abstract, changing representation does not require the 
+client program using the data to change.
+
+Some of the key questions to be addressed here are
+1) How can users define data types that look the same as primitives?
+2) What are objects?
+3) What are data structures?
+4) Why do most popular languages, like Python and Java, have both primitive types and objects?
+5) Is it possible to have a practical language without primitive data?
+
+== Data in Programming Languages
+
+Primitive data types were introduced in the very first programming languages. 
+They include integers, floating point numbers, booleans, and strings. 
+Languages like Algol, FORTRAN, COBOL, and Lisp were defined with these primitives.
+Primitives sometimes included date/times, fixed-point numbers, and complex numbers.
+Early languages also had built in *data structures*, like records, arrays, unions, hash tables, 
+and lists. These languages supoorted *user-defined data types* that were constructed
+using these primitive data structuring mechanisms.
+
+However, the fact that primitives were different from user-defined data types began to be an issue.
+For example, if your language didn't support complex numbers, or date/time values, it was
+impossible for the user to define these types and have them work the same as primitive types.
+It was a challenge to figure out how to allow user-defined data types that look like primitive types.
+
+This challenge was eventually solved by the discovery of *Abstract Data Types* (ADT). The
+key idea is in understanding primitive types. They work by having a *type name* together
+with *operations* on values of that type. Since they are primitive types they could be 
+created by *literals* in the language, like |-32| and |99.75|. An Abstract Data Type is
+a user-defined type that has its representation *hidden* from the client. It includes
+operations for construction, manipulation, and observation of values. For example,
+an abstract data type for complex numbers might look like this:
+
+````sml
+type complex
+
+val fromPolar : real, real -> complex
+
+val + : complex, complex -> complex
+val - : complex, complex -> complex
+val * : complex, complex -> complex
+val / : complex, complex -> complex
+
+val magnitude : complex -> real
+val phase     : complex -> real
+val toString  : complex -> string
+````
+
+There are two primary forms of data absraction: Abstract Data Types (ADTs) and Objects (OO).
+Primitive data is usually a form of abstract data type. Most object languages 
+
+
+
+
+
+For example, primitive
+types are abstract: a programmer using them doesn't *really* know
+how they are implemented or represented. This applies to booleans, integers,
+floating point values, strings and dates. For example, integers could be 
+implemented as 32 or 64 bit representations, or they could be implemented
+as arbitrary-precision arithmetic, which would require variable amounts of
+storage and more complex operations.
+
+All the programmer needs to know is that there is a way to create primitive values, 
+operations that manipulate them, and ways to view some textual representation of the data. 
+In a statically typed language, there will also be a *name* associated with
+each type of primitive data.
 
 
 --------------------BEGIN-HIDE------------------------- %Memo2

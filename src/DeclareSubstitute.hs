@@ -24,6 +24,7 @@ evaluate (Subtract a b)   = evaluate a - evaluate b
 evaluate (Multiply a b)   = evaluate a * evaluate b
 evaluate (Divide a b)     = evaluate a `div` evaluate b
 --BEGIN:Eval28
-evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
+evaluate (Declare x exp body) = 
+  evaluate (substitute1 (x, evaluate exp) body)
 --END:Eval28
 --END:Summ4

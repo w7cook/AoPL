@@ -168,6 +168,7 @@ anatomy.htm: anatomy.mkd
 		| sed "s/STAR/*/g" \
 		| sed "s/OPENB/{/g" \
 		| sed "s/CLOSEB/}/g" \
+		| sed "s/BIND/\&gt;\&gt;=/g" \
 		| perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)//g" \
 		| perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)//g" \
 		| sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
@@ -202,6 +203,8 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/\\\\textless{}/</g" \
 		| sed "s/\\\\textgreater{}/>/g" \
 		| sed "s/\\\\textgreater/>/g" \
+		| sed "s/\\\\textless{}/</g" \
+		| sed "s/\\\\textless/</g" \
 		| sed "s/\\\\ldots{}/.../g" \
 		| sed "s/\\\\textbackslash{}/\\\\/g" \
 		| sed "/|/s/\\\\_/_/g" \
@@ -211,6 +214,7 @@ temp.lhs: anatomy.mkd template.tex
 		| sed "s/STAR/*/g" \
 		| sed "s/AtX/@/g" \
 		| sed "s/ATSIGN/@@/g" \
+		| sed "s/BIND/>>=/g" \
 		| sed "/|/s/\\\\{/{/g" \
 		| sed "/|/s/\\\\}/}/g" \
 		| sed "s/\\\\newcommand{\\\\VerbBar}{|}/%VerbBar/g" \

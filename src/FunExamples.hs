@@ -63,9 +63,9 @@ bindL var val env = (var, val) : env
 
 --BEGIN:Repr13
 envL2 = bindL "z" (IntV 5) envL1
-   -- [("z", IntV 5), ("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
+-- [("z", IntV 5), ("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
 envL3 = bindL "x" (IntV 9) envL1
-   -- [("x", IntV 9), ("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
+-- [("x", IntV 9), ("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
 --END:Repr13
 
 --BEGIN:Repr23
