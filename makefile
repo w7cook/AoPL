@@ -69,8 +69,7 @@ diff: new.lhs
 	diff anatomy.lhs new.lhs
 
 new.lhs: anatomy.lhs output/*.out
-	ruby tags.rb \
-	| ruby includes.rb "src/*.hs" "src/*.y" "src/*.js" "output/*.out" ">" \
+	ruby includes.rb "src/*.hs" "src/*.y" "src/*.js" "output/*.out" ">" < anatomy.lhs \
 	| perl -pe "s/ +$$//" \
 	> new.lhs
 
@@ -119,16 +118,16 @@ execute: code $(addprefix output/, $(addsuffix .out, $(basename $(notdir $(TESTS
 
 # update the server copy (requires server access)
 update: anatomy.pdf anatomyVerbatim.pdf	anatomy.htm packages
-	cp anatomyVerbatim.pdf ~/Public/web/anatomy/anatomyVerbatim.pdf
-	cp anatomy.pdf ~/Public/web/anatomy/anatomy.pdf
-	cp anatomy.htm ~/Public/web/anatomy/anatomy.htm
-	cp anatomy.css ~/Public/web/anatomy/anatomy.css
+	cp index.htm ~/Public/web/anatomy/
+	cp anatomyVerbatim.pdf ~/Public/web/anatomy/
+	cp anatomy.pdf ~/Public/web/anatomy/
+	cp anatomy.htm ~/Public/web/anatomy/
+	cp anatomy.css ~/Public/web/anatomy/
 	mkdir -p	~/Public/web/anatomy/figures
 	mkdir -p	~/Public/web/anatomy/packages
 	cp packages/* ~/Public/web/anatomy/packages
 	cp figures/*.png ~/Public/web/anatomy/figures
-	cp -r cc ~/Public/web/anatomy
-	scp -r ~/Public/web/anatomy firefly.cs.utexas.edu:public_html
+	rsync -rvz ~/Public/web/anatomy firefly.cs.utexas.edu:public_html
 
 # build the anatomy.mkd file by including all the code, then removing the INCLUDE markers
 # Change the header markers to remove space before them
@@ -139,7 +138,6 @@ anatomy.mkd: anatomy.lhs makefile template.tex anatomy.bib figures/*.eps execute
 		| sed "s/'[0-9][0-9a-z]*//g" \
 		| sed "s/^> test[^= ][^= ]* =/> /g" \
 		| sed '/--BEGIN-HIDE--/,/--END-HIDE--/d' \
-		| sed "/> -- %[a-zA-Z0-9][a-zA-Z0-9]*/d" \
 		> anatomy.mkd
 
 # build the HTML version. 
@@ -153,41 +151,30 @@ anatomy.htm: anatomy.mkd
 		| sed "s/||/VERTICAL_BAR/g" \
 		| perl -pe 's/\|([^ ][^|]*)\|/\`$$1\`/g;' \
 		| sed "s/VERTICAL_BAR/||/g" \
-		| replace "$$\\\sqrt{x}$$" "√x"  \
-		| replace "\\\sqrt{5}" "√5"  \
+		| sed "s/$$\\\sqrt{x}$$/√x/g"  \
+		| sed "s/\\\sqrt{5}/√5/g"  \
 		> foo.mkd
   # process markdown+lhs to html
 	cat foo.mkd \
-		| $(PANDOC) --toc -f markdown+lhs -t html --css anatomy.css --css cc/commentCloud.css  --filter pandoc-citeproc --top-level-division=chapter \
+		| $(PANDOC) --toc -f markdown+lhs -t html --css anatomy.css --filter pandoc-citeproc --top-level-division=chapter \
 		| sed "s/\\.eps/.png/" \
 		> foo2.mkd
   # fix problems in HTML
-	cat foo2.mkd \
+	cat header.htm foo2.mkd \
 		| sed "s/@@/@/g" \
 		| sed "s/BAR/|/g" \
 		| sed "s/STAR/*/g" \
 		| sed "s/OPENB/{/g" \
 		| sed "s/CLOSEB/}/g" \
 		| sed "s/BIND/\&gt;\&gt;=/g" \
-		| perl -pe "s/ %([a-zA-Z0-9][a-zA-Z0-9]*)//g" \
-		| perl -pe "s/^%([a-zA-Z0-9][a-zA-Z0-9]*)//g" \
-		| sed "s|</head>|<script src="cc/parse.js"></script><script src="cc/commentCloud.js"></script></head>|" \
-		| sed "s|<body>|<body onLoad=\"CommentSetup('g7Ukr5GXnqtS6jqM5gUkSwfY4eyWHxERMkrhurR0','qK1pZ7VXZv8eNtULnMcIzcLy2pIBgvIG9YyO9pu7','Anatomy')\">|" \
 		> anatomy.htm
 	rm foo.mkd foo2.mkd
-	mkdir -p cc
-	cp ../CommentCloud/*.js cc
-	cp ../CommentCloud/*.css cc
-	# <a href='' id='Comment:\$$1' ><\\/a> 
-	# <a href='' id='Comment:\$$1' ><\\/a> 
 
 # convert the markdown+lhs into a latex+lhs file
 # first, remove the HTML paragraph markdown
 # Then perform translations that are common to both PDF formats
 temp.lhs: anatomy.mkd template.tex
 	cat anatomy.mkd \
-		| sed "/^%[a-zA-Z0-9][a-zA-Z0-9]*/d" \
-		| sed "s/%[a-zA-Z0-9][a-zA-Z0-9]*//g" \
 		| sed "s/@@/AtX/g" \
 		| sed "s/@/ATSIGN/g" \
 		> foo.lhs

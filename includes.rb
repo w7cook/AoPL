@@ -69,7 +69,7 @@ def process(input, output, marker, content, location)
       # skip this line!
     else
       if included
-        output.write("#{marker} -- %#{name}\n")
+        # output.write("#{marker} -- %#{name}\n")
         included = false
       end
       output.write(line)
