@@ -316,7 +316,6 @@ are always distinguished syntactically in Haskell. Here is an example person:
 A Haskell program almost always includes more than one data type definition.
 
 
-
 ==== Parametric Polymorphism and Type-Inference
 
 We have seen that Haskell supports definitions with a type-signature or without.
@@ -384,7 +383,6 @@ here are two definitions with pattern matching on tuples and integers:
 > first :: (a, b) -> a
 > first (x, y) = x
 
-
 > isZero :: Int -> Bool
 > isZero 0 = True
 > isZero n = False
@@ -400,7 +398,6 @@ INCLUDE:GEOM2
 > area (Circle x y r)      = pi * r ^ 2
 > area (Rectangle t l r b) = (b - t) * (r - l)
 > area (Composite cs)      = sum [ area c | c <- cs ]
-
 
 ==== Recursion
 
@@ -439,11 +436,9 @@ Question 6: The Fibonacci sequence is:
 
 > 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
 
-
 write a function:
 
 > fib :: Int -> Int
-
 
 that given a number returns the corresponding number in the sequence.
 (If you don't know Fibonacci numbers you may enjoy finding the recurrence pattern;
@@ -453,23 +448,19 @@ Question 7: Write a function:
 
 > mapList :: (a -> b) -> [a] -> [b]
 
-
 that applies the function of type |a -> b| to every element of a list. For example:
 
 > Prelude> mapList absolute [4, -5, 9, -7]
 > [4, 5, 9, 7]
-
 
 Question 7: Write a function that given a list of characters returns a list with
 the corresponding ASCII number of the character. Note that in Haskell, the function |ord|:
 
 > ord :: Char -> Int
 
-
 gives you the ASCII number of a character. To use it add the following just after the module declaration:
 
 > import Data.Char
-
 
 to import the character handling library.
 
@@ -478,36 +469,30 @@ with only the elements that satisfy the predicate.
 
 > filterList :: (a -> Bool) -> [a] -> [a]
 
-
 For example, the following filters all the even numbers in a list (even is a built-in Haskell function):
 
 > Prelude> filterList even [1, 2, 3, 4, 5]
 > [2, 4]
 
-
 Question 9: Haskell has a function |zip|:
 
 > zip :: [a] -> [b] -> [(a, b)]
-
 
 that given two lists pairs together the elements in the same positions. For example:
 
 > Prelude> zip [1, 2, 3] ['a', 'b', 'c']
 > [(1, 'a'), (2, 'b'), (3, 'c')]
 
-
 For lists of different lengths it truncates the larger list:
 
 > Prelude> zip [1, 2, 3] ['a', 'b', 'c', 'd']
 > [(1, 'a'), (2, 'b'), (3, 'c')]
-
 
 Write a definition |zipList| that implements the |zip| function.
 
 Question 10: Define a function |zipSum|:
 
 > zipSum :: [Int] -> [Int] -> [Int]
-
 
 that sums the elements of two lists at the same positions.
 Suggestion: You can define this function recursively, but a simpler solution can be found by
@@ -618,7 +603,6 @@ INCLUDE:Abst3
 >          | Multiply   Exp Exp
 >          | Divide     Exp Exp
 
-
 This data type defines five representational variants, one for numbers,
 and four for the the binary operators of addition, subtraction, multiplication,
 and division. The symbols |Number|, |Add|, |Subtract| etc are the *constructors*
@@ -636,7 +620,6 @@ As an example of abstract syntax, consider this expression:
 INCLUDE:Abst1
 > -- 3 - -2 - -7
 > t1 = Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
-
 
 NOTE: It is not legal to write |Subtract 3 (-2)| because |3| and |-2|
 are of type |Int| not |Exp|. Also, Haskell requires parentheses
@@ -673,7 +656,6 @@ token
     individual characters, or groups of characters. Token are often
     classified into kinds, for example *integers*, *strings*, *identifiers*.
 
-
 identifier
   ~ An identifier is a string of characters that represents a name. Identifiers usually
     begin with a alphabetic character, then continue with one or more
@@ -698,7 +680,6 @@ INCLUDE:BasicToken
 > data Token = Digits Int
 >            | Symbol String
 
-
 A |Token| is either an integer token or a symbol token with a string.
 For example, the tokens from the string |"3 + 81 * 2"| are:
 
@@ -707,7 +688,6 @@ For example, the tokens from the string |"3 + 81 * 2"| are:
 > Digits 81
 > Symbol "*"
 > Digits 2
-
 
 The Lexer.hs file contains the code for a simple
 lexer that creates tokens in this form. It defines a function |lexer|
@@ -752,7 +732,6 @@ Here is a simple grammar:
 > Verb : 'runs' | 'talks'
 > Preposition : 'to' | 'with'
 
-
 The names |Sentence|, |PrepositionalPhase|, |Noun|, |Verb|, and |Preposition| are
 the syntactic categories of this grammar.
 Each line of the grammar is a *rule* that specifies a syntactic category,
@@ -779,12 +758,10 @@ Some sentences in the language defined by this grammar are:
 > Dick runs to Jane with Spot
 > Spot runs to Jane to Dick to Jane to Dick
 
-
 There are also some sentences that don't make much sense:
 
 > Dick talks with Dick
 > Jane runs to Jane to Jane to Jane to Jane
-
 
 These sentences are *syntactically correct* because they
 follow the pattern specified by the grammar, but that doesn't
@@ -826,7 +803,6 @@ in the grammar:
 >     | Exp '*' Exp   { Multiply $1 $3 }
 >     | Exp '/' Exp   { Divide $1 $3 }
 >     | '(' Exp ')'   { $2 }
-
 
 This grammar is similar to the one given above for English, but each
 rule includes an *action* enclosed in curly braces |{ ... }|. The
@@ -877,7 +853,6 @@ two different abstract syntax trees [TODO: define "parse"]:
 > Subtract (Number 1) (Subtract (Number 2) (Number 3))
 > Subtract (Subtract (Number 1) (Number 2)) (Number 3)
 
-
 TODO: show the parse trees? define "parse tree"
 
 The same abstract syntax can be generated by parsing |1-(2-3)| and |(1-2)-3|.
@@ -893,7 +868,6 @@ Similarly, the expression |1-2*3| can be parsed in two ways:
 
 > Subtract (Number 1) (Multiply (Number 2) (Number 2))
 > Multiply (Subtract (Number 1) (Number 2)) (Number 2)
-
 
 The same abstract syntax can be generated by parsing |1-(2*3)| and |(1-2)*3|.
 Again we know that the first version is the correct one, because
@@ -927,7 +901,6 @@ INCLUDE:SimpleGrammar
 >         | '-' digits     { Number (- $2) }
 >         | '(' Exp ')'   { $2 }
 
-
 This grammar works by splitting the |Exp| non-terminal of the original
 grammar into multiple non-terminals, each of which represents a precedence level.
 The low-precedence operators |+| and |-| are grouped into a |Term| non-terminal,
@@ -936,7 +909,6 @@ allows multiplication and division, but does not allow addition. A |Primary|
 non-terminal allows primitive constructs, including a parenthesized expression,
 which allows addition and subtraction to be used under multiplication.
 
-
 ==== Parser Generators
 
 The grammar notation used above is also a language. It is a language
@@ -944,7 +916,6 @@ of grammars.
 
 How to create simple grammars using the
 [Happy Parser Generator](http://www.haskell.org/happy/).
-
 
 == Evaluating Arithmetic Expressions
 
@@ -962,7 +933,6 @@ INCLUDE:Eval3
 > evaluate (Multiply a b)  = evaluate a * evaluate b
 > evaluate (Divide a b)    = evaluate a `div` evaluate b
 
-
 In Haskell, the two-argument function |div| can be used as an
 infix operator by surrounding it in back-quotes.
 Here is a main program that tests evaluation:
@@ -976,7 +946,6 @@ INCLUDE:Eval5
 >   putStr "  "
 >   print (evaluate t1)
 
-
 The output is
 
 INCLUDE:Eval7
@@ -984,7 +953,6 @@ INCLUDE:Eval7
 >   Subtract (Subtract (Number 3) (Number (-2))) (Number (-7))
 > Produces the following result:
 >   12
-
 
 TODO: Explain Show
 
@@ -997,7 +965,6 @@ is attempting to divide by zero. These examples are given in the
 
 INCLUDE:Erro3
 > testDBZ = evaluate (parseExp "8 / 0")
-
 
 In this case, the |div| operator in
 Haskell throws a low-level error, which terminates execution of
@@ -1045,7 +1012,6 @@ of the two languages are we talking about what we mean is the object
 language. In other words, when referring to the expression |2 + 3| the
 default meaning is the object language expression |2 + 3|.
 
-
 = Variables
 
 Arithmetic expressions often contain *variables* in addition
@@ -1075,7 +1041,6 @@ INCLUDE:Vari99
 >           | Divide    Exp Exp
 >           | Variable  String        -- added
 >    deriving (Eq, Show)
-
 
 An association of a variable $x$ with a value $v$ is called a *binding*,
 which can be written $x \mapsto v$.
@@ -1160,7 +1125,6 @@ INCLUDE:Subs9
 >                           then Number val
 >                           else Variable name
 
-
 The |subst| helper function is introduced avoid repeating the |var| and |val|
 parameters for each of the specific cases of substitution. The |var| and |val|
 parameters are the same for all substitutions within an expression.
@@ -1192,7 +1156,6 @@ INCLUDE:Subs13
 >  ==> Add (Add (Number 5) (Multiply (Number 2) (Variable "y"))) (Variable "z")
 >
 
-
 Note that the test case prints the concrete syntax of the expression in square brackets,
 as |[x + 2]|. The print format
 represents the more longwinded abstract syntax representation of the
@@ -1201,7 +1164,6 @@ corresponds to the following piece of real Haskell code:
 
 > substitute1 ("x", 5) (Add (Variable "x") (Number 2))
 >  ==> [5 + 2]
-
 
 However it will be useful to us to use the pseudo-code |[x+2]| instead, since it
 can be quite difficult to read abstract syntax directly.
@@ -1227,12 +1189,10 @@ would be
 INCLUDE:Mult4
 > e1 = [ ("x", 3), ("y", -2) ]
 
-
 The corresponding type is
 
 INCLUDE:Mult6
 > type Env = [(String, Int)]
-
 
 An important operation on environments is *variable lookup*. Variable lookup
 is an operation that given a variable name and an environment looks up that
@@ -1259,7 +1219,6 @@ is as follows:
 
 > lookup :: Eq a => a -> [(a, b)] -> Maybe b
 
-
 This type is more general than what we need for variable lookup, but we can see
 that if |a| is instantiated to |String| and |b| is instantiated to |Int|,
 then the type is almost what we expect: |String -> Env -> Maybe Int|. The return
@@ -1267,7 +1226,6 @@ type of lookup (|Maybe b|) deserves a little bit more of explanation. The type |
 is part of the Haskell libraries and it is widely used. The definition is as follows:
 
 > data Maybe a = Nothing | Just a
-
 
 The basic intuition is that |Maybe| is a container that may either
 contain a value of type |a| (|Just a|) or no value at all (|Nothing|).
@@ -1294,7 +1252,6 @@ INCLUDE:Mult8
 >       Just val -> Number val
 >       Nothing  -> Variable name
 
-
 The last case is the only one that is different from the previous
 definition of substitution for a single binding. It uses the
 |lookup| function to search the list of bindings to find
@@ -1307,7 +1264,6 @@ values, but that unknown variables are left intact:
 
 INCLUDE:Mult4
 > e1 = [ ("x", 3), ("y", -2) ]
-
 
 INCLUDE:Mult11
 > substitute e1 Add (Variable "x") (Number 2)
@@ -1326,12 +1282,10 @@ INCLUDE:Mult11
 >  ==> Add (Add (Number 3) (Multiply (Number 2) (Number (-1)))) (Variable "z")
 >
 
-
 Note that it is also possible to substitute multiple variables one at a time:
 
 INCLUDE:Mult14
 > substitute1R env exp = foldr substitute1 exp env
-
 
 The |foldr fun init list| function applies a given function to each item
 in a list, starting with a given initial value.
@@ -1362,13 +1316,11 @@ Haskell defines local variables with a |let| expression:
 INCLUDE:Loca8
 > test1 = let x = 3 in 2*x + 5
 
-
 In Haskell |let| is an expression, because it can be
 used inside other expressions:
 
 INCLUDE:Loca10
 > test2 = 2 * (let x = 3 in x + 5)
-
 
 Haskell's |where| allows a declarative style (vs |let|'s expressive style) that
 states an algorithm in a manner that that assumes equations shall be eventually
@@ -1380,7 +1332,6 @@ two, but most uses are relatively straightforward:
 >     predicate = odd n
 >     t = True
 >     f = False
-
 
 It is also possible to define multiple local variables in Java or C:
 
@@ -1395,12 +1346,10 @@ and in Haskell
 INCLUDE:Loca15
 > test3 = let x = 3 in let y = x*2 in x + y
 
-
 which is equivalent to
 
 INCLUDE:Loca17
 > test4 = let x = 3 in (let y = x*2 in x + y)
-
 
 Since the language we are defining is a subset of JavaScript, we will use its syntax.
 In general a *variable declaration* expression has the following concrete syntax:
@@ -1416,7 +1365,6 @@ another case to the definition of expressions:
 
 > data Exp = ...
 >          | Declare String Exp Exp
-
 
 where the string is the variable name, the first |Exp| is the *bound expression*
 and the second |Exp| is the *body*.
@@ -1459,7 +1407,6 @@ Because *x* is redefined, the *body* is a hole in the scope of *x*.
 >                   then body
 >                   else subst body
 
-
 In the |Declare| case for |subst|, the variable is always substituted
 into the bound expression |e|. But the substitution is only performed
 on the body |b| if the variable |var| being substituted is *not* the
@@ -1478,7 +1425,6 @@ substitution is evaluated.
 INCLUDE:Eval28
 > evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
 
-
  There is no rule for evaluating a variable because all variables
  are substituted away before evaluation begins. 
 
@@ -1494,7 +1440,6 @@ expressions all contain undefined variables:
 > x + 3
 > var x = 2; x * y
 > (var x = 3; x) * x
-
 
 What will happen when these expressions are evaluated? The definition of
 |evaluate| does not include a case for evaluating a variable. This is because all variables
@@ -1541,7 +1486,6 @@ INCLUDE:Summ3
 >          | Variable   String
 >          | Declare    String Exp Exp
 
-
 INCLUDE:Summ19
 > substitute1 (var, val) exp = subst exp where
 >   subst (Number i)      = Number i
@@ -1557,7 +1501,6 @@ INCLUDE:Summ19
 >                   then body
 >                   else subst body
 
-
 INCLUDE:Summ4
 > evaluate :: Exp -> Int
 > evaluate (Number i)       = i
@@ -1566,7 +1509,6 @@ INCLUDE:Summ4
 > evaluate (Multiply a b)   = evaluate a * evaluate b
 > evaluate (Divide a b)     = evaluate a `div` evaluate b
 > evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
-
 
 == Evaluation using Environments {#BasicEvalEnv}
 
@@ -1585,7 +1527,6 @@ three times:
 > var y = x+1;
 > var z = y+2;
 > x*y*z
-
 
 The steps are as follows: 
 
@@ -1624,7 +1565,6 @@ INCLUDE:Eval38
 > evaluate (Variable x) env    = fromJust (lookup x env)
 > evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
-
 
 In most cases the environment argument is simply passed unchanged to
 all recursive calls to |evaluate|.
@@ -1680,7 +1620,6 @@ expression:
 > var x = x*x;
 > x+x
 
-
 Environment                                         Evaluation
 -------------------------------------------         -----------------------------------
 $\emptyset$                                         |var x = 9; var x = x * x; x + x|
@@ -1706,7 +1645,6 @@ creates to extensions of the base environment
 > var x = 3;
 > (var y = 3*x; 2+y) + (var z = 7*x; 1+z)
 
-
 The first variable declaration creates an environment |x| $\mapsto$ 3 with a
 single binding. The next two variable declarations create environments
 
@@ -1721,7 +1659,6 @@ The code for this section
 is given in the
 [Declare zip](./packages/Declare.zip) file.
 
-
 == More Kinds of Data: Booleans and Conditionals {#MoreData}
 
 In addition to arithmetic computations, it is useful for expressions
@@ -1735,7 +1672,6 @@ INCLUDE:More3
 > data Value  =  IntV  Int
 >             |  BoolV Bool
 >  deriving (Show, Eq)
-
 
 Some example values are |BoolV True| and
 |IntV 3|. We will define additional kinds of values, including functions and lists, later.
@@ -1779,7 +1715,6 @@ INCLUDE:UnBinOps
 > data UnaryOp = Neg | Not
 >   deriving (Show, Eq)
 
-
 INCLUDE:More99
 > data Exp  = Literal   Value
 >           | Unary     UnaryOp Exp
@@ -1788,13 +1723,11 @@ INCLUDE:More99
 >           | Variable  String
 >           | Declare   String Exp Exp
 
-
 Evaluation is then defined by cases as before. Two helper functions, |binary| and |unary| (defined below),
 perform the actual computations for binary and unary operations, respectively.
 
 INCLUDE:EnvDef
 > type Env = [(String, Value)]
-
 
 INCLUDE:More12
 > -- Evaluate an expression in an environment
@@ -1806,7 +1739,6 @@ INCLUDE:More12
 > evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
 
-
 The conditional expression first evaluates the condition, forces it to be a boolean,
 and then evaluates either the *then* or *else* expression.
 
@@ -1815,7 +1747,6 @@ INCLUDE:More14
 >   let BoolV test = evaluate a env in
 >     if test then evaluate b env
 >             else evaluate c env
-
 
 The binary and unary helper functions perform case analysis on the operator
 and the arguments to compute the result of basic operations.
@@ -1835,7 +1766,6 @@ INCLUDE:More16
 > binary GE  (IntV a)  (IntV b)  = BoolV (a >= b)
 > binary GT  (IntV a)  (IntV b)  = BoolV (a > b)
 > binary EQ  a         b         = BoolV (a == b)
-
 
 TODO: talk about strictness!
 
@@ -1864,7 +1794,6 @@ INCLUDE:More19
 >
 > # IntV 19
 
-
 In addition, new expressions can be defined to test conditional expressions:
 
 INCLUDE:More98
@@ -1876,7 +1805,6 @@ INCLUDE:More98
 >
 > # IntV (-3)
 >
-
 
 === Type Errors
 
@@ -1917,7 +1845,6 @@ INCLUDE:Type6
 > # Error: Value.hs:(16,1)-(17,31): Non-exhaustive patterns in function unary
 >
 
-
 Running these tests produce error messages, but the errors are not
 very descriptive of the problem that actually took place.
 
@@ -1933,20 +1860,17 @@ expression. For example,
 > var x = 3, y = 9;
 > x * y
 
-
 The abstract syntax of the |Exp| language with multiple bindings can be expressed
 by changing the |Declare| rule to support a list of pairs of strings and expressions:
 
 > data Exp = ...
 >          | Declare [(String, Exp)] Exp
 
-
 If a |Declare| expression has duplicate identifiers, your program must signal an error.
 It is legal for a nested |Declare| to reuse the same name. Two examples:
 
 > var x = 3, x = x + 2; x*2       -- illegal
 > var x = 3; var x = x + 2; x*2   -- legal
-
 
 **The meaning of a |var| declaration is that all of the expressions associated with variables
 are evaluated first, in the environment before the |var| is entered. Then all the variables are
@@ -1959,7 +1883,6 @@ Note that a multiple declare is not the same as multiple nested declares. For ex
 > var a = 3; var b = 8; var a = b, b = a; a + b       -- evaluates to 11
 > var a = 3; var b = 8; var a = b; var b = a; a + b   -- evaluates to 16
 
-
 You must write and include test cases that amply exercise all of the code you've written.
 
 You can assume that the inputs are valid programs and that your program may
@@ -1969,11 +1892,9 @@ Here is an example test case:
 
 > var a = 2, b = 7; (var m = 5 * a, n = b - 1; a * n + b / m) + a
 
-
 The previous version of this example contained an unbound use of the variable |m|:
 
 > var a = 2, b = 7; (var m = 5 * a, n = m - 1; a * n + b / m) + a
-
 
 The code that you must modify
 is given in the
@@ -2048,7 +1969,6 @@ without return statements:
 > main =
 >   print (power(3, 4))
 
-
 These examples provides an outline for the basic concrete syntax of a function:
 
 |function| *name*|(|*parameter*, ..., *parameter*|)| { *body-expression* }
@@ -2077,7 +1997,6 @@ INCLUDE:Top15
 > type FunEnv = [(String, Function)]
 > data Function = Function [String] Exp
 
-
 A list of function definitions is a *function environment*.
 This list represents a list of bindings of function names
 to function definitions.
@@ -2088,14 +2007,12 @@ main expression:
 INCLUDE:Top18
 > data Program = Program FunEnv Exp
 
-
 Any of the expressions can contain calls to the top-level
 functions. A call has a function name and a list
 of actual argument expressions:
 
 > data Exp = ...
 >          | Call      String [Exp]
-
 
 As an example, here is an encoding of the example program:
 
@@ -2111,7 +2028,6 @@ INCLUDE:Top22
 > =>> IntV 81
 >
 
-
 === Evaluating Top-Level Functions {#EvalTopLevel}
 
 A new function, |execute|, runs a program. It does so
@@ -2122,13 +2038,11 @@ INCLUDE:Eval41
 > execute :: Program -> String
 > execute (Program funEnv main) = show (evaluate main [] funEnv)
 
-
 The evaluator is extended to take a function environment |funEnv| as
 a additional argument. 
 
 INCLUDE:Eval59
 > evaluate :: Exp -> Env -> FunEnv -> Value
-
 
 All the cases of evaluation are the same as before, except for the
 new case for calling a function:
@@ -2137,7 +2051,6 @@ INCLUDE:Eval31
 > evaluate (Call fun args) env funEnv   = evaluate body newEnv funEnv
 >   where Function xs body = fromJust (lookup fun funEnv)
 >         newEnv = zip xs [evaluate a env funEnv | a <- args]
-
 
 Evaluation of a call expression performs the following steps: 
 
@@ -2166,7 +2079,6 @@ in the abstract syntax:
 > data Exp = ...
 >      | Variable  String         -- variable name
 >      | Call      String [Exp]   -- function name
-
 
 A variable name is tagged as a |Variable| and a function name
 appears in a |Call| expression. 
@@ -2267,7 +2179,6 @@ INCLUDE:Summ12
 >   where Function xs body = fromJust (lookup fun funEnv)
 >         newEnv = zip xs [evaluate a env funEnv | a <- args]
 
-
 ==== Exercise 3.1: Stack-based evaluation
 
 Modify the evaluator for top-level functions to use a stack with a list of
@@ -2300,7 +2211,6 @@ Consider the following function definition:
 
 INCLUDE:Firs4
 > f(x) = x * 2
-
 
 The intent here is to define |f|, but it doesn't really
 say what |f| is, it only says what |f| does when applied to
@@ -2389,7 +2299,6 @@ INCLUDE:Usin3
 > f'2 x  = x * 2
 > f'3 = \x -> x * 2
 
-
 The last example uses Haskell's notation for writing a lambda expression.
 Because $\lambda$ is not a standard character on most
 keyboards (and it is not part of ASCII), Haskell uses
@@ -2455,7 +2364,6 @@ definition.
 > -- version A
 > f(3)
 
-
 In this form, the function |f| is *applied* to the argument |3|.
 The expression |f(3)| is called a function *application*.
 In this book I use "function call" and "function application"
@@ -2463,7 +2371,6 @@ interchangeably.
 
 > -- version B
 > (\x -> x * 2)(3)
-
 
 The A and B versions of this expression are equivalent. The latter is a
 juxtaposition of a function expression |\x -> x * 2| with its argument, |3|.
@@ -2502,13 +2409,11 @@ Composition can be defined in Haskell as:
 INCLUDE:Func17
 > compose f g = \x -> f(g x)
 
-
 The two arguments are both functions, and the result of composition is
 also a function. The type of |compose| is 
 
 INCLUDE:Func5
 > compose :: (b -> c) -> (a -> b) -> (a -> c)
-
 
 As an example of function composition, consider two functions that
 operate on numbers: 
@@ -2517,20 +2422,17 @@ INCLUDE:Func20
 > square n = n * n
 > mulPi m = pi * m
 
-
 Now using composition we can define a function for computing the area of a circle,
 given the radius: 
 
 INCLUDE:Func22
 > areaR = compose mulPi square
 
-
 To compute the area given the diameter, we can compose this function with a function that
 divides by two: 
 
 INCLUDE:Func24
 > areaD = compose areaR (\x -> x / 2)
-
 
 === Mapping and List Comprehensions {#Map}
 
@@ -2545,12 +2447,10 @@ INCLUDE:Mapp4
 > testM1 = map negate [1, 3, -7, 0, 12]
 > -- returns [-1, -3, 7, 0, -12]
 
-
 The |map| function takes a function as an argument. You can see that
 |map| takes a function argument by looking at its type:
 
 > map :: (a -> b) -> [a] -> [b]
-
 
 The first argument |a -> b| is a function from |a| to |b| where
 |a| and |b| are arbitrary types.
@@ -2562,7 +2462,6 @@ a nice name to the items of the list. Here is an equivalent example using compre
 INCLUDE:Mapp9
 > testM2 = [ negate n | n <- [1, 3, -7, 0, 12] ]
 > -- returns [-1, -3, 7, 0, -12]
-
 
 A function that takes another function as an input is called a *higher-order function*.
 Higher-order functions are quite useful, but what I find even more interesting
@@ -2589,7 +2488,6 @@ INCLUDE:Repr3
 > type EnvL = [(String, Value)]
 > envL1 = [("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
 
-
 Since environments always have a finite number of
 bindings, it is more precise to say that an environment is a
 *partial function* from names to values. A partial function is one
@@ -2602,13 +2500,11 @@ same environment as a function:
 INCLUDE:Repl801
 > type EnvF = String -> Maybe Value
 
-
 INCLUDE:Repr5
 > envF1 "x"    = Just (IntV 3)
 > envF1 "y"    = Just (IntV 4)
 > envF1 "size" = Just (IntV 10)
 > envF1 _      = Nothing
-
 
 Looking up the value of a variable in either of these environments
 is quite different:
@@ -2616,7 +2512,6 @@ is quite different:
 INCLUDE:Repr7
 > x1 = lookup "x" envL1
 > x2 = envF1 "x"
-
 
 The |lookup| function searches a list environment |envL1| for an appropriate binding.
 An functional environment |envF1| is applied to the name to get the result.
@@ -2636,7 +2531,6 @@ INCLUDE:Repr11
 > bindL :: String -> Value -> EnvL -> EnvL
 > bindL var val env = (var, val) : env
 
-
 Since |lookup| searches lists from the front, this new binding can shadow existing bindings.
 
 INCLUDE:Repr13
@@ -2645,7 +2539,6 @@ INCLUDE:Repr13
 > envL3 = bindL "x" (IntV 9) envL1
 >    -- [("x", IntV 9), ("x", IntV 3), ("y", IntV 4), ("size", IntV 10)]
 
-
 To extend an environment expressed as a partial function, we need to
 write a *higher-order* function. A higher-order function is one that
 takes a function as input or returns a function as an result. The
@@ -2653,12 +2546,10 @@ function |bindF| takes an |EnvF| as an input and returns a new |EnvF|.
 
 > bindF :: String -> Value -> EnvF -> EnvF
 
-
 Expanding the definition of |EnvF| makes the higher-order nature of |bindF| clear:
 
 > bindF :: String -> Value -> 
               (String -> Maybe Int) -> (String -> Maybe Int)
-
 
 The definition of |bindF| is quite different from |bindL|:
 
@@ -2666,7 +2557,6 @@ INCLUDE:Repr19
 > bindF var val env = \testVar -> if testVar == var
 >                                 then Just val
 >                                 else env testVar
-
 
 Understanding how this function works takes a little time. The first
 thing to keep in mind is that |env| is a function. It is a function
@@ -2697,7 +2587,6 @@ INCLUDE:Repr23
 > -- version A
 > envF2 = bindF "z" (IntV 5) envF1
 
-
 Let's execute this program manually. The call to |bindF| has three
 arguments, creating these bindings:
 |var| $\mapsto$ |"z"|, |val| $\mapsto$ |5|, |env| $\mapsto$ |envF1|.
@@ -2709,7 +2598,6 @@ INCLUDE:Repr25
 >                     then Just (IntV 5)
 >                     else envF1 testVar
 
-
 This makes more sense! It says that |envF2| is a function that
 takes a variable name as an argument. It first tests if the
 variable is named |z| and if so it returns 5. Otherwise it returns
@@ -2720,7 +2608,6 @@ INCLUDE:Repr27
 > -- version C
 > envF2'2 "z" = Just (IntV 5)
 > envF2'2 testVar = envF1 testVar
-
 
 These two versions are the same because of the way Haskell deals
 with functions defined by cases: it tries the first case (argument == |"z"|),
@@ -2735,11 +2622,9 @@ INCLUDE:Repr30
 > emptyEnvL :: EnvL
 > emptyEnvL = []
 
-
 INCLUDE:Repr31
 > emptyEnvF :: EnvF
 > emptyEnvF = \var -> Nothing
-
 
 The empty function environment |emptyEnvF| is interesting: it
 maps every variable name to |Nothing|.
@@ -2761,7 +2646,6 @@ INCLUDE:Repr34
 > evaluateF (Variable x) env     = fromJust (env x)        -- changed
 > evaluateF (Declare x exp body) env = evaluateF body newEnv
 >   where newEnv = bindF x (evaluateF exp env) env             -- changed
-
 
 The result looks better than the previous version, because
 it does not have spurious references to list functions |lookup|
@@ -2786,7 +2670,6 @@ simple Haskell function that appears to have two arguments:
 INCLUDE:Mult29
 > add a b = b + a
 
-
 The [Rule of Function Arguments](#LambdaDefinition) for Haskell says that arguments
 on the left of a definition are short-hand for lambdas.
 The |b| argument can be moved to the right hand side to
@@ -2795,19 +2678,16 @@ get an equivalent definition:
 INCLUDE:Mult31
 > add'1 a = \b -> b + a
 
-
 Now the |a| argument can also be moved. We have now
 "solved" for |add|: 
 
 INCLUDE:Mult33
 > add'2 = \a -> \b -> b + a
 
-
 It's useful to add parentheses to make the grouping explicit: 
 
 INCLUDE:Mult35
 > add'3 = \a -> (\b -> b + a)
-
 
 What this means is that |add| is a function of one argument |a|
 whose return value is the function |\b -> b + a|. The function
@@ -2827,7 +2707,6 @@ INCLUDE:Mult12
 > inc = add 1      -- \b. b + 1
 > dec = add (-1)   -- \b. b + (-1)
 
-
 These two functions each take a single argument.
 The first adds one to its argument. The second subtracts one.
 Here are two examples that use the resulting functions: 
@@ -2836,13 +2715,11 @@ INCLUDE:Mult39
 > eleven = inc 10
 > nine   = dec 10
 
-
 To see how the definition of |inc| works, we can analyze the function call
 |add 1| in more detail. Replacing |add| by its definition yields: 
 
 INCLUDE:Mult41
 > inc'1 = (\a -> (\b -> b + a)) 1
-
 
 The Rule of Function Invocation says that in this situation, |a| is
 substituted for |1| in the body |\b -> b + a| to yield:
@@ -2850,12 +2727,10 @@ substituted for |1| in the body |\b -> b + a| to yield:
 INCLUDE:Mult18
 > inc'2 = \b -> b + 1
 
-
 Which is the same (by the [Rule of Function Arguments](#LambdaDefinition)) as:
 
 INCLUDE:Mult20
 > inc'3 b = b + 1
-
 
 One way to look at what is going on here is that the two arguments
 are split into stages. Normally both arguments are supplied at the same
@@ -2866,7 +2741,6 @@ can be used many times.
 
 INCLUDE:Mult22
 > testinc = inc 5 + inc 10 + dec 20 + dec 100
-
 
 (remember that this means |(inc 5) + (inc 10) + (dec 20) + (dec 100)|)
 
@@ -2884,7 +2758,6 @@ INCLUDE:Mult25
 >                             then Just val
 >                             else env testVar
 
-
 The ability to selectively stage functions suggests a design principle
 for Haskell that is not found in most other languages: *place arguments
 that change most frequently at the end of the argument list*. Conversely,
@@ -2898,12 +2771,10 @@ case of a tuple is a *pair*. For example, here are two pairs:
 > (3, 5)
 > ("test", 99)
 
-
 A Haskell function that takes a tuple as an argument resembles functions in most
 other programming languages:
 
 > max(a, b) = if a > b then a else b
-
 
 But in Haskell this is really just a function taking one argument, which is pattern
 matched to be a tuple, in this case a pair that binds |a| to the first component and |b|
@@ -2913,16 +2784,13 @@ that takes the second argument,
 
 > max a b = if a > b then a else b
 
-
 which is equivalent to
 
 > max = \a -> \b -> if a > b then a else b
 
-
 Note that multiple functions can be represented in a lambda expression as well:
 
 > max = \a b -> if a > b then a else b   -- equivalent to above definition
-
 
 currying
   ~ The process of converting from a function taking a tuple to a chain of functions
@@ -2932,13 +2800,11 @@ A curry function is a higher-order function that performs this operation:
 
 > curry2 f = \a b -> f(a, b)
 
-
 The function |curry2| converts a function |f| that takes a pair to a new function that
 takes one argument and returns a function that takes the second argument.
 A function that takes a 3-tuple and converts it to curryied form can also be defined:
 
 > curry3 f = \a b c -> f(a, b, c)
-
 
 In Haskell it is not possible to take a arbitrary length tuple and curry it.
 It is possible to write |uncurry| functions that perform that opposite transformation,
@@ -2947,12 +2813,10 @@ from a function with multiple arguments to a function with a single tuple argume
 > uncurry2 f = \(a, b)    -> f a b
 > uncurry3 f = \(a, b, c) -> f a b c
 
-
 uncurrying
   ~ The process of converting from a chain of functions
     that take one argument at a time into a function that takes a single tuple argument
     is called *uncurrying*.
-
 
 
 === Church Encodings
@@ -2972,7 +2836,6 @@ INCLUDE:Bool3
 > true  x y = x
 > false x y = y
 
-
 The |true| function returns its first argument. The |false| function
 returns its second argument. For example |true 0 1| returns |0| while
 |false "yes" "no"| returns |"no"|.  One way to write the type
@@ -2983,7 +2846,6 @@ INCLUDE:Bool5
 > true :: BooleanF
 > false :: BooleanF
 
-
 Things get more interesting when performing operations on booleans.
 Negation of a boolean |b| returns the result of applying |b| to |false|
 and |true|. If |b| is true then it will return the first argument, |false|.
@@ -2993,7 +2855,6 @@ INCLUDE:Bool7
 > notF :: BooleanF -> BooleanF
 > notF b = b false true
 
-
 The unary function |not| is a higher-order function: it takes a
 functional boolean as an input and returns a functional boolean as
 a result. We can also define binary operations on booleans:
@@ -3002,7 +2863,6 @@ INCLUDE:Bool9
 > orF :: BooleanF -> BooleanF -> BooleanF
 > orF a b  = a true b
 
-
 The behavior of "or" is to return true if |a| is true, and return |b|
 if |a| is false. It works by calling |a| as a function, passing
 |true| and |b| as arguments.
@@ -3010,7 +2870,6 @@ if |a| is false. It works by calling |a| as a function, passing
 INCLUDE:Bool11
 > andF :: BooleanF -> BooleanF -> BooleanF
 > andF a b = a b false
-
 
 You get the idea. Calling |a| with |b| and false as arguments will
 return |b| if |a| is true and false otherwise.
@@ -3021,12 +2880,10 @@ completely unnecessary. For example,
 INCLUDE:Bool14
 > testb1 = if not True then 1 else 2
 
-
 is replaced by
 
 INCLUDE:Bool16
 > testb2 = (notF true) 1 2
-
 
 This code is not necessarily more readable, but it is concise.
 In effect a Church boolean *is* an |if| expression: it is a
@@ -3073,10 +2930,8 @@ INCLUDE:Natu11
 > two = \f -> \x -> f (f x)
 > three = \f -> \x -> f (f (f x))
 
-
 INCLUDE:NatuSucc
 > succ = \n -> (\f -> \x -> f (n f x))
-
 
 Note that |f| and |x| have no restrictions. To demonstrate Church numerals, let
 us evaluate |three| by setting |f| to the successor function |(+1)| and |x|
@@ -3084,19 +2939,16 @@ to |0|.
 
 > three (+1) 0   ==>   3
 
-
 To further demonstrate the flexibility, suppose we want our Church numerals to
 start with |[]| as the base value, and our successor function to append
 the character |'A'| to the beginning of the list.
 
 > three ('A':) []    ===>    "AAA"
 
-
 In Haskell we can write the generic type for Church numerals as
 
 INCLUDE:Natu17
 > type ChurchN = forall a. (a -> a) -> a -> a
-
 
 If we are given a Haskell |Integer|, we can represent the equivalent Church
 numeral with the following Haskell definition.
@@ -3106,7 +2958,6 @@ INCLUDE:Natu19
 > church 0 = \f -> \x -> x
 > church n = \f -> \x -> f (church (n-1) f x)
 
-
 To retrieve the |Integer| value of a Church numeral, we can evaluate
 the lambda using the usual successor and base value.
 
@@ -3114,7 +2965,6 @@ INCLUDE:Natu21
 > unchurch :: ChurchN -> Integer
 > unchurch n = n (+1) 0
 > -- 5 == (unchurch (church 5)) -- this evaluates to True
-
 
 We define addition and multiplication in Haskell by using the above
 arithmetic relations.
@@ -3125,14 +2975,12 @@ INCLUDE:Natu23
 > mul :: ChurchN -> ChurchN -> ChurchN
 > mul n m = \f -> n (m f)
 
-
 We can use these functions to produce simple arithmetic equations.
 
 > x = church 10
 > y = church 5
 > z = church 2
 > a = plus x (mul y z) -- is equivalent to church 20
-
 
 === Relationship between Declarations and Functions
 
@@ -3202,7 +3050,6 @@ allows functions appears a literal values in a program:
 >            | Function String Exp  -- new
 >   deriving Eq
 
-
 The two components of a function expression |Function| are
 the *bound variable* |String| and the *body expression* |Exp|.
 This new kind of value for functions looks a little strange.
@@ -3232,7 +3079,6 @@ INCLUDE:A32
 >            | Function String Exp  -- new
 >   deriving (Eq, Show)
 
-
 To clarify the effect of this change, consider these two versions
 of a simple program, written using top-level functions or
 first-class functions:
@@ -3249,11 +3095,9 @@ The explicit abstract syntax for the call in example (A) is:
 
 >  Call "f" (Literal (IntV 10))
 
-
 The explicit abstract syntax for the call in example (B) is:
 
 >  Call (Variable "f") (Literal (IntV 10))
-
 
 Note that the function in the |Call| is string |"f"|
 in the first version, but is an expression |Variable "f"|
@@ -3272,12 +3116,10 @@ depending on a condition. The following example calls either
 
 > (if a > b then f else g)(4)
 
-
 This is similar to calling a function
 on a conditional argument:
 
 > f(if a > b then 4 else 7)
-
 
 Which is equivalent to the perhaps more familiar form:
 
@@ -3286,13 +3128,11 @@ Which is equivalent to the perhaps more familiar form:
 > else
 >   f(7)
 
-
 Another example of not using a variable to name a function is
 the use of *function literals*. The following example applies a
 function literal that squares a number to the argument 7.
 
 > (function(x) { x * x })(7)
-
 
 Lets now define the (incorrect) interpreter.
 The first few cases for evaluation are exactly the same
@@ -3303,7 +3143,6 @@ INCLUDE:A34
 > evaluate :: Exp -> Env -> Value
 > evaluate (Literal v) env      = v
 
-
 Calling a function works almost the same as the case for
 function calls in the [language with top-level functions](#TopLevel).
 Here is the code:
@@ -3312,7 +3151,6 @@ INCLUDE:A35
 > evaluate (Call fun arg) env = evaluate body newEnv
 >   where Function x body = evaluate fun env
 >         newEnv = bindF x (evaluate arg env) env
-
 
 To evaluate a function call |Call fun arg|,
 
@@ -3355,12 +3193,10 @@ argument. Here is a small Haskell program that illustrates this technique:
 INCLUDE:Prob3
 > teste1 = let add = \a -> (\b -> b + a) in add 3 2
 
-
 This program is encoded in our language as follows:
 
 > var add = function(a) { function(b) { b + a } };
 > add(3)(2)
-
 
 Here is how evaluation of this sample program proceeds:
 
@@ -3405,7 +3241,6 @@ INCLUDE:Prob22
 >   let double = \n -> k * n in
 >     let k = 9 in
 >       double k
-
 
 The correct answer, which is produced if you run this program in Haskell,
 is 18. The key point is that |k| is equal to |2| in the body of |double|,
@@ -3459,7 +3294,6 @@ of expression:
 > data Exp = ....
 >          | Function String Exp      -- new
 
-
 As before, the two components of a function expression are
 the *bound variable* |String| and the *body expression* |Exp|.
 Function expressions resemble variable declarations, so they fit
@@ -3476,7 +3310,6 @@ INCLUDE:A42
 >            | ClosureV String Exp Env  -- new
 >   deriving (Eq, Show)
 
-
 The three parts of a closure are the *bound variable* |String|,
 the *function body* |Exp|, and *the closure environment* |Env|.
 The bound variable and function body are the same as the
@@ -3488,7 +3321,6 @@ first-class functions using environments. The first step is to
 
 INCLUDE:A44
 > evaluate (Function x body) env = ClosureV x body env     -- new
-
 
 The resulting closure is the value that represents a
 function. The function expression |Function x body|
@@ -3511,7 +3343,6 @@ INCLUDE:A47
 > evaluate (Call fun arg) env = evaluate body newEnv    -- changed
 >   where ClosureV x body closeEnv = evaluate fun env
 >         newEnv = (x, evaluate arg env) : closeEnv
-
 
 The code starts by evaluating both the function part |fun| to
 produce a value. The |where| clause
@@ -3710,7 +3541,6 @@ Here is the Environment/Closure Tree (ECT)
 | RESULT: 27
 ````
 
-
 == Call-by-value and Call-by-name
 
 In languages with declarations, functions or first-class functions there are a few
@@ -3731,13 +3561,11 @@ Here is the code of evaluation for declarations and function application:
 >       VException -> VException
 >       v          -> evaluate body ((x,v) : env)
 
-
 > evaluate (Call fun arg) env =
 >   case evaluate arg env of
 >      VException -> VException
 >      v -> case evaluate fun env of
 >             ClosureV name body denv -> evaluate body ((name,v) : denv)
-
 
 In the case of |Declare| expressions,  expression |exp| is evaluated before evaluating the
 body of the declaration. In the case of |Call| expressions the argument |arg| is evaluated before
@@ -3754,9 +3582,7 @@ in some cases. For example, consider the following expressions:
 
 > var x = longcomputation; 3
 
-
 > (\x -> 3) longcomputation
-
 
 In the two expressions the idea is that |longcomputation| stands for an expression that
 takes a long time to compute. In both cases the returned value will be 3 and the final
@@ -3774,9 +3600,7 @@ So, in the programs:
 
 > var x = longcomputation; 3
 
-
 > (\x -> 3) longcomputation
-
 
 the expression |longcomputation| is never evaluated and therefore evaluating such expressions is very fast.
 
@@ -3788,9 +3612,7 @@ there are also programs where call-by-name is worse than call-by-value. For exam
 
 > var x = longcomputation; x + x
 
-
 > (\x -> x + x) longcomputation
-
 
 In both programs a call-by-name language will evaluate |longcomputation| twice. Since evaluation is
 delayed to the use-point of the expression, the expression bound to |x| is evaluated twice.
@@ -3812,7 +3634,6 @@ under call-by-name or call-by-value. For example:
 
 > var x = 3 / 0; 7
 
-
 evaluates to:
 
   1) an exception in a call-by-value language;
@@ -3833,7 +3654,6 @@ INCLUDE:FCFGrammar1
 > Exp : function '(' id ')' '{' Exp '}'  { Function $3 $6 }
 INCLUDE:FCFGrammar2
 > Primary : Primary '(' Exp ')' { Call $1 $3 }
-
 
 Here is the definition of the abstract syntax and the evaluator,
 taken from the [First Class Functions zip](./packages/FirstClassFunctions.zip) file:  
@@ -3876,7 +3696,6 @@ INCLUDE:Summ14
 >   where ClosureV x body closeEnv = evaluate fun env
 >         newEnv = (x, evaluate arg env) : closeEnv
 
-
 Test cases can be found in
   and the FirstClassFunctionsTest.js file.
 
@@ -3891,11 +3710,9 @@ Here are two example test cases:
 > var f = function(a, b) { a + 2 * b };
 > f(3, 4) - f(5, 2)
 
-
 > var z = 10;
 > var (x, y) = (3, z*2);
 > y / z
-
 
 You must change the parser to allow creation of tuples, patterns
 in function and variable definitions, and functions called with a tuple.
@@ -3906,16 +3723,13 @@ Here are suggested changes to your abstract syntax:
 >          | Function Pattern Exp     -- functions have patterns
 >          | Tuple [Exp]              -- tuple expression
 
-
 > data Pattern = VarP String          -- variable patterns
 >              | TupleP [Pattern]     -- tuple patterns
-
 
 > data Value = ...
 >            | ClosureV Pattern Exp Env -- functions have patterns
 >            | TupleV [Value]           -- tuple value
 >   deriving (Eq, Show)
-
 
 You must write and include test cases that amply exercise all of the code you've written.
 You can assume that the inputs are valid programs and that your program may raise arbitrary
@@ -3940,7 +3754,6 @@ INCLUDE:Recu3
 >   let fact = \n -> if n == 0 then 1 else n * fact(n-1)
 >   in fact(10)
 
-
 The |fact| function is recursive because it calls |fact| within its definition.
 
 The problem with our existing language implementation is that
@@ -3959,7 +3772,6 @@ can cause problems. For example,
 INCLUDE:Recu7
 > testLet3 = let x = x + 1 in x
 
-
 This is now syntactically correct, as the bound variable |x| is in scope
 for the expression |x + 1|. However, such a program is either meaningless, or
 it can be understood to mean "infinite loop". There are similar cases that
@@ -3970,7 +3782,6 @@ INCLUDE:Recu9
 >   let x = y + 1
 >       y = 99
 >   in x * y
-
 
 This example includes two bindings at the same time (which we do not
 currently support.
@@ -4001,7 +3812,6 @@ The point is that the definition of |fact| has exactly the same form:
 
 INCLUDE:Sema11
 > fact = \n -> if n == 0 then 1 else n * fact(n-1)
-
 
 This is an equation where |fact| appears on both sides, just as $a$ appears
 on both sides in $a = 1 + 3a$. The question is: *how do we solve for |fact|*?
@@ -4059,24 +3869,20 @@ data structures. For example, this line creates an infinite list of 2's:
 INCLUDE:Unde3
 > twos = 2 : twos
 
-
 Remember that the |:| operator adds an item to the front of a list.
 This means that |twos| is a list with |2| concatenated onto the front of
 the list |twos|. In other words, |twos| is an infinite list of 2's: 
 
 > twos  ==>  [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, ... ]
 
-
 It's also possible to make infinite lists that change: 
 
 INCLUDE:Unde7
 > numbers = 0 : [ n + 1 | n <- numbers ]
 
-
 This creates an infinite list of the natural numbers:
 
 > [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...]
-
 
 All these definitions work in Haskell because of *laziness*.
 Haskell creates an internal representation of a potentially infinite
@@ -4092,7 +3898,6 @@ discussed earlier:
 INCLUDE:Unde12
 > a = 1 + 3 * a
 
-
 Haskell considers this a valid program, but it does *not* solve for |a|.
 Instead it treats the definition as a computational rule: to evaluate
 |a|, add one to three times the value of |a|, which requires evaluating
@@ -4101,7 +3906,6 @@ The quickest way to write an infinite loop is:
 
 INCLUDE:Unde14
 > inf = inf
-
 
 TODO: make pictures to illustrate the cyclic values in this section.
 
@@ -4127,22 +3931,18 @@ A type for trees:
 > data Tree = Leaf Int | Branch Tree Tree
 >   deriving Show
 
-
 An example tree: 
 
 > testTr = Branch (Branch (Leaf 5) (Leaf 3))
 >             (Leaf (-99))
-
 
 Computing the minimum and maximum of a tree: 
 
 > minTree (Leaf n) = n
 > minTree (Branch a b) = min (minTree a) (minTree b)
 
-
 > maxTree (Leaf n) = n
 > maxTree (Branch a b) = max (maxTree a) (maxTree b)
-
 
 Point out that computing both requires two traversals.
 
@@ -4153,7 +3953,6 @@ Computing minimum and maximum at the same time.
 >   where (min1, max1) = minMax a
 >         (min2, max2) = minMax b
 
-
 |minMax| is an example of *fusing* two functions together.
 
 Another operation: copying a tree and replacing all the
@@ -4162,12 +3961,10 @@ leaves with a specific integer value:
 > repTree x (Leaf n) = Leaf x
 > repTree x (Branch a b) = Branch (repTree x a) (repTree x b)
 
-
 Now for our key puzzle: replacing every leaf in a tree with
 the minimum value of the tree:
 
 > repMinA tree = repTree (minTree tree) tree
-
 
 This requires two traversals. It seems to truly *require* two
 traversals the minimum must be identified before the process
@@ -4182,12 +3979,10 @@ helper function:
 >   where (min1, newTree1) = repMin' (a, r)
 >         (min2, newTree2) = repMin' (b, r)
 
-
 Finally to do the replacement with the minimum:
 
 > repMin tree = newTree
 >    where (min, newTree) = repMin'(tree, min)
-
 
 Note how one of the results of the function call, the |min| value,
 is passed as an argument to the function call itself!
@@ -4205,7 +4000,6 @@ INCLUDE:Impl3
 > evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp env) : env
 
-
 The problem here is that the bound expression |exp| is evaluated
 in the parent environment |env|. To allow the bound variable |x| to
 be used within the expression |exp|, the expression must be evaluated
@@ -4215,7 +4009,6 @@ in Haskell:
 INCLUDE:Impl5
 > evaluate (Declare x exp body) env = evaluate body newEnv
 >   where newEnv = (x, evaluate exp newEnv) : env
-
 
 The only change is the replace |env| with |newEnv| in the call to |evaluate| on |exp|.
 The new environment being created is passed as an argument to the
@@ -4240,42 +4033,68 @@ For the case of recursive bindings, a special case must be defined
 for a |var| binding that defines a funtion:  
 
 * Case **Recursive** |var f = function (x) { exp }; body| 
-    1. Create a binding |[f = C]| where C is the name of a new closure.
+    1. Create a binding |f = C| where |C| is the name of a new closure.
     2. Create a |CLOSURE C: x, exp| to define the closure
     3. Proceed with the ECT for the |body|
     
 Note that the |CLOSURE| is within scope of the binding, not above it as before.
 
-````javascript
-var fact = function(n) {
-             if (n == 1) 
-                1
-             else
-                n * fact(n - 1)
-           };
-fact(3)
-````
+Here is an example an example that uses this approach.
 
-The Environment/Closure Tree for this program is:
+```javascript
+var fact = function(n) {
+  if (n == 0)
+    1
+  else
+    n * fact(n - 1)
+};
+fact(4)
+```
+
+Below is an Environment/Closure Tree for evaluating this program. 
+Note that the binding of |fact| has moved from after the closure to before the closure.
+This means that the binding is in scope for the body of the function. 
 
 ```
-[fact = C1]
-  CLOSURE C1: n, function-1
-  | INVOKE I1:
-  |   [n = 3]
-  |   CALL I2: C1(2)
-  |     RESULT: 2
-  |   RESULT: 6
-  | INVOKE I2:
-  |   [n = 2]
-  |   CALL I3: C1(1)
-  |     RESULT: 1 
-  |   RESULT: 2
-  | INVOKE I3:
-  |   [n = 1]
-  |   RESULT: 1
-CALL I1: C1(3)
-  RESULT: 6 
+* fact = C1
+|
++---+ CLOSURE C1: n, function-1
+|   |
+|   |   INVOKE I1
+|   +---* n = 4
+|   |   | 
+|   |   | CALL I2: C1(3)
+|   |   |   RESULT: 24
+|   |   | RESULT: 24
+|   |
+|   |   INVOKE I2
+|   +---* n = 3
+|   |   | 
+|   |   | CALL I3: C1(2)
+|   |   |   RESULT: 6
+|   |   | RESULT: 6
+|   |
+|   |   INVOKE I3
+|   +---* n = 2
+|   |   | 
+|   |   | CALL I4: C1(1)
+|   |   |   RESULT: 2
+|   |   | RESULT: 2
+|   |
+|   |   INVOKE I4
+|   +---* n = 1
+|   |   | 
+|   |   | CALL I5: C1(0)
+|   |   |   RESULT: 1
+|   |   | RESULT: 1
+|   |
+|   |   INVOKE I5
+|   +---* n = 0
+|       | RESULT: 1
+|
+| CALL I1: C1(4)
+|   RESULT: 24
+| RESULT: 24
 ```
 
 == Understanding Recursion with Fixed Points
@@ -4488,7 +4307,6 @@ The infinite recursive structures discussed in
 INCLUDE:Fixe30
 > g_twos l = 2 : l
 
-
 The function |g_twos| is a non-recursive function that adds a 2 to the front
 of a list. Here are some test cases for applying |g_twos| to various lists: 
 
@@ -4510,7 +4328,6 @@ an infinite list of 2s is a fixed point of |g_twos|.
 
 > fix(g_twos)  ==>  [2, 2, 2, ...]
 
-
 Functions used in this way are called generators because they
 generate recursive structures. One way to think about them is that
 the function performs *one step* in the creation of a infinite
@@ -4527,7 +4344,6 @@ that creates a list containing the natural numbers, is more interesting:
 
 INCLUDE:Fixe37
 > g_numbers ns = 0 : [ n + 1 | n <- ns ]
-
 
 This function takes a list as an input, it adds one to each item in the
 list and then puts a |0| on the front of the list. 
@@ -4560,7 +4376,6 @@ is the list of natural numbers:
 
 > fix(g_numbers)  ==>  [0, 1, 2, 3, 4, 5, ...]
 
-
 By staring with the empty list and then applying |g_numbers| repeatedly,
 the result eventually converges on the fixed point. Each step is a
 better approximation of the final answer.
@@ -4572,10 +4387,8 @@ TODO: text explaining how to implement |fact| using fix.
 INCLUDE:Fixe45
 > g_fact = \f -> \n -> if n == 0 then 1 else n * f(n-1)
 
-
 INCLUDE:Fixe46
 > fact'1 = fix g_fact
-
 
 more... 
 
@@ -4586,7 +4399,6 @@ avoids the issue of selecting a starting value for the iteration.
 
 INCLUDE:A58
 > fix g = g (fix g)
-
 
 This definition is beautiful because it is a direct translation of the
 original mathematic definition of a fixed point: |fix|$(f)$ is a value $x$ such
@@ -4613,7 +4425,6 @@ function, which simply returns its argument:
 
 INCLUDE:A61
 > id x = x
-
 
 The identity function can be applied to *any* value, because it doesn't
 do anything with the argument other than return it. Since it can be
@@ -4657,7 +4468,6 @@ Given the ability to loop infinitely, it is also possible to execute
 a function infinitely many times. 
 
 > fix g = stamp (g . stamp)
-
 
 The composition (|.|) operator composes two functions:
 
@@ -4727,13 +4537,10 @@ This definition builds the self-application into
 the |fact_s| function, rather than separating it
 into a generator and a fixed point function.
 One way to derive |fact_s| is from the self-applicative
-|fix| function. Remember that 
+|fix| function. The actual |fact| function should
+still be defined:
 
-> fact = stamp (g_fact . stamp)
-
-|fact_s| is created by *merging* |g_fact| with |stamp|.
-The other use of |stamp| indicates that |fact_s| must be
-applied to itself to compute a factorial. 
+> fact = function(n) { fact_s(fact_s, n) }
 
 One interesting thing about this final implementation
 strategy is that it is *exactly* the strategy used in
@@ -4776,14 +4583,12 @@ INCLUDE:Hand5
 > data Checked a = Good a | Error String
 >   deriving Show
 
-
 The declaration defines a generic |Checked| type that has a parameter |a|
 representing the type of the good value. The |Checked| type has two constructors,
 |Good| and |Error|. The |Good| constructor takes a value of type |a|
 and labels it as good. The |Error| constructor has an error message.
 The following figure is an abstract illustration of a |Checked| value,
 which represents a computation that may either be a good value or an error.
-
 
 ![A computation that may produce an error.](figures/ErrroShape.eps)
 
@@ -4802,7 +4607,6 @@ INCLUDE:Hand8
 > evaluate :: Exp -> Env -> Checked Value
 > evaluate (Literal v) env = Good v
 
-
 Evaluation of a literal can never cause an error. The value is marked
 as a |Good| value and returned.
 
@@ -4815,7 +4619,6 @@ INCLUDE:Hand11
 >     Nothing -> Error ("Variable " ++ x ++ " undefined")
 >     Just v  -> Good v
 
-
 === Error Checking in Multiple Sub-expressions
 
 The case for binary operations is more interesting.
@@ -4823,7 +4626,6 @@ Here is the original rule for evaluating binary expressions:
 
 INCLUDE:Hand13
 > evaluate (Binary op a b) env  = binary op (evaluate a env) (evaluate b env)
-
 
 The problem is that either |evaluate a env| or |evaluate b env| could return an |Error| value.
 The actual binary operation is only performed if they both return |Good| values.
@@ -4844,7 +4646,6 @@ INCLUDE:Hand15
 >         Error msg -> Error msg
 >         Good bv ->
 >           checked_binary op av bv
-
 
 Now it should be clear why programmers do not always check all error return codes:
 because it is tedious and requires lots of code! What was
@@ -4890,7 +4691,6 @@ INCLUDE:Hand17
 >     Error ("Binary " ++ show op ++
 >            " called with invalid arguments " ++ show a ++ ", " ++ show b)
 
-
 All the other cases are the same as before, so |checked_binary|
 calls |binary| and then tags the resulting value as |Good|.
 
@@ -4903,14 +4703,12 @@ INCLUDE:Hand28
 >
 > # Error "Variable x undefined"
 
-
 Or for divide by zero:
 
 INCLUDE:Hand32
 > 3 / 0
 >
 > # Error "Divide by zero"
-
 
 Your take-away from this section should be that checking error everywhere
 is messy and tedious. The code for binary operators has to deal with
@@ -5084,7 +4882,6 @@ INCLUDE:Addr11
 >            | AddressV Int        -- new
 >   deriving (Eq, Show)
 
-
 When writing programs and values, it is useful to distinguish addresses
 from ordinary integer values. As a convention, addresses will be tagged with
 a "pound sign", so that |Address 3| will be written #3.
@@ -5125,7 +4922,6 @@ as a list of values:
 INCLUDE:Memo4
 > type Memory = [Value]
 
-
 One complication is that the memory must be able to *grow* by adding
 new addresses. The initial empty memory is the empty list |[]|.
 The first address added is zero [#0]. The next address is one to
@@ -5135,12 +4931,10 @@ Here is an example memory, with two addresses:
 
 > [IntV 120, IntV 6]
 
-
 This memory has value 120 at address #0 and value 6 at address #1.
 More concisely, this memory can be written as
 
 > [120, 6]
-
 
 This memory could be the result of executing the factorial program given above,
 under the assumption that |x| is bound to address 0 and |i| is bound to address #1.
@@ -5182,7 +4976,6 @@ so it is exactly what we need:
 INCLUDE:Acce3
 > access i mem = mem !! i
 
-
 TODO: rename "access" to be "contents"?
 
 ==== Update
@@ -5208,7 +5001,6 @@ INCLUDE:Upda4
 >   let (before, _ : after) = splitAt addr mem in
 >     before ++ [val] ++ after
 
-
 The |update| function works by splitting the memory into the part
 before the address and the part starting with the address |addr|. The pattern
 |_ : after| binds |after| to be the memory after the address. The |update|
@@ -5227,24 +5019,20 @@ INCLUDE:Upda7
 >   let IntV n = access addr mem in
 >     update addr (IntV (10 * n)) mem
 
-
 Here is an example calling |mul10| on a memory with 4 cells:
 
 INCLUDE:Upda9
 > testMul10 = mul10 1 [IntV 3, IntV 4, IntV 5, IntV 6]
-
 
 The result is
 
 INCLUDE:Upda11
 > [IntV 3,IntV 40,IntV 5,IntV 6]
 
-
 The fact that |mul10| is a transformation on memory is evident from its type:
 
 INCLUDE:Upda13
 > mul10 :: Int -> Memory -> Memory
-
 
 This means that |mul10| takes an memory address as an input and returns
 a function that transforms an input memory into an output memory.
@@ -5259,12 +5047,10 @@ takes an expression and an environment and returns a value:
 INCLUDE:Stat2
 > evaluate :: Exp -> Env -> Value
 
-
 Now that an expression can access memory, the current memory must be
 an input to the evaluation process:
 
 > evaluate :: Exp -> Env -> Memory -> ...
-
 
 The evaluator still produces a value, but it may also return a new
 modified memory. These two requirements, to return a value and a memory,
@@ -5272,13 +5058,11 @@ can be achieved by returning a *pair* of a value and a new memory:
 
 > evaluate :: Exp -> Env -> Memory -> (Value, Memory)
 
-
 This final type is the type of a *stateful* computation. Since it is
 useful to talk about, we will give it a name:
 
 INCLUDE:Stat8
 > type Stateful t = Memory -> (t, Memory)
-
 
 This is a *generic* type for a memory-based computation which returns
 a value of type |t|.
@@ -5296,7 +5080,6 @@ Thus the final type for |evaluate| is written concisely as:
 
 INCLUDE:Stat11
 > evaluate :: Exp -> Env -> Stateful Value
-
 
 This type is very similar to the type given for |evaluate| in the error
 section, where |Checked| was used in place of |Stateful|. This similarity
@@ -5322,7 +5105,6 @@ our language:
 >          | Access    Exp        -- @a
 >          | Assign    Exp Exp    -- a = e
 
-
 The |mutable e| expression creates a new memory cell and returns its
 address. First the expression |e| is evaluated to get the initial value
 of the new memory cell. Evaluating |e| may modify memory, so care must
@@ -5334,7 +5116,6 @@ INCLUDE:Sema20
 >   let (ev, mem2) = evaluate e env mem1 in
 >     (AddressV (length mem2), mem2 ++ [ev])
 
-
 The access expression |@@a| evaluates the address
 expression |a| to get an address, then returns the contents of
 the memory at that address. Note that if the |Address i| pattern fails, Haskell
@@ -5345,7 +5126,6 @@ INCLUDE:Sema23
 > evaluate (Access a) env mem1 =
 >   let (AddressV i, mem2) = evaluate a env mem1 in
 >     (access i mem2, mem2)
-
 
 An assignment statement |a = e| first evaluates the target expression |a|
 to get an address. It is an error if |a| does not evaluate to an address.
@@ -6129,7 +5909,6 @@ We are going to use the following type for the type-checker:
 
 > typeCheck :: Exp -> TEnv -> Type
 
-
 Note how similar this type is to the type of an environment-based interpreter except for one difference: 
 
 1) Where in the concrete interpreter we used |Value|, we now use |Type|. 
@@ -6254,10 +6033,8 @@ INCLUDE:TypeA49
 >            | FunT Type Type  -- new
 >   deriving (Eq, Show)
 
-
 INCLUDE:TypeAEnv
 > type TypeEnv = [(String, Type)]
-
 
 The interesting thing is that we now have a type for functions denoted by the constructor |TFun|.
 These types are similar to Haskell function types like |Int -> Int|  or |Bool -> (Int -> Bool)|.
@@ -6268,7 +6045,6 @@ Function types are useful to have function arguments. For example:
 >     f(f(x))
 >   }
 > }
-
 
 is a function that given a function |f| and an integer |x|, applies |f| twice to |x|. 
 
@@ -6403,8 +6179,6 @@ Primitive data is usually a form of abstract data type. Most object languages
 
 
 
-
-
 For example, primitive
 types are abstract: a programmer using them doesn't *really* know
 how they are implemented or represented. This applies to booleans, integers,
@@ -6417,7 +6191,6 @@ All the programmer needs to know is that there is a way to create primitive valu
 operations that manipulate them, and ways to view some textual representation of the data. 
 In a statically typed language, there will also be a *name* associated with
 each type of primitive data.
-
 
 --------------------BEGIN-HIDE------------------------- 
 
@@ -6434,12 +6207,10 @@ each type of primitive data.
 == Memory Management
 == Lambda Calculus
 
-
 === Special Kinds of States: Readers and Writers
 == Order of Evaluation
 === Strict versus non-strict
 === Lazy
-
 
 = Data Abstraction (content from essay)
 == Abstract Data Types
