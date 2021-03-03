@@ -1173,7 +1173,7 @@ evaluating an expression containing a variable. The first stage
 is to *substitute* the variable for its value, then the second
 stage is to *evaluate* the resulting arithmetic expression.
 
-=== Multiple Substitution using Environments
+== Multiple Substitution using Environments
 
 There can be multiple variables in a single expression. For example,
 evaluating $2 * x + y$ where $x=3$ and $y=-2$. A collection of bindings
@@ -1411,22 +1411,6 @@ In the |Declare| case for |subst|, the variable is always substituted
 into the bound expression |e|. But the substitution is only performed
 on the body |b| if the variable |var| being substituted is *not* the
 same as the variable |x| defined in the variable declaration. 
-
-TODO: need some test cases here 
-
-=== Evaluating Variable Declarations using Substitution
-
-The evaluation of a variable declaration is based on substitution.
-To evaluate |var| *x* |=| *e*|;| *b*,
-first evaluate the bound expression *e*, then substitute its value
-for variable *x* in the body *b*. Finally, the result of
-substitution is evaluated. 
-
-INCLUDE:Eval28
-> evaluate (Declare x exp body) = evaluate (substitute1 (x, evaluate exp) body)
-
- There is no rule for evaluating a variable because all variables
- are substituted away before evaluation begins. 
 
 TODO: need some test cases here 
 
@@ -1905,7 +1889,7 @@ is given in the
 Functions are familiar to any student of mathematics. The first hint of
 a function in grade school may be some of the standard operators that
 are introduced early in the curriculum. Examples include absolute value
-$\mid x \mid$ and square root $\sqrt{x}$. The concept of a function is also implicit in the
+$\mid{}x\mid{}$ and square root $\sqrt{x}$. The concept of a function is also implicit in the
 standard equation for a line $y = mx + b$. Trigonometry introduces
 the standard functions *sin(a)* and *cos(a)* to support computation on angles.
 While these operators use more traditional function syntax, they are
@@ -2179,13 +2163,6 @@ INCLUDE:Summ12
 >   where Function xs body = fromJust (lookup fun funEnv)
 >         newEnv = zip xs [evaluate a env funEnv | a <- args]
 
-==== Exercise 3.1: Stack-based evaluation
-
-Modify the evaluator for top-level functions to use a stack with a list of
-values, rather than an environment. Use a function to look up the position of
-a variable in an argument list, then access the corresponding position from
-the top of the stack.
-
 == First-Class Functions
 
 In the [Section on Top-Level Functions](#TopLevel), function definitions were defined using
@@ -2240,7 +2217,7 @@ To 'solve for |f|' we need some new notation, just the
 way that the square root symbol $\sqrt{x}$ was introduced
 to represent a new operation.
 
-== Lambda Notation
+=== Lambda Notation
 
 The standard solution is to use a *lambda expression*, or
 *function expression*,
@@ -2284,7 +2261,7 @@ calculus has had huge influence on programming languages.
 We will study the lambda calculus in more detail in a
 later section, but the basic concepts are introduced here.
 
-=== Using Lambdas in Haskell {#LambdaDefinition}
+==== Using Lambdas in Haskell {#LambdaDefinition}
 
 Haskell is based directly on the lambda calculus. In
 fact, the example illustrating how to "solve" for the
@@ -2999,7 +2976,7 @@ Calling |foo(|$e$|)| is equivalent to  |var x =| $e$|;| $b$.
 So, a |var| statement is another rewording of a lambda function that takes a certain
 argument binding before interpretting the body.
 
-==== Others
+=== Others
 
 There are many other uses of first-class functions, including
 callbacks, event handlers, thunks, continuations, etc.
@@ -3022,9 +2999,9 @@ lexical scope
   ~ *Lexical scope* means that a variable refers to the
      closest enclosing definition of that variable.
 
-TODO: move this discussion earlier!  
-
 \StartIncorrect
+
+<span style="color:red">
 
 === A Non-Solution: Function Expressions as Values
 
@@ -3267,6 +3244,7 @@ dynamic binding
     dynamic calls for the most recent binding of the symbol.
 
 \EndIncorrect
+<span style="END">
 
 === A Correct Solution: Closures {#Closures}
 
