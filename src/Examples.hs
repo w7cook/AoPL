@@ -25,9 +25,8 @@ f'2 x  = x * 2
 f'3 = \x -> x * 2
 --END:Usin3
 
-
---BEGIN:Recu3
 testLet =
+--BEGIN:Recu3
   let fact = \n -> if n == 0 then 1 else n * fact(n-1)
   in fact(10)
 --END:Recu3
@@ -36,8 +35,8 @@ testLet =
 testLet3 = let x = x + 1 in x
 --END:Recu7
 
---BEGIN:Recu9
 testLet2 =
+--BEGIN:Recu9
   let x = y + 1
       y = 99
   in x * y

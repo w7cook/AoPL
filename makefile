@@ -144,7 +144,7 @@ anatomy.mkd: anatomy.lhs makefile # template.tex anatomy.bib figures/*.eps execu
 # then run panddoc to convert markdown+lhs to html
 # finally perform some cleanups, and implement the paragraph comment system
 
-anatomy.htm: anatomy.mkd
+anatomy.htm: anatomy.mkd makefile
   # convert | to ` for inline haskell
 	cat anatomy.mkd \
 		| sed 's/||/VERTICAL_BAR/g' \
@@ -153,8 +153,8 @@ anatomy.htm: anatomy.mkd
 		> foo.mkd
   # process markdown+lhs to html
 	cat foo.mkd \
-		| $(PANDOC) --toc -f markdown+lhs -t html --css anatomy.css --filter pandoc-citeproc --top-level-division=chapter \
-		| sed 's/\\.eps/.png/' \
+		| $(PANDOC) -H header.htm --toc -f markdown+lhs -t html --css anatomy.css --filter pandoc-citeproc --top-level-division=chapter \
+		| sed 's/\.eps/.png/' \
 		> foo2.mkd
   # fix problems in HTML
 	cat header.htm foo2.mkd \

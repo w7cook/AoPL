@@ -560,7 +560,7 @@ clearly using pictures. For example, the following pictures make a
 clear description of the underlying arithmetic operations specified in the
 expressions given above:
 
-![Graphical illustration of abstract structure](figures/abstract_syntax.eps "a: (+ (-5) 6)    b: (- (- 3 (-2)) (-7))   c: (+ 1 (* 8 2))")
+![Graphical illustration of abstract structure](figures/abstract_syntax.eps "a: (+ (-5) 6)    b: (- (- 3 (-2)) (-7))   c: (+ 1 (* 8 2))"){ width=65% }
 
 These pictures are similar to *sentence diagramming* that is taught in grade school
 to explain the structure of English.
@@ -1382,7 +1382,7 @@ variable is all of the body of the declaration in which the variable is defined.
 However, it is possible for a variable to be redefined, which creates
 a hole in the scope of the outer variable:
 
-![Variable Scope](figures/scopes.eps)
+![Variable Scope](figures/scopes.eps){ width=65% }
 
 In this example Figure [Variable Scope] there are two variables named |x|. Even though
 two variables have the same name, they are not the same variable.
@@ -1919,7 +1919,7 @@ definition of functions, top-level functions are quite common. The code
 for this section is given in the [Top Level Functions zip](./packages/TopLevelFunctions.zip) file.
 Here is an example of some top-level functions, written in JavaScript:
 
-````Java
+````JavaScript
 // compute n raised to the m-th power
 function power(n, m) {
   if (m == 0)
@@ -2072,27 +2072,27 @@ completely distinct, they are said to be in different *namespaces*.
 The separation of the variable and function namespace is clear
 in the following (silly) example: 
 
-````Java
-    function pow(pow)
-      if pow <= 0 then
-        2
-      else (
-        var pow = pow(pow - 1);
-        pow * pow(pow - 2)
-      )
+````JavaScript
+function pow(pow)
+  if pow <= 0 then
+    2
+  else (
+    var pow = pow(pow - 1);
+    pow * pow(pow - 2)
+  )
 ````
 
 This is the same as the following function, in which variables
 are renamed to be less confusing: 
 
-````Java
-    function pow(a)
-      if a <= 0 then
-        2
-      else (
-        var b = pow(a - 1);
-        b * pow(b - 2)
-      )
+````JavaScript
+function pow(a)
+  if a <= 0 then
+    2
+  else (
+    var b = pow(a - 1);
+    b * pow(b - 2)
+  )
 ````
 
 When renaming variables, the *functions* are *not* renamed.
@@ -3370,6 +3370,7 @@ double(k)
 ````
 
 Here is the Environment/Closure Tree that results from executing this code.
+
 ```
 * k = 2
 |
@@ -3452,6 +3453,7 @@ add(3)(2)
 ````
 
 Here is the Environment/Closure Tree (ECT)
+
 ````
 | CLOSURE C1: a, function-1
 |   INVOKE I1:
@@ -3487,6 +3489,7 @@ inc(7)
 ````
 
 Here is the Environment/Closure Tree (ECT)
+
 ````
 * m = 2
 |
@@ -4234,7 +4237,7 @@ iteration.
 
 Here is a plot of how the function converges:
 
-![Plot of convergence of $\phi$](figures/converge.eps)
+![Plot of convergence of $\phi$](figures/converge.eps){ width=75% }
 
 The result converges on $1.6180339887...$
 which is the value of $\phi$. It turns out that iterating
@@ -4431,7 +4434,7 @@ Many other languages allow |stamp| to be defined, either using more complex or
 weaker type systems. Dynamic languages do not have any problem defining |stamp|.
 For example, here is a definition of |stamp| in JavaScript: 
 
-````Java
+````JavaScript
 stamp = function(f) { return f(f); }
 ````
 
@@ -4495,7 +4498,7 @@ self-application directly into a function. For
 example, here is a non-recursive version of fact
 based on integrated self-application, defined in JavaScript. 
 
-````Java
+````JavaScript
 fact_s = function(f, n) {
   if (n == 0)
     return 1;
@@ -4507,7 +4510,7 @@ fact_s = function(f, n) {
 To call |fact_s| to compute a factorial, it is necessary to pass |fact_s|
 as an argument to itself: 
 
-````Java
+````JavaScript
 fact_s(fact_s, 10);
 ````
 
@@ -4568,7 +4571,7 @@ and labels it as good. The |Error| constructor has an error message.
 The following figure is an abstract illustration of a |Checked| value,
 which represents a computation that may either be a good value or an error.
 
-![A computation that may produce an error.](figures/ErrroShape.eps)
+![A computation that may produce an error.](figures/ErrroShape.eps){ width=30% }
 
 === Error Checking in Basic Expressions
 
@@ -4632,7 +4635,7 @@ variables. When multiple sub-expressions can generate errors, it is necessary
 to *compose* multiple error checks together. The situation in the case of
 |Binary| operations is illustrated in the following figure:
 
-![Composing computations that may produce errors.](figures/ErrorBind.eps)
+![Composing computations that may produce errors.](figures/ErrorBind.eps){ width=70% }
 
 This figure illustrates the composition of two sub-expressions |A| and |B|
 which represent computations of checked values. The composition of the two
@@ -5052,7 +5055,7 @@ stateful computation
 Just as in the case of errors, it is useful to
 give a visual form to the shape of a stateful computation:
 
-![Shape of a stateful computation.](figures/StatefulShape.eps)
+![Shape of a stateful computation.](figures/StatefulShape.eps){ width=30% }
 
 Thus the final type for |evaluate| is written concisely as:
 
@@ -5130,7 +5133,7 @@ INCLUDE:Sema27
 
 This form of composition is illustrated in the following diagram:
 
-![Composing stateful computations.](figures/StatefulBind.eps) 
+![Composing stateful computations.](figures/StatefulBind.eps){ width=75% } 
 
 The memory input of the combined expression is passed to |A|. The value out
 and the memory output of |A| are given as inputs to |B|. The final result of
@@ -5304,25 +5307,25 @@ The next step is to unify the case when there are multiple sub-expressions
 that must be evaluated. The binary operator provides a good example
 of multiple sub-expressions. 
 
-+-----------------------------------------+--------------------------------------------------+
-| Checked evaluate                        | Stateful evaluate                                |
-+:========================================+:=================================================+
-| |evaluate (Binary op a b) env =|        | |evaluate (Binary op a b) env = |$\lambda$|m1| . | 
-+-----------------------------------------+--------------------------------------------------+
-| \ |case evaluate a env of|              | \ |let (av, m2) = evaluate a env m1 in|          |
-+-----------------------------------------+--------------------------------------------------+
-| \ \ |Error msg -> Error msg|            | \ \ |let (bv, m3) = evaluate b env m2 in|        |
-+-----------------------------------------+--------------------------------------------------+
-| \ \ |Good av ->|                        | \ \ |(binary op av bv, m3)|                      |
-+-----------------------------------------+--------------------------------------------------+
-| \ \ \ |case evaluate b env of|          |                                                  |
-+-----------------------------------------+--------------------------------------------------+
-| \ \ \ \ |Error msg -> Error msg|        |                                                  |
-+-----------------------------------------+--------------------------------------------------+
-| \ \ \ \ \ |Good bv ->|                  |                                                  |
-+-----------------------------------------+--------------------------------------------------+
-| \ \ \ \ \ \ |checked_binary op av bv|   |                                                  |
-+-----------------------------------------+--------------------------------------------------+
++--------------------------------------------+--------------------------------------------------+
+| Checked evaluate                           | Stateful evaluate                                |
++:===========================================+:=================================================+
+| |evaluate (Binary op a b) env =|           | |evaluate (Binary op a b) env = | $\lambda$|m1|. | 
++--------------------------------------------+--------------------------------------------------+
+| \ |case evaluate a env of|                 | \ |let (av, m2) = evaluate a env m1 in|          |
++--------------------------------------------+--------------------------------------------------+
+| \ \ |Error msg -> Error msg|               | \ \ |let (bv, m3) = evaluate b env m2 in|        |
++--------------------------------------------+--------------------------------------------------+
+| \ \ |Good av ->|                           | \ \ |(binary op av bv, m3)|                      |
++--------------------------------------------+--------------------------------------------------+
+| \ \ \ |case evaluate b env of|             |                                                  |
++--------------------------------------------+--------------------------------------------------+
+| \ \ \ \ |Error msg -> Error msg|           |                                                  |
++--------------------------------------------+--------------------------------------------------+
+| \ \ \ \ \ |Good bv ->|                     |                                                  |
++--------------------------------------------+--------------------------------------------------+
+| \ \ \ \ \ \ |checked_binary op av bv| \ \  |                                                  |
++--------------------------------------------+--------------------------------------------------+
 
 Note that the memory |m1| argument has become a lambda! This is an instance of the
 *Rule of Function Arguments*. It was done to allow the first
@@ -5335,15 +5338,15 @@ appropriate). They both have a similar pattern of code for dealing with
 the evaluation of |a| and |b|. Factoring out the common
 parts as *first* and *next*, the core of the pattern is: 
 
-+---------------------------------+-----------------------------------------------+
-| Checked                         | Stateful                                      |
-+:================================+:==============================================+
-| |case| *first* |of|             | $\lambda$|m1|.|let (v, m2) =| *first* |m1 in| |
-+---------------------------------+-----------------------------------------------+
-| \ \ |Error msg -> Error msg|    | \ \ \ \ \ \ \ \ \ \ \ *next* |v| |m2|         |
-+---------------------------------+-----------------------------------------------+
-| \ \ |Good v ->| *next* |v|      |                                               |
-+---------------------------------+-----------------------------------------------+
++------------------------------------+-----------------------------------------------+
+| Checked                            | Stateful                                      |
++:===================================+:==============================================+
+| |case| *first* |of|                | $\lambda$|m1|.|let (v, m2) =| *first* |m1 in| |
++------------------------------------+-----------------------------------------------+
+| \ \ |Error msg -> Error msg|\ \ \  | \ \ \ \ \ \ \ \ \ \ \ *next* |v| |m2|         |
++------------------------------------+-----------------------------------------------+
+| \ \ |Good v ->| *next* |v|         |                                               |
++------------------------------------+-----------------------------------------------+
 
 This *first* corresponds to |evaluate a env| or |evaluate b env| in both the original
 versions. The *next* represents the remainder of the computation. It is just everything that
