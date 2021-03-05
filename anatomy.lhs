@@ -341,7 +341,7 @@ The answer is:
 
 The function |identity| is a (parametrically) polymorphic function. Polymorphism means that
 the definition works for multiple types; and this type of polymorphism is called parametric
-because it results from abstracting/parametrizing over a type. In the type signature the a
+because it results from abstracting/parameterizing over a type. In the type signature the a
 is a type variable (or parameter). In other words it is a variable that can be replaced by
 some valid type (for example |Int|, |Char| or |String|). Indeed the |identity| function can be applied
 to any type of values. Try the following in |ghci|, and see what is the resulting type:
@@ -442,7 +442,7 @@ write a function:
 
 that given a number returns the corresponding number in the sequence.
 (If you don't know Fibonacci numbers you may enjoy finding the recurrence pattern;
-alternatively you can look it up in Wikipedia).
+alternatively you can look it up in WikiPedia).
 
 Question 7: Write a function:
 
@@ -1856,11 +1856,11 @@ It is legal for a nested |Declare| to reuse the same name. Two examples:
 > var x = 3, x = x + 2; x*2       -- illegal
 > var x = 3; var x = x + 2; x*2   -- legal
 
-**The meaning of a |var| declaration is that all of the expressions associated with variables
+The meaning of a |var| declaration is that all of the expressions associated with variables
 are evaluated first, in the environment before the |var| is entered. Then all the variables are
 bound to the values that result from those evaluations. Then these bindings are added to the
 outer environment, creating a new environment that is used to evaluate the body of the |var| declaration.
-This means that the *scope* of all variables is the body of the |var| in which they are defined.**
+This means that the *scope* of all variables is the body of the |var| in which they are defined.
 
 Note that a multiple declare is not the same as multiple nested declares. For examle,
 
@@ -2974,7 +2974,7 @@ from arguments provided to a function. So, if a function was defined as:
 |foo = function(x) {| $b$ |}|
 Calling |foo(|$e$|)| is equivalent to  |var x =| $e$|;| $b$.
 So, a |var| statement is another rewording of a lambda function that takes a certain
-argument binding before interpretting the body.
+argument binding before interpreting the body.
 
 === Others
 
@@ -3016,7 +3016,7 @@ This section is
 colored red to remind you that the solution it presents
 is *incorrect*. The correct solution is given in
 the [next section, on closures](#Closures). The code for
-the incorrect soluiton mentioned here is in the
+the incorrect solution mentioned here is in the
 [Incorrect Functions zip](./packages/IncorrectFunctions.zip) file.
 
 To try this approach, function expressions
@@ -3153,7 +3153,6 @@ function is computed by calling |evaluate fun env| rather than
 now only have one argument, while we allowed multiple arguments
 in the previous case.
 
-The key question is: **why doesn't the code given above work?**
 There are two problems. One has to do with returning functions
 as values, and the other with passing functions as arguments.
 They both involve the handling of free variables in the
@@ -3391,9 +3390,9 @@ Here is the Environment/Closure Tree that results from executing this code.
 The idea here is that the bindings created during execution
 have their parent environment implicitly represented by the text:
 A binding |x = v| appears below the environment it extends. If it
-is a local binding or function argument binding, it is indendented.
+is a local binding or function argument binding, it is indented.
 
-Closures have environents, which capture the environment in which
+Closures have environments, which capture the environment in which
 they were created. This is represented by a |CLOSURE| *name*. They key
 point is that calls to this function create invocations below the
 closure. This means that the function call/invoke's environment is the
@@ -3532,7 +3531,7 @@ different design options when it comes to evaluation.
 So far all our interpreters have explored one particular design option, called call-by-value. 
 
 call-by-value
-  ~ In *call-by-value* interpretation, expressions, such as parameters of functions arguments or variable initialisers,
+  ~ In *call-by-value* interpretation, expressions, such as parameters of functions arguments or variable initializers,
     are always evaluated before being added to the environment. 
 
 Here is the code of evaluation for declarations and function application: 
@@ -3598,7 +3597,7 @@ there are also programs where call-by-name is worse than call-by-value. For exam
 In both programs a call-by-name language will evaluate |longcomputation| twice. Since evaluation is
 delayed to the use-point of the expression, the expression bound to |x| is evaluated twice.
 
-In languages like Haskell this drawback is avoided by using an optimisation of call-by-name
+In languages like Haskell this drawback is avoided by using an optimization of call-by-name
 called call-by-need.
 
 call-by-need
@@ -3621,7 +3620,7 @@ evaluates to:
   2) 7 in a call-by-name language.
 
 The reason is that exceptions propagate. Since in call-by-value all expressions arguments
-(or initialisers) are evaluated, the program will raise an exception which is then propagated
+(or initializers) are evaluated, the program will raise an exception which is then propagated
 throughout evaluation. In contrast in call-by-name the expression bound to x is not needed
 to compute the result. Therefore, because that expression is not evaluated, no exception is propagated.
 
@@ -3711,6 +3710,38 @@ Here are suggested changes to your abstract syntax:
 >            | ClosureV Pattern Exp Env -- functions have patterns
 >            | TupleV [Value]           -- tuple value
 >   deriving (Eq, Show)
+
+Here are some notes on special interpretation of singleton tuples/patterns, as in |(x)|.
+
+In the grammar ".y" file:
+
+1)  In the |Primary| case for |'(' Exp ')'| you should change this to |'(' ExpList ')'| 
+    to allow for lists of expressions which should create a |Tuple| in the program.
+    Define |ExpList| as a new rule for lists of expressions.
+    Note that the type of |ExpList| is |[Exp]|, which doesn't
+    match |Exp| as required by |Primary|. You'll have to apply a function to
+    convert it to the right type.
+
+    But special handling is needed for singleton tuples, like |(exp)|. 
+    Based on the change above, this will create |Tuple [exp]|, which is not wanted.
+    That is a tuple with a single expression. It should be interpreted as just the 
+    expression, |exp|. 
+
+    The easiest way to do this is to put a condition that tests if the |ExpList| has 
+    |length 1| and return its single |Exp|, otherwise return it as a tuple.
+    The condition goes into the |{...}| code for that |Primary| rule.
+
+2)  A similar problem happens with |function '(' PatLIst ')'|. You can either 
+    fix that in the grammar or (more easily) in your new function that matches/combines 
+    |Pattern| and |Value| to make environments |Env|. 
+    In that case, you need a add a special case for |TupleP [VarP x]|, 
+    where there is only one variable in a tuple pattern.
+    Its a case where |(exp)| should work that same as |exp| (without parentheses).
+
+3)  As a hint, change the |Declare| rule to be |var Pattern '=' Exp ';' Exp|
+    where |Pattern| is your new rule that parses patterns (either a |VarP| or a |TupleP|).
+    
+4)  I'll leave it as an *optional* challenge to figure out to handle empty lists |()|. 
 
 You must write and include test cases that amply exercise all of the code you've written.
 You can assume that the inputs are valid programs and that your program may raise arbitrary
@@ -3951,7 +3982,7 @@ This requires two traversals. It seems to truly *require* two
 traversals the minimum must be identified before the process
 of replacement can begin.
 
-But lets fuze them anyway:
+But lets fuse them anyway:
 TODO: need to develop this in a few more steps! Here is a
 helper function:
 
@@ -4011,7 +4042,7 @@ and exploring. PLAI uses names like ArithC and ExprC.
 ==== Recursive Definitions in Environment/Closure Trees
 
 For the case of recursive bindings, a special case must be defined
-for a |var| binding that defines a funtion:  
+for a |var| binding that defines a function:  
 
 * Case **Recursive** |var f = function (x) { exp }; body| 
     1. Create a binding |f = C| where |C| is the name of a new closure.
@@ -4022,7 +4053,7 @@ Note that the |CLOSURE| is within scope of the binding, not above it as before.
 
 Here is an example an example that uses this approach.
 
-```javascript
+```JavaScript
 var fact = function(n) {
   if (n == 0)
     1
@@ -4540,7 +4571,7 @@ and mutable state.
 == Error Checking {#ErrorCheckingMonMonadic}
 
 Errors are an important aspect of computation. They
-are typically a pervasive feature of a language, beause they affect
+are typically a pervasive feature of a language, because they affect
 the way that every expression is evaluated. For example,
 the expression |a+b| may not cause any errors,
 but if evaluating |a| or |b| can cause an error,
@@ -5352,7 +5383,7 @@ This *first* corresponds to |evaluate a env| or |evaluate b env| in both the ori
 versions. The *next* represents the remainder of the computation. It is just everything that
 appears after the main pattern, but with all the free variables made explicit.
 For the |Checked| case, the only variable needed in *next* is the
-variable |v| that comes form the |Good| case. For the Stateful case,
+variable |v| that comes form the |Good| case. For the |Stateful| case,
 in addition to |v| the *next* also requires access to |m2| 
 
 These patterns can be made explicit as a special operator named *bind* |BIND| that combines
@@ -5392,7 +5423,7 @@ Using these operators, the *original* code can be written in simpler form:
 
 All mention of |Error| and |Good| have been removed from the |Checked| version!
 The error 'plumbing' has been hidden. Most of the memory plumbing has been removed
-from the Stateful version, but there is still a little at the end. But the pattern
+from the |Stateful| version, but there is still a little at the end. But the pattern
 that has emerged is the same one that was identified in the previous section, where
 the |return|$_S$ function converts a value (the result of |binary op av bv|) into
 a default stateful computation. To see how this works, consider that
@@ -5569,7 +5600,7 @@ generates.
 For a concrete example, if |m| is |Checked| then |e1| must have type |Checked t1|
 for some type |t1|. The value of expression |e1|, which is a |Checked t1|, could be
 a good value or an error. If |e1| produces an error then the
-compututation stops, |x| is never bound to any value, and |e2| is not called.
+computation stops, |x| is never bound to any value, and |e2| is not called.
 But if |e1| produces a good value |v|, then |x| will be bound
 to |v| (which is the value that was labeled |Good|) and the
 computation will proceed with |e2|. 
@@ -5584,7 +5615,7 @@ TODO: mention |let| in |do|, and the case where no variable is used.
 
 The messy evaluators for error checking and mutable state can be rewritten much more
 cleanly using monads. In the format of the previous chapter's comparison of
-Checked and Stateful computations, here they are using monads: 
+|Checked| and |Stateful| computations, here they are using monads: 
 
 +------------------------------+----------------------------+
 | Checked                      | Stateful                   |
@@ -5658,7 +5689,7 @@ a pure function type:
 INCLUDE:Stat8
 > type Stateful t = Memory -> (t, Memory)
 
-To define a monad, Haskell requires a |data| type that labels the function with a constructpr.
+To define a monad, Haskell requires a |data| type that labels the function with a constructor.
 In this case, the constructor is named |ST|: 
 
 INCLUDE:StatefulMonad1
@@ -5670,7 +5701,7 @@ a type with a label.
 The |Stateful| monad is an instance of |Monad|. It is fairly complex,
 mostly because of the need to deal with the type tag. 
 
-It defines |return| to return a value without changing memmory. It does this by
+It defines |return| to return a value without changing memory. It does this by
 returning a |ST| with a function that takes a memory and returns the
 value with the memory unchanged. 
 
@@ -5690,7 +5721,7 @@ INCLUDE:StatefulMonad2
 
 It defines the bind operator |BIND| to take a stateful value |c| and a function |f|.
 It returns a new |Stateful| value that accepts a memory |m|, it then passes this
-memory to |c| and captures the result as a |val| and a new memeory |m'|.
+memory to |c| and captures the result as a |val| and a new memory |m'|.
 It then applies the function |f| to the value |val| and captures the resulting
 |Stateful| value. This function |f'| is applied to the new memory |m'| to
 create the |Stateful| result. 
@@ -5800,7 +5831,7 @@ abstract interpreter
 
 validity
   ~ An abstract interpreter is *valid* if the concrete value result is a member
-    of the set of values of the abstact value evaluation result, for all evaluations. 
+    of the set of values of the abstract value evaluation result, for all evaluations. 
 
 The most common and familiar example of abstract interpretation is
 *type-checking* or *type-inference*. A type-checker analyses a program in
@@ -5864,7 +5895,7 @@ For this language types are represented as:
 > data Type = TInt | TBool
 >    deriving (Eq, Show)
 
-This datatype accounts for the two possible types in the language. 
+This data type accounts for the two possible types in the language. 
 
 Type-checking can fail when the types of subexpressions are incompatible. For example, the expression: 
 
@@ -6029,7 +6060,7 @@ Function types are useful to have function arguments. For example:
 
 is a function that given a function |f| and an integer |x|, applies |f| twice to |x|. 
 
-Type checking a function definition is straighforward, given the argument type as part of the
+Type checking a function definition is straightforward, given the argument type as part of the
 definition. It  type checks the body of the function in a type environment extended with
 a declaration of the argument. 
 
@@ -6083,7 +6114,7 @@ we have been studying.
 
 The main topic of the chapter is how to define and implement *data abstraction*.
 By *data* we mean the information that appears in a program. Data is a
-complex topic, encompasing primitive data, data structures, algebraic data,
+complex topic, encompassing primitive data, data structures, algebraic data,
 abstract data types, objects in object-oriented programming, and databases.
 *Abstraction* is a concept that has appeared in several important places in this book already.
 It was used to describe *function abstraction*, or the definition of reusable
@@ -6099,7 +6130,7 @@ representation of data, which is created and managed by an *implementor*.
 
 There are several benefits
 to having an abstract view of data. The first benefit is that only the essential 
-properties of the data are visible to the prorgrammer -- all non-essential details
+properties of the data are visible to the programmer -- all non-essential details
 are hidden. This allows a programmer to focus on what is important, and
 ignore implementation details. A second benefit is that the implementation of 
 the data can be changed, for example to be more reliable, smaller, or more efficient, without
@@ -6124,7 +6155,7 @@ They include integers, floating point numbers, booleans, and strings.
 Languages like Algol, FORTRAN, COBOL, and Lisp were defined with these primitives.
 Primitives sometimes included date/times, fixed-point numbers, and complex numbers.
 Early languages also had built in *data structures*, like records, arrays, unions, hash tables, 
-and lists. These languages supoorted *user-defined data types* that were constructed
+and lists. These languages supported *user-defined data types* that were constructed
 using these primitive data structuring mechanisms.
 
 However, the fact that primitives were different from user-defined data types began to be an issue.
@@ -6155,7 +6186,7 @@ val phase     : complex -> real
 val toString  : complex -> string
 ````
 
-There are two primary forms of data absraction: Abstract Data Types (ADTs) and Objects (OO).
+There are two primary forms of data abstraction: Abstract Data Types (ADTs) and Objects (OO).
 Primitive data is usually a form of abstract data type. Most object languages 
 
 
@@ -6183,7 +6214,7 @@ each type of primitive data.
 
 = More Chapters on the way...
 == Data Abstraction: Objects and Abstract Data Types
-== Algebra and Coalgebra
+== Algebra and Co-algebra
 == Partial Evaluation
 == Memory Management
 == Lambda Calculus
@@ -6203,7 +6234,7 @@ each type of primitive data.
 == Small-step semantics
 
 = Additional Topics
-== Algebra and Coalgebra
+== Algebra and Co-algebra
 == Partial Evaluation
 == Memory Management (??)
 == Continuations

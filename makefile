@@ -216,7 +216,7 @@ temp.lhs: anatomy.mkd template.tex
 # convert temp.lhs into Verbatim PDF, coverting various character sequences
 # from fancy format to normal text, so that the verbatim PDF will look more verbatim
 anatomyVerbatim.pdf: temp.lhs packages
-	lhs2TeX --tt temp.lhs \
+	lhs2TeX --verb temp.lhs \
 		| sed "s/\\\\char'31/\\\\char45{}\\\\char62{}/g" \
 		| sed "s|\\\\char'32|/=|g" \
 		| sed "s/\\\\char'10/\\\\char92{}/g" \
