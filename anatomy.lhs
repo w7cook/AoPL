@@ -711,7 +711,7 @@ syntactic category
   ~ The parts of a language are called *syntactic categories*.
     For example, in English there are many different parts, including
     *verb*, *noun*, *gerund*, *prepositional phrase*,
-    *declarative sentence*, etc. In software langauges, example syntactic
+    *declarative sentence*, etc. In software languages, example syntactic
     categories include *expressions*, *terms, *functions*, *types*,
     or *classes*.
 
